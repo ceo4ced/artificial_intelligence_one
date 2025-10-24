@@ -1,701 +1,341 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Tree Search Visualizer - Enhanced</title>
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:Arial,sans-serif;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);padding:20px;min-height:100vh}
-.container{max-width:1600px;margin:0 auto;background:#fff;border-radius:15px;padding:30px;box-shadow:0 20px 60px rgba(0,0,0,0.3)}
-h1{text-align:center;color:#333;margin-bottom:10px;font-size:2.5em}
-.subtitle{text-align:center;color:#666;margin-bottom:30px}
-.inst{background:#e8f5e9;padding:20px;border-radius:10px;margin-bottom:25px;border-left:5px solid #4CAF50}
-.inst h3{color:#2e7d32;margin-bottom:10px}
-.inst ul{list-style-position:inside;color:#1b5e20;line-height:1.8}
-.main{display:grid;grid-template-columns:320px 1fr;gap:30px;margin-bottom:30px}
-.sidebar{background:#f8f9fa;padding:20px;border-radius:10px;height:fit-content}
-.sidebar h3{color:#333;margin-bottom:15px}
-.cs{margin-bottom:20px}
-.cs label{display:block;margin-bottom:8px;font-weight:600;color:#555}
-select,input{width:100%;padding:10px;border:2px solid #ddd;border-radius:6px;font-size:14px;margin-bottom:10px}
-button{width:100%;padding:12px;font-size:14px;border:none;border-radius:8px;cursor:pointer;font-weight:600;transition:all 0.3s;box-shadow:0 2px 5px rgba(0,0,0,0.1);margin-bottom:10px}
-button:hover{transform:translateY(-2px);box-shadow:0 4px 10px rgba(0,0,0,0.2)}
-.bp{background:#4CAF50;color:#fff}.bp:hover{background:#45a049}
-.bs{background:#2196F3;color:#fff}.bs:hover{background:#0b7dda}
-.bd{background:#f44336;color:#fff}.bd:hover{background:#da190b}
-.bw{background:#ff9800;color:#fff}.bw:hover{background:#e68900}
-.can{background:#fff;border-radius:10px;box-shadow:0 4px 15px rgba(0,0,0,0.1);position:relative}
-#tc{display:block;cursor:crosshair}
-.leg{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:15px;margin:25px 0}
-.li{display:flex;align-items:center;gap:10px;font-weight:600;color:#555;font-size:0.9em}
-.lc{width:25px;height:25px;border-radius:50%;border:3px solid #333;flex-shrink:0}
-.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:20px;margin-top:30px}
-.sc{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#fff;padding:20px;border-radius:10px}
-.sc h3{font-size:1.2em;margin-bottom:15px;border-bottom:2px solid rgba(255,255,255,0.3);padding-bottom:10px}
-.si{display:flex;justify-content:space-between;margin:8px 0}
-.sv{font-weight:bold;font-size:1.1em}
-.st{text-align:center;font-size:1.2em;font-weight:bold;margin:20px 0;padding:15px;border-radius:8px;background:#fff3cd;color:#856404;display:none}
-.st.suc{background:#d4edda;color:#155724}
-.st.run{background:#cce5ff;color:#004085}
-.st.err{background:#f8d7da;color:#721c24}
-.spc{display:flex;align-items:center;gap:10px;margin-bottom:15px}
-.spc input{flex:1;margin-bottom:0}
-.mi{background:#e3f2fd;padding:10px;border-radius:6px;margin-bottom:15px;font-size:0.9em;color:#1565c0;font-weight:600;text-align:center}
-.tt{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:15px}
-.tt button{font-size:12px;padding:8px}
-.mode-buttons{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:15px}
-.mode-buttons button{font-size:13px;padding:10px}
-.mode-btn-active{background:#1976D2!important;color:#fff}
-.tooltip{position:absolute;background:rgba(0,0,0,0.8);color:#fff;padding:8px 12px;border-radius:6px;font-size:12px;pointer-events:none;display:none;z-index:1000}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Interactive AI learning tools for exploring search algorithms">
+    <title>AI 1 - Interactive Learning Tools</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 60px 40px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        header p {
+            font-size: 1.3em;
+            opacity: 0.95;
+        }
+
+        .intro {
+            padding: 40px;
+            background: #f8f9fa;
+            border-bottom: 3px solid #e9ecef;
+        }
+
+        .intro h2 {
+            color: #2d3748;
+            margin-bottom: 15px;
+            font-size: 2em;
+        }
+
+        .intro p {
+            font-size: 1.1em;
+            color: #4a5568;
+            margin-bottom: 10px;
+        }
+
+        .tools-section {
+            padding: 50px 40px;
+        }
+
+        .tools-section h2 {
+            text-align: center;
+            font-size: 2.5em;
+            color: #2d3748;
+            margin-bottom: 40px;
+        }
+
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .tool-card {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 30px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+        }
+
+        .tool-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+            border-color: #667eea;
+        }
+
+        .tool-icon {
+            font-size: 4em;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .tool-card h3 {
+            color: #2d3748;
+            font-size: 1.8em;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .tool-card p {
+            color: #4a5568;
+            margin-bottom: 20px;
+            font-size: 1.05em;
+            text-align: center;
+        }
+
+        .features {
+            list-style: none;
+            margin-bottom: 25px;
+        }
+
+        .features li {
+            padding: 8px 0;
+            padding-left: 30px;
+            position: relative;
+            color: #4a5568;
+        }
+
+        .features li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #48bb78;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .tool-link {
+            display: block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-align: center;
+            padding: 15px 30px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+        }
+
+        .tool-link:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .algorithms-section {
+            background: #f7fafc;
+            padding: 40px;
+            margin-top: 40px;
+        }
+
+        .algorithms-section h3 {
+            color: #2d3748;
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .algorithm-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .algorithm-box {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .algorithm-box h4 {
+            color: #667eea;
+            margin-bottom: 8px;
+            font-size: 1.2em;
+        }
+
+        .algorithm-box p {
+            color: #4a5568;
+            font-size: 0.95em;
+        }
+
+        footer {
+            background: #2d3748;
+            color: white;
+            text-align: center;
+            padding: 30px;
+            font-size: 0.95em;
+        }
+
+        footer p {
+            margin: 5px 0;
+        }
+
+        footer a {
+            color: #90cdf4;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2em;
+            }
+
+            header p {
+                font-size: 1.1em;
+            }
+
+            .tools-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .tool-card {
+                padding: 20px;
+            }
+
+            .algorithm-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 <body>
-<div class="container">
-<h1>🌳 Tree Search Visualizer - Enhanced</h1>
-<p class="subtitle">Build trees and watch search algorithms • Now with delete & improved editing!</p>
-<div class="inst">
-<h3>📚 How to Use:</h3>
-<ul>
-<li><strong>Add Node:</strong> Click on empty canvas space</li>
-<li><strong>Add Edge:</strong> Click "Add Edge" button, then click two nodes</li>
-<li><strong>Bidirectional Edges:</strong> Create edges in both directions for cycles - they'll curve automatically!</li>
-<li><strong>Delete Node/Edge:</strong> Click "Delete" button, then click node or edge</li>
-<li><strong>Set Goal:</strong> Click "Set Goal" button, then click a node</li>
-<li><strong>Edit Node:</strong> Double-click a node to edit label and heuristic</li>
-<li><strong>Edit Edge:</strong> Double-click an edge to edit cost</li>
-<li><strong>Keyboard shortcuts:</strong> A (add edge), D (delete), G (set goal), Esc (cancel mode)</li>
-</ul>
-</div>
-<div class="main">
-<div class="sidebar">
-<h3>🎮 Controls</h3>
-<div class="mi" id="mi">Mode: Add Nodes</div>
-<div class="mode-buttons">
-<button class="bs mode-btn-active" id="btnAddNode" onclick="setMode('add')">➕ Add Node</button>
-<button class="bs" id="btnAddEdge" onclick="setMode('edge')">🔗 Add Edge (A)</button>
-<button class="bw" id="btnSetGoal" onclick="setMode('goal')">🎯 Set Goal (G)</button>
-<button class="bd" id="btnDelete" onclick="setMode('delete')">🗑 Delete (D)</button>
-</div>
-<div class="cs">
-<label>Algorithm:</label>
-<select id="algo">
-<option value="bfs">Breadth-First Search (BFS)</option>
-<option value="dfs">Depth-First Search (DFS)</option>
-<option value="ucs">Uniform Cost Search (UCS)</option>
-<option value="astar">A* Search</option>
-<option value="greedy">Greedy Best-First</option>
-<option value="iddfs">Iterative Deepening DFS</option>
-</select>
-</div>
-<div class="cs">
-<label>Speed:</label>
-<div class="spc">
-<input type="range" id="spd" min="50" max="2000" value="600">
-<span id="sv">600ms</span>
-</div>
-</div>
-<button class="bp" onclick="runSearch()">▶ Run Algorithm</button>
-<button class="bs" onclick="resetVis()">🔄 Reset Visualization</button>
-<button class="bd" onclick="clearTree()">🗑 Clear All</button>
-<div class="cs">
-<label>Templates:</label>
-<div class="tt">
-<button class="bs" onclick="loadBal()">Balanced</button>
-<button class="bs" onclick="loadSkew()">Skewed</button>
-<button class="bs" onclick="loadComp()">Complex</button>
-<button class="bs" onclick="loadWt()">Weighted</button>
-<button class="bs" onclick="loadCycle()">Cycles</button>
-</div>
-</div>
-<div class="cs">
-<h3>📝 Node Info</h3>
-<div id="ni" style="font-size:0.9em;color:#666">Click a node for details</div>
-</div>
-<div class="cs">
-<h3>⚙️ Settings</h3>
-<label style="display:flex;align-items:center;gap:8px;cursor:pointer">
-<input type="checkbox" id="showLabels" checked onchange="draw()">
-Show node labels
-</label>
-<label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-top:8px">
-<input type="checkbox" id="showHeuristics" checked onchange="draw()">
-Show heuristics
-</label>
-</div>
-</div>
-<div class="can">
-<canvas id="tc" width="1200" height="700"></canvas>
-<div id="tooltip" class="tooltip"></div>
-</div>
-</div>
-<div class="leg">
-<div class="li"><div class="lc" style="background:#4CAF50"></div><span>Root (Start)</span></div>
-<div class="li"><div class="lc" style="background:#f44336"></div><span>Goal</span></div>
-<div class="li"><div class="lc" style="background:#ff9800"></div><span>Current</span></div>
-<div class="li"><div class="lc" style="background:#2196F3"></div><span>Visited</span></div>
-<div class="li"><div class="lc" style="background:#ffd54f"></div><span>Path</span></div>
-<div class="li"><div class="lc" style="background:#fff"></div><span>Unvisited</span></div>
-</div>
-<div id="status" class="st"></div>
-<div class="stats" id="stats"></div>
-</div>
-<script>
-const c=document.getElementById('tc'),ctx=c.getContext('2d');
-let nodes=[],edges=[],root=null,goal=null,sel=null,run=false,nid=0;
-let mode='add',edgeStart=null;
-const R=25,COL={def:'#fff',root:'#4CAF50',goal:'#f44336',cur:'#ff9800',vis:'#2196F3',path:'#ffd54f',bor:'#333',txt:'#000'};
+    <div class="container">
+        <header>
+            <h1>🤖 AI 1 - Interactive Learning Tools</h1>
+            <p>Explore search algorithms through hands-on visualization</p>
+        </header>
 
-// Algorithm registry for easy extension
-const algorithms = {
-  bfs: { name: 'Breadth-First Search', fn: bfs, description: 'Explores level by level' },
-  dfs: { name: 'Depth-First Search', fn: dfs, description: 'Explores depth first' },
-  ucs: { name: 'Uniform Cost Search', fn: ucs, description: 'Lowest cost first' },
-  astar: { name: 'A* Search', fn: astar, description: 'Best of UCS + heuristic' },
-  greedy: { name: 'Greedy Best-First', fn: greedy, description: 'Follows heuristic only' },
-  iddfs: { name: 'Iterative Deepening DFS', fn: iddfs, description: 'DFS with depth limits' }
-};
+        <div class="intro">
+            <h2>Welcome to AI Class!</h2>
+            <p>
+                Learn artificial intelligence concepts by interacting with real algorithms. 
+                These tools help you visualize how computers solve problems and find paths.
+            </p>
+            <p>
+                Perfect for understanding search algorithms, graph theory, and pathfinding - 
+                core concepts in AI, game development, robotics, and computer science.
+            </p>
+        </div>
 
-class Node{
-  constructor(x,y,l){
-    this.id=nid++;this.x=x;this.y=y;this.label=l;this.h=0;this.color=COL.def;this.children=[]
-  }
-  draw(hl=false){
-    ctx.beginPath();ctx.arc(this.x,this.y,R,0,Math.PI*2);ctx.fillStyle=this.color;ctx.fill();
-    ctx.strokeStyle=hl?'#FF1744':COL.bor;ctx.lineWidth=hl?4:3;ctx.stroke();
-    if(document.getElementById('showLabels').checked){
-      ctx.fillStyle=COL.txt;ctx.font='bold 16px Arial';ctx.textAlign='center';ctx.textBaseline='middle';
-      ctx.fillText(this.label,this.x,this.y);
-    }
-    if(this.h>0&&document.getElementById('showHeuristics').checked){
-      ctx.font='12px Arial';ctx.fillStyle='#666';ctx.fillText(`h=${this.h}`,this.x,this.y+R+15);
-    }
-  }
-  contains(x,y){const dx=x-this.x,dy=y-this.y;return dx*dx+dy*dy<=R*R}
-}
+        <div class="tools-section">
+            <h2>🛠 Interactive Tools</h2>
+            
+            <div class="tools-grid">
+                <div class="tool-card">
+                    <div class="tool-icon">🌳</div>
+                    <h3>Tree Search Visualizer</h3>
+                    <p>Build custom trees and watch algorithms explore them step-by-step</p>
+                    
+                    <ul class="features">
+                        <li>Create your own tree structures</li>
+                        <li>Add costs and heuristics to edges</li>
+                        <li>Visualize BFS, DFS, UCS, A*, and more</li>
+                        <li>Handle cycles with curved edges</li>
+                        <li>Compare algorithm performance</li>
+                    </ul>
+                    
+                    <a href="pathing/index.html" class="tool-link">Launch Tree Visualizer →</a>
+                </div>
 
-class Edge{
-  constructor(f,t,co=1){
-    this.from=f;this.to=t;this.cost=co;this.color='#333';this.width=2;this.id=`${f.id}-${t.id}`;
-  }
-  
-  // Check if there's a reverse edge (for curved drawing)
-  hasReverseEdge(){
-    return edges.some(e=>e.from===this.to&&e.to===this.from&&e!==this);
-  }
-  
-  draw(hl=false){
-    const curved=this.hasReverseEdge();
-    
-    if(curved){
-      this.drawCurved(hl);
-    }else{
-      this.drawStraight(hl);
-    }
-  }
-  
-  drawStraight(hl=false){
-    const ang=Math.atan2(this.to.y-this.from.y,this.to.x-this.from.x);
-    const sx=this.from.x+R*Math.cos(ang),sy=this.from.y+R*Math.sin(ang);
-    const ex=this.to.x-R*Math.cos(ang),ey=this.to.y-R*Math.sin(ang);
-    ctx.beginPath();ctx.moveTo(sx,sy);ctx.lineTo(ex,ey);
-    ctx.strokeStyle=hl?'#FF1744':this.color;ctx.lineWidth=hl?5:this.width;ctx.stroke();
-    
-    // Draw arrowhead
-    const a=10;ctx.beginPath();ctx.moveTo(ex,ey);
-    ctx.lineTo(ex-a*Math.cos(ang-Math.PI/6),ey-a*Math.sin(ang-Math.PI/6));
-    ctx.lineTo(ex-a*Math.cos(ang+Math.PI/6),ey-a*Math.sin(ang+Math.PI/6));
-    ctx.closePath();ctx.fillStyle=hl?'#FF1744':this.color;ctx.fill();
-    
-    // Draw cost label ON the line
-    if(this.cost!==1){
-      const mx=(sx+ex)/2,my=(sy+ey)/2;
-      // Draw background box
-      ctx.fillStyle='#fff';
-      ctx.strokeStyle='#333';
-      ctx.lineWidth=1;
-      const boxWidth=28,boxHeight=20;
-      ctx.fillRect(mx-boxWidth/2,my-boxHeight/2,boxWidth,boxHeight);
-      ctx.strokeRect(mx-boxWidth/2,my-boxHeight/2,boxWidth,boxHeight);
-      // Draw cost text
-      ctx.fillStyle='#d32f2f';ctx.font='bold 13px Arial';ctx.textAlign='center';ctx.textBaseline='middle';
-      ctx.fillText(this.cost,mx,my);
-    }
-  }
-  
-  drawCurved(hl=false){
-    // Calculate control point for quadratic curve (bow shape)
-    const dx=this.to.x-this.from.x;
-    const dy=this.to.y-this.from.y;
-    const dist=Math.sqrt(dx*dx+dy*dy);
-    
-    // Perpendicular offset for curve (bow height)
-    const offset=dist*0.25;
-    const perpX=-dy/dist;
-    const perpY=dx/dist;
-    
-    // Control point (midpoint + perpendicular offset)
-    const cpx=(this.from.x+this.to.x)/2+perpX*offset;
-    const cpy=(this.from.y+this.to.y)/2+perpY*offset;
-    
-    // Calculate start and end points on circle perimeters
-    const angStart=Math.atan2(cpy-this.from.y,cpx-this.from.x);
-    const angEnd=Math.atan2(this.to.y-cpy,this.to.x-cpx);
-    
-    const sx=this.from.x+R*Math.cos(angStart);
-    const sy=this.from.y+R*Math.sin(angStart);
-    const ex=this.to.x-R*Math.cos(angEnd);
-    const ey=this.to.y-R*Math.sin(angEnd);
-    
-    // Draw curved path
-    ctx.beginPath();
-    ctx.moveTo(sx,sy);
-    ctx.quadraticCurveTo(cpx,cpy,ex,ey);
-    ctx.strokeStyle=hl?'#FF1744':this.color;
-    ctx.lineWidth=hl?5:this.width;
-    ctx.stroke();
-    
-    // Draw arrowhead at end
-    const t=0.99; // Point near end for arrow angle
-    const beforeX=Math.pow(1-t,2)*sx+2*(1-t)*t*cpx+Math.pow(t,2)*ex;
-    const beforeY=Math.pow(1-t,2)*sy+2*(1-t)*t*cpy+Math.pow(t,2)*ey;
-    const arrowAng=Math.atan2(ey-beforeY,ex-beforeX);
-    
-    const a=10;
-    ctx.beginPath();
-    ctx.moveTo(ex,ey);
-    ctx.lineTo(ex-a*Math.cos(arrowAng-Math.PI/6),ey-a*Math.sin(arrowAng-Math.PI/6));
-    ctx.lineTo(ex-a*Math.cos(arrowAng+Math.PI/6),ey-a*Math.sin(arrowAng+Math.PI/6));
-    ctx.closePath();
-    ctx.fillStyle=hl?'#FF1744':this.color;
-    ctx.fill();
-    
-    // Draw cost label ON the curve at t=0.5 (midpoint)
-    if(this.cost!==1){
-      const t=0.5;
-      const labelX=Math.pow(1-t,2)*sx+2*(1-t)*t*cpx+Math.pow(t,2)*ex;
-      const labelY=Math.pow(1-t,2)*sy+2*(1-t)*t*cpy+Math.pow(t,2)*ey;
-      
-      // Draw background box
-      ctx.fillStyle='#fff';
-      ctx.strokeStyle='#333';
-      ctx.lineWidth=1;
-      const boxWidth=28,boxHeight=20;
-      ctx.fillRect(labelX-boxWidth/2,labelY-boxHeight/2,boxWidth,boxHeight);
-      ctx.strokeRect(labelX-boxWidth/2,labelY-boxHeight/2,boxWidth,boxHeight);
-      // Draw cost text
-      ctx.fillStyle='#d32f2f';
-      ctx.font='bold 13px Arial';
-      ctx.textAlign='center';
-      ctx.textBaseline='middle';
-      ctx.fillText(this.cost,labelX,labelY);
-    }
-  }
-  
-  distanceToPoint(x,y){
-    const curved=this.hasReverseEdge();
-    
-    if(curved){
-      return this.distanceToCurve(x,y);
-    }else{
-      return this.distanceToStraight(x,y);
-    }
-  }
-  
-  distanceToStraight(x,y){
-    const A=this.from.x,B=this.from.y,C=this.to.x,D=this.to.y;
-    const dx=C-A,dy=D-B;const len=Math.sqrt(dx*dx+dy*dy);
-    if(len===0)return Math.sqrt((x-A)*(x-A)+(y-B)*(y-B));
-    const t=Math.max(0,Math.min(1,((x-A)*dx+(y-B)*dy)/(len*len)));
-    const px=A+t*dx,py=B+t*dy;
-    return Math.sqrt((x-px)*(x-px)+(y-py)*(y-py));
-  }
-  
-  distanceToCurve(x,y){
-    // Sample points along the quadratic curve
-    const dx=this.to.x-this.from.x;
-    const dy=this.to.y-this.from.y;
-    const dist=Math.sqrt(dx*dx+dy*dy);
-    const offset=dist*0.25;
-    const perpX=-dy/dist;
-    const perpY=dx/dist;
-    const cpx=(this.from.x+this.to.x)/2+perpX*offset;
-    const cpy=(this.from.y+this.to.y)/2+perpY*offset;
-    
-    let minDist=Infinity;
-    for(let t=0;t<=1;t+=0.05){
-      const px=Math.pow(1-t,2)*this.from.x+2*(1-t)*t*cpx+Math.pow(t,2)*this.to.x;
-      const py=Math.pow(1-t,2)*this.from.y+2*(1-t)*t*cpy+Math.pow(t,2)*this.to.y;
-      const d=Math.sqrt((x-px)*(x-px)+(y-py)*(y-py));
-      if(d<minDist)minDist=d;
-    }
-    return minDist;
-  }
-  
-  contains(x,y){return this.distanceToPoint(x,y)<12}
-}
+                <div class="tool-card">
+                    <div class="tool-icon">🎯</div>
+                    <h3>Maze Pathfinder</h3>
+                    <p>Draw mazes and discover how algorithms find the shortest path</p>
+                    
+                    <ul class="features">
+                        <li>Interactive grid-based maze creation</li>
+                        <li>Draw walls by clicking and dragging</li>
+                        <li>Watch algorithms explore in real-time</li>
+                        <li>Random maze generator included</li>
+                        <li>Adjustable animation speed</li>
+                    </ul>
+                    
+                    <a href="pathing/maze/index.html" class="tool-link">Launch Maze Pathfinder →</a>
+                </div>
+            </div>
 
-function draw(){
-  ctx.clearRect(0,0,c.width,c.height);
-  edges.forEach(e=>e.draw(false));
-  nodes.forEach(n=>n.draw(n===sel));
-}
+            <div class="algorithms-section">
+                <h3>📚 Algorithms You'll Explore</h3>
+                <div class="algorithm-grid">
+                    <div class="algorithm-box">
+                        <h4>Breadth-First Search (BFS)</h4>
+                        <p>Explores all neighbors at the current depth before going deeper. Guarantees shortest path in unweighted graphs.</p>
+                    </div>
 
-function setMode(m){
-  if(run)return;
-  mode=m;edgeStart=null;sel=null;
-  document.querySelectorAll('.mode-buttons button').forEach(b=>b.classList.remove('mode-btn-active'));
-  const modeTexts={add:'Add Nodes',edge:'Add Edge (click 2 nodes)',delete:'Delete Mode',goal:'Set Goal'};
-  const btnIds={add:'btnAddNode',edge:'btnAddEdge',delete:'btnDelete',goal:'btnSetGoal'};
-  if(btnIds[m])document.getElementById(btnIds[m]).classList.add('mode-btn-active');
-  updMI(modeTexts[m]||'Unknown Mode');
-  draw();
-}
+                    <div class="algorithm-box">
+                        <h4>Depth-First Search (DFS)</h4>
+                        <p>Goes as deep as possible down one path before backtracking. Fast but doesn't guarantee shortest path.</p>
+                    </div>
 
-c.addEventListener('click',e=>{
-  if(run)return;
-  const r=c.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top;
-  const cn=nodes.find(n=>n.contains(x,y));
-  const ce=edges.find(ed=>ed.contains(x,y));
-  
-  if(mode==='add'){
-    if(!cn){
-      const l=String.fromCharCode(65+nodes.length%26);
-      const n=new Node(x,y,l);nodes.push(n);
-      if(nodes.length===1){root=n;n.color=COL.root}
-      sel=n;updNI(n);
-    }else{sel=cn;updNI(cn)}
-  }else if(mode==='edge'){
-    if(cn){
-      if(!edgeStart){edgeStart=cn;sel=cn;updMI(`Add Edge: ${cn.label} → ?`)}
-      else if(edgeStart!==cn){
-        const cs=prompt(`Cost from ${edgeStart.label} to ${cn.label}:`,'1');
-        if(cs!==null){
-          const co=parseInt(cs)||1;
-          edges.push(new Edge(edgeStart,cn,co));
-          edgeStart.children.push(cn);
-          showSt(`Edge ${edgeStart.label}→${cn.label} added`,'suc');
-          setTimeout(hideSt,2000);
-        }
-        edgeStart=null;sel=null;updMI('Add Edge (click 2 nodes)');
-      }
-    }
-  }else if(mode==='delete'){
-    if(cn){deleteNode(cn)}else if(ce){deleteEdge(ce)}
-  }else if(mode==='goal'){
-    if(cn){
-      if(goal)goal.color=(goal===root)?COL.root:COL.def;
-      goal=cn;goal.color=COL.goal;
-      const hs=prompt(`Heuristic h(${cn.label}) for A*:`,'0');
-      if(hs!==null)cn.h=parseInt(hs)||0;
-      showSt(`Goal set: ${cn.label}`,'suc');
-      setTimeout(hideSt,2000);
-      setMode('add');
-    }
-  }
-  draw();
-});
+                    <div class="algorithm-box">
+                        <h4>Uniform Cost Search (UCS)</h4>
+                        <p>Always expands the lowest-cost path first. Finds optimal path in weighted graphs.</p>
+                    </div>
 
-c.addEventListener('dblclick',e=>{
-  if(run)return;
-  const r=c.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top;
-  const cn=nodes.find(n=>n.contains(x,y));
-  const ce=edges.find(ed=>ed.contains(x,y));
-  if(cn){
-    const nl=prompt(`Edit label for node:`,cn.label);
-    if(nl&&nl.trim())cn.label=nl.trim();
-    const nh=prompt(`Edit heuristic h(${cn.label}):`,cn.h);
-    if(nh!==null)cn.h=parseInt(nh)||0;
-    updNI(cn);draw();
-  }else if(ce){
-    const nc=prompt(`Edit cost for edge ${ce.from.label}→${ce.to.label}:`,ce.cost);
-    if(nc!==null){ce.cost=parseInt(nc)||1;draw()}
-  }
-});
+                    <div class="algorithm-box">
+                        <h4>A* Search</h4>
+                        <p>Uses both actual cost and estimated distance to goal. Most efficient informed search algorithm.</p>
+                    </div>
 
-c.addEventListener('mousemove',e=>{
-  if(run)return;
-  const r=c.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top;
-  const cn=nodes.find(n=>n.contains(x,y));
-  const ce=edges.find(ed=>ed.contains(x,y));
-  const tt=document.getElementById('tooltip');
-  if(cn){
-    tt.textContent=`${cn.label} (h=${cn.h})`;
-    tt.style.left=(e.clientX+15)+'px';tt.style.top=(e.clientY+15)+'px';
-    tt.style.display='block';
-  }else if(ce){
-    tt.textContent=`${ce.from.label}→${ce.to.label} (cost=${ce.cost})`;
-    tt.style.left=(e.clientX+15)+'px';tt.style.top=(e.clientY+15)+'px';
-    tt.style.display='block';
-  }else{tt.style.display='none'}
-});
+                    <div class="algorithm-box">
+                        <h4>Greedy Best-First</h4>
+                        <p>Only considers estimated distance to goal. Fast but not always optimal.</p>
+                    </div>
 
-document.addEventListener('keydown',e=>{
-  if(run)return;
-  if(e.key==='a'||e.key==='A')setMode('edge');
-  else if(e.key==='d'||e.key==='D')setMode('delete');
-  else if(e.key==='g'||e.key==='G')setMode('goal');
-  else if(e.key==='Escape')setMode('add');
-});
+                    <div class="algorithm-box">
+                        <h4>Iterative Deepening DFS</h4>
+                        <p>Combines benefits of BFS and DFS. Memory efficient with guaranteed shortest path.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-function deleteNode(n){
-  if(n===root){alert('Cannot delete root node!');return}
-  nodes=nodes.filter(nd=>nd!==n);
-  edges=edges.filter(e=>e.from!==n&&e.to!==n);
-  nodes.forEach(nd=>nd.children=nd.children.filter(c=>c!==n));
-  if(goal===n){goal=null}
-  sel=null;updMI('Delete Mode');
-  document.getElementById('ni').innerHTML='Click a node for details';
-  showSt(`Node ${n.label} deleted`,'suc');
-  setTimeout(hideSt,2000);
-}
-
-function deleteEdge(e){
-  edges=edges.filter(ed=>ed!==e);
-  e.from.children=e.from.children.filter(c=>c!==e.to);
-  showSt(`Edge ${e.from.label}→${e.to.label} deleted`,'suc');
-  setTimeout(hideSt,2000);
-}
-
-function updMI(t){document.getElementById('mi').textContent=`Mode: ${t}`}
-function updNI(n){
-  const chi=n.children.map(c=>c.label).join(', ')||'None';
-  const par=nodes.filter(nd=>nd.children.includes(n)).map(p=>p.label).join(', ')||'None';
-  document.getElementById('ni').innerHTML=`<strong>${n.label}</strong><br>h=${n.h}<br>Children: ${chi}<br>Parents: ${par}`;
-}
-function showSt(m,t='run'){const s=document.getElementById('status');s.textContent=m;s.className='st '+t;s.style.display='block'}
-function hideSt(){document.getElementById('status').style.display='none'}
-function getSpd(){return parseInt(document.getElementById('spd').value)}
-document.getElementById('spd').addEventListener('input',function(){document.getElementById('sv').textContent=this.value+'ms'});
-function sleep(ms){return new Promise(r=>setTimeout(r,ms))}
-
-function resetVis(){
-  if(run)return;
-  nodes.forEach(n=>{if(n===root)n.color=COL.root;else if(n===goal)n.color=COL.goal;else n.color=COL.def});
-  edges.forEach(e=>{e.color='#333';e.width=2});
-  draw();document.getElementById('stats').innerHTML='';hideSt();
-}
-
-function clearTree(){
-  if(run)return;
-  if(nodes.length>0&&!confirm('Clear all nodes and edges?'))return;
-  nodes=[];edges=[];root=null;goal=null;sel=null;nid=0;edgeStart=null;draw();
-  document.getElementById('stats').innerHTML='';document.getElementById('ni').innerHTML='Click a node for details';
-  hideSt();updMI('Add Nodes');setMode('add');
-}
-
-async function hilite(n,co){n.color=co;draw();await sleep(getSpd())}
-async function hpath(p){
-  for(let i=0;i<p.length-1;i++){
-    const f=p[i],t=p[i+1];
-    const e=edges.find(e=>e.from===f&&e.to===t);
-    if(e){e.color=COL.path;e.width=4}
-    if(f!==root)f.color=COL.path;
-    draw();await sleep(getSpd()/2);
-  }
-  if(p.length>0&&p[p.length-1]!==goal){p[p.length-1].color=COL.path;draw()}
-}
-
-// Core algorithm implementations
-async function bfs(){
-  if(!root||!goal){showSt('Set root and goal!','err');return null}
-  const q=[{node:root,path:[root]}],vis=new Set([root.id]);let ne=0;const st=Date.now();
-  while(q.length>0){
-    const{node,path}=q.shift();ne++;await hilite(node,COL.cur);
-    if(node===goal){const et=Date.now();await hpath(path);return{success:true,nodesExplored:ne,pathLength:path.length,time:et-st,path}}
-    if(node!==root&&node!==goal)node.color=COL.vis;draw();
-    for(const ch of node.children){if(!vis.has(ch.id)){vis.add(ch.id);q.push({node:ch,path:[...path,ch]})}}
-  }
-  return{success:false,nodesExplored:ne,pathLength:0,time:Date.now()-st}
-}
-
-async function dfs(){
-  if(!root||!goal){showSt('Set root and goal!','err');return null}
-  const stk=[{node:root,path:[root]}],vis=new Set([root.id]);let ne=0;const st=Date.now();
-  while(stk.length>0){
-    const{node,path}=stk.pop();ne++;await hilite(node,COL.cur);
-    if(node===goal){const et=Date.now();await hpath(path);return{success:true,nodesExplored:ne,pathLength:path.length,time:et-st,path}}
-    if(node!==root&&node!==goal)node.color=COL.vis;draw();
-    const chs=[...node.children].reverse();
-    for(const ch of chs){if(!vis.has(ch.id)){vis.add(ch.id);stk.push({node:ch,path:[...path,ch]})}}
-  }
-  return{success:false,nodesExplored:ne,pathLength:0,time:Date.now()-st}
-}
-
-async function ucs(){
-  if(!root||!goal){showSt('Set root and goal!','err');return null}
-  const pq=[{node:root,cost:0,path:[root]}],vis=new Set();let ne=0;const st=Date.now();
-  while(pq.length>0){
-    pq.sort((a,b)=>a.cost-b.cost);const{node,cost,path}=pq.shift();
-    if(vis.has(node.id))continue;vis.add(node.id);ne++;await hilite(node,COL.cur);
-    if(node===goal){const et=Date.now();await hpath(path);return{success:true,nodesExplored:ne,pathLength:path.length,pathCost:cost,time:et-st,path}}
-    if(node!==root&&node!==goal)node.color=COL.vis;draw();
-    for(const ch of node.children){
-      if(!vis.has(ch.id)){
-        const e=edges.find(e=>e.from===node&&e.to===ch);
-        const ec=e?e.cost:1;pq.push({node:ch,cost:cost+ec,path:[...path,ch]})
-      }
-    }
-  }
-  return{success:false,nodesExplored:ne,pathLength:0,pathCost:0,time:Date.now()-st}
-}
-
-async function astar(){
-  if(!root||!goal){showSt('Set root and goal!','err');return null}
-  const pq=[{node:root,g:0,f:root.h,path:[root]}],vis=new Set();let ne=0;const st=Date.now();
-  while(pq.length>0){
-    pq.sort((a,b)=>a.f-b.f);const{node,g,path}=pq.shift();
-    if(vis.has(node.id))continue;vis.add(node.id);ne++;await hilite(node,COL.cur);
-    if(node===goal){const et=Date.now();await hpath(path);return{success:true,nodesExplored:ne,pathLength:path.length,pathCost:g,time:et-st,path}}
-    if(node!==root&&node!==goal)node.color=COL.vis;draw();
-    for(const ch of node.children){
-      if(!vis.has(ch.id)){
-        const e=edges.find(e=>e.from===node&&e.to===ch);
-        const ec=e?e.cost:1;const ng=g+ec;const h=ch.h;
-        pq.push({node:ch,g:ng,f:ng+h,path:[...path,ch]})
-      }
-    }
-  }
-  return{success:false,nodesExplored:ne,pathLength:0,pathCost:0,time:Date.now()-st}
-}
-
-async function greedy(){
-  if(!root||!goal){showSt('Set root and goal!','err');return null}
-  const pq=[{node:root,h:root.h,path:[root]}],vis=new Set();let ne=0;const st=Date.now();
-  while(pq.length>0){
-    pq.sort((a,b)=>a.h-b.h);const{node,path}=pq.shift();
-    if(vis.has(node.id))continue;vis.add(node.id);ne++;await hilite(node,COL.cur);
-    if(node===goal){const et=Date.now();await hpath(path);return{success:true,nodesExplored:ne,pathLength:path.length,time:et-st,path}}
-    if(node!==root&&node!==goal)node.color=COL.vis;draw();
-    for(const ch of node.children){
-      if(!vis.has(ch.id)){pq.push({node:ch,h:ch.h,path:[...path,ch]})}
-    }
-  }
-  return{success:false,nodesExplored:ne,pathLength:0,time:Date.now()-st}
-}
-
-async function dfsLimited(limit,vis,ne,st){
-  const stk=[{node:root,path:[root],depth:0}];
-  while(stk.length>0){
-    const{node,path,depth}=stk.pop();
-    if(vis.current.has(node.id))continue;
-    vis.current.add(node.id);ne.count++;await hilite(node,COL.cur);
-    if(node===goal){return{found:true,path}}
-    if(depth<limit){
-      if(node!==root&&node!==goal)node.color=COL.vis;draw();
-      const chs=[...node.children].reverse();
-      for(const ch of chs){stk.push({node:ch,path:[...path,ch],depth:depth+1})}
-    }
-  }
-  return{found:false}
-}
-
-async function iddfs(){
-  if(!root||!goal){showSt('Set root and goal!','err');return null}
-  const st=Date.now();let ne={count:0};
-  for(let limit=0;limit<50;limit++){
-    resetVis();const vis={current:new Set()};
-    const res=await dfsLimited(limit,vis,ne,st);
-    if(res.found){
-      const et=Date.now();await hpath(res.path);
-      return{success:true,nodesExplored:ne.count,pathLength:res.path.length,depthLimit:limit,time:et-st,path:res.path}
-    }
-  }
-  return{success:false,nodesExplored:ne.count,pathLength:0,time:Date.now()-st}
-}
-
-async function runSearch(){
-  if(run)return;
-  if(!root){showSt('Add nodes first!','err');return}
-  if(!goal){showSt('Set goal node!','err');return}
-  resetVis();run=true;const al=document.getElementById('algo').value;
-  const alg=algorithms[al];showSt(`Running ${alg.name}...`,'run');
-  const res=await alg.fn();
-  if(res){
-    dispSt(al,res);
-    if(res.success){
-      const ps=res.path.map(n=>n.label).join(' → ');
-      showSt(`✓ Path: ${ps}`,'suc');
-    }else{showSt('✗ No path exists','err')}
-  }
-  run=false;
-}
-
-function dispSt(al,res){
-  const sd=document.getElementById('stats');const alg=algorithms[al];
-  let h=`<div class="sc"><h3>${alg.name}</h3>
-  <div class="si"><span>Status:</span><span class="sv">${res.success?'✓ Found':'✗ None'}</span></div>
-  <div class="si"><span>Nodes Explored:</span><span class="sv">${res.nodesExplored}</span></div>
-  <div class="si"><span>Path Length:</span><span class="sv">${res.pathLength}</span></div>`;
-  if(res.pathCost!==undefined)h+=`<div class="si"><span>Path Cost:</span><span class="sv">${res.pathCost}</span></div>`;
-  if(res.depthLimit!==undefined)h+=`<div class="si"><span>Depth Limit:</span><span class="sv">${res.depthLimit}</span></div>`;
-  h+=`<div class="si"><span>Time:</span><span class="sv">${res.time}ms</span></div></div>`;
-  sd.innerHTML=h;
-}
-
-// Template loading functions
-function loadBal(){
-  clearTree();const rn=new Node(600,100,'A'),b=new Node(400,250,'B'),cc=new Node(800,250,'C'),
-  d=new Node(300,400,'D'),e=new Node(500,400,'E'),f=new Node(700,400,'F'),g=new Node(900,400,'G'),
-  h=new Node(250,550,'H'),i=new Node(350,550,'I');nodes=[rn,b,cc,d,e,f,g,h,i];root=rn;rn.color=COL.root;
-  goal=i;i.color=COL.goal;rn.children=[b,cc];b.children=[d,e];cc.children=[f,g];d.children=[h,i];
-  edges=[new Edge(rn,b),new Edge(rn,cc),new Edge(b,d),new Edge(b,e),new Edge(cc,f),new Edge(cc,g),
-  new Edge(d,h),new Edge(d,i)];rn.h=4;b.h=3;cc.h=5;d.h=1;e.h=4;f.h=6;g.h=7;h.h=2;i.h=0;
-  draw();showSt('Balanced tree loaded','suc');setTimeout(hideSt,2000);
-}
-
-function loadSkew(){
-  clearTree();const rn=new Node(600,100,'A'),b=new Node(550,200,'B'),cc=new Node(500,300,'C'),
-  d=new Node(450,400,'D'),e=new Node(400,500,'E'),f=new Node(350,600,'F');nodes=[rn,b,cc,d,e,f];root=rn;
-  rn.color=COL.root;goal=f;f.color=COL.goal;rn.children=[b];b.children=[cc];cc.children=[d];d.children=[e];e.children=[f];
-  edges=[new Edge(rn,b),new Edge(b,cc),new Edge(cc,d),new Edge(d,e),new Edge(e,f)];
-  rn.h=5;b.h=4;cc.h=3;d.h=2;e.h=1;f.h=0;draw();showSt('Skewed tree loaded','suc');setTimeout(hideSt,2000);
-}
-
-function loadComp(){
-  clearTree();const rn=new Node(600,80,'A'),b=new Node(400,180,'B'),cc=new Node(800,180,'C'),
-  d=new Node(300,280,'D'),e=new Node(500,280,'E'),f=new Node(700,280,'F'),g=new Node(900,280,'G'),
-  h=new Node(200,380,'H'),i=new Node(350,380,'I'),j=new Node(450,380,'J'),k=new Node(550,380,'K'),
-  l=new Node(650,380,'L'),m=new Node(750,380,'M'),n=new Node(850,380,'N'),o=new Node(950,380,'O'),
-  p=new Node(400,480,'P'),q=new Node(300,580,'Q');nodes=[rn,b,cc,d,e,f,g,h,i,j,k,l,m,n,o,p,q];
-  root=rn;rn.color=COL.root;goal=q;q.color=COL.goal;rn.children=[b,cc];b.children=[d,e];cc.children=[f,g];
-  d.children=[h,i];e.children=[j,k];f.children=[l,m];g.children=[n,o];i.children=[p];p.children=[q];
-  edges=[new Edge(rn,b),new Edge(rn,cc),new Edge(b,d),new Edge(b,e),new Edge(cc,f),new Edge(cc,g),
-  new Edge(d,h),new Edge(d,i),new Edge(e,j),new Edge(e,k),new Edge(f,l),new Edge(f,m),new Edge(g,n),
-  new Edge(g,o),new Edge(i,p),new Edge(p,q)];rn.h=5;b.h=4;cc.h=7;d.h=3;e.h=5;f.h=8;g.h=9;h.h=4;i.h=2;
-  j.h=6;k.h=6;l.h=9;m.h=9;n.h=10;o.h=10;p.h=1;q.h=0;draw();showSt('Complex tree loaded','suc');setTimeout(hideSt,2000);
-}
-
-function loadWt(){
-  clearTree();const rn=new Node(600,100,'A'),b=new Node(400,250,'B'),cc=new Node(800,250,'C'),
-  d=new Node(300,400,'D'),e=new Node(500,400,'E'),f=new Node(700,400,'F'),g=new Node(900,400,'G'),
-  h=new Node(400,550,'H');nodes=[rn,b,cc,d,e,f,g,h];root=rn;rn.color=COL.root;goal=h;h.color=COL.goal;
-  rn.children=[b,cc];b.children=[d,e];cc.children=[f,g];e.children=[h];
-  edges=[new Edge(rn,b,1),new Edge(rn,cc,5),new Edge(b,d,3),new Edge(b,e,1),new Edge(cc,f,2),new Edge(cc,g,4),new Edge(e,h,1)];
-  rn.h=3;b.h=2;cc.h=6;d.h=5;e.h=1;f.h=7;g.h=8;h.h=0;draw();showSt('Weighted tree loaded','suc');setTimeout(hideSt,3000);
-}
-
-function loadCycle(){
-  clearTree();
-  const rn=new Node(400,200,'A'),b=new Node(600,200,'B'),cc=new Node(700,350,'C'),
-  d=new Node(500,450,'D'),e=new Node(300,350,'E');
-  nodes=[rn,b,cc,d,e];root=rn;rn.color=COL.root;goal=d;d.color=COL.goal;
-  
-  // Create bidirectional edges to show curved arrows
-  rn.children=[b,e];b.children=[rn,cc];cc.children=[d];d.children=[e,cc];e.children=[rn];
-  
-  edges=[
-    new Edge(rn,b,2),new Edge(b,rn,3),  // Bidirectional A<->B
-    new Edge(rn,e,1),new Edge(e,rn,2),  // Bidirectional A<->E
-    new Edge(b,cc,1),
-    new Edge(cc,d,2),new Edge(d,cc,4),  // Bidirectional C<->D
-    new Edge(d,e,1)
-  ];
-  
-  rn.h=3;b.h=2;cc.h=1;d.h=0;e.h=2;
-  draw();showSt('Graph with cycles loaded - See curved edges!','suc');setTimeout(hideSt,3000);
-}
-
-setMode('add');draw();
-</script>
+        <footer>
+            <p><strong>AI 1 - Search Algorithms & Pathfinding</strong></p>
+            <p>Interactive learning tools for high school students (Grades 9-12)</p>
+            <p>Built with HTML5, CSS3, and JavaScript • No installation required</p>
+        </footer>
+    </div>
 </body>
 </html>
