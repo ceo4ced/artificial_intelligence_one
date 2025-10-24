@@ -14,8 +14,39 @@
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 20px;
+            padding: 0;
             min-height: 100vh;
+        }
+
+        .nav-header {
+            background: #2d3748;
+            padding: 15px 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-header a {
+            color: #90cdf4;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1em;
+            transition: color 0.3s;
+        }
+
+        .nav-header a:hover {
+            color: #63b3ed;
+        }
+
+        .nav-title {
+            color: #fff;
+            font-size: 1.2em;
+            font-weight: 700;
+        }
+
+        .page-wrapper {
+            padding: 20px;
         }
 
         .container {
@@ -346,6 +377,11 @@
     </style>
 </head>
 <body>
+    <nav class="nav-header">
+        <div class="nav-title">🎯 Maze Pathfinder</div>
+        <a href="../../index.html">← Back to Home</a>
+    </nav>
+    <div class="page-wrapper">
     <div class="container">
         <h1>🔍 Pathfinding Algorithm Visualizer</h1>
         <p class="subtitle">Interactive tool for learning BFS, DFS, Uniform Cost Search, and A*</p>
@@ -987,5 +1023,7 @@
             document.getElementById('speedValue').textContent = this.value + 'ms';
         });
     </script>
+    </div>
+    </div>
 </body>
 </html>
