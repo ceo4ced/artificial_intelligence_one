@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Linear Regression Visualizer - ML Learning Tool</title>
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 0;
+}
+
+.nav-header {
+    background: #2d3748;
+    padding: 15px 30px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.nav-header a {
+    color: #90cdf4;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1.1em;
+    transition: color 0.3s;
+}
+
+.nav-header a:hover {
+    color: #63b3ed;
+}
+
+.nav-title {
+    color: #fff;
+    font-size: 1.2em;
+    font-weight: 700;
+}
+
+.page-wrapper {
+    padding: 20px;
+}
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+
+h1 {
+    text-align: center;
+    color: #2d3748;
+    margin-bottom: 10px;
+    font-size: 2.5em;
+}
+
+.subtitle {
+    text-align: center;
+    color: #4a5568;
+    margin-bottom: 30px;
+    font-size: 1.1em;
+}
+
+.info-section {
+    background: #e8f5e9;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 25px;
+    border-left: 5px solid #4CAF50;
+}
+
+.info-section h3 {
+    color: #2e7d32;
+    margin-bottom: 10px;
+}
+
+.info-section p {
+    color: #1b5e20;
+    line-height: 1.6;
+    margin-bottom: 8px;
+}
+
+.info-section ul {
+    list-style-position: inside;
+    color: #1b5e20;
+    line-height: 1.8;
+}
+
+.main-content {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 30px;
+    margin-bottom: 30px;
+}
+
+.sidebar {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 10px;
+    height: fit-content;
+}
+
+.sidebar h3 {
+    color: #2d3748;
+    margin-bottom: 15px;
+    font-size: 1.3em;
+}
+
+.control-section {
+    margin-bottom: 20px;
+}
+
+.control-section label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #4a5568;
+}
+
+button {
+    width: 100%;
+    padding: 12px;
+    font-size: 14px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    margin-bottom: 10px;
+}
+
+button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+.btn-primary {
+    background: #4CAF50;
+    color: #fff;
+}
+
+.btn-primary:hover {
+    background: #45a049;
+}
+
+.btn-secondary {
+    background: #2196F3;
+    color: #fff;
+}
+
+.btn-secondary:hover {
+    background: #0b7dda;
+}
+
+.btn-danger {
+    background: #f44336;
+    color: #fff;
+}
+
+.btn-danger:hover {
+    background: #da190b;
+}
+
+.btn-warning {
+    background: #ff9800;
+    color: #fff;
+}
+
+.btn-warning:hover {
+    background: #e68900;
+}
+
+.slider-control {
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.slider-value {
+    text-align: center;
+    font-weight: 600;
+    color: #667eea;
+    margin-bottom: 10px;
+}
+
+.canvas-area {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    padding: 20px;
+}
+
+#canvas {
+    display: block;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    cursor: crosshair;
+    background: #fafafa;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.stat-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #fff;
+    padding: 15px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.stat-label {
+    font-size: 0.9em;
+    opacity: 0.9;
+    margin-bottom: 5px;
+}
+
+.stat-value {
+    font-size: 1.8em;
+    font-weight: bold;
+}
+
+.equation-display {
+    background: #fff3cd;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.equation-display .equation {
+    font-size: 1.5em;
+    font-weight: 600;
+    color: #856404;
+    font-family: 'Courier New', monospace;
+}
+
+.dataset-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 15px;
+}
+
+.dataset-buttons button {
+    font-size: 12px;
+    padding: 8px;
+}
+
+.mode-indicator {
+    background: #e3f2fd;
+    padding: 10px;
+    border-radius: 6px;
+    margin-bottom: 15px;
+    font-size: 0.9em;
+    color: #1565c0;
+    font-weight: 600;
+    text-align: center;
+}
+
+@media (max-width: 968px) {
+    .main-content {
+        grid-template-columns: 1fr;
+    }
+
+    h1 {
+        font-size: 2em;
+    }
+
+    .dataset-buttons {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+</head>
+<body>
+<nav class="nav-header">
+    <div class="nav-title">📈 Linear Regression Visualizer</div>
+    <a href="../../index.html">← Back to Home</a>
+</nav>
+
+<div class="page-wrapper">
+    <div class="container">
+        <h1>📈 Linear Regression Visualizer</h1>
+        <p class="subtitle">Click to add points and watch the algorithm find the best-fit line!</p>
+
+        <div class="info-section">
+            <h3>📚 What is Linear Regression?</h3>
+            <p>
+                Linear regression is a fundamental machine learning algorithm that finds the best straight line
+                through a set of data points. It's used to predict values and understand relationships between variables.
+            </p>
+            <p><strong>Real-world applications:</strong></p>
+            <ul>
+                <li>Predicting house prices based on square footage</li>
+                <li>Estimating test scores based on study hours</li>
+                <li>Forecasting sales based on advertising spend</li>
+                <li>Analyzing temperature trends over time</li>
+            </ul>
+        </div>
+
+        <div class="main-content">
+            <div class="sidebar">
+                <h3>🎮 Controls</h3>
+
+                <div class="mode-indicator" id="modeIndicator">
+                    Mode: Add Points (Click Canvas)
+                </div>
+
+                <div class="equation-display" id="equationDisplay">
+                    <div class="equation">y = mx + b</div>
+                </div>
+
+                <div class="control-section">
+                    <label>📊 Sample Datasets:</label>
+                    <div class="dataset-buttons">
+                        <button class="btn-secondary" onclick="loadDataset('linear')">📏 Perfect Linear</button>
+                        <button class="btn-secondary" onclick="loadDataset('housing')">🏠 Housing Prices</button>
+                        <button class="btn-secondary" onclick="loadDataset('temperature')">🌡️ Temperature</button>
+                        <button class="btn-secondary" onclick="loadDataset('study')">📚 Study Hours</button>
+                    </div>
+                </div>
+
+                <button class="btn-primary" onclick="calculateRegression()">🔄 Calculate Best Fit</button>
+                <button class="btn-warning" onclick="toggleManualMode()">✋ Manual Adjust</button>
+                <button class="btn-danger" onclick="clearCanvas()">🗑️ Clear All</button>
+
+                <div class="control-section" id="manualControls" style="display: none;">
+                    <label>Manual Slope (m):</label>
+                    <div class="slider-value" id="slopeValue">1.00</div>
+                    <input type="range" class="slider-control" id="slopeSlider"
+                           min="-5" max="5" step="0.1" value="1"
+                           oninput="updateManualLine()">
+
+                    <label>Manual Intercept (b):</label>
+                    <div class="slider-value" id="interceptValue">0.00</div>
+                    <input type="range" class="slider-control" id="interceptSlider"
+                           min="-200" max="200" step="1" value="0"
+                           oninput="updateManualLine()">
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">R² Score</div>
+                        <div class="stat-value" id="r2Value">-</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">MSE</div>
+                        <div class="stat-value" id="mseValue">-</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Points</div>
+                        <div class="stat-value" id="pointsValue">0</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="canvas-area">
+                <canvas id="canvas" width="800" height="600"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+
+let points = [];
+let slope = 0;
+let intercept = 0;
+let manualMode = false;
+
+const PADDING = 60;
+const WIDTH = canvas.width - 2 * PADDING;
+const HEIGHT = canvas.height - 2 * PADDING;
+
+// Data point ranges for scaling
+let xMin = 0, xMax = 100;
+let yMin = 0, yMax = 100;
+
+function drawGrid() {
+    ctx.strokeStyle = '#e2e8f0';
+    ctx.lineWidth = 1;
+
+    // Vertical lines
+    for (let i = 0; i <= 10; i++) {
+        const x = PADDING + (WIDTH / 10) * i;
+        ctx.beginPath();
+        ctx.moveTo(x, PADDING);
+        ctx.lineTo(x, PADDING + HEIGHT);
+        ctx.stroke();
+    }
+
+    // Horizontal lines
+    for (let i = 0; i <= 10; i++) {
+        const y = PADDING + (HEIGHT / 10) * i;
+        ctx.beginPath();
+        ctx.moveTo(PADDING, y);
+        ctx.lineTo(PADDING + WIDTH, y);
+        ctx.stroke();
+    }
+
+    // Axes
+    ctx.strokeStyle = '#2d3748';
+    ctx.lineWidth = 2;
+
+    // X-axis
+    ctx.beginPath();
+    ctx.moveTo(PADDING, PADDING + HEIGHT);
+    ctx.lineTo(PADDING + WIDTH, PADDING + HEIGHT);
+    ctx.stroke();
+
+    // Y-axis
+    ctx.beginPath();
+    ctx.moveTo(PADDING, PADDING);
+    ctx.lineTo(PADDING, PADDING + HEIGHT);
+    ctx.stroke();
+
+    // Labels
+    ctx.fillStyle = '#4a5568';
+    ctx.font = '12px Arial';
+    ctx.textAlign = 'center';
+
+    // X-axis labels
+    for (let i = 0; i <= 10; i += 2) {
+        const x = PADDING + (WIDTH / 10) * i;
+        const value = xMin + (xMax - xMin) * (i / 10);
+        ctx.fillText(value.toFixed(0), x, PADDING + HEIGHT + 20);
+    }
+
+    // Y-axis labels
+    ctx.textAlign = 'right';
+    for (let i = 0; i <= 10; i += 2) {
+        const y = PADDING + HEIGHT - (HEIGHT / 10) * i;
+        const value = yMin + (yMax - yMin) * (i / 10);
+        ctx.fillText(value.toFixed(0), PADDING - 10, y + 5);
+    }
+}
+
+function canvasToData(canvasX, canvasY) {
+    const x = xMin + (canvasX - PADDING) / WIDTH * (xMax - xMin);
+    const y = yMax - (canvasY - PADDING) / HEIGHT * (yMax - yMin);
+    return { x, y };
+}
+
+function dataToCanvas(dataX, dataY) {
+    const x = PADDING + (dataX - xMin) / (xMax - xMin) * WIDTH;
+    const y = PADDING + HEIGHT - (dataY - yMin) / (yMax - yMin) * HEIGHT;
+    return { x, y };
+}
+
+function drawPoints() {
+    points.forEach((point, index) => {
+        const pos = dataToCanvas(point.x, point.y);
+
+        // Draw error line if we have a regression line
+        if (slope !== 0 || intercept !== 0) {
+            const predictedY = slope * point.x + intercept;
+            const predictedPos = dataToCanvas(point.x, predictedY);
+
+            ctx.strokeStyle = 'rgba(244, 67, 54, 0.3)';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(pos.x, pos.y);
+            ctx.lineTo(predictedPos.x, predictedPos.y);
+            ctx.stroke();
+        }
+
+        // Draw point
+        ctx.fillStyle = '#667eea';
+        ctx.beginPath();
+        ctx.arc(pos.x, pos.y, 6, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+    });
+}
+
+function drawRegressionLine() {
+    if (points.length < 2) return;
+
+    const y1 = slope * xMin + intercept;
+    const y2 = slope * xMax + intercept;
+
+    const pos1 = dataToCanvas(xMin, y1);
+    const pos2 = dataToCanvas(xMax, y2);
+
+    ctx.strokeStyle = '#f44336';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(pos1.x, pos1.y);
+    ctx.lineTo(pos2.x, pos2.y);
+    ctx.stroke();
+}
+
+function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    drawGrid();
+    drawRegressionLine();
+    drawPoints();
+}
+
+function calculateRegression() {
+    if (points.length < 2) {
+        alert('Add at least 2 points to calculate regression!');
+        return;
+    }
+
+    const n = points.length;
+    let sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0;
+
+    points.forEach(point => {
+        sumX += point.x;
+        sumY += point.y;
+        sumXY += point.x * point.y;
+        sumX2 += point.x * point.x;
+    });
+
+    slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+    intercept = (sumY - slope * sumX) / n;
+
+    // Update sliders to match calculated values
+    document.getElementById('slopeSlider').value = slope;
+    document.getElementById('interceptSlider').value = intercept;
+
+    updateStats();
+    draw();
+}
+
+function calculateR2() {
+    if (points.length < 2) return 0;
+
+    const meanY = points.reduce((sum, p) => sum + p.y, 0) / points.length;
+
+    let ssRes = 0;  // Sum of squares of residuals
+    let ssTot = 0;  // Total sum of squares
+
+    points.forEach(point => {
+        const predicted = slope * point.x + intercept;
+        ssRes += Math.pow(point.y - predicted, 2);
+        ssTot += Math.pow(point.y - meanY, 2);
+    });
+
+    return 1 - (ssRes / ssTot);
+}
+
+function calculateMSE() {
+    if (points.length === 0) return 0;
+
+    let sumSquaredError = 0;
+    points.forEach(point => {
+        const predicted = slope * point.x + intercept;
+        sumSquaredError += Math.pow(point.y - predicted, 2);
+    });
+
+    return sumSquaredError / points.length;
+}
+
+function updateStats() {
+    const r2 = calculateR2();
+    const mse = calculateMSE();
+
+    document.getElementById('r2Value').textContent = r2.toFixed(3);
+    document.getElementById('mseValue').textContent = mse.toFixed(2);
+    document.getElementById('pointsValue').textContent = points.length;
+
+    document.getElementById('equationDisplay').innerHTML =
+        `<div class="equation">y = ${slope.toFixed(2)}x + ${intercept.toFixed(2)}</div>`;
+}
+
+function toggleManualMode() {
+    manualMode = !manualMode;
+    const controls = document.getElementById('manualControls');
+    controls.style.display = manualMode ? 'block' : 'none';
+
+    if (manualMode) {
+        document.getElementById('modeIndicator').textContent = 'Mode: Manual Adjustment';
+        document.getElementById('modeIndicator').style.background = '#fff3cd';
+        document.getElementById('modeIndicator').style.color = '#856404';
+    } else {
+        document.getElementById('modeIndicator').textContent = 'Mode: Add Points (Click Canvas)';
+        document.getElementById('modeIndicator').style.background = '#e3f2fd';
+        document.getElementById('modeIndicator').style.color = '#1565c0';
+    }
+}
+
+function updateManualLine() {
+    slope = parseFloat(document.getElementById('slopeSlider').value);
+    intercept = parseFloat(document.getElementById('interceptSlider').value);
+
+    document.getElementById('slopeValue').textContent = slope.toFixed(2);
+    document.getElementById('interceptValue').textContent = intercept.toFixed(2);
+
+    updateStats();
+    draw();
+}
+
+function clearCanvas() {
+    points = [];
+    slope = 0;
+    intercept = 0;
+    document.getElementById('slopeSlider').value = 1;
+    document.getElementById('interceptSlider').value = 0;
+    updateStats();
+    draw();
+}
+
+function loadDataset(type) {
+    points = [];
+
+    switch(type) {
+        case 'linear':
+            // Perfect linear relationship
+            for (let i = 10; i <= 90; i += 10) {
+                points.push({ x: i, y: i + Math.random() * 5 - 2.5 });
+            }
+            break;
+        case 'housing':
+            // House price vs square footage (thousands)
+            const housingData = [
+                {x: 10, y: 150}, {x: 15, y: 200}, {x: 20, y: 250},
+                {x: 25, y: 300}, {x: 30, y: 350}, {x: 35, y: 400},
+                {x: 40, y: 480}, {x: 45, y: 520}, {x: 50, y: 600}
+            ];
+            housingData.forEach(d => {
+                points.push({
+                    x: d.x,
+                    y: d.y + Math.random() * 40 - 20
+                });
+            });
+            xMax = 60; yMax = 700;
+            break;
+        case 'temperature':
+            // Ice cream sales vs temperature
+            const tempData = [
+                {x: 60, y: 20}, {x: 65, y: 30}, {x: 70, y: 45},
+                {x: 75, y: 55}, {x: 80, y: 70}, {x: 85, y: 80},
+                {x: 90, y: 90}, {x: 95, y: 95}
+            ];
+            tempData.forEach(d => {
+                points.push({
+                    x: d.x,
+                    y: d.y + Math.random() * 10 - 5
+                });
+            });
+            xMin = 55; xMax = 100;
+            yMin = 10; yMax = 100;
+            break;
+        case 'study':
+            // Test score vs study hours
+            const studyData = [
+                {x: 1, y: 50}, {x: 2, y: 55}, {x: 3, y: 65},
+                {x: 4, y: 70}, {x: 5, y: 75}, {x: 6, y: 82},
+                {x: 7, y: 88}, {x: 8, y: 92}, {x: 9, y: 95}
+            ];
+            studyData.forEach(d => {
+                points.push({
+                    x: d.x,
+                    y: d.y + Math.random() * 6 - 3
+                });
+            });
+            xMin = 0; xMax = 10;
+            yMin = 40; yMax = 100;
+            break;
+    }
+
+    calculateRegression();
+}
+
+canvas.addEventListener('click', (e) => {
+    if (manualMode) return;
+
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    // Check if click is within the grid area
+    if (x >= PADDING && x <= PADDING + WIDTH &&
+        y >= PADDING && y <= PADDING + HEIGHT) {
+
+        const dataPoint = canvasToData(x, y);
+        points.push(dataPoint);
+
+        updateStats();
+        draw();
+    }
+});
+
+// Initialize
+draw();
+updateStats();
+</script>
+</body>
+</html>
