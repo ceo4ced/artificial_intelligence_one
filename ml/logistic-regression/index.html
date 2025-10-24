@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Logistic Regression Visualizer - ML Learning Tool</title>
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 0;
+}
+
+.nav-header {
+    background: #2d3748;
+    padding: 15px 30px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.nav-header a {
+    color: #90cdf4;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1.1em;
+    transition: color 0.3s;
+}
+
+.nav-header a:hover {
+    color: #63b3ed;
+}
+
+.nav-title {
+    color: #fff;
+    font-size: 1.2em;
+    font-weight: 700;
+}
+
+.page-wrapper {
+    padding: 20px;
+}
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+
+h1 {
+    text-align: center;
+    color: #2d3748;
+    margin-bottom: 10px;
+    font-size: 2.5em;
+}
+
+.subtitle {
+    text-align: center;
+    color: #4a5568;
+    margin-bottom: 30px;
+    font-size: 1.1em;
+}
+
+.info-section {
+    background: #e8f5e9;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 25px;
+    border-left: 5px solid #4CAF50;
+}
+
+.info-section h3 {
+    color: #2e7d32;
+    margin-bottom: 10px;
+}
+
+.info-section p {
+    color: #1b5e20;
+    line-height: 1.6;
+    margin-bottom: 8px;
+}
+
+.info-section ul {
+    list-style-position: inside;
+    color: #1b5e20;
+    line-height: 1.8;
+}
+
+.main-content {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 30px;
+    margin-bottom: 30px;
+}
+
+.sidebar {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 10px;
+    height: fit-content;
+}
+
+.sidebar h3 {
+    color: #2d3748;
+    margin-bottom: 15px;
+    font-size: 1.3em;
+}
+
+.control-section {
+    margin-bottom: 20px;
+}
+
+.control-section label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #4a5568;
+}
+
+button {
+    width: 100%;
+    padding: 12px;
+    font-size: 14px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    margin-bottom: 10px;
+}
+
+button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+.btn-primary {
+    background: #4CAF50;
+    color: #fff;
+}
+
+.btn-primary:hover {
+    background: #45a049;
+}
+
+.btn-class1 {
+    background: #2196F3;
+    color: #fff;
+}
+
+.btn-class1:hover {
+    background: #0b7dda;
+}
+
+.btn-class2 {
+    background: #f44336;
+    color: #fff;
+}
+
+.btn-class2:hover {
+    background: #da190b;
+}
+
+.btn-danger {
+    background: #9e9e9e;
+    color: #fff;
+}
+
+.btn-danger:hover {
+    background: #757575;
+}
+
+.btn-active {
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.4);
+}
+
+.canvas-area {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    padding: 20px;
+}
+
+#canvas {
+    display: block;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    cursor: crosshair;
+    background: #fafafa;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.stat-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #fff;
+    padding: 15px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.stat-label {
+    font-size: 0.9em;
+    opacity: 0.9;
+    margin-bottom: 5px;
+}
+
+.stat-value {
+    font-size: 1.8em;
+    font-weight: bold;
+}
+
+.mode-indicator {
+    background: #e3f2fd;
+    padding: 10px;
+    border-radius: 6px;
+    margin-bottom: 15px;
+    font-size: 0.9em;
+    color: #1565c0;
+    font-weight: 600;
+    text-align: center;
+}
+
+.dataset-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 15px;
+}
+
+.dataset-buttons button {
+    font-size: 12px;
+    padding: 8px;
+}
+
+.legend {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 15px;
+    padding: 10px;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.legend-color {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid #333;
+}
+
+@media (max-width: 968px) {
+    .main-content {
+        grid-template-columns: 1fr;
+    }
+
+    h1 {
+        font-size: 2em;
+    }
+
+    .dataset-buttons {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+</head>
+<body>
+<nav class="nav-header">
+    <div class="nav-title">🎯 Logistic Regression Visualizer</div>
+    <a href="../../index.html">← Back to Home</a>
+</nav>
+
+<div class="page-wrapper">
+    <div class="container">
+        <h1>🎯 Logistic Regression Visualizer</h1>
+        <p class="subtitle">Binary classification with decision boundaries!</p>
+
+        <div class="info-section">
+            <h3>📚 What is Logistic Regression?</h3>
+            <p>
+                Logistic regression is a classification algorithm that predicts which category something belongs to.
+                Unlike linear regression, it outputs probabilities between 0 and 1, making it perfect for yes/no decisions.
+            </p>
+            <p><strong>Real-world applications:</strong></p>
+            <ul>
+                <li>Email spam detection (spam vs. not spam)</li>
+                <li>Medical diagnosis (disease vs. healthy)</li>
+                <li>Student pass/fail prediction based on study time</li>
+                <li>Credit approval (approve vs. deny)</li>
+            </ul>
+        </div>
+
+        <div class="main-content">
+            <div class="sidebar">
+                <h3>🎮 Controls</h3>
+
+                <div class="mode-indicator" id="modeIndicator">
+                    Click to add Class 1 (Blue)
+                </div>
+
+                <div class="control-section">
+                    <label>Select Class to Add:</label>
+                    <button class="btn-class1 btn-active" id="class1Btn" onclick="setClass(1)">🔵 Class 1 (Pass)</button>
+                    <button class="btn-class2" id="class2Btn" onclick="setClass(2)">🔴 Class 2 (Fail)</button>
+                </div>
+
+                <div class="control-section">
+                    <label>📊 Sample Datasets:</label>
+                    <div class="dataset-buttons">
+                        <button class="btn-primary" onclick="loadDataset('linearlySeparable')">📏 Linear</button>
+                        <button class="btn-primary" onclick="loadDataset('studyHours')">📚 Study</button>
+                        <button class="btn-primary" onclick="loadDataset('spam')">📧 Spam</button>
+                        <button class="btn-primary" onclick="loadDataset('medical')">🏥 Medical</button>
+                    </div>
+                </div>
+
+                <button class="btn-primary" onclick="trainModel()">🚀 Train Model</button>
+                <button class="btn-danger" onclick="clearCanvas()">🗑️ Clear All</button>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">Accuracy</div>
+                        <div class="stat-value" id="accuracyValue">-</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Total Points</div>
+                        <div class="stat-value" id="pointsValue">0</div>
+                    </div>
+                </div>
+
+                <div class="legend">
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #2196F3;"></div>
+                        <span>Class 1</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #f44336;"></div>
+                        <span>Class 2</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="canvas-area">
+                <canvas id="canvas" width="800" height="600"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+
+let points = [];
+let currentClass = 1;
+let weights = null;
+let bias = null;
+
+const PADDING = 40;
+const WIDTH = canvas.width - 2 * PADDING;
+const HEIGHT = canvas.height - 2 * PADDING;
+
+function sigmoid(z) {
+    return 1 / (1 + Math.exp(-z));
+}
+
+function drawBackground() {
+    if (!weights || !bias) return;
+
+    const step = 5;
+    for (let x = PADDING; x < PADDING + WIDTH; x += step) {
+        for (let y = PADDING; y < PADDING + HEIGHT; y += step) {
+            const dataX = (x - PADDING) / WIDTH;
+            const dataY = 1 - (y - PADDING) / HEIGHT;
+
+            const z = weights[0] * dataX + weights[1] * dataY + bias;
+            const prob = sigmoid(z);
+
+            // Create color gradient based on probability
+            const r = Math.floor(244 * (1 - prob) + 33 * prob);
+            const g = Math.floor(67 * (1 - prob) + 150 * prob);
+            const b = Math.floor(54 * (1 - prob) + 243 * prob);
+
+            ctx.fillStyle = `rgba(${r}, ${g}, ${b}, 0.2)`;
+            ctx.fillRect(x, y, step, step);
+        }
+    }
+}
+
+function drawDecisionBoundary() {
+    if (!weights || !bias) return;
+
+    // Draw decision boundary where probability = 0.5
+    // This is where weights[0] * x + weights[1] * y + bias = 0
+
+    const points = [];
+    for (let x = 0; x <= 1; x += 0.01) {
+        // Solve for y: y = -(weights[0] * x + bias) / weights[1]
+        if (Math.abs(weights[1]) > 0.001) {
+            const y = -(weights[0] * x + bias) / weights[1];
+            if (y >= 0 && y <= 1) {
+                const canvasX = PADDING + x * WIDTH;
+                const canvasY = PADDING + (1 - y) * HEIGHT;
+                points.push({ x: canvasX, y: canvasY });
+            }
+        }
+    }
+
+    if (points.length > 1) {
+        ctx.strokeStyle = '#000';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(points[0].x, points[0].y);
+        for (let i = 1; i < points.length; i++) {
+            ctx.lineTo(points[i].x, points[i].y);
+        }
+        ctx.stroke();
+
+        // Draw dashed confidence lines
+        ctx.setLineDash([5, 5]);
+        ctx.strokeStyle = 'rgba(0, 0, 0, 0.3)';
+        ctx.lineWidth = 2;
+
+        // Lines for 0.7 and 0.3 probability
+        [0.85, 0.15].forEach(prob => {
+            const offset = Math.log(prob / (1 - prob));
+            const points = [];
+
+            for (let x = 0; x <= 1; x += 0.01) {
+                if (Math.abs(weights[1]) > 0.001) {
+                    const y = -(weights[0] * x + bias + offset) / weights[1];
+                    if (y >= 0 && y <= 1) {
+                        const canvasX = PADDING + x * WIDTH;
+                        const canvasY = PADDING + (1 - y) * HEIGHT;
+                        points.push({ x: canvasX, y: canvasY });
+                    }
+                }
+            }
+
+            if (points.length > 1) {
+                ctx.beginPath();
+                ctx.moveTo(points[0].x, points[0].y);
+                for (let i = 1; i < points.length; i++) {
+                    ctx.lineTo(points[i].x, points[i].y);
+                }
+                ctx.stroke();
+            }
+        });
+
+        ctx.setLineDash([]);
+    }
+}
+
+function drawGrid() {
+    ctx.strokeStyle = '#e2e8f0';
+    ctx.lineWidth = 1;
+
+    // Vertical lines
+    for (let i = 0; i <= 10; i++) {
+        const x = PADDING + (WIDTH / 10) * i;
+        ctx.beginPath();
+        ctx.moveTo(x, PADDING);
+        ctx.lineTo(x, PADDING + HEIGHT);
+        ctx.stroke();
+    }
+
+    // Horizontal lines
+    for (let i = 0; i <= 10; i++) {
+        const y = PADDING + (HEIGHT / 10) * i;
+        ctx.beginPath();
+        ctx.moveTo(PADDING, y);
+        ctx.lineTo(PADDING + WIDTH, y);
+        ctx.stroke();
+    }
+
+    // Axes
+    ctx.strokeStyle = '#2d3748';
+    ctx.lineWidth = 2;
+
+    // Border
+    ctx.strokeRect(PADDING, PADDING, WIDTH, HEIGHT);
+}
+
+function drawPoints() {
+    points.forEach(point => {
+        const x = PADDING + point.x * WIDTH;
+        const y = PADDING + (1 - point.y) * HEIGHT;
+
+        // Determine if correctly classified
+        let correct = true;
+        if (weights && bias) {
+            const z = weights[0] * point.x + weights[1] * point.y + bias;
+            const prob = sigmoid(z);
+            const predicted = prob >= 0.5 ? 1 : 2;
+            correct = predicted === point.class;
+        }
+
+        // Draw point
+        ctx.fillStyle = point.class === 1 ? '#2196F3' : '#f44336';
+        ctx.beginPath();
+        ctx.arc(x, y, 7, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Draw border (white if correct, black if incorrect)
+        ctx.strokeStyle = correct ? '#fff' : '#000';
+        ctx.lineWidth = correct ? 2 : 3;
+        ctx.stroke();
+    });
+}
+
+function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    drawGrid();
+    drawBackground();
+    drawDecisionBoundary();
+    drawPoints();
+}
+
+function trainModel() {
+    if (points.length < 4) {
+        alert('Add at least 4 points (2 of each class) to train!');
+        return;
+    }
+
+    // Simple gradient descent for logistic regression
+    weights = [Math.random() - 0.5, Math.random() - 0.5];
+    bias = Math.random() - 0.5;
+
+    const learningRate = 0.5;
+    const iterations = 1000;
+
+    for (let iter = 0; iter < iterations; iter++) {
+        let dw0 = 0, dw1 = 0, db = 0;
+
+        points.forEach(point => {
+            const z = weights[0] * point.x + weights[1] * point.y + bias;
+            const pred = sigmoid(z);
+            const target = point.class === 1 ? 1 : 0;
+            const error = pred - target;
+
+            dw0 += error * point.x;
+            dw1 += error * point.y;
+            db += error;
+        });
+
+        weights[0] -= learningRate * dw0 / points.length;
+        weights[1] -= learningRate * dw1 / points.length;
+        bias -= learningRate * db / points.length;
+    }
+
+    updateStats();
+    draw();
+}
+
+function updateStats() {
+    document.getElementById('pointsValue').textContent = points.length;
+
+    if (weights && bias) {
+        let correct = 0;
+        points.forEach(point => {
+            const z = weights[0] * point.x + weights[1] * point.y + bias;
+            const prob = sigmoid(z);
+            const predicted = prob >= 0.5 ? 1 : 2;
+            if (predicted === point.class) correct++;
+        });
+
+        const accuracy = (correct / points.length * 100).toFixed(1);
+        document.getElementById('accuracyValue').textContent = accuracy + '%';
+    } else {
+        document.getElementById('accuracyValue').textContent = '-';
+    }
+}
+
+function setClass(classNum) {
+    currentClass = classNum;
+
+    const class1Btn = document.getElementById('class1Btn');
+    const class2Btn = document.getElementById('class2Btn');
+
+    if (classNum === 1) {
+        class1Btn.classList.add('btn-active');
+        class2Btn.classList.remove('btn-active');
+        document.getElementById('modeIndicator').textContent = 'Click to add Class 1 (Blue)';
+        document.getElementById('modeIndicator').style.background = '#e3f2fd';
+    } else {
+        class1Btn.classList.remove('btn-active');
+        class2Btn.classList.add('btn-active');
+        document.getElementById('modeIndicator').textContent = 'Click to add Class 2 (Red)';
+        document.getElementById('modeIndicator').style.background = '#ffebee';
+    }
+}
+
+function clearCanvas() {
+    points = [];
+    weights = null;
+    bias = null;
+    updateStats();
+    draw();
+}
+
+function loadDataset(type) {
+    points = [];
+    weights = null;
+    bias = null;
+
+    switch(type) {
+        case 'linearlySeparable':
+            // Easy linearly separable data
+            for (let i = 0; i < 15; i++) {
+                points.push({
+                    x: Math.random() * 0.4 + 0.1,
+                    y: Math.random() * 0.4 + 0.5,
+                    class: 1
+                });
+                points.push({
+                    x: Math.random() * 0.4 + 0.5,
+                    y: Math.random() * 0.4 + 0.1,
+                    class: 2
+                });
+            }
+            break;
+
+        case 'studyHours':
+            // Study hours (x) vs exam score (y)
+            // Class 1: Pass, Class 2: Fail
+            const studyData = [
+                {x: 0.7, y: 0.8, class: 1}, {x: 0.75, y: 0.85, class: 1},
+                {x: 0.8, y: 0.75, class: 1}, {x: 0.65, y: 0.7, class: 1},
+                {x: 0.85, y: 0.9, class: 1}, {x: 0.6, y: 0.65, class: 1},
+                {x: 0.9, y: 0.85, class: 1}, {x: 0.7, y: 0.75, class: 1},
+                {x: 0.2, y: 0.3, class: 2}, {x: 0.25, y: 0.35, class: 2},
+                {x: 0.3, y: 0.25, class: 2}, {x: 0.15, y: 0.2, class: 2},
+                {x: 0.35, y: 0.4, class: 2}, {x: 0.4, y: 0.35, class: 2},
+                {x: 0.45, y: 0.5, class: 2}, {x: 0.5, y: 0.45, class: 2}
+            ];
+            points = studyData;
+            break;
+
+        case 'spam':
+            // Spam detection (keyword frequency vs link count)
+            const spamData = [
+                {x: 0.8, y: 0.7, class: 2}, {x: 0.85, y: 0.8, class: 2},
+                {x: 0.75, y: 0.85, class: 2}, {x: 0.9, y: 0.75, class: 2},
+                {x: 0.7, y: 0.9, class: 2}, {x: 0.85, y: 0.85, class: 2},
+                {x: 0.8, y: 0.8, class: 2}, {x: 0.75, y: 0.75, class: 2},
+                {x: 0.2, y: 0.3, class: 1}, {x: 0.25, y: 0.2, class: 1},
+                {x: 0.3, y: 0.35, class: 1}, {x: 0.15, y: 0.25, class: 1},
+                {x: 0.35, y: 0.3, class: 1}, {x: 0.4, y: 0.25, class: 1},
+                {x: 0.3, y: 0.4, class: 1}, {x: 0.25, y: 0.35, class: 1}
+            ];
+            points = spamData;
+            break;
+
+        case 'medical':
+            // Medical diagnosis
+            const medicalData = [
+                {x: 0.3, y: 0.6, class: 1}, {x: 0.35, y: 0.65, class: 1},
+                {x: 0.4, y: 0.7, class: 1}, {x: 0.25, y: 0.55, class: 1},
+                {x: 0.45, y: 0.75, class: 1}, {x: 0.3, y: 0.7, class: 1},
+                {x: 0.35, y: 0.6, class: 1}, {x: 0.4, y: 0.65, class: 1},
+                {x: 0.6, y: 0.3, class: 2}, {x: 0.65, y: 0.35, class: 2},
+                {x: 0.7, y: 0.25, class: 2}, {x: 0.55, y: 0.4, class: 2},
+                {x: 0.75, y: 0.3, class: 2}, {x: 0.6, y: 0.35, class: 2},
+                {x: 0.65, y: 0.25, class: 2}, {x: 0.7, y: 0.4, class: 2}
+            ];
+            points = medicalData;
+            break;
+    }
+
+    trainModel();
+}
+
+canvas.addEventListener('click', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    // Check if click is within the grid area
+    if (x >= PADDING && x <= PADDING + WIDTH &&
+        y >= PADDING && y <= PADDING + HEIGHT) {
+
+        const dataX = (x - PADDING) / WIDTH;
+        const dataY = 1 - (y - PADDING) / HEIGHT;
+
+        points.push({
+            x: dataX,
+            y: dataY,
+            class: currentClass
+        });
+
+        updateStats();
+        draw();
+    }
+});
+
+// Initialize
+draw();
+updateStats();
+</script>
+</body>
+</html>
