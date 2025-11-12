@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Beam Search - Optimization</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 0; }
+.nav-header { background: #2d3748; padding: 15px 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; }
+.nav-header a { color: #90cdf4; text-decoration: none; font-weight: 600; font-size: 1.1em; }
+.nav-title { color: #fff; font-size: 1.2em; font-weight: 700; }
+.container { max-width: 1400px; margin: 20px auto; background: #fff; border-radius: 15px; padding: 30px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+h1 { text-align: center; color: #2d3748; font-size: 2.5em; margin-bottom: 30px; }
+.main-content { display: grid; grid-template-columns: 320px 1fr; gap: 30px; }
+.sidebar { background: #f8f9fa; padding: 20px; border-radius: 10px; height: fit-content; }
+button { width: 100%; padding: 12px; margin: 5px 0; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }
+.btn-primary { background: #4CAF50; color: #fff; }
+.btn-secondary { background: #2196F3; color: #fff; }
+canvas { border: 2px solid #ddd; border-radius: 8px; display: block; background: #fafafa; }
+.stats { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; padding: 15px; border-radius: 10px; margin-top: 15px; }
+.stat-row { display: flex; justify-content: space-between; margin: 8px 0; }
+.control-group { margin: 15px 0; }
+.control-group label { display: block; margin-bottom: 5px; font-weight: 600; }
+.control-group input[type="range"] { width: 100%; }
+.control-group .value { float: right; color: #667eea; }
+</style>
+</head>
+<body>
+<nav class="nav-header">
+    <div class="nav-title">🔦 Beam Search</div>
+    <a href="../../index.html">← Back to Home</a>
+</nav>
+<div class="container">
+    <h1>🔦 Beam Search</h1>
+    <div class="main-content">
+        <div class="sidebar">
+            <h3>Controls</h3>
+            <button class="btn-primary" onclick="reset()">Reset</button>
+            <button class="btn-secondary" onclick="step()">Next Step</button>
+            <button class="btn-secondary" onclick="run()">Run to Goal</button>
+
+            <div class="control-group">
+                <label>Beam Width: <span class="value" id="beamWidthVal">3</span></label>
+                <input type="range" min="1" max="10" value="3" id="beamWidth" onchange="updateBeamWidth()">
+            </div>
+
+            <div class="stats">
+                <div class="stat-row"><span>Level:</span><span id="level">0</span></div>
+                <div class="stat-row"><span>Active Nodes:</span><span id="active">1</span></div>
+                <div class="stat-row"><span>Expanded:</span><span id="expanded">0</span></div>
+                <div class="stat-row"><span>Pruned:</span><span id="pruned">0</span></div>
+                <div class="stat-row"><span>Status:</span><span id="status">Ready</span></div>
+            </div>
+
+            <div style="margin-top: 20px; padding: 15px; background: #e3f2fd; border-radius: 8px;">
+                <h4 style="margin-bottom: 10px;">How Beam Search Works:</h4>
+                <p style="font-size: 0.9em; line-height: 1.5;">
+                    Beam Search is a memory-limited breadth-first search. It only keeps the k best nodes at each level,
+                    where k is the beam width. This trades completeness for memory efficiency.
+                </p>
+            </div>
+        </div>
+        <div>
+            <canvas id="canvas" width="900" height="700"></canvas>
+        </div>
+    </div>
+</div>
+<script>
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+
+let beamWidth = 3;
+let level = 0;
+let activeNodes = [];
+let allNodes = [];
+let expandedCount = 0;
+let prunedCount = 0;
+let goalFound = false;
+
+class Node {
+    constructor(x, y, depth, parent = null) {
+        this.x = x;
+        this.y = y;
+        this.depth = depth;
+        this.parent = parent;
+        this.heuristic = Math.abs(x - 8) + Math.abs(y - 6); // Manhattan distance to goal (8,6)
+        this.isGoal = (x === 8 && y === 6);
+        this.state = 'active'; // active, expanded, pruned, goal, path
+    }
+}
+
+function reset() {
+    level = 0;
+    expandedCount = 0;
+    prunedCount = 0;
+    goalFound = false;
+
+    const startNode = new Node(1, 1, 0);
+    activeNodes = [startNode];
+    allNodes = [startNode];
+
+    updateStats();
+    draw();
+}
+
+function step() {
+    if (goalFound || activeNodes.length === 0) return;
+
+    // Expand active nodes
+    const newNodes = [];
+    activeNodes.forEach(node => {
+        node.state = 'expanded';
+        expandedCount++;
+
+        // Generate children (4 directions)
+        const directions = [
+            {dx: 1, dy: 0}, {dx: -1, dy: 0},
+            {dx: 0, dy: 1}, {dx: 0, dy: -1}
+        ];
+
+        directions.forEach(dir => {
+            const nx = node.x + dir.dx;
+            const ny = node.y + dir.dy;
+
+            // Stay within bounds
+            if (nx >= 0 && nx <= 9 && ny >= 0 && ny <= 7) {
+                const child = new Node(nx, ny, node.depth + 1, node);
+                newNodes.push(child);
+                allNodes.push(child);
+
+                if (child.isGoal) {
+                    child.state = 'goal';
+                    goalFound = true;
+                    markPath(child);
+                }
+            }
+        });
+    });
+
+    if (!goalFound && newNodes.length > 0) {
+        // Sort by heuristic and keep only beam width best nodes
+        newNodes.sort((a, b) => a.heuristic - b.heuristic);
+
+        activeNodes = newNodes.slice(0, beamWidth);
+        const prunedNodes = newNodes.slice(beamWidth);
+
+        prunedCount += prunedNodes.length;
+        prunedNodes.forEach(node => node.state = 'pruned');
+
+        level++;
+    } else if (!goalFound) {
+        activeNodes = [];
+    }
+
+    updateStats();
+    draw();
+}
+
+function markPath(goalNode) {
+    let current = goalNode;
+    while (current.parent) {
+        current.state = 'path';
+        current = current.parent;
+    }
+    current.state = 'path';
+}
+
+function run() {
+    const interval = setInterval(() => {
+        step();
+        if (goalFound || activeNodes.length === 0) {
+            clearInterval(interval);
+        }
+    }, 500);
+}
+
+function updateStats() {
+    document.getElementById('level').textContent = level;
+    document.getElementById('active').textContent = activeNodes.length;
+    document.getElementById('expanded').textContent = expandedCount;
+    document.getElementById('pruned').textContent = prunedCount;
+
+    if (goalFound) {
+        document.getElementById('status').textContent = 'Goal Found!';
+    } else if (activeNodes.length === 0 && level > 0) {
+        document.getElementById('status').textContent = 'No Path';
+    } else {
+        document.getElementById('status').textContent = 'Searching...';
+    }
+}
+
+function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Draw grid
+    const cellSize = 80;
+    const offsetX = 50;
+    const offsetY = 50;
+
+    for (let i = 0; i <= 9; i++) {
+        for (let j = 0; j <= 7; j++) {
+            ctx.strokeStyle = '#ddd';
+            ctx.lineWidth = 1;
+            ctx.strokeRect(offsetX + i * cellSize, offsetY + j * cellSize, cellSize, cellSize);
+        }
+    }
+
+    // Draw goal
+    ctx.fillStyle = '#4CAF50';
+    ctx.fillRect(offsetX + 8 * cellSize, offsetY + 6 * cellSize, cellSize, cellSize);
+    ctx.fillStyle = '#fff';
+    ctx.font = '20px Arial';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('GOAL', offsetX + 8.5 * cellSize, offsetY + 6.5 * cellSize);
+
+    // Draw start
+    ctx.fillStyle = '#2196F3';
+    ctx.fillRect(offsetX + 1 * cellSize, offsetY + 1 * cellSize, cellSize, cellSize);
+    ctx.fillStyle = '#fff';
+    ctx.fillText('START', offsetX + 1.5 * cellSize, offsetY + 1.5 * cellSize);
+
+    // Draw all edges first
+    allNodes.forEach(node => {
+        if (node.parent) {
+            ctx.strokeStyle = node.state === 'path' ? '#4CAF50' :
+                             node.state === 'pruned' ? '#ffcccc' : '#ddd';
+            ctx.lineWidth = node.state === 'path' ? 3 : 1;
+            ctx.beginPath();
+            ctx.moveTo(offsetX + (node.parent.x + 0.5) * cellSize, offsetY + (node.parent.y + 0.5) * cellSize);
+            ctx.lineTo(offsetX + (node.x + 0.5) * cellSize, offsetY + (node.y + 0.5) * cellSize);
+            ctx.stroke();
+        }
+    });
+
+    // Draw nodes
+    allNodes.forEach(node => {
+        const x = offsetX + (node.x + 0.5) * cellSize;
+        const y = offsetY + (node.y + 0.5) * cellSize;
+
+        if (node.x === 1 && node.y === 1) return; // Skip drawing start circle
+        if (node.isGoal) return; // Skip drawing goal circle
+
+        let color;
+        switch (node.state) {
+            case 'active': color = '#2196F3'; break;
+            case 'expanded': color = '#999'; break;
+            case 'pruned': color = '#ffcccc'; break;
+            case 'path': color = '#4CAF50'; break;
+            case 'goal': color = '#4CAF50'; break;
+            default: color = '#ccc';
+        }
+
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.arc(x, y, 12, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Draw heuristic value
+        ctx.fillStyle = '#333';
+        ctx.font = '11px Arial';
+        ctx.fillText(node.heuristic, x, y + 25);
+    });
+
+    // Draw legend
+    const legendY = 620;
+    const legends = [
+        {color: '#2196F3', text: 'Active'},
+        {color: '#999', text: 'Expanded'},
+        {color: '#ffcccc', text: 'Pruned'},
+        {color: '#4CAF50', text: 'Path'}
+    ];
+
+    legends.forEach((legend, i) => {
+        ctx.fillStyle = legend.color;
+        ctx.beginPath();
+        ctx.arc(100 + i * 150, legendY, 10, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#333';
+        ctx.font = '14px Arial';
+        ctx.textAlign = 'left';
+        ctx.fillText(legend.text, 120 + i * 150, legendY + 5);
+    });
+}
+
+function updateBeamWidth() {
+    beamWidth = parseInt(document.getElementById('beamWidth').value);
+    document.getElementById('beamWidthVal').textContent = beamWidth;
+}
+
+reset();
+</script>
+</body>
+</html>
