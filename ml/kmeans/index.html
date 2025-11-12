@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>K-Means Clustering - ML Learning Tool</title>
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 0;
+}
+
+.nav-header {
+    background: #2d3748;
+    padding: 15px 30px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.nav-header a {
+    color: #90cdf4;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1.1em;
+    transition: color 0.3s;
+}
+
+.nav-header a:hover {
+    color: #63b3ed;
+}
+
+.nav-title {
+    color: #fff;
+    font-size: 1.2em;
+    font-weight: 700;
+}
+
+.page-wrapper {
+    padding: 20px;
+}
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+
+h1 {
+    text-align: center;
+    color: #2d3748;
+    margin-bottom: 10px;
+    font-size: 2.5em;
+}
+
+.subtitle {
+    text-align: center;
+    color: #4a5568;
+    margin-bottom: 30px;
+    font-size: 1.1em;
+}
+
+.info-section {
+    background: #e8f5e9;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 25px;
+    border-left: 5px solid #4CAF50;
+}
+
+.info-section h3 {
+    color: #2e7d32;
+    margin-bottom: 10px;
+}
+
+.info-section p {
+    color: #1b5e20;
+    line-height: 1.6;
+    margin-bottom: 8px;
+}
+
+.info-section ul {
+    list-style-position: inside;
+    color: #1b5e20;
+    line-height: 1.8;
+}
+
+.main-content {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 30px;
+    margin-bottom: 30px;
+}
+
+.sidebar {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 10px;
+    height: fit-content;
+}
+
+.sidebar h3 {
+    color: #2d3748;
+    margin-bottom: 15px;
+    font-size: 1.3em;
+}
+
+.control-section {
+    margin-bottom: 20px;
+}
+
+.control-section label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #4a5568;
+    font-size: 0.9em;
+}
+
+button {
+    width: 100%;
+    padding: 12px;
+    font-size: 14px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    margin-bottom: 10px;
+}
+
+button:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.btn-primary {
+    background: #4CAF50;
+    color: #fff;
+}
+
+.btn-primary:hover:not(:disabled) {
+    background: #45a049;
+}
+
+.btn-secondary {
+    background: #2196F3;
+    color: #fff;
+}
+
+.btn-secondary:hover:not(:disabled) {
+    background: #0b7dda;
+}
+
+.btn-danger {
+    background: #f44336;
+    color: #fff;
+}
+
+.btn-danger:hover:not(:disabled) {
+    background: #da190b;
+}
+
+input[type="number"] {
+    width: 100%;
+    padding: 8px;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+.canvas-area {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    padding: 20px;
+}
+
+#canvas {
+    display: block;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    cursor: crosshair;
+    background: #fafafa;
+}
+
+.stats-display {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #fff;
+    padding: 15px;
+    border-radius: 10px;
+    margin-top: 15px;
+}
+
+.stat-row {
+    display: flex;
+    justify-content: space-between;
+    margin: 8px 0;
+    font-size: 0.95em;
+}
+
+.stat-value {
+    font-weight: bold;
+}
+
+.dataset-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 15px;
+}
+
+.dataset-buttons button {
+    font-size: 12px;
+    padding: 8px;
+}
+
+.status-indicator {
+    background: #fff3cd;
+    color: #856404;
+    padding: 10px;
+    border-radius: 6px;
+    margin-bottom: 15px;
+    text-align: center;
+    font-weight: 600;
+}
+
+.status-indicator.converged {
+    background: #d4edda;
+    color: #155724;
+}
+
+@media (max-width: 1000px) {
+    .main-content {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+</head>
+<body>
+<nav class="nav-header">
+    <div class="nav-title">🎨 K-Means Clustering</div>
+    <a href="../../index.html">← Back to Home</a>
+</nav>
+
+<div class="page-wrapper">
+    <div class="container">
+        <h1>🎨 K-Means Clustering</h1>
+        <p class="subtitle">Discover natural groupings in data with unsupervised learning!</p>
+
+        <div class="info-section">
+            <h3>📚 What is K-Means Clustering?</h3>
+            <p>
+                K-Means is an unsupervised learning algorithm that groups similar data points into K clusters.
+                It works by iteratively assigning points to the nearest cluster center (centroid) and
+                recalculating centroids based on the assigned points.
+            </p>
+            <p><strong>How it works:</strong></p>
+            <ul>
+                <li>Initialize K cluster centers (randomly or manually)</li>
+                <li>Assign each point to the nearest centroid</li>
+                <li>Recalculate centroids as the mean of assigned points</li>
+                <li>Repeat until centroids stop moving (convergence)</li>
+            </ul>
+            <p><strong>Real-world applications:</strong></p>
+            <ul>
+                <li>Customer segmentation (marketing groups)</li>
+                <li>Image compression (color quantization)</li>
+                <li>Document clustering (topic grouping)</li>
+                <li>Anomaly detection</li>
+                <li>Recommendation systems</li>
+            </ul>
+        </div>
+
+        <div class="main-content">
+            <div class="sidebar">
+                <h3>🎮 Controls</h3>
+
+                <div class="status-indicator" id="statusIndicator">
+                    Click canvas to add centroids
+                </div>
+
+                <div class="control-section">
+                    <label>Number of Clusters (K):</label>
+                    <input type="number" id="kValue" value="3" min="1" max="8">
+                </div>
+
+                <button class="btn-primary" id="initBtn" onclick="initializeCentroids()">🎲 Random Centroids</button>
+                <button class="btn-secondary" id="stepBtn" onclick="stepIteration()" disabled>▶️ Step Iteration</button>
+                <button class="btn-secondary" id="runBtn" onclick="runToConvergence()" disabled>⏩ Run to Convergence</button>
+                <button class="btn-danger" id="stopBtn" onclick="stopRunning()" disabled>⏸️ Stop</button>
+                <button class="btn-danger" onclick="reset()">🔄 Reset</button>
+
+                <div class="control-section">
+                    <label>📊 Sample Datasets:</label>
+                    <div class="dataset-buttons">
+                        <button class="btn-secondary" onclick="loadDataset('blobs')">🎯 Blobs</button>
+                        <button class="btn-secondary" onclick="loadDataset('circles')">⭕ Circles</button>
+                        <button class="btn-secondary" onclick="loadDataset('moons')">🌙 Moons</button>
+                        <button class="btn-secondary" onclick="loadDataset('grid')">⊞ Grid</button>
+                    </div>
+                </div>
+
+                <div class="stats-display">
+                    <div class="stat-row">
+                        <span>Iteration:</span>
+                        <span class="stat-value" id="iteration">0</span>
+                    </div>
+                    <div class="stat-row">
+                        <span>Data Points:</span>
+                        <span class="stat-value" id="dataCount">0</span>
+                    </div>
+                    <div class="stat-row">
+                        <span>Centroids:</span>
+                        <span class="stat-value" id="centroidCount">0</span>
+                    </div>
+                    <div class="stat-row">
+                        <span>Status:</span>
+                        <span class="stat-value" id="status">Not Started</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="canvas-area">
+                <h3>Clustering Visualization</h3>
+                <canvas id="canvas" width="700" height="600"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+
+let dataPoints = [];
+let centroids = [];
+let assignments = [];
+let iteration = 0;
+let isRunning = false;
+let runInterval = null;
+let mode = 'addCentroids'; // 'addCentroids' or 'addData'
+
+const COLORS = ['#e74c3c', '#3498db', '#2ecc71', '#f39c12', '#9b59b6', '#1abc9c', '#e67e22', '#95a5a6'];
+
+function distance(p1, p2) {
+    return Math.sqrt(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2));
+}
+
+function drawCanvas() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Draw grid
+    ctx.strokeStyle = '#e2e8f0';
+    ctx.lineWidth = 1;
+    for (let i = 0; i <= 10; i++) {
+        const pos = (i / 10) * canvas.width;
+        ctx.beginPath();
+        ctx.moveTo(pos, 0);
+        ctx.lineTo(pos, canvas.height);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(0, pos);
+        ctx.lineTo(canvas.width, pos);
+        ctx.stroke();
+    }
+
+    // Draw cluster regions (Voronoi)
+    if (centroids.length > 0) {
+        const resolution = 10;
+        for (let x = 0; x < canvas.width; x += resolution) {
+            for (let y = 0; y < canvas.height; y += resolution) {
+                const point = { x: x / canvas.width, y: 1 - y / canvas.height };
+                let minDist = Infinity;
+                let nearestCluster = 0;
+
+                centroids.forEach((centroid, idx) => {
+                    const dist = distance(point, centroid);
+                    if (dist < minDist) {
+                        minDist = dist;
+                        nearestCluster = idx;
+                    }
+                });
+
+                ctx.fillStyle = COLORS[nearestCluster] + '20';
+                ctx.fillRect(x, y, resolution, resolution);
+            }
+        }
+    }
+
+    // Draw lines from points to centroids
+    if (assignments.length > 0 && centroids.length > 0) {
+        dataPoints.forEach((point, idx) => {
+            const cluster = assignments[idx];
+            if (cluster !== undefined && centroids[cluster]) {
+                const centroid = centroids[cluster];
+                const px = point.x * canvas.width;
+                const py = (1 - point.y) * canvas.height;
+                const cx = centroid.x * canvas.width;
+                const cy = (1 - centroid.y) * canvas.height;
+
+                ctx.strokeStyle = COLORS[cluster] + '40';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(px, py);
+                ctx.lineTo(cx, cy);
+                ctx.stroke();
+            }
+        });
+    }
+
+    // Draw data points
+    dataPoints.forEach((point, idx) => {
+        const x = point.x * canvas.width;
+        const y = (1 - point.y) * canvas.height;
+
+        const cluster = assignments[idx];
+        ctx.fillStyle = cluster !== undefined && centroids.length > 0 ? COLORS[cluster] : '#95a5a6';
+        ctx.beginPath();
+        ctx.arc(x, y, 5, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+    });
+
+    // Draw centroids
+    centroids.forEach((centroid, idx) => {
+        const x = centroid.x * canvas.width;
+        const y = (1 - centroid.y) * canvas.height;
+
+        // Draw large marker
+        ctx.fillStyle = COLORS[idx];
+        ctx.beginPath();
+        ctx.arc(x, y, 12, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.strokeStyle = '#2d3748';
+        ctx.lineWidth = 3;
+        ctx.stroke();
+
+        // Draw X in center
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(x - 6, y - 6);
+        ctx.lineTo(x + 6, y + 6);
+        ctx.moveTo(x + 6, y - 6);
+        ctx.lineTo(x - 6, y + 6);
+        ctx.stroke();
+    });
+}
+
+function assignPointsToClusters() {
+    assignments = [];
+    dataPoints.forEach(point => {
+        let minDist = Infinity;
+        let nearestCluster = 0;
+
+        centroids.forEach((centroid, idx) => {
+            const dist = distance(point, centroid);
+            if (dist < minDist) {
+                minDist = dist;
+                nearestCluster = idx;
+            }
+        });
+
+        assignments.push(nearestCluster);
+    });
+}
+
+function updateCentroids() {
+    const newCentroids = [];
+
+    for (let i = 0; i < centroids.length; i++) {
+        const clusterPoints = dataPoints.filter((_, idx) => assignments[idx] === i);
+
+        if (clusterPoints.length > 0) {
+            const sumX = clusterPoints.reduce((sum, p) => sum + p.x, 0);
+            const sumY = clusterPoints.reduce((sum, p) => sum + p.y, 0);
+            newCentroids.push({
+                x: sumX / clusterPoints.length,
+                y: sumY / clusterPoints.length
+            });
+        } else {
+            // Keep old centroid if no points assigned
+            newCentroids.push({ ...centroids[i] });
+        }
+    }
+
+    // Check convergence
+    let converged = true;
+    for (let i = 0; i < centroids.length; i++) {
+        const dist = distance(centroids[i], newCentroids[i]);
+        if (dist > 0.001) {
+            converged = false;
+            break;
+        }
+    }
+
+    centroids = newCentroids;
+    return converged;
+}
+
+function stepIteration() {
+    if (centroids.length === 0 || dataPoints.length === 0) return;
+
+    assignPointsToClusters();
+    const converged = updateCentroids();
+    iteration++;
+
+    updateStats();
+    drawCanvas();
+
+    if (converged) {
+        document.getElementById('statusIndicator').textContent = '✅ Converged!';
+        document.getElementById('statusIndicator').classList.add('converged');
+        document.getElementById('status').textContent = 'Converged';
+        stopRunning();
+    }
+}
+
+function runToConvergence() {
+    if (isRunning) return;
+    isRunning = true;
+    document.getElementById('runBtn').disabled = true;
+    document.getElementById('stopBtn').disabled = false;
+    document.getElementById('statusIndicator').textContent = '🔄 Running...';
+
+    runInterval = setInterval(() => {
+        stepIteration();
+        if (document.getElementById('status').textContent === 'Converged') {
+            stopRunning();
+        }
+    }, 500);
+}
+
+function stopRunning() {
+    isRunning = false;
+    if (runInterval) {
+        clearInterval(runInterval);
+        runInterval = null;
+    }
+    document.getElementById('runBtn').disabled = false;
+    document.getElementById('stopBtn').disabled = true;
+}
+
+function initializeCentroids() {
+    const k = parseInt(document.getElementById('kValue').value);
+    centroids = [];
+
+    for (let i = 0; i < k; i++) {
+        centroids.push({
+            x: Math.random(),
+            y: Math.random()
+        });
+    }
+
+    iteration = 0;
+    assignments = [];
+    mode = 'addData';
+
+    document.getElementById('stepBtn').disabled = false;
+    document.getElementById('runBtn').disabled = false;
+    document.getElementById('statusIndicator').textContent = 'Click canvas to add data points';
+    document.getElementById('statusIndicator').classList.remove('converged');
+
+    updateStats();
+    drawCanvas();
+}
+
+function reset() {
+    dataPoints = [];
+    centroids = [];
+    assignments = [];
+    iteration = 0;
+    stopRunning();
+    mode = 'addCentroids';
+
+    document.getElementById('stepBtn').disabled = true;
+    document.getElementById('runBtn').disabled = true;
+    document.getElementById('statusIndicator').textContent = 'Click canvas to add centroids';
+    document.getElementById('statusIndicator').classList.remove('converged');
+
+    updateStats();
+    drawCanvas();
+}
+
+function updateStats() {
+    document.getElementById('iteration').textContent = iteration;
+    document.getElementById('dataCount').textContent = dataPoints.length;
+    document.getElementById('centroidCount').textContent = centroids.length;
+
+    if (iteration === 0) {
+        document.getElementById('status').textContent = 'Not Started';
+    } else if (document.getElementById('statusIndicator').classList.contains('converged')) {
+        document.getElementById('status').textContent = 'Converged';
+    } else {
+        document.getElementById('status').textContent = 'Running';
+    }
+}
+
+function loadDataset(type) {
+    dataPoints = [];
+    reset();
+
+    switch(type) {
+        case 'blobs':
+            // Three distinct blobs
+            for (let i = 0; i < 30; i++) {
+                dataPoints.push({
+                    x: 0.25 + Math.random() * 0.15,
+                    y: 0.75 + Math.random() * 0.15
+                });
+                dataPoints.push({
+                    x: 0.75 + Math.random() * 0.15,
+                    y: 0.75 + Math.random() * 0.15
+                });
+                dataPoints.push({
+                    x: 0.5 + Math.random() * 0.15,
+                    y: 0.25 + Math.random() * 0.15
+                });
+            }
+            document.getElementById('kValue').value = 3;
+            break;
+
+        case 'circles':
+            // Concentric circles
+            for (let i = 0; i < 40; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const r1 = 0.15 + Math.random() * 0.05;
+                dataPoints.push({
+                    x: 0.5 + Math.cos(angle) * r1,
+                    y: 0.5 + Math.sin(angle) * r1
+                });
+
+                const r2 = 0.3 + Math.random() * 0.05;
+                dataPoints.push({
+                    x: 0.5 + Math.cos(angle) * r2,
+                    y: 0.5 + Math.sin(angle) * r2
+                });
+            }
+            document.getElementById('kValue').value = 2;
+            break;
+
+        case 'moons':
+            // Two moons
+            for (let i = 0; i < 50; i++) {
+                const t = i / 50 * Math.PI;
+                dataPoints.push({
+                    x: 0.3 + Math.cos(t) * 0.3 + (Math.random() - 0.5) * 0.05,
+                    y: 0.5 + Math.sin(t) * 0.3 + (Math.random() - 0.5) * 0.05
+                });
+                dataPoints.push({
+                    x: 0.7 - Math.cos(t) * 0.3 + (Math.random() - 0.5) * 0.05,
+                    y: 0.5 - Math.sin(t) * 0.3 + (Math.random() - 0.5) * 0.05
+                });
+            }
+            document.getElementById('kValue').value = 2;
+            break;
+
+        case 'grid':
+            // Grid pattern
+            for (let i = 0; i < 5; i++) {
+                for (let j = 0; j < 5; j++) {
+                    for (let k = 0; k < 5; k++) {
+                        dataPoints.push({
+                            x: 0.1 + i * 0.2 + (Math.random() - 0.5) * 0.05,
+                            y: 0.1 + j * 0.2 + (Math.random() - 0.5) * 0.05
+                        });
+                    }
+                }
+            }
+            document.getElementById('kValue').value = 4;
+            break;
+    }
+
+    initializeCentroids();
+}
+
+canvas.addEventListener('click', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / canvas.width;
+    const y = 1 - (e.clientY - rect.top) / canvas.height;
+
+    if (mode === 'addCentroids') {
+        const k = parseInt(document.getElementById('kValue').value);
+        if (centroids.length < k) {
+            centroids.push({ x, y });
+            if (centroids.length === k) {
+                mode = 'addData';
+                document.getElementById('stepBtn').disabled = false;
+                document.getElementById('runBtn').disabled = false;
+                document.getElementById('statusIndicator').textContent = 'Click canvas to add data points';
+            }
+        }
+    } else {
+        dataPoints.push({ x, y });
+    }
+
+    updateStats();
+    drawCanvas();
+});
+
+// Initialize
+drawCanvas();
+updateStats();
+</script>
+</body>
+</html>

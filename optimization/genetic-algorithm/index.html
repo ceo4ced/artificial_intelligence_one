@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Genetic Algorithm - Optimization</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 0; }
+.nav-header { background: #2d3748; padding: 15px 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; }
+.nav-header a { color: #90cdf4; text-decoration: none; font-weight: 600; font-size: 1.1em; }
+.nav-title { color: #fff; font-size: 1.2em; font-weight: 700; }
+.container { max-width: 1400px; margin: 20px auto; background: #fff; border-radius: 15px; padding: 30px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+h1 { text-align: center; color: #2d3748; font-size: 2.5em; margin-bottom: 30px; }
+.main-content { display: grid; grid-template-columns: 320px 1fr; gap: 30px; }
+.sidebar { background: #f8f9fa; padding: 20px; border-radius: 10px; height: fit-content; }
+button { width: 100%; padding: 12px; margin: 5px 0; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }
+.btn-primary { background: #4CAF50; color: #fff; }
+.btn-secondary { background: #2196F3; color: #fff; }
+canvas { border: 2px solid #ddd; border-radius: 8px; display: block; background: #fafafa; }
+.stats { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; padding: 15px; border-radius: 10px; margin-top: 15px; }
+.stat-row { display: flex; justify-content: space-between; margin: 8px 0; }
+.control-group { margin: 15px 0; }
+.control-group label { display: block; margin-bottom: 5px; font-weight: 600; }
+.control-group input[type="range"] { width: 100%; }
+.control-group .value { float: right; color: #667eea; }
+</style>
+</head>
+<body>
+<nav class="nav-header">
+    <div class="nav-title">🧬 Genetic Algorithm</div>
+    <a href="../../index.html">← Back to Home</a>
+</nav>
+<div class="container">
+    <h1>🧬 Genetic Algorithm</h1>
+    <div class="main-content">
+        <div class="sidebar">
+            <h3>Controls</h3>
+            <button class="btn-primary" onclick="reset()">Reset</button>
+            <button class="btn-secondary" onclick="runGeneration()">Next Generation</button>
+            <button class="btn-secondary" onclick="runContinuous()">Run Continuous</button>
+            <button class="btn-secondary" onclick="stop()">Stop</button>
+
+            <div class="control-group">
+                <label>Population Size: <span class="value" id="popSizeVal">50</span></label>
+                <input type="range" min="20" max="100" value="50" id="popSize" onchange="updateParams()">
+            </div>
+
+            <div class="control-group">
+                <label>Mutation Rate: <span class="value" id="mutRateVal">0.01</span></label>
+                <input type="range" min="0" max="100" value="10" id="mutRate" onchange="updateParams()">
+            </div>
+
+            <div class="control-group">
+                <label>Crossover Rate: <span class="value" id="crossRateVal">0.7</span></label>
+                <input type="range" min="0" max="100" value="70" id="crossRate" onchange="updateParams()">
+            </div>
+
+            <div class="stats">
+                <div class="stat-row"><span>Generation:</span><span id="gen">0</span></div>
+                <div class="stat-row"><span>Best Fitness:</span><span id="bestFit">0</span></div>
+                <div class="stat-row"><span>Avg Fitness:</span><span id="avgFit">0</span></div>
+                <div class="stat-row"><span>Best Solution:</span><span id="bestSol">-</span></div>
+            </div>
+        </div>
+        <div>
+            <canvas id="canvas" width="800" height="600"></canvas>
+        </div>
+    </div>
+</div>
+<script>
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+
+let popSize = 50;
+let mutationRate = 0.01;
+let crossoverRate = 0.7;
+let generation = 0;
+let population = [];
+let intervalId = null;
+
+// Fitness function: find maximum of f(x,y) = exp(-((x-0.3)^2 + (y-0.3)^2)*15) + 0.8*exp(-((x-0.7)^2 + (y-0.7)^2)*15)
+function fitness(x, y) {
+    return Math.exp(-((x-0.3)**2 + (y-0.3)**2) * 15) +
+           0.8 * Math.exp(-((x-0.7)**2 + (y-0.7)**2) * 15);
+}
+
+class Individual {
+    constructor(x = Math.random(), y = Math.random()) {
+        this.x = Math.max(0, Math.min(1, x));
+        this.y = Math.max(0, Math.min(1, y));
+        this.fitness = fitness(this.x, this.y);
+    }
+
+    mutate() {
+        if (Math.random() < mutationRate) {
+            this.x = Math.max(0, Math.min(1, this.x + (Math.random() - 0.5) * 0.2));
+        }
+        if (Math.random() < mutationRate) {
+            this.y = Math.max(0, Math.min(1, this.y + (Math.random() - 0.5) * 0.2));
+        }
+        this.fitness = fitness(this.x, this.y);
+    }
+}
+
+function crossover(parent1, parent2) {
+    if (Math.random() < crossoverRate) {
+        const alpha = Math.random();
+        const child1X = alpha * parent1.x + (1 - alpha) * parent2.x;
+        const child1Y = alpha * parent1.y + (1 - alpha) * parent2.y;
+        const child2X = (1 - alpha) * parent1.x + alpha * parent2.x;
+        const child2Y = (1 - alpha) * parent1.y + alpha * parent2.y;
+        return [new Individual(child1X, child1Y), new Individual(child2X, child2Y)];
+    }
+    return [new Individual(parent1.x, parent1.y), new Individual(parent2.x, parent2.y)];
+}
+
+function selectParent() {
+    // Tournament selection
+    const tournamentSize = 5;
+    let best = population[Math.floor(Math.random() * population.length)];
+    for (let i = 1; i < tournamentSize; i++) {
+        const candidate = population[Math.floor(Math.random() * population.length)];
+        if (candidate.fitness > best.fitness) {
+            best = candidate;
+        }
+    }
+    return best;
+}
+
+function runGeneration() {
+    // Selection and crossover
+    const newPopulation = [];
+
+    // Elitism: keep top 10%
+    population.sort((a, b) => b.fitness - a.fitness);
+    const eliteCount = Math.floor(popSize * 0.1);
+    for (let i = 0; i < eliteCount; i++) {
+        newPopulation.push(new Individual(population[i].x, population[i].y));
+    }
+
+    // Generate rest through crossover
+    while (newPopulation.length < popSize) {
+        const parent1 = selectParent();
+        const parent2 = selectParent();
+        const [child1, child2] = crossover(parent1, parent2);
+        child1.mutate();
+        child2.mutate();
+        newPopulation.push(child1);
+        if (newPopulation.length < popSize) {
+            newPopulation.push(child2);
+        }
+    }
+
+    population = newPopulation;
+    generation++;
+
+    updateStats();
+    draw();
+}
+
+function updateStats() {
+    const best = population.reduce((a, b) => a.fitness > b.fitness ? a : b);
+    const avgFitness = population.reduce((sum, ind) => sum + ind.fitness, 0) / population.length;
+
+    document.getElementById('gen').textContent = generation;
+    document.getElementById('bestFit').textContent = best.fitness.toFixed(4);
+    document.getElementById('avgFit').textContent = avgFitness.toFixed(4);
+    document.getElementById('bestSol').textContent = `(${best.x.toFixed(2)}, ${best.y.toFixed(2)})`;
+}
+
+function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Draw fitness landscape
+    const gridSize = 80;
+    for (let i = 0; i < gridSize; i++) {
+        for (let j = 0; j < gridSize; j++) {
+            const x = i / gridSize;
+            const y = j / gridSize;
+            const z = fitness(x, y);
+            const c = Math.floor(z * 255);
+            ctx.fillStyle = `rgb(${255-c}, ${c}, 100)`;
+            ctx.fillRect(i * (800/gridSize), j * (600/gridSize), 800/gridSize, 600/gridSize);
+        }
+    }
+
+    // Draw population
+    population.forEach(ind => {
+        const alpha = Math.min(1, ind.fitness / 1.0);
+        ctx.fillStyle = `rgba(255, 0, 0, ${alpha * 0.6 + 0.2})`;
+        ctx.beginPath();
+        ctx.arc(ind.x * 800, ind.y * 600, 4, 0, Math.PI * 2);
+        ctx.fill();
+    });
+
+    // Highlight best individual
+    const best = population.reduce((a, b) => a.fitness > b.fitness ? a : b);
+    ctx.strokeStyle = '#00ff00';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.arc(best.x * 800, best.y * 600, 10, 0, Math.PI * 2);
+    ctx.stroke();
+}
+
+function reset() {
+    stop();
+    generation = 0;
+    population = [];
+    for (let i = 0; i < popSize; i++) {
+        population.push(new Individual());
+    }
+    updateStats();
+    draw();
+}
+
+function runContinuous() {
+    stop();
+    intervalId = setInterval(() => {
+        runGeneration();
+        if (generation >= 200) stop();
+    }, 100);
+}
+
+function stop() {
+    if (intervalId) {
+        clearInterval(intervalId);
+        intervalId = null;
+    }
+}
+
+function updateParams() {
+    popSize = parseInt(document.getElementById('popSize').value);
+    mutationRate = parseInt(document.getElementById('mutRate').value) / 1000;
+    crossoverRate = parseInt(document.getElementById('crossRate').value) / 100;
+
+    document.getElementById('popSizeVal').textContent = popSize;
+    document.getElementById('mutRateVal').textContent = mutationRate.toFixed(3);
+    document.getElementById('crossRateVal').textContent = crossoverRate.toFixed(2);
+}
+
+reset();
+</script>
+</body>
+</html>

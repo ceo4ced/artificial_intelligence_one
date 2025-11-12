@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulated Annealing - Optimization</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 0; }
+.nav-header { background: #2d3748; padding: 15px 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; }
+.nav-header a { color: #90cdf4; text-decoration: none; font-weight: 600; font-size: 1.1em; }
+.nav-title { color: #fff; font-size: 1.2em; font-weight: 700; }
+.container { max-width: 1400px; margin: 20px auto; background: #fff; border-radius: 15px; padding: 30px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+h1 { text-align: center; color: #2d3748; font-size: 2.5em; margin-bottom: 30px; }
+.main-content { display: grid; grid-template-columns: 320px 1fr; gap: 30px; }
+.sidebar { background: #f8f9fa; padding: 20px; border-radius: 10px; height: fit-content; }
+button { width: 100%; padding: 12px; margin: 5px 0; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }
+.btn-primary { background: #4CAF50; color: #fff; }
+.btn-secondary { background: #2196F3; color: #fff; }
+canvas { border: 2px solid #ddd; border-radius: 8px; display: block; background: #fafafa; }
+.stats { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; padding: 15px; border-radius: 10px; margin-top: 15px; }
+.stat-row { display: flex; justify-content: space-between; margin: 8px 0; }
+</style>
+</head>
+<body>
+<nav class="nav-header">
+    <div class="nav-title">🌡️ Simulated Annealing</div>
+    <a href="../../index.html">← Back to Home</a>
+</nav>
+<div class="container">
+    <h1>🌡️ Simulated Annealing</h1>
+    <div class="main-content">
+        <div class="sidebar">
+            <h3>Controls</h3>
+            <button class="btn-primary" onclick="reset()">Reset</button>
+            <button class="btn-secondary" onclick="run()">Run</button>
+            <div class="stats">
+                <div class="stat-row"><span>Temperature:</span><span id="temp">1000</span></div>
+                <div class="stat-row"><span>Iteration:</span><span id="iter">0</span></div>
+                <div class="stat-row"><span>Best Value:</span><span id="best">0</span></div>
+            </div>
+        </div>
+        <div>
+            <canvas id="canvas" width="700" height="600"></canvas>
+        </div>
+    </div>
+</div>
+<script>
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+let temp = 1000, iter = 0, current = {x: 0.5, y: 0.5}, best = 0;
+
+function f(x, y) {
+    return Math.exp(-((x-0.3)**2 + (y-0.3)**2) * 15) +
+           0.8 * Math.exp(-((x-0.7)**2 + (y-0.7)**2) * 15);
+}
+
+function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (let i = 0; i < 100; i++) {
+        for (let j = 0; j < 100; j++) {
+            const z = f(i/100, j/100);
+            const c = Math.floor(z * 255);
+            ctx.fillStyle = `rgb(${255-c}, ${c}, 100)`;
+            ctx.fillRect(i*7, j*6, 7, 6);
+        }
+    }
+    ctx.fillStyle = '#e74c3c';
+    ctx.beginPath();
+    ctx.arc(current.x * 700, current.y * 600, 8, 0, Math.PI * 2);
+    ctx.fill();
+}
+
+function step() {
+    const nx = Math.max(0, Math.min(1, current.x + (Math.random()-0.5)*0.1));
+    const ny = Math.max(0, Math.min(1, current.y + (Math.random()-0.5)*0.1));
+    const delta = f(nx, ny) - f(current.x, current.y);
+    if (delta > 0 || Math.random() < Math.exp(delta/temp)) {
+        current = {x: nx, y: ny};
+    }
+    temp *= 0.995;
+    iter++;
+    best = Math.max(best, f(current.x, current.y));
+    document.getElementById('temp').textContent = temp.toFixed(2);
+    document.getElementById('iter').textContent = iter;
+    document.getElementById('best').textContent = best.toFixed(3);
+    draw();
+}
+
+function run() {
+    const interval = setInterval(() => {
+        step();
+        if (temp < 0.01) clearInterval(interval);
+    }, 50);
+}
+
+function reset() {
+    temp = 1000;
+    iter = 0;
+    best = 0;
+    current = {x: Math.random(), y: Math.random()};
+    draw();
+}
+
+reset();
+</script>
+</body>
+</html>

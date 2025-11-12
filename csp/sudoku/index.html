@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sudoku Solver</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 0; }
+.nav-header { background: #2d3748; padding: 15px 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; }
+.nav-header a { color: #90cdf4; text-decoration: none; font-weight: 600; font-size: 1.1em; }
+.nav-title { color: #fff; font-size: 1.2em; font-weight: 700; }
+.container { max-width: 1200px; margin: 20px auto; background: #fff; border-radius: 15px; padding: 30px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+h1 { text-align: center; color: #2d3748; font-size: 2.5em; margin-bottom: 30px; }
+.main-content { display: grid; grid-template-columns: 320px 1fr; gap: 30px; }
+.sidebar { background: #f8f9fa; padding: 20px; border-radius: 10px; height: fit-content; }
+button { width: 100%; padding: 12px; margin: 5px 0; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }
+.btn-primary { background: #4CAF50; color: #fff; }
+.btn-secondary { background: #2196F3; color: #fff; }
+.btn-danger { background: #f44336; color: #fff; }
+.board-container { display: flex; justify-content: center; align-items: center; }
+.sudoku-grid { display: grid; grid-template-columns: repeat(9, 50px); grid-template-rows: repeat(9, 50px); gap: 0; border: 4px solid #2d3748; background: #2d3748; }
+.sudoku-cell { width: 50px; height: 50px; background: #fff; display: flex; align-items: center; justify-content: center; font-size: 1.5em; font-weight: bold; border: 1px solid #ccc; }
+.sudoku-cell.given { background: #e3f2fd; color: #1976d2; }
+.sudoku-cell.solved { background: #c8e6c9; color: #2e7d32; animation: fadeIn 0.3s; }
+.sudoku-cell.current { background: #fff9c4; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.sudoku-cell:nth-child(3n) { border-right: 2px solid #2d3748; }
+.sudoku-cell:nth-child(n):nth-child(-n+9):nth-child(3n) { border-right: 2px solid #2d3748; }
+.stats { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; padding: 15px; border-radius: 10px; margin-top: 15px; }
+.stat-row { display: flex; justify-content: space-between; margin: 8px 0; }
+.control-group { margin: 15px 0; }
+.control-group label { display: block; margin-bottom: 5px; font-weight: 600; }
+.control-group select { width: 100%; padding: 8px; border-radius: 5px; border: 2px solid #ddd; }
+.info { background: #e3f2fd; padding: 12px; border-radius: 8px; margin-top: 15px; font-size: 0.9em; line-height: 1.5; }
+</style>
+</head>
+<body>
+<nav class="nav-header">
+    <div class="nav-title">🔢 Sudoku</div>
+    <a href="../../index.html">← Back to Home</a>
+</nav>
+<div class="container">
+    <h1>🔢 Sudoku Solver</h1>
+    <div class="main-content">
+        <div class="sidebar">
+            <h3>Controls</h3>
+            <button class="btn-primary" onclick="solve()">Solve</button>
+            <button class="btn-secondary" onclick="step()">Step Through</button>
+            <button class="btn-danger" onclick="reset()">Clear Board</button>
+
+            <div class="control-group">
+                <label>Load Puzzle:</label>
+                <select id="puzzleSelect" onchange="loadPuzzle()">
+                    <option value="easy">Easy</option>
+                    <option value="medium">Medium</option>
+                    <option value="hard">Hard</option>
+                    <option value="expert">Expert</option>
+                    <option value="empty">Empty</option>
+                </select>
+            </div>
+
+            <div class="stats">
+                <div class="stat-row"><span>Filled Cells:</span><span id="filled">0</span></div>
+                <div class="stat-row"><span>Empty Cells:</span><span id="empty">81</span></div>
+                <div class="stat-row"><span>Backtracks:</span><span id="backtracks">0</span></div>
+                <div class="stat-row"><span>Status:</span><span id="status">Ready</span></div>
+            </div>
+
+            <div class="info">
+                <strong>Sudoku Rules:</strong><br>
+                Fill the 9×9 grid so that each row, column, and 3×3 box contains digits 1-9 without repetition.<br><br>
+                <strong>Algorithm:</strong> Backtracking with constraint propagation
+            </div>
+        </div>
+        <div class="board-container">
+            <div class="sudoku-grid" id="grid"></div>
+        </div>
+    </div>
+</div>
+<script>
+let board = Array(9).fill(0).map(() => Array(9).fill(0));
+let initialBoard = Array(9).fill(0).map(() => Array(9).fill(0));
+let backtracks = 0;
+let stepGenerator = null;
+let currentCell = null;
+
+const puzzles = {
+    easy: [
+        [5,3,0,0,7,0,0,0,0],
+        [6,0,0,1,9,5,0,0,0],
+        [0,9,8,0,0,0,0,6,0],
+        [8,0,0,0,6,0,0,0,3],
+        [4,0,0,8,0,3,0,0,1],
+        [7,0,0,0,2,0,0,0,6],
+        [0,6,0,0,0,0,2,8,0],
+        [0,0,0,4,1,9,0,0,5],
+        [0,0,0,0,8,0,0,7,9]
+    ],
+    medium: [
+        [0,0,0,6,0,0,4,0,0],
+        [7,0,0,0,0,3,6,0,0],
+        [0,0,0,0,9,1,0,8,0],
+        [0,0,0,0,0,0,0,0,0],
+        [0,5,0,1,8,0,0,0,3],
+        [0,0,0,3,0,6,0,4,5],
+        [0,4,0,2,0,0,0,6,0],
+        [9,0,3,0,0,0,0,0,0],
+        [0,2,0,0,0,0,1,0,0]
+    ],
+    hard: [
+        [0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,3,0,8,5],
+        [0,0,1,0,2,0,0,0,0],
+        [0,0,0,5,0,7,0,0,0],
+        [0,0,4,0,0,0,1,0,0],
+        [0,9,0,0,0,0,0,0,0],
+        [5,0,0,0,0,0,0,7,3],
+        [0,0,2,0,1,0,0,0,0],
+        [0,0,0,0,4,0,0,0,9]
+    ],
+    expert: [
+        [0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0],
+        [0,0,4,0,5,0,6,0,0],
+        [0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0],
+        [1,2,3,4,5,6,7,8,9]
+    ],
+    empty: Array(9).fill(0).map(() => Array(9).fill(0))
+};
+
+function initGrid() {
+    const grid = document.getElementById('grid');
+    grid.innerHTML = '';
+
+    for (let row = 0; row < 9; row++) {
+        for (let col = 0; col < 9; col++) {
+            const cell = document.createElement('div');
+            cell.className = 'sudoku-cell';
+            cell.dataset.row = row;
+            cell.dataset.col = col;
+
+            // Add thicker borders for 3x3 boxes
+            if (row % 3 === 2 && row !== 8) cell.style.borderBottom = '3px solid #2d3748';
+            if (col % 3 === 2 && col !== 8) cell.style.borderRight = '3px solid #2d3748';
+
+            grid.appendChild(cell);
+        }
+    }
+}
+
+function loadPuzzle() {
+    const puzzleName = document.getElementById('puzzleSelect').value;
+    board = puzzles[puzzleName].map(row => [...row]);
+    initialBoard = puzzles[puzzleName].map(row => [...row]);
+    backtracks = 0;
+    stepGenerator = null;
+    currentCell = null;
+    updateBoard();
+    updateStats();
+    document.getElementById('status').textContent = 'Ready';
+}
+
+function isValid(board, row, col, num) {
+    // Check row
+    for (let x = 0; x < 9; x++) {
+        if (board[row][x] === num) return false;
+    }
+
+    // Check column
+    for (let x = 0; x < 9; x++) {
+        if (board[x][col] === num) return false;
+    }
+
+    // Check 3x3 box
+    const startRow = row - row % 3;
+    const startCol = col - col % 3;
+    for (let i = 0; i < 3; i++) {
+        for (let j = 0; j < 3; j++) {
+            if (board[i + startRow][j + startCol] === num) return false;
+        }
+    }
+
+    return true;
+}
+
+function solveSudoku() {
+    for (let row = 0; row < 9; row++) {
+        for (let col = 0; col < 9; col++) {
+            if (board[row][col] === 0) {
+                for (let num = 1; num <= 9; num++) {
+                    if (isValid(board, row, col, num)) {
+                        board[row][col] = num;
+
+                        if (solveSudoku()) {
+                            return true;
+                        }
+
+                        board[row][col] = 0;
+                        backtracks++;
+                    }
+                }
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+function* solveSudokuGenerator() {
+    for (let row = 0; row < 9; row++) {
+        for (let col = 0; col < 9; col++) {
+            if (board[row][col] === 0) {
+                currentCell = {row, col};
+                yield false;
+
+                for (let num = 1; num <= 9; num++) {
+                    if (isValid(board, row, col, num)) {
+                        board[row][col] = num;
+                        yield false;
+
+                        const result = yield* solveSudokuGenerator();
+                        if (result) {
+                            return true;
+                        }
+
+                        board[row][col] = 0;
+                        backtracks++;
+                        yield false;
+                    }
+                }
+                currentCell = null;
+                return false;
+            }
+        }
+    }
+    currentCell = null;
+    return true;
+}
+
+function solve() {
+    backtracks = 0;
+    stepGenerator = null;
+    document.getElementById('status').textContent = 'Solving...';
+
+    setTimeout(() => {
+        const solved = solveSudoku();
+        updateBoard();
+        updateStats();
+        document.getElementById('status').textContent = solved ? 'Solved!' : 'No solution';
+    }, 50);
+}
+
+function step() {
+    if (!stepGenerator) {
+        backtracks = 0;
+        stepGenerator = solveSudokuGenerator();
+        document.getElementById('status').textContent = 'Stepping...';
+    }
+
+    const result = stepGenerator.next();
+    updateBoard();
+    updateStats();
+
+    if (result.done) {
+        stepGenerator = null;
+        currentCell = null;
+        document.getElementById('status').textContent = result.value ? 'Solved!' : 'No solution';
+    }
+}
+
+function updateBoard() {
+    const cells = document.querySelectorAll('.sudoku-cell');
+    cells.forEach(cell => {
+        const row = parseInt(cell.dataset.row);
+        const col = parseInt(cell.dataset.col);
+        const value = board[row][col];
+
+        cell.textContent = value === 0 ? '' : value;
+        cell.className = 'sudoku-cell';
+
+        if (initialBoard[row][col] !== 0) {
+            cell.classList.add('given');
+        } else if (value !== 0) {
+            cell.classList.add('solved');
+        }
+
+        if (currentCell && currentCell.row === row && currentCell.col === col) {
+            cell.classList.add('current');
+        }
+    });
+}
+
+function updateStats() {
+    let filled = 0;
+    for (let i = 0; i < 9; i++) {
+        for (let j = 0; j < 9; j++) {
+            if (board[i][j] !== 0) filled++;
+        }
+    }
+
+    document.getElementById('filled').textContent = filled;
+    document.getElementById('empty').textContent = 81 - filled;
+    document.getElementById('backtracks').textContent = backtracks;
+}
+
+function reset() {
+    board = Array(9).fill(0).map(() => Array(9).fill(0));
+    initialBoard = Array(9).fill(0).map(() => Array(9).fill(0));
+    backtracks = 0;
+    stepGenerator = null;
+    currentCell = null;
+    updateBoard();
+    updateStats();
+    document.getElementById('status').textContent = 'Ready';
+}
+
+initGrid();
+loadPuzzle();
+</script>
+</body>
+</html>

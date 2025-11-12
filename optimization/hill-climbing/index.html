@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hill Climbing - Optimization Visualizer</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 0;
+}
+.nav-header {
+    background: #2d3748;
+    padding: 15px 30px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.nav-header a {
+    color: #90cdf4;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1.1em;
+    transition: color 0.3s;
+}
+.nav-header a:hover { color: #63b3ed; }
+.nav-title { color: #fff; font-size: 1.2em; font-weight: 700; }
+.page-wrapper { padding: 20px; }
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+h1 { text-align: center; color: #2d3748; margin-bottom: 10px; font-size: 2.5em; }
+.subtitle { text-align: center; color: #4a5568; margin-bottom: 30px; font-size: 1.1em; }
+.info-section {
+    background: #e8f5e9;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 25px;
+    border-left: 5px solid #4CAF50;
+}
+.info-section h3 { color: #2e7d32; margin-bottom: 10px; }
+.info-section p { color: #1b5e20; line-height: 1.6; margin-bottom: 8px; }
+.info-section ul { list-style-position: inside; color: #1b5e20; line-height: 1.8; }
+.main-content { display: grid; grid-template-columns: 320px 1fr; gap: 30px; margin-bottom: 30px; }
+.sidebar { background: #f8f9fa; padding: 20px; border-radius: 10px; height: fit-content; }
+.sidebar h3 { color: #2d3748; margin-bottom: 15px; font-size: 1.3em; }
+button {
+    width: 100%;
+    padding: 12px;
+    font-size: 14px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    margin-bottom: 10px;
+}
+button:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+button:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-primary { background: #4CAF50; color: #fff; }
+.btn-primary:hover:not(:disabled) { background: #45a049; }
+.btn-secondary { background: #2196F3; color: #fff; }
+.btn-secondary:hover:not(:disabled) { background: #0b7dda; }
+.canvas-area { background: #fff; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); padding: 20px; }
+canvas { display: block; border: 2px solid #e2e8f0; border-radius: 8px; background: #fafafa; }
+.stats-display {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #fff;
+    padding: 15px;
+    border-radius: 10px;
+    margin-top: 15px;
+}
+.stat-row { display: flex; justify-content: space-between; margin: 8px 0; font-size: 0.95em; }
+.stat-value { font-weight: bold; }
+select { width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 6px; font-size: 14px; margin-bottom: 10px; }
+@media (max-width: 1000px) { .main-content { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<nav class="nav-header">
+    <div class="nav-title">📈 Hill Climbing</div>
+    <a href="../../index.html">← Back to Home</a>
+</nav>
+<div class="page-wrapper">
+    <div class="container">
+        <h1>📈 Hill Climbing</h1>
+        <p class="subtitle">Find local optima by always moving to better neighboring states!</p>
+        <div class="info-section">
+            <h3>📚 What is Hill Climbing?</h3>
+            <p>Hill Climbing is a local search algorithm that continuously moves towards increasing value (or decreasing cost). It's like climbing a hill in fog - you can only see nearby positions and always move upward.</p>
+            <p><strong>How it works:</strong></p>
+            <ul>
+                <li>Start at a random position</li>
+                <li>Look at neighboring positions</li>
+                <li>Move to the best neighbor if it's better than current</li>
+                <li>Repeat until no neighbors are better (local maximum)</li>
+            </ul>
+            <p><strong>Limitations:</strong> Can get stuck at local maxima, plateaus, or ridges</p>
+        </div>
+        <div class="main-content">
+            <div class="sidebar">
+                <h3>🎮 Controls</h3>
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #4a5568;">Landscape:</label>
+                    <select id="landscape" onchange="selectLandscape()">
+                        <option value="simple">Simple Peak</option>
+                        <option value="multimodal">Multiple Peaks</option>
+                        <option value="plateau">Plateau</option>
+                        <option value="ridge">Ridge</option>
+                    </select>
+                </div>
+                <button class="btn-primary" onclick="reset()">🎲 Random Start</button>
+                <button class="btn-secondary" onclick="step()">▶️ Step</button>
+                <button class="btn-secondary" onclick="run()">⏩ Run</button>
+                <button class="btn-secondary" onclick="stop()">⏸️ Stop</button>
+                <div class="stats-display">
+                    <div class="stat-row"><span>Steps:</span><span class="stat-value" id="steps">0</span></div>
+                    <div class="stat-row"><span>Current Value:</span><span class="stat-value" id="value">0.00</span></div>
+                    <div class="stat-row"><span>Status:</span><span class="stat-value" id="status">Not Started</span></div>
+                </div>
+            </div>
+            <div class="canvas-area">
+                <h3>3D Landscape Visualization</h3>
+                <canvas id="canvas" width="700" height="600"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+let current = { x: 0.5, y: 0.5 };
+let path = [];
+let steps = 0;
+let isRunning = false;
+let interval = null;
+let landscapeType = 'simple';
+
+function f(x, y) {
+    switch(landscapeType) {
+        case 'simple':
+            return Math.exp(-((x-0.5)**2 + (y-0.5)**2) * 10);
+        case 'multimodal':
+            return Math.exp(-((x-0.3)**2 + (y-0.3)**2) * 15) +
+                   0.8 * Math.exp(-((x-0.7)**2 + (y-0.7)**2) * 15) +
+                   0.6 * Math.exp(-((x-0.5)**2 + (y-0.8)**2) * 20);
+        case 'plateau':
+            const d = Math.sqrt((x-0.5)**2 + (y-0.5)**2);
+            return d < 0.3 ? 0.8 : Math.exp(-(d-0.3)**2 * 20);
+        case 'ridge':
+            return Math.exp(-Math.abs(x - y) * 20) * Math.exp(-((x+y-1)**2) * 5);
+    }
+}
+
+function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const size = 100;
+
+    // Draw 3D landscape
+    for (let i = 0; i < size; i++) {
+        for (let j = 0; j < size; j++) {
+            const x = i / size;
+            const y = j / size;
+            const z = f(x, y);
+
+            const px = 100 + i * 5 - j * 2;
+            const py = 400 - j * 3 - i * 1.5 - z * 200;
+
+            const intensity = Math.floor(z * 255);
+            ctx.fillStyle = `rgb(${255-intensity}, ${intensity}, 100)`;
+            ctx.fillRect(px, py, 6, 6);
+        }
+    }
+
+    // Draw path
+    ctx.strokeStyle = '#f44336';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    path.forEach((p, idx) => {
+        const px = 100 + p.x * 500 - p.y * 200;
+        const py = 400 - p.y * 300 - p.x * 150 - f(p.x, p.y) * 200;
+        if (idx === 0) ctx.moveTo(px, py);
+        else ctx.lineTo(px, py);
+    });
+    ctx.stroke();
+
+    // Draw current position
+    const px = 100 + current.x * 500 - current.y * 200;
+    const py = 400 - current.y * 300 - current.x * 150 - f(current.x, current.y) * 200;
+    ctx.fillStyle = '#e74c3c';
+    ctx.beginPath();
+    ctx.arc(px, py, 8, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+}
+
+function step() {
+    const delta = 0.05;
+    const neighbors = [];
+
+    for (let dx = -delta; dx <= delta; dx += delta) {
+        for (let dy = -delta; dy <= delta; dy += delta) {
+            if (dx === 0 && dy === 0) continue;
+            const nx = Math.max(0, Math.min(1, current.x + dx));
+            const ny = Math.max(0, Math.min(1, current.y + dy));
+            neighbors.push({ x: nx, y: ny, value: f(nx, ny) });
+        }
+    }
+
+    neighbors.sort((a, b) => b.value - a.value);
+    const best = neighbors[0];
+    const currentValue = f(current.x, current.y);
+
+    if (best.value > currentValue) {
+        current = { x: best.x, y: best.y };
+        path.push({ ...current });
+        steps++;
+        updateStats();
+        draw();
+    } else {
+        document.getElementById('status').textContent = 'Local Maximum';
+        stop();
+    }
+}
+
+function run() {
+    if (isRunning) return;
+    isRunning = true;
+    interval = setInterval(step, 200);
+}
+
+function stop() {
+    isRunning = false;
+    if (interval) clearInterval(interval);
+}
+
+function reset() {
+    stop();
+    current = { x: Math.random(), y: Math.random() };
+    path = [{ ...current }];
+    steps = 0;
+    document.getElementById('status').textContent = 'Ready';
+    updateStats();
+    draw();
+}
+
+function selectLandscape() {
+    landscapeType = document.getElementById('landscape').value;
+    reset();
+}
+
+function updateStats() {
+    document.getElementById('steps').textContent = steps;
+    document.getElementById('value').textContent = f(current.x, current.y).toFixed(3);
+}
+
+reset();
+</script>
+</body>
+</html>

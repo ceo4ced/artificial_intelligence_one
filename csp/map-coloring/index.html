@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Map Coloring CSP</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 0; }
+.nav-header { background: #2d3748; padding: 15px 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; }
+.nav-header a { color: #90cdf4; text-decoration: none; font-weight: 600; font-size: 1.1em; }
+.nav-title { color: #fff; font-size: 1.2em; font-weight: 700; }
+.container { max-width: 1400px; margin: 20px auto; background: #fff; border-radius: 15px; padding: 30px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+h1 { text-align: center; color: #2d3748; font-size: 2.5em; margin-bottom: 30px; }
+.main-content { display: grid; grid-template-columns: 320px 1fr; gap: 30px; }
+.sidebar { background: #f8f9fa; padding: 20px; border-radius: 10px; height: fit-content; }
+button { width: 100%; padding: 12px; margin: 5px 0; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }
+.btn-primary { background: #4CAF50; color: #fff; }
+.btn-secondary { background: #2196F3; color: #fff; }
+canvas { border: 2px solid #ddd; border-radius: 8px; display: block; background: #fafafa; }
+.stats { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; padding: 15px; border-radius: 10px; margin-top: 15px; }
+.stat-row { display: flex; justify-content: space-between; margin: 8px 0; }
+.control-group { margin: 15px 0; }
+.control-group label { display: block; margin-bottom: 5px; font-weight: 600; }
+.control-group select { width: 100%; padding: 8px; border-radius: 5px; border: 2px solid #ddd; }
+.info { background: #e3f2fd; padding: 12px; border-radius: 8px; margin-top: 15px; font-size: 0.9em; line-height: 1.5; }
+.colors-legend { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
+.color-box { width: 30px; height: 30px; border-radius: 5px; border: 2px solid #333; }
+</style>
+</head>
+<body>
+<nav class="nav-header">
+    <div class="nav-title">🗺️ Map Coloring</div>
+    <a href="../../index.html">← Back to Home</a>
+</nav>
+<div class="container">
+    <h1>🗺️ Map Coloring CSP</h1>
+    <div class="main-content">
+        <div class="sidebar">
+            <h3>Controls</h3>
+            <button class="btn-primary" onclick="solve()">Solve with Backtracking</button>
+            <button class="btn-secondary" onclick="step()">Step Through</button>
+            <button class="btn-secondary" onclick="reset()">Reset</button>
+
+            <div class="control-group">
+                <label>Map:</label>
+                <select id="mapSelect" onchange="loadMap()">
+                    <option value="australia">Australia</option>
+                    <option value="usa">USA (Simplified)</option>
+                    <option value="europe">Europe (Simplified)</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label>Number of Colors:</label>
+                <select id="numColors" onchange="reset()">
+                    <option value="3">3 Colors</option>
+                    <option value="4" selected>4 Colors</option>
+                    <option value="5">5 Colors</option>
+                </select>
+            </div>
+
+            <div class="stats">
+                <div class="stat-row"><span>Regions:</span><span id="regions">0</span></div>
+                <div class="stat-row"><span>Colored:</span><span id="colored">0</span></div>
+                <div class="stat-row"><span>Backtracks:</span><span id="backtracks">0</span></div>
+                <div class="stat-row"><span>Status:</span><span id="status">Ready</span></div>
+            </div>
+
+            <div>
+                <strong>Colors:</strong>
+                <div class="colors-legend" id="legend"></div>
+            </div>
+
+            <div class="info">
+                <strong>Map Coloring Problem:</strong><br>
+                Color each region so that no two adjacent regions have the same color.
+                This is a classic CSP solved with backtracking.<br><br>
+                <strong>Four Color Theorem:</strong> Any map can be colored with at most 4 colors.
+            </div>
+        </div>
+        <div>
+            <canvas id="canvas" width="900" height="700"></canvas>
+        </div>
+    </div>
+</div>
+<script>
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+
+const COLORS = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8'];
+
+let regions = {};
+let adjacency = {};
+let solution = {};
+let numColors = 4;
+let backtracks = 0;
+let stepMode = false;
+let stepGenerator = null;
+
+const maps = {
+    australia: {
+        regions: {
+            WA: { x: 200, y: 350, points: [[100,200], [300,200], [300,400], [200,500], [100,400]] },
+            NT: { x: 350, y: 250, points: [[300,100], [450,100], [450,400], [300,400]] },
+            SA: { x: 400, y: 450, points: [[300,400], [450,400], [500,500], [400,550], [200,500]] },
+            Q: { x: 550, y: 250, points: [[450,100], [650,100], [650,350], [500,400], [450,400]] },
+            NSW: { x: 600, y: 450, points: [[500,400], [650,350], [700,450], [600,500], [500,500]] },
+            V: { x: 550, y: 550, points: [[500,500], [600,500], [600,550], [500,550]] },
+            T: { x: 600, y: 650, points: [[550,620], [650,620], [650,670], [550,670]] }
+        },
+        adjacency: {
+            WA: ['NT', 'SA'],
+            NT: ['WA', 'SA', 'Q'],
+            SA: ['WA', 'NT', 'Q', 'NSW', 'V'],
+            Q: ['NT', 'SA', 'NSW'],
+            NSW: ['Q', 'SA', 'V'],
+            V: ['SA', 'NSW'],
+            T: []
+        }
+    },
+    usa: {
+        regions: {
+            WA: { x: 150, y: 150, points: [[100,100], [200,100], [200,200], [100,200]] },
+            OR: { x: 150, y: 250, points: [[100,200], [200,200], [200,300], [100,300]] },
+            CA: { x: 150, y: 400, points: [[100,300], [200,300], [200,500], [100,500]] },
+            NV: { x: 250, y: 350, points: [[200,300], [300,300], [300,450], [200,450]] },
+            ID: { x: 250, y: 200, points: [[200,100], [300,100], [300,250], [200,250]] },
+            MT: { x: 350, y: 150, points: [[300,100], [450,100], [450,200], [300,200]] },
+            WY: { x: 350, y: 250, points: [[300,200], [450,200], [450,300], [300,300]] },
+            UT: { x: 300, y: 350, points: [[300,300], [350,300], [350,400], [300,400]] },
+            AZ: { x: 250, y: 500, points: [[200,450], [350,450], [350,550], [200,550]] },
+            NM: { x: 400, y: 450, points: [[350,400], [500,400], [500,550], [350,550]] },
+            CO: { x: 400, y: 350, points: [[350,300], [500,300], [500,400], [350,400]] },
+            TX: { x: 550, y: 500, points: [[500,400], [650,400], [650,600], [500,600]] }
+        },
+        adjacency: {
+            WA: ['OR', 'ID'],
+            OR: ['WA', 'ID', 'NV', 'CA'],
+            CA: ['OR', 'NV', 'AZ'],
+            NV: ['OR', 'ID', 'UT', 'AZ', 'CA'],
+            ID: ['WA', 'OR', 'NV', 'UT', 'WY', 'MT'],
+            MT: ['ID', 'WY'],
+            WY: ['MT', 'ID', 'UT', 'CO'],
+            UT: ['ID', 'WY', 'CO', 'NM', 'AZ', 'NV'],
+            AZ: ['CA', 'NV', 'UT', 'NM'],
+            NM: ['AZ', 'UT', 'CO', 'TX'],
+            CO: ['WY', 'UT', 'NM', 'TX'],
+            TX: ['NM', 'CO']
+        }
+    },
+    europe: {
+        regions: {
+            PT: { x: 100, y: 400, points: [[50,350], [100,350], [100,450], [50,450]] },
+            ES: { x: 200, y: 450, points: [[100,350], [300,350], [300,500], [100,500]] },
+            FR: { x: 300, y: 300, points: [[250,250], [400,250], [400,400], [300,400], [250,350]] },
+            BE: { x: 350, y: 200, points: [[320,180], [380,180], [380,220], [320,220]] },
+            DE: { x: 450, y: 250, points: [[400,200], [500,200], [500,350], [400,350]] },
+            IT: { x: 450, y: 450, points: [[400,400], [500,400], [500,550], [400,550]] },
+            CH: { x: 400, y: 350, points: [[380,330], [420,330], [420,370], [380,370]] },
+            AT: { x: 550, y: 300, points: [[500,280], [600,280], [600,350], [500,350]] },
+            PL: { x: 600, y: 200, points: [[550,150], [650,150], [650,250], [550,250]] },
+            CZ: { x: 550, y: 250, points: [[500,230], [600,230], [600,280], [500,280]] }
+        },
+        adjacency: {
+            PT: ['ES'],
+            ES: ['PT', 'FR'],
+            FR: ['ES', 'BE', 'DE', 'CH', 'IT'],
+            BE: ['FR', 'DE'],
+            DE: ['BE', 'FR', 'CH', 'AT', 'CZ', 'PL'],
+            IT: ['FR', 'CH', 'AT'],
+            CH: ['FR', 'DE', 'IT', 'AT'],
+            AT: ['DE', 'CH', 'IT', 'CZ'],
+            PL: ['DE', 'CZ'],
+            CZ: ['DE', 'AT', 'PL']
+        }
+    }
+};
+
+function loadMap() {
+    const mapName = document.getElementById('mapSelect').value;
+    const map = maps[mapName];
+    regions = map.regions;
+    adjacency = map.adjacency;
+    reset();
+}
+
+function reset() {
+    solution = {};
+    Object.keys(regions).forEach(r => solution[r] = -1);
+    backtracks = 0;
+    stepGenerator = null;
+    stepMode = false;
+    numColors = parseInt(document.getElementById('numColors').value);
+
+    updateLegend();
+    updateStats();
+    draw();
+    document.getElementById('status').textContent = 'Ready';
+}
+
+function updateLegend() {
+    const legend = document.getElementById('legend');
+    legend.innerHTML = '';
+    for (let i = 0; i < numColors; i++) {
+        const box = document.createElement('div');
+        box.className = 'color-box';
+        box.style.background = COLORS[i];
+        legend.appendChild(box);
+    }
+}
+
+function isConsistent(region, color) {
+    const neighbors = adjacency[region];
+    for (let neighbor of neighbors) {
+        if (solution[neighbor] === color) {
+            return false;
+        }
+    }
+    return true;
+}
+
+function* backtrackGenerator() {
+    const regionNames = Object.keys(regions);
+
+    function* solve(index) {
+        if (index === regionNames.length) {
+            yield true;
+            return true;
+        }
+
+        const region = regionNames[index];
+
+        for (let color = 0; color < numColors; color++) {
+            if (isConsistent(region, color)) {
+                solution[region] = color;
+                yield false;
+
+                const result = yield* solve(index + 1);
+                if (result) {
+                    return true;
+                }
+
+                solution[region] = -1;
+                backtracks++;
+                yield false;
+            }
+        }
+
+        return false;
+    }
+
+    yield* solve(0);
+}
+
+function solveBacktrack() {
+    const regionNames = Object.keys(regions);
+
+    function solve(index) {
+        if (index === regionNames.length) {
+            return true;
+        }
+
+        const region = regionNames[index];
+
+        for (let color = 0; color < numColors; color++) {
+            if (isConsistent(region, color)) {
+                solution[region] = color;
+
+                if (solve(index + 1)) {
+                    return true;
+                }
+
+                solution[region] = -1;
+                backtracks++;
+            }
+        }
+
+        return false;
+    }
+
+    return solve(0);
+}
+
+function solve() {
+    reset();
+    document.getElementById('status').textContent = 'Solving...';
+
+    setTimeout(() => {
+        const solved = solveBacktrack();
+        draw();
+        updateStats();
+        document.getElementById('status').textContent = solved ? 'Solved!' : 'No solution';
+    }, 50);
+}
+
+function step() {
+    if (!stepGenerator) {
+        reset();
+        stepGenerator = backtrackGenerator();
+        stepMode = true;
+        document.getElementById('status').textContent = 'Stepping...';
+    }
+
+    const result = stepGenerator.next();
+    draw();
+    updateStats();
+
+    if (result.done) {
+        stepGenerator = null;
+        document.getElementById('status').textContent = result.value ? 'Solved!' : 'No solution';
+    }
+}
+
+function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Draw regions
+    Object.keys(regions).forEach(name => {
+        const region = regions[name];
+        const color = solution[name];
+
+        ctx.beginPath();
+        ctx.moveTo(region.points[0][0], region.points[0][1]);
+        for (let i = 1; i < region.points.length; i++) {
+            ctx.lineTo(region.points[i][0], region.points[i][1]);
+        }
+        ctx.closePath();
+
+        if (color >= 0) {
+            ctx.fillStyle = COLORS[color];
+        } else {
+            ctx.fillStyle = '#f0f0f0';
+        }
+        ctx.fill();
+
+        ctx.strokeStyle = '#333';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Draw region name
+        ctx.fillStyle = '#000';
+        ctx.font = 'bold 16px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(name, region.x, region.y);
+    });
+}
+
+function updateStats() {
+    const regionCount = Object.keys(regions).length;
+    const coloredCount = Object.values(solution).filter(c => c >= 0).length;
+
+    document.getElementById('regions').textContent = regionCount;
+    document.getElementById('colored').textContent = coloredCount;
+    document.getElementById('backtracks').textContent = backtracks;
+}
+
+loadMap();
+</script>
+</body>
+</html>
