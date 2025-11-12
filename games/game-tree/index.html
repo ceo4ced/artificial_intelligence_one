@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Game Tree Visualizer</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 0; }
+.nav-header { background: #2d3748; padding: 15px 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; }
+.nav-header a { color: #90cdf4; text-decoration: none; font-weight: 600; font-size: 1.1em; }
+.nav-title { color: #fff; font-size: 1.2em; font-weight: 700; }
+.container { max-width: 1400px; margin: 20px auto; background: #fff; border-radius: 15px; padding: 30px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+h1 { text-align: center; color: #2d3748; font-size: 2.5em; margin-bottom: 30px; }
+.main-content { display: grid; grid-template-columns: 320px 1fr; gap: 30px; }
+.sidebar { background: #f8f9fa; padding: 20px; border-radius: 10px; height: fit-content; }
+button { width: 100%; padding: 12px; margin: 5px 0; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }
+.btn-primary { background: #4CAF50; color: #fff; }
+.btn-secondary { background: #2196F3; color: #fff; }
+canvas { border: 2px solid #ddd; border-radius: 8px; display: block; background: #fafafa; cursor: crosshair; }
+.stats { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; padding: 15px; border-radius: 10px; margin-top: 15px; }
+.stat-row { display: flex; justify-content: space-between; margin: 8px 0; }
+.control-group { margin: 15px 0; }
+.control-group label { display: block; margin-bottom: 5px; font-weight: 600; }
+.control-group input[type="range"] { width: 100%; }
+.control-group .value { float: right; color: #667eea; }
+.info { background: #e3f2fd; padding: 12px; border-radius: 8px; margin-top: 15px; font-size: 0.9em; line-height: 1.5; }
+</style>
+</head>
+<body>
+<nav class="nav-header">
+    <div class="nav-title">🌲 Game Tree</div>
+    <a href="../../index.html">← Back to Home</a>
+</nav>
+<div class="container">
+    <h1>🌲 Game Tree Visualizer</h1>
+    <div class="main-content">
+        <div class="sidebar">
+            <h3>Controls</h3>
+            <button class="btn-primary" onclick="generateTree()">Generate Tree</button>
+            <button class="btn-secondary" onclick="runMinimax()">Run Minimax</button>
+            <button class="btn-secondary" onclick="step()">Step</button>
+            <button class="btn-secondary" onclick="reset()">Reset</button>
+
+            <div class="control-group">
+                <label>Tree Depth: <span class="value" id="depthVal">3</span></label>
+                <input type="range" min="2" max="4" value="3" id="depth" onchange="updateDepth()">
+            </div>
+
+            <div class="control-group">
+                <label>Branching Factor: <span class="value" id="branchVal">2</span></label>
+                <input type="range" min="2" max="3" value="2" id="branch" onchange="updateBranch()">
+            </div>
+
+            <div class="stats">
+                <div class="stat-row"><span>Total Nodes:</span><span id="nodes">0</span></div>
+                <div class="stat-row"><span>Evaluated:</span><span id="evaluated">0</span></div>
+                <div class="stat-row"><span>Best Move:</span><span id="bestMove">-</span></div>
+                <div class="stat-row"><span>Best Value:</span><span id="bestValue">-</span></div>
+            </div>
+
+            <div class="info">
+                <strong>How to use:</strong><br>
+                1. Click "Generate Tree" to create a game tree<br>
+                2. Click "Run Minimax" to see the algorithm evaluate the tree<br>
+                3. Blue nodes are MAX (your turn), Red nodes are MIN (opponent's turn)<br>
+                4. Values propagate from leaves to root
+            </div>
+        </div>
+        <div>
+            <canvas id="canvas" width="900" height="700"></canvas>
+        </div>
+    </div>
+</div>
+<script>
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+
+let depth = 3;
+let branchingFactor = 2;
+let tree = null;
+let evaluatedCount = 0;
+let currentStep = 0;
+let evaluationSteps = [];
+
+class TreeNode {
+    constructor(level, index, parent = null) {
+        this.level = level;
+        this.index = index;
+        this.parent = parent;
+        this.children = [];
+        this.value = null;
+        this.evaluated = false;
+        this.isMax = level % 2 === 0;
+        this.x = 0;
+        this.y = 0;
+        this.bestChild = false;
+    }
+}
+
+function generateTree() {
+    reset();
+    tree = buildTree(0, 0, null);
+    assignPositions(tree);
+    assignLeafValues(tree);
+    draw();
+    updateStats();
+}
+
+function buildTree(level, index, parent) {
+    const node = new TreeNode(level, index, parent);
+
+    if (level < depth) {
+        for (let i = 0; i < branchingFactor; i++) {
+            const child = buildTree(level + 1, i, node);
+            node.children.push(child);
+        }
+    } else {
+        // Leaf node - assign random value
+        node.value = Math.floor(Math.random() * 20) - 10;
+    }
+
+    return node;
+}
+
+function assignLeafValues(node) {
+    if (node.children.length === 0) {
+        node.value = Math.floor(Math.random() * 20) - 10;
+    } else {
+        node.children.forEach(child => assignLeafValues(child));
+    }
+}
+
+function assignPositions(node, x = canvas.width / 2, y = 50, horizontalSpacing = 400) {
+    node.x = x;
+    node.y = y;
+
+    if (node.children.length > 0) {
+        const totalWidth = horizontalSpacing;
+        const spacing = totalWidth / (node.children.length + 1);
+        const startX = x - totalWidth / 2;
+
+        node.children.forEach((child, i) => {
+            assignPositions(
+                child,
+                startX + spacing * (i + 1),
+                y + 120,
+                horizontalSpacing / 2
+            );
+        });
+    }
+}
+
+function runMinimax() {
+    if (!tree) return;
+
+    evaluatedCount = 0;
+    currentStep = 0;
+    evaluationSteps = [];
+
+    minimax(tree);
+    draw();
+    updateStats();
+}
+
+function minimax(node) {
+    evaluatedCount++;
+
+    if (node.children.length === 0) {
+        node.evaluated = true;
+        evaluationSteps.push({ node, value: node.value });
+        return node.value;
+    }
+
+    if (node.isMax) {
+        let maxValue = -Infinity;
+        let bestChildNode = null;
+
+        for (let child of node.children) {
+            const value = minimax(child);
+            if (value > maxValue) {
+                maxValue = value;
+                bestChildNode = child;
+            }
+        }
+
+        node.value = maxValue;
+        node.evaluated = true;
+        if (bestChildNode) {
+            bestChildNode.bestChild = true;
+        }
+        evaluationSteps.push({ node, value: maxValue });
+        return maxValue;
+    } else {
+        let minValue = Infinity;
+        let bestChildNode = null;
+
+        for (let child of node.children) {
+            const value = minimax(child);
+            if (value < minValue) {
+                minValue = value;
+                bestChildNode = child;
+            }
+        }
+
+        node.value = minValue;
+        node.evaluated = true;
+        if (bestChildNode) {
+            bestChildNode.bestChild = true;
+        }
+        evaluationSteps.push({ node, value: minValue });
+        return minValue;
+    }
+}
+
+function step() {
+    if (currentStep < evaluationSteps.length) {
+        const step = evaluationSteps[currentStep];
+        step.node.evaluated = true;
+        currentStep++;
+        draw();
+        updateStats();
+    }
+}
+
+function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    if (!tree) return;
+
+    drawNode(tree);
+}
+
+function drawNode(node) {
+    // Draw edges to children first
+    node.children.forEach(child => {
+        ctx.strokeStyle = child.bestChild ? '#4CAF50' : '#ccc';
+        ctx.lineWidth = child.bestChild ? 3 : 1;
+        ctx.beginPath();
+        ctx.moveTo(node.x, node.y);
+        ctx.lineTo(child.x, child.y);
+        ctx.stroke();
+
+        drawNode(child);
+    });
+
+    // Draw node
+    const radius = 25;
+    ctx.fillStyle = node.isMax ? '#2196F3' : '#f44336';
+    if (node.evaluated) {
+        ctx.globalAlpha = 1;
+    } else {
+        ctx.globalAlpha = 0.3;
+    }
+
+    ctx.beginPath();
+    ctx.arc(node.x, node.y, radius, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.globalAlpha = 1;
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // Draw value
+    if (node.value !== null) {
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold 16px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(node.value, node.x, node.y);
+    }
+
+    // Draw label
+    ctx.fillStyle = '#333';
+    ctx.font = '12px Arial';
+    ctx.fillText(node.isMax ? 'MAX' : 'MIN', node.x, node.y + radius + 15);
+}
+
+function countNodes(node) {
+    if (!node) return 0;
+    return 1 + node.children.reduce((sum, child) => sum + countNodes(child), 0);
+}
+
+function updateStats() {
+    if (tree) {
+        document.getElementById('nodes').textContent = countNodes(tree);
+        document.getElementById('evaluated').textContent = evaluatedCount;
+
+        if (tree.evaluated && tree.children.length > 0) {
+            const bestChild = tree.children.find(c => c.bestChild);
+            if (bestChild) {
+                document.getElementById('bestMove').textContent = `Child ${tree.children.indexOf(bestChild) + 1}`;
+                document.getElementById('bestValue').textContent = tree.value;
+            }
+        }
+    }
+}
+
+function reset() {
+    tree = null;
+    evaluatedCount = 0;
+    currentStep = 0;
+    evaluationSteps = [];
+    document.getElementById('bestMove').textContent = '-';
+    document.getElementById('bestValue').textContent = '-';
+    draw();
+    updateStats();
+}
+
+function updateDepth() {
+    depth = parseInt(document.getElementById('depth').value);
+    document.getElementById('depthVal').textContent = depth;
+}
+
+function updateBranch() {
+    branchingFactor = parseInt(document.getElementById('branch').value);
+    document.getElementById('branchVal').textContent = branchingFactor;
+}
+
+updateStats();
+</script>
+</body>
+</html>
