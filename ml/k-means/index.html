@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>K-Means Clustering Visualizer - ML Learning Tool</title>
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 0;
+}
+
+.nav-header {
+    background: #2d3748;
+    padding: 15px 30px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.nav-header a {
+    color: #90cdf4;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1.1em;
+    transition: color 0.3s;
+}
+
+.nav-header a:hover {
+    color: #63b3ed;
+}
+
+.nav-title {
+    color: #fff;
+    font-size: 1.2em;
+    font-weight: 700;
+}
+
+.page-wrapper {
+    padding: 20px;
+}
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+
+h1 {
+    text-align: center;
+    color: #2d3748;
+    margin-bottom: 10px;
+    font-size: 2.5em;
+}
+
+.subtitle {
+    text-align: center;
+    color: #4a5568;
+    margin-bottom: 30px;
+    font-size: 1.1em;
+}
+
+.info-section {
+    background: #e8f5e9;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 25px;
+    border-left: 5px solid #4CAF50;
+}
+
+.info-section h3 {
+    color: #2e7d32;
+    margin-bottom: 10px;
+}
+
+.info-section p {
+    color: #1b5e20;
+    line-height: 1.6;
+    margin-bottom: 8px;
+}
+
+.info-section ul {
+    list-style-position: inside;
+    color: #1b5e20;
+    line-height: 1.8;
+}
+
+.main-content {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 30px;
+    margin-bottom: 30px;
+}
+
+.sidebar {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 10px;
+    height: fit-content;
+}
+
+.sidebar h3 {
+    color: #2d3748;
+    margin-bottom: 15px;
+    font-size: 1.3em;
+}
+
+.control-section {
+    margin-bottom: 20px;
+}
+
+.control-section label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #4a5568;
+}
+
+button {
+    width: 100%;
+    padding: 12px;
+    font-size: 14px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    margin-bottom: 10px;
+}
+
+button:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.btn-primary {
+    background: #4CAF50;
+    color: #fff;
+}
+
+.btn-primary:hover:not(:disabled) {
+    background: #45a049;
+}
+
+.btn-secondary {
+    background: #2196F3;
+    color: #fff;
+}
+
+.btn-secondary:hover:not(:disabled) {
+    background: #0b7dda;
+}
+
+.btn-danger {
+    background: #f44336;
+    color: #fff;
+}
+
+.btn-danger:hover:not(:disabled) {
+    background: #da190b;
+}
+
+.btn-warning {
+    background: #ff9800;
+    color: #fff;
+}
+
+.slider-control {
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.slider-value {
+    text-align: center;
+    font-weight: 600;
+    color: #667eea;
+    margin-bottom: 10px;
+}
+
+.canvas-area {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    padding: 20px;
+}
+
+#canvas {
+    display: block;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    cursor: crosshair;
+    background: #fafafa;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.stat-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #fff;
+    padding: 12px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.stat-label {
+    font-size: 0.85em;
+    opacity: 0.9;
+    margin-bottom: 5px;
+}
+
+.stat-value {
+    font-size: 1.5em;
+    font-weight: bold;
+}
+
+.dataset-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 15px;
+}
+
+.dataset-buttons button {
+    font-size: 12px;
+    padding: 8px;
+}
+
+.mode-indicator {
+    background: #e3f2fd;
+    padding: 10px;
+    border-radius: 6px;
+    margin-bottom: 15px;
+    font-size: 0.9em;
+    font-weight: 600;
+    text-align: center;
+}
+
+@media (max-width: 968px) {
+    .main-content {
+        grid-template-columns: 1fr;
+    }
+
+    h1 {
+        font-size: 2em;
+    }
+}
+</style>
+</head>
+<body>
+<nav class="nav-header">
+    <div class="nav-title">🎨 K-Means Clustering Visualizer</div>
+    <a href="../../index.html">← Back to Home</a>
+</nav>
+
+<div class="page-wrapper">
+    <div class="container">
+        <h1>🎨 K-Means Clustering Visualizer</h1>
+        <p class="subtitle">Discover natural groupings in data with unsupervised learning!</p>
+
+        <div class="info-section">
+            <h3>📚 What is K-Means Clustering?</h3>
+            <p>
+                K-Means is an unsupervised learning algorithm that groups similar data points into clusters.
+                It works by iteratively assigning points to the nearest cluster center (centroid) and
+                then updating the centroids based on the assigned points.
+            </p>
+            <p><strong>Real-world applications:</strong></p>
+            <ul>
+                <li>Customer segmentation for marketing</li>
+                <li>Image compression and color quantization</li>
+                <li>Document classification and topic modeling</li>
+                <li>Anomaly detection in network traffic</li>
+            </ul>
+        </div>
+
+        <div class="main-content">
+            <div class="sidebar">
+                <h3>🎮 Controls</h3>
+
+                <div class="mode-indicator">
+                    Click to add data points
+                </div>
+
+                <div class="control-section">
+                    <label>Number of Clusters (K):</label>
+                    <div class="slider-value" id="kValue">3</div>
+                    <input type="range" class="slider-control" id="kSlider"
+                           min="2" max="8" step="1" value="3"
+                           oninput="updateK()">
+                </div>
+
+                <div class="control-section">
+                    <label>📊 Sample Datasets:</label>
+                    <div class="dataset-buttons">
+                        <button class="btn-secondary" onclick="loadDataset('blobs')">🎯 Blobs</button>
+                        <button class="btn-secondary" onclick="loadDataset('circles')">⭕ Circles</button>
+                        <button class="btn-secondary" onclick="loadDataset('moons')">🌙 Moons</button>
+                        <button class="btn-secondary" onclick="loadDataset('grid')">📐 Grid</button>
+                    </div>
+                </div>
+
+                <button class="btn-primary" onclick="initializeCentroids()">🎲 Initialize Centroids</button>
+                <button class="btn-primary" onclick="runKMeansStep()">➡️ Single Step</button>
+                <button class="btn-warning" onclick="runKMeansAuto()" id="autoBtn">▶️ Auto Run</button>
+                <button class="btn-secondary" onclick="runToConvergence()">⚡ Run to Convergence</button>
+                <button class="btn-danger" onclick="clearAll()">🗑️ Clear All</button>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">Points</div>
+                        <div class="stat-value" id="pointsValue">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Clusters (K)</div>
+                        <div class="stat-value" id="clustersValue">3</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Iteration</div>
+                        <div class="stat-value" id="iterationValue">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Converged</div>
+                        <div class="stat-value" id="convergedValue">No</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="canvas-area">
+                <canvas id="canvas" width="900" height="700"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+
+let points = [];
+let centroids = [];
+let assignments = [];
+let k = 3;
+let iteration = 0;
+let converged = false;
+let isAutoRunning = false;
+let autoInterval = null;
+
+const PADDING = 50;
+const WIDTH = canvas.width - 2 * PADDING;
+const HEIGHT = canvas.height - 2 * PADDING;
+
+const COLORS = [
+    '#ef5350', '#42a5f5', '#66bb6a', '#ffa726',
+    '#ab47bc', '#26c6da', '#ffee58', '#ec407a'
+];
+
+function drawGrid() {
+    ctx.strokeStyle = '#e2e8f0';
+    ctx.lineWidth = 1;
+
+    for (let i = 0; i <= 10; i++) {
+        const x = PADDING + (WIDTH / 10) * i;
+        ctx.beginPath();
+        ctx.moveTo(x, PADDING);
+        ctx.lineTo(x, PADDING + HEIGHT);
+        ctx.stroke();
+    }
+
+    for (let i = 0; i <= 10; i++) {
+        const y = PADDING + (HEIGHT / 10) * i;
+        ctx.beginPath();
+        ctx.moveTo(PADDING, y);
+        ctx.lineTo(PADDING + WIDTH, y);
+        ctx.stroke();
+    }
+
+    ctx.strokeStyle = '#2d3748';
+    ctx.lineWidth = 2;
+
+    ctx.beginPath();
+    ctx.moveTo(PADDING, PADDING + HEIGHT);
+    ctx.lineTo(PADDING + WIDTH, PADDING + HEIGHT);
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(PADDING, PADDING);
+    ctx.lineTo(PADDING, PADDING + HEIGHT);
+    ctx.stroke();
+}
+
+function drawPoints() {
+    points.forEach((point, i) => {
+        const x = PADDING + (point.x / 100) * WIDTH;
+        const y = PADDING + HEIGHT - (point.y / 100) * HEIGHT;
+
+        const clusterIndex = assignments[i];
+        const color = clusterIndex !== undefined ? COLORS[clusterIndex % COLORS.length] : '#999';
+
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.arc(x, y, 6, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+    });
+}
+
+function drawCentroids() {
+    centroids.forEach((centroid, i) => {
+        const x = PADDING + (centroid.x / 100) * WIDTH;
+        const y = PADDING + HEIGHT - (centroid.y / 100) * HEIGHT;
+
+        const color = COLORS[i % COLORS.length];
+
+        // Draw large X for centroid
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 4;
+        ctx.lineCap = 'round';
+
+        const size = 15;
+        ctx.beginPath();
+        ctx.moveTo(x - size, y - size);
+        ctx.lineTo(x + size, y + size);
+        ctx.moveTo(x + size, y - size);
+        ctx.lineTo(x - size, y + size);
+        ctx.stroke();
+
+        // Draw circle around centroid
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 3;
+        ctx.setLineDash([5, 5]);
+        ctx.beginPath();
+        ctx.arc(x, y, 20, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // Draw Voronoi-like regions (very simplified)
+        if (points.length > 0 && centroids.length === k) {
+            ctx.globalAlpha = 0.1;
+            ctx.fillStyle = color;
+
+            for (let px = 0; px < WIDTH; px += 10) {
+                for (let py = 0; py < HEIGHT; py += 10) {
+                    const testX = (px / WIDTH) * 100;
+                    const testY = (1 - py / HEIGHT) * 100;
+
+                    let minDist = Infinity;
+                    let closestCentroid = -1;
+
+                    centroids.forEach((c, ci) => {
+                        const dist = Math.sqrt(Math.pow(c.x - testX, 2) + Math.pow(c.y - testY, 2));
+                        if (dist < minDist) {
+                            minDist = dist;
+                            closestCentroid = ci;
+                        }
+                    });
+
+                    if (closestCentroid === i) {
+                        ctx.fillRect(PADDING + px, PADDING + py, 10, 10);
+                    }
+                }
+            }
+
+            ctx.globalAlpha = 1.0;
+        }
+    });
+}
+
+function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    drawGrid();
+    drawCentroids();
+    drawPoints();
+}
+
+function initializeCentroids() {
+    if (points.length < k) {
+        alert(`Add at least ${k} points first!`);
+        return;
+    }
+
+    centroids = [];
+    iteration = 0;
+    converged = false;
+
+    // K-means++ initialization for better results
+    // Choose first centroid randomly
+    const firstIdx = Math.floor(Math.random() * points.length);
+    centroids.push({ ...points[firstIdx] });
+
+    // Choose remaining centroids based on distance
+    for (let i = 1; i < k; i++) {
+        const distances = points.map(p => {
+            let minDist = Infinity;
+            centroids.forEach(c => {
+                const dist = Math.sqrt(Math.pow(p.x - c.x, 2) + Math.pow(p.y - c.y, 2));
+                minDist = Math.min(minDist, dist);
+            });
+            return minDist;
+        });
+
+        const totalDist = distances.reduce((sum, d) => sum + d, 0);
+        let random = Math.random() * totalDist;
+
+        for (let j = 0; j < points.length; j++) {
+            random -= distances[j];
+            if (random <= 0) {
+                centroids.push({ ...points[j] });
+                break;
+            }
+        }
+    }
+
+    assignPointsToClusters();
+    updateStats();
+    draw();
+}
+
+function assignPointsToClusters() {
+    assignments = points.map(point => {
+        let minDist = Infinity;
+        let closestCentroid = 0;
+
+        centroids.forEach((centroid, i) => {
+            const dist = Math.sqrt(
+                Math.pow(point.x - centroid.x, 2) +
+                Math.pow(point.y - centroid.y, 2)
+            );
+
+            if (dist < minDist) {
+                minDist = dist;
+                closestCentroid = i;
+            }
+        });
+
+        return closestCentroid;
+    });
+}
+
+function updateCentroids() {
+    const newCentroids = [];
+
+    for (let i = 0; i < k; i++) {
+        const clusterPoints = points.filter((_, idx) => assignments[idx] === i);
+
+        if (clusterPoints.length === 0) {
+            // Keep old centroid if no points assigned
+            newCentroids.push({ ...centroids[i] });
+        } else {
+            const sumX = clusterPoints.reduce((sum, p) => sum + p.x, 0);
+            const sumY = clusterPoints.reduce((sum, p) => sum + p.y, 0);
+
+            newCentroids.push({
+                x: sumX / clusterPoints.length,
+                y: sumY / clusterPoints.length
+            });
+        }
+    }
+
+    // Check for convergence
+    converged = true;
+    for (let i = 0; i < k; i++) {
+        const dist = Math.sqrt(
+            Math.pow(centroids[i].x - newCentroids[i].x, 2) +
+            Math.pow(centroids[i].y - newCentroids[i].y, 2)
+        );
+
+        if (dist > 0.1) {
+            converged = false;
+            break;
+        }
+    }
+
+    centroids = newCentroids;
+}
+
+function runKMeansStep() {
+    if (centroids.length === 0) {
+        initializeCentroids();
+        return;
+    }
+
+    if (converged) {
+        alert('Algorithm has converged!');
+        return;
+    }
+
+    assignPointsToClusters();
+    updateCentroids();
+    iteration++;
+
+    updateStats();
+    draw();
+
+    if (converged && isAutoRunning) {
+        stopAutoRun();
+        alert('Converged!');
+    }
+}
+
+function runToConvergence() {
+    if (centroids.length === 0) {
+        initializeCentroids();
+    }
+
+    let maxIterations = 100;
+    while (!converged && maxIterations > 0) {
+        runKMeansStep();
+        maxIterations--;
+    }
+}
+
+function runKMeansAuto() {
+    if (isAutoRunning) {
+        stopAutoRun();
+    } else {
+        startAutoRun();
+    }
+}
+
+function startAutoRun() {
+    if (centroids.length === 0) {
+        initializeCentroids();
+    }
+
+    isAutoRunning = true;
+    document.getElementById('autoBtn').textContent = '⏸️ Pause';
+    document.getElementById('autoBtn').style.background = '#ff9800';
+
+    autoInterval = setInterval(() => {
+        if (converged) {
+            stopAutoRun();
+            alert('Converged!');
+        } else {
+            runKMeansStep();
+        }
+    }, 500);
+}
+
+function stopAutoRun() {
+    isAutoRunning = false;
+    clearInterval(autoInterval);
+    document.getElementById('autoBtn').textContent = '▶️ Auto Run';
+    document.getElementById('autoBtn').style.background = '#ff9800';
+}
+
+function updateK() {
+    k = parseInt(document.getElementById('kSlider').value);
+    document.getElementById('kValue').textContent = k;
+    document.getElementById('clustersValue').textContent = k;
+
+    centroids = [];
+    assignments = [];
+    iteration = 0;
+    converged = false;
+
+    updateStats();
+    draw();
+}
+
+function updateStats() {
+    document.getElementById('pointsValue').textContent = points.length;
+    document.getElementById('clustersValue').textContent = k;
+    document.getElementById('iterationValue').textContent = iteration;
+    document.getElementById('convergedValue').textContent = converged ? 'Yes' : 'No';
+}
+
+function clearAll() {
+    points = [];
+    centroids = [];
+    assignments = [];
+    iteration = 0;
+    converged = false;
+
+    if (isAutoRunning) {
+        stopAutoRun();
+    }
+
+    updateStats();
+    draw();
+}
+
+function loadDataset(type) {
+    points = [];
+
+    switch(type) {
+        case 'blobs':
+            const blobCenters = [
+                {x: 25, y: 75}, {x: 75, y: 75}, {x: 50, y: 25}
+            ];
+            blobCenters.forEach(center => {
+                for (let i = 0; i < 30; i++) {
+                    points.push({
+                        x: center.x + (Math.random() - 0.5) * 20,
+                        y: center.y + (Math.random() - 0.5) * 20
+                    });
+                }
+            });
+            break;
+        case 'circles':
+            for (let i = 0; i < 50; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const radius = 15 + Math.random() * 5;
+                points.push({
+                    x: 50 + radius * Math.cos(angle),
+                    y: 50 + radius * Math.sin(angle)
+                });
+            }
+            for (let i = 0; i < 50; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const radius = 28 + Math.random() * 8;
+                points.push({
+                    x: 50 + radius * Math.cos(angle),
+                    y: 50 + radius * Math.sin(angle)
+                });
+            }
+            break;
+        case 'moons':
+            for (let i = 0; i < 50; i++) {
+                const angle = Math.PI * i / 50;
+                points.push({
+                    x: 30 + 20 * Math.cos(angle) + Math.random() * 5,
+                    y: 50 + 20 * Math.sin(angle) + Math.random() * 5
+                });
+            }
+            for (let i = 0; i < 50; i++) {
+                const angle = Math.PI * i / 50;
+                points.push({
+                    x: 50 + 20 * Math.cos(angle + Math.PI) + Math.random() * 5,
+                    y: 30 + 20 * Math.sin(angle + Math.PI) + Math.random() * 5
+                });
+            }
+            break;
+        case 'grid':
+            for (let i = 0; i < 4; i++) {
+                for (let j = 0; j < 4; j++) {
+                    for (let p = 0; p < 10; p++) {
+                        points.push({
+                            x: 15 + i * 25 + Math.random() * 8,
+                            y: 15 + j * 25 + Math.random() * 8
+                        });
+                    }
+                }
+            }
+            break;
+    }
+
+    centroids = [];
+    assignments = [];
+    iteration = 0;
+    converged = false;
+
+    updateStats();
+    draw();
+}
+
+canvas.addEventListener('click', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    if (x >= PADDING && x <= PADDING + WIDTH &&
+        y >= PADDING && y <= PADDING + HEIGHT) {
+
+        const dataX = ((x - PADDING) / WIDTH) * 100;
+        const dataY = (1 - (y - PADDING) / HEIGHT) * 100;
+
+        points.push({ x: dataX, y: dataY });
+
+        // Reset clustering
+        centroids = [];
+        assignments = [];
+        iteration = 0;
+        converged = false;
+
+        updateStats();
+        draw();
+    }
+});
+
+// Initialize
+draw();
+updateStats();
+</script>
+</body>
+</html>
