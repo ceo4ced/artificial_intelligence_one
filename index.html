@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Comprehensive AI learning platform with interactive visualizations for search algorithms, machine learning, game playing, and constraint satisfaction problems">
+    <meta name="description" content="Comprehensive AI learning platform with interactive visualizations, games, and lessons for search algorithms, machine learning, game AI, optimization, and constraint satisfaction">
     <title>Mr. Williams' AI 1 - Interactive Learning Tools</title>
     <style>
         * {
@@ -158,41 +158,16 @@
             box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
         }
 
-        .algorithms-section {
-            background: #f7fafc;
-            padding: 40px;
-            margin-top: 40px;
-        }
-
-        .algorithms-section h3 {
-            color: #2d3748;
-            font-size: 1.8em;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        .algorithm-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-        }
-
-        .algorithm-box {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            border-left: 4px solid #667eea;
-        }
-
-        .algorithm-box h4 {
-            color: #667eea;
-            margin-bottom: 8px;
-            font-size: 1.2em;
-        }
-
-        .algorithm-box p {
-            color: #4a5568;
-            font-size: 0.95em;
+        .new-badge {
+            display: inline-block;
+            background: #4CAF50;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.7em;
+            font-weight: bold;
+            margin-left: 8px;
+            vertical-align: middle;
         }
 
         footer {
@@ -232,10 +207,6 @@
             .tool-card {
                 padding: 20px;
             }
-
-            .algorithm-grid {
-                grid-template-columns: 1fr;
-            }
         }
     </style>
 </head>
@@ -243,156 +214,365 @@
     <div class="container">
         <header>
             <h1>Mr. Williams' 🤖 AI 1 - Interactive Learning Tools</h1>
-            <p>Explore AI algorithms through hands-on visualization</p>
+            <p>Explore AI algorithms through hands-on visualization, games, and lessons</p>
         </header>
 
         <div class="intro">
             <h2>Welcome to AI Class!</h2>
             <p>
-                Learn artificial intelligence concepts by interacting with real algorithms.
-                These tools help you visualize how computers solve problems, find paths, learn from data,
-                play games strategically, and satisfy complex constraints.
+                Learn artificial intelligence concepts through <strong>interactive visualizations</strong>,
+                <strong>engaging games</strong>, and <strong>comprehensive lessons</strong>. Experience how computers
+                solve problems, learn from data, play games strategically, and satisfy complex constraints.
             </p>
             <p>
-                Explore search algorithms, machine learning, game playing with MinMax, constraint satisfaction problems,
-                and optimization techniques - core concepts in AI, data science, robotics, and computer science.
+                Covering search algorithms, machine learning, deep learning, NLP, game AI, optimization, reinforcement
+                learning, and constraint satisfaction - all the core concepts in modern AI, data science, and computer science!
             </p>
         </div>
 
         <div class="tools-section">
-            <h2>🛠 Search Algorithms</h2>
+            <h2>📚 Interactive Lessons</h2>
+
+            <div class="tools-grid">
+                <div class="tool-card">
+                    <div class="tool-icon">🎮</div>
+                    <h3>Minimax Algorithm</h3>
+                    <p>Learn how AI makes optimal decisions in two-player games</p>
+                    <ul class="features">
+                        <li>Interactive game tree visualization</li>
+                        <li>Step-by-step algorithm execution</li>
+                        <li>MAX/MIN node evaluation</li>
+                        <li>Real-world applications showcase</li>
+                    </ul>
+                    <a href="lessons/minimax/index.html" class="tool-link">Start Lesson →</a>
+                </div>
+
+                <div class="tool-card">
+                    <div class="tool-icon">📊</div>
+                    <h3>Dimension Reduction</h3>
+                    <p>Visualize how PCA reduces high-dimensional data to lower dimensions</p>
+                    <ul class="features">
+                        <li>3D to 2D visualization with PCA</li>
+                        <li>Real-time data generation</li>
+                        <li>Variance retention calculation</li>
+                        <li>Interactive rotation and projection</li>
+                    </ul>
+                    <a href="lessons/dimension-reduction/index.html" class="tool-link">Start Lesson →</a>
+                </div>
+
+                <div class="tool-card">
+                    <div class="tool-icon">📚</div>
+                    <h3>Supervised Learning</h3>
+                    <p>Understand classification and regression with interactive examples</p>
+                    <ul class="features">
+                        <li>Classification AND regression modes</li>
+                        <li>Multiple algorithms (KNN, Trees, SVM, Linear)</li>
+                        <li>Interactive training data creation</li>
+                        <li>Decision boundary visualization</li>
+                    </ul>
+                    <a href="lessons/supervised-learning/index.html" class="tool-link">Start Lesson →</a>
+                </div>
+
+                <div class="tool-card">
+                    <div class="tool-icon">🔍</div>
+                    <h3>Unsupervised Learning</h3>
+                    <p>Discover patterns in unlabeled data with clustering and anomaly detection</p>
+                    <ul class="features">
+                        <li>K-Means clustering with Voronoi diagrams</li>
+                        <li>Anomaly detection visualization</li>
+                        <li>Step-by-step convergence</li>
+                        <li>Adjustable cluster count</li>
+                    </ul>
+                    <a href="lessons/unsupervised-learning/index.html" class="tool-link">Start Lesson →</a>
+                </div>
+
+                <div class="tool-card">
+                    <div class="tool-icon">🤖</div>
+                    <h3>Reinforcement Learning</h3>
+                    <p>Watch an agent learn through trial and error using Q-Learning</p>
+                    <ul class="features">
+                        <li>Q-Learning in grid world environment</li>
+                        <li>Agent learns to avoid traps and reach goals</li>
+                        <li>Adjustable hyperparameters (α, γ, ε)</li>
+                        <li>Live Q-value display and optimal path</li>
+                    </ul>
+                    <a href="lessons/reinforcement-learning/index.html" class="tool-link">Start Lesson →</a>
+                </div>
+
+                <div class="tool-card">
+                    <div class="tool-icon">🧠</div>
+                    <h3>Deep Learning <span class="new-badge">NEW</span></h3>
+                    <p>Build deep neural networks and understand hierarchical feature learning</p>
+                    <ul class="features">
+                        <li>Configurable network depth (2-10 layers)</li>
+                        <li>Visual architecture display</li>
+                        <li>Training simulation with live accuracy</li>
+                        <li>Explains multi-layer representations</li>
+                    </ul>
+                    <a href="lessons/deep-learning/index.html" class="tool-link">Start Lesson →</a>
+                </div>
+
+                <div class="tool-card">
+                    <div class="tool-icon">💬</div>
+                    <h3>Natural Language Processing <span class="new-badge">NEW</span></h3>
+                    <p>Learn how computers understand and process human language</p>
+                    <ul class="features">
+                        <li>Interactive sentiment analysis</li>
+                        <li>Real-time tokenization display</li>
+                        <li>Word importance highlighting</li>
+                        <li>Word embedding visualization</li>
+                    </ul>
+                    <a href="lessons/nlp/index.html" class="tool-link">Start Lesson →</a>
+                </div>
+            </div>
+
+            <h2 style="margin-top: 60px;">🎮 Interactive Games</h2>
+
+            <div class="tools-grid">
+                <div class="tool-card">
+                    <div class="tool-icon">📈</div>
+                    <h3>Stock Market Prophet <span class="new-badge">NEW</span></h3>
+                    <p>Predict future stock prices using linear regression!</p>
+                    <ul class="features">
+                        <li>3 different stocks with unique trends</li>
+                        <li>Easy, Medium, Hard difficulty levels</li>
+                        <li>Visual regression line display</li>
+                        <li>Score based on prediction accuracy</li>
+                    </ul>
+                    <a href="games/linear-regression/index.html" class="tool-link">Play Game →</a>
+                </div>
+
+                <div class="tool-card">
+                    <div class="tool-icon">📧</div>
+                    <h3>Spam Filter Trainer <span class="new-badge">NEW</span></h3>
+                    <p>Train a spam classifier using logistic regression!</p>
+                    <ul class="features">
+                        <li>Label 20 emails to train classifier</li>
+                        <li>Test phase to evaluate performance</li>
+                        <li>Decision boundary visualization</li>
+                        <li>Precision/Recall metrics tracking</li>
+                    </ul>
+                    <a href="games/logistic-regression/index.html" class="tool-link">Play Game →</a>
+                </div>
+
+                <div class="tool-card">
+                    <div class="tool-icon">🎨</div>
+                    <h3>Color Palette Creator <span class="new-badge">NEW</span></h3>
+                    <p>Use K-Means clustering to compress image colors!</p>
+                    <ul class="features">
+                        <li>4 beautiful images to compress</li>
+                        <li>Adjust colors from 2 to 16</li>
+                        <li>Visual before/after comparison</li>
+                        <li>Compression ratio and quality scoring</li>
+                    </ul>
+                    <a href="games/kmeans/index.html" class="tool-link">Play Game →</a>
+                </div>
+
+                <div class="tool-card">
+                    <div class="tool-icon">🧠</div>
+                    <h3>Image Classifier Challenge <span class="new-badge">NEW</span></h3>
+                    <p>Build and train deep neural networks for image classification!</p>
+                    <ul class="features">
+                        <li>Add layers to build custom networks</li>
+                        <li>Train on shape classification task</li>
+                        <li>Live training progress visualization</li>
+                        <li>Scoring system with difficulty levels</li>
+                    </ul>
+                    <a href="games/deep-learning/index.html" class="tool-link">Play Game →</a>
+                </div>
+
+                <div class="tool-card">
+                    <div class="tool-icon">🕵️</div>
+                    <h3>Sentiment Detective <span class="new-badge">NEW</span></h3>
+                    <p>Train your sentiment analysis skills and compete against AI!</p>
+                    <ul class="features">
+                        <li>Training mode: Label emails as positive/negative</li>
+                        <li>Challenge mode: Compete against AI</li>
+                        <li>Word cloud of important features</li>
+                        <li>Accuracy tracking and leaderboard</li>
+                    </ul>
+                    <a href="games/nlp/index.html" class="tool-link">Play Game →</a>
+                </div>
+            </div>
+
+            <h2 style="margin-top: 60px;">🛠 Search Algorithms</h2>
 
             <div class="tools-grid">
                 <div class="tool-card">
                     <div class="tool-icon">🌳</div>
                     <h3>Tree Search Visualizer</h3>
                     <p>Build custom trees and watch algorithms explore them step-by-step</p>
-
                     <ul class="features">
                         <li>Create your own tree structures</li>
+                        <li>Visualize BFS, DFS, UCS, A*, Greedy, IDDFS</li>
                         <li>Add costs and heuristics to edges</li>
-                        <li>Visualize BFS, DFS, UCS, A*, and more</li>
-                        <li>Handle cycles with curved edges</li>
                         <li>Compare algorithm performance</li>
                     </ul>
-
-                    <a href="pathing/index.html" class="tool-link">Launch Tree Visualizer →</a>
+                    <a href="pathing/index.html" class="tool-link">Launch Visualizer →</a>
                 </div>
 
                 <div class="tool-card">
                     <div class="tool-icon">🎯</div>
                     <h3>Maze Pathfinder</h3>
                     <p>Draw mazes and discover how algorithms find the shortest path</p>
-
                     <ul class="features">
                         <li>Interactive grid-based maze creation</li>
                         <li>Draw walls by clicking and dragging</li>
                         <li>Watch algorithms explore in real-time</li>
                         <li>Random maze generator included</li>
-                        <li>Adjustable animation speed</li>
                     </ul>
-
-                    <a href="pathing/maze/index.html" class="tool-link">Launch Maze Pathfinder →</a>
+                    <a href="pathing/maze/index.html" class="tool-link">Launch Pathfinder →</a>
                 </div>
             </div>
 
-            <h2 style="margin-top: 60px;">🤖 Machine Learning</h2>
+            <h2 style="margin-top: 60px;">🤖 Machine Learning Visualizers</h2>
 
             <div class="tools-grid">
                 <div class="tool-card">
                     <div class="tool-icon">📈</div>
                     <h3>Linear Regression</h3>
                     <p>Click to add data points and watch the algorithm find the best-fit line</p>
-
                     <ul class="features">
                         <li>Interactive scatter plot creation</li>
                         <li>Automatic best-fit line calculation</li>
                         <li>View equation and R² score</li>
-                        <li>Manual adjustment to see error changes</li>
                         <li>Sample datasets included</li>
                     </ul>
-
-                    <a href="ml/linear-regression/index.html" class="tool-link">Launch Linear Regression →</a>
+                    <a href="ml/linear-regression/index.html" class="tool-link">Launch Tool →</a>
                 </div>
 
                 <div class="tool-card">
                     <div class="tool-icon">🎯</div>
                     <h3>Logistic Regression</h3>
                     <p>Binary classification with decision boundaries and probability visualization</p>
-
                     <ul class="features">
                         <li>Two-class classification demo</li>
                         <li>Visual decision boundary display</li>
                         <li>Probability gradient zones</li>
                         <li>Classification accuracy metrics</li>
-                        <li>Real-world sample datasets</li>
                     </ul>
-
-                    <a href="ml/logistic-regression/index.html" class="tool-link">Launch Logistic Regression →</a>
+                    <a href="ml/logistic-regression/index.html" class="tool-link">Launch Tool →</a>
                 </div>
 
                 <div class="tool-card">
                     <div class="tool-icon">🔍</div>
                     <h3>K-Nearest Neighbors</h3>
                     <p>Add training points and classify test points by finding nearest neighbors</p>
-
                     <ul class="features">
                         <li>Interactive point placement</li>
                         <li>Adjustable K value slider</li>
                         <li>Visual nearest neighbor highlighting</li>
                         <li>Voronoi diagram boundaries</li>
-                        <li>Distance calculation display</li>
                     </ul>
-
-                    <a href="ml/knn/index.html" class="tool-link">Launch KNN Demo →</a>
+                    <a href="ml/knn/index.html" class="tool-link">Launch Tool →</a>
                 </div>
 
                 <div class="tool-card">
                     <div class="tool-icon">🧠</div>
                     <h3>Neural Network</h3>
                     <p>Build and train your own neural network - watch it learn in real-time!</p>
-
                     <ul class="features">
                         <li>Configurable network architecture</li>
                         <li>Multiple activation functions</li>
-                        <li>Real-time forward propagation</li>
-                        <li>Backpropagation visualization</li>
+                        <li>Real-time backpropagation</li>
                         <li>Decision boundary evolution</li>
                     </ul>
-
-                    <a href="ml/neural-network/index.html" class="tool-link">Launch Neural Network →</a>
+                    <a href="ml/neural-network/index.html" class="tool-link">Launch Tool →</a>
                 </div>
 
                 <div class="tool-card">
                     <div class="tool-icon">🌳</div>
                     <h3>Decision Tree</h3>
                     <p>Build decision trees and see how they split data into branches</p>
-
                     <ul class="features">
                         <li>Gini impurity & entropy criteria</li>
                         <li>Adjustable tree depth</li>
                         <li>Visual tree structure display</li>
                         <li>Decision region visualization</li>
-                        <li>Real-time accuracy metrics</li>
                     </ul>
-
-                    <a href="ml/decision-tree/index.html" class="tool-link">Launch Decision Tree →</a>
+                    <a href="ml/decision-tree/index.html" class="tool-link">Launch Tool →</a>
                 </div>
 
                 <div class="tool-card">
                     <div class="tool-icon">📊</div>
                     <h3>Naive Bayes</h3>
                     <p>Probabilistic classification using Bayes' Theorem</p>
-
                     <ul class="features">
                         <li>Gaussian Naive Bayes implementation</li>
                         <li>Probability heatmap visualization</li>
                         <li>Feature distribution graphs</li>
                         <li>Prior & posterior probabilities</li>
-                        <li>Hover for class probabilities</li>
                     </ul>
+                    <a href="ml/naive-bayes/index.html" class="tool-link">Launch Tool →</a>
+                </div>
 
-                    <a href="ml/naive-bayes/index.html" class="tool-link">Launch Naive Bayes →</a>
+                <div class="tool-card">
+                    <div class="tool-icon">🎨</div>
+                    <h3>K-Means Clustering</h3>
+                    <p>Watch K-Means find clusters in data through iterative convergence</p>
+                    <ul class="features">
+                        <li>Adjustable number of clusters (K)</li>
+                        <li>Voronoi diagram visualization</li>
+                        <li>Step-by-step convergence</li>
+                        <li>Centroid tracking and updates</li>
+                    </ul>
+                    <a href="ml/kmeans/index.html" class="tool-link">Launch Tool →</a>
+                </div>
+            </div>
+
+            <h2 style="margin-top: 60px;">⚙️ Optimization Algorithms</h2>
+
+            <div class="tools-grid">
+                <div class="tool-card">
+                    <div class="tool-icon">⛰️</div>
+                    <h3>Hill Climbing</h3>
+                    <p>Local search algorithm that climbs to peak but can get stuck</p>
+                    <ul class="features">
+                        <li>3D landscape visualization</li>
+                        <li>Multiple terrain types</li>
+                        <li>Path tracking showing climb</li>
+                        <li>Local maxima demonstration</li>
+                    </ul>
+                    <a href="optimization/hill-climbing/index.html" class="tool-link">Launch Tool →</a>
+                </div>
+
+                <div class="tool-card">
+                    <div class="tool-icon">🌡️</div>
+                    <h3>Simulated Annealing</h3>
+                    <p>Probabilistic optimization that can escape local maxima using temperature</p>
+                    <ul class="features">
+                        <li>Temperature scheduling visualization</li>
+                        <li>Probabilistic acceptance of worse solutions</li>
+                        <li>Cooling rate adjustment</li>
+                        <li>Comparison with hill climbing</li>
+                    </ul>
+                    <a href="optimization/simulated-annealing/index.html" class="tool-link">Launch Tool →</a>
+                </div>
+
+                <div class="tool-card">
+                    <div class="tool-icon">🧬</div>
+                    <h3>Genetic Algorithm</h3>
+                    <p>Evolution-inspired optimization using selection, crossover, and mutation</p>
+                    <ul class="features">
+                        <li>Population-based optimization</li>
+                        <li>Adjustable mutation and crossover rates</li>
+                        <li>Generation-by-generation evolution</li>
+                        <li>Fitness landscape visualization</li>
+                    </ul>
+                    <a href="optimization/genetic-algorithm/index.html" class="tool-link">Launch Tool →</a>
+                </div>
+
+                <div class="tool-card">
+                    <div class="tool-icon">🔦</div>
+                    <h3>Beam Search</h3>
+                    <p>Memory-limited breadth-first search keeping only K best nodes</p>
+                    <ul class="features">
+                        <li>Adjustable beam width</li>
+                        <li>Visual node pruning</li>
+                        <li>Active/expanded/pruned state tracking</li>
+                        <li>Comparison with full BFS</li>
+                    </ul>
+                    <a href="optimization/beam-search/index.html" class="tool-link">Launch Tool →</a>
                 </div>
             </div>
 
@@ -400,108 +580,110 @@
 
             <div class="tools-grid">
                 <div class="tool-card">
-                    <div class="tool-icon">🎮</div>
-                    <h3>Connect Four</h3>
-                    <p>Play against an AI using the Minimax algorithm with alpha-beta pruning!</p>
-
+                    <div class="tool-icon">⭕</div>
+                    <h3>Tic-Tac-Toe</h3>
+                    <p>Play against perfect Minimax AI that never loses!</p>
                     <ul class="features">
                         <li>Minimax algorithm implementation</li>
-                        <li>Alpha-beta pruning optimization</li>
-                        <li>Adjustable difficulty (1-7 depth)</li>
+                        <li>Easy, Medium, Hard difficulty</li>
+                        <li>Nodes evaluated counter</li>
+                        <li>Win/loss/draw tracking</li>
+                    </ul>
+                    <a href="games/tic-tac-toe/index.html" class="tool-link">Play Game →</a>
+                </div>
+
+                <div class="tool-card">
+                    <div class="tool-icon">🎮</div>
+                    <h3>Connect Four</h3>
+                    <p>Challenge the AI using Minimax with alpha-beta pruning!</p>
+                    <ul class="features">
+                        <li>Minimax with alpha-beta pruning</li>
+                        <li>Adjustable difficulty (depth 1-7)</li>
                         <li>Game tree evaluation metrics</li>
                         <li>Watch AI think and decide</li>
                     </ul>
+                    <a href="games/connect-four/index.html" class="tool-link">Play Game →</a>
+                </div>
 
-                    <a href="games/connect-four/index.html" class="tool-link">Play Connect Four →</a>
+                <div class="tool-card">
+                    <div class="tool-icon">🌲</div>
+                    <h3>Game Tree Visualizer</h3>
+                    <p>See how Minimax evaluates entire game trees</p>
+                    <ul class="features">
+                        <li>Generate random game trees</li>
+                        <li>Adjustable depth and branching</li>
+                        <li>Step-through evaluation</li>
+                        <li>Best path highlighting</li>
+                    </ul>
+                    <a href="games/game-tree/index.html" class="tool-link">Launch Tool →</a>
                 </div>
             </div>
 
-            <div class="algorithms-section">
-                <h3>📚 Search Algorithms</h3>
-                <div class="algorithm-grid">
-                    <div class="algorithm-box">
-                        <h4>Breadth-First Search (BFS)</h4>
-                        <p>Explores all neighbors at the current depth before going deeper. Guarantees shortest path in unweighted graphs.</p>
-                    </div>
+            <h2 style="margin-top: 60px;">🧩 Constraint Satisfaction Problems</h2>
 
-                    <div class="algorithm-box">
-                        <h4>Depth-First Search (DFS)</h4>
-                        <p>Goes as deep as possible down one path before backtracking. Fast but doesn't guarantee shortest path.</p>
-                    </div>
-
-                    <div class="algorithm-box">
-                        <h4>Uniform Cost Search (UCS)</h4>
-                        <p>Always expands the lowest-cost path first. Finds optimal path in weighted graphs.</p>
-                    </div>
-
-                    <div class="algorithm-box">
-                        <h4>A* Search</h4>
-                        <p>Uses both actual cost and estimated distance to goal. Most efficient informed search algorithm.</p>
-                    </div>
-
-                    <div class="algorithm-box">
-                        <h4>Greedy Best-First</h4>
-                        <p>Only considers estimated distance to goal. Fast but not always optimal.</p>
-                    </div>
-
-                    <div class="algorithm-box">
-                        <h4>Iterative Deepening DFS</h4>
-                        <p>Combines benefits of BFS and DFS. Memory efficient with guaranteed shortest path.</p>
-                    </div>
+            <div class="tools-grid">
+                <div class="tool-card">
+                    <div class="tool-icon">👑</div>
+                    <h3>N-Queens Solver</h3>
+                    <p>Place N queens on a chessboard so none attack each other</p>
+                    <ul class="features">
+                        <li>Adjustable board size (4-12)</li>
+                        <li>Backtracking algorithm visualization</li>
+                        <li>Step-through and find all solutions</li>
+                        <li>Backtrack counter</li>
+                    </ul>
+                    <a href="csp/n-queens/index.html" class="tool-link">Launch Solver →</a>
                 </div>
 
-                <h3 style="margin-top: 40px;">🤖 Machine Learning Algorithms</h3>
-                <div class="algorithm-grid">
-                    <div class="algorithm-box">
-                        <h4>Linear Regression</h4>
-                        <p>Finds the best-fit line through data points to predict continuous values. Foundation of supervised learning.</p>
-                    </div>
-
-                    <div class="algorithm-box">
-                        <h4>Logistic Regression</h4>
-                        <p>Binary classification algorithm using sigmoid function. Outputs probabilities for yes/no decisions.</p>
-                    </div>
-
-                    <div class="algorithm-box">
-                        <h4>K-Nearest Neighbors</h4>
-                        <p>Instance-based learning that classifies points based on majority vote of K nearest training examples.</p>
-                    </div>
-
-                    <div class="algorithm-box">
-                        <h4>Neural Networks</h4>
-                        <p>Interconnected layers of neurons that learn through backpropagation. Inspired by biological brains.</p>
-                    </div>
-
-                    <div class="algorithm-box">
-                        <h4>Decision Trees</h4>
-                        <p>Tree-like model of decisions using feature splits. Uses information gain or Gini impurity for optimal splits.</p>
-                    </div>
-
-                    <div class="algorithm-box">
-                        <h4>Naive Bayes</h4>
-                        <p>Probabilistic classifier based on Bayes' Theorem. Assumes feature independence for efficient computation.</p>
-                    </div>
+                <div class="tool-card">
+                    <div class="tool-icon">🗺️</div>
+                    <h3>Map Coloring</h3>
+                    <p>Color maps so no adjacent regions share colors</p>
+                    <ul class="features">
+                        <li>Australia, USA, Europe maps</li>
+                        <li>3, 4, or 5 color options</li>
+                        <li>Backtracking with step-through</li>
+                        <li>Four Color Theorem demonstration</li>
+                    </ul>
+                    <a href="csp/map-coloring/index.html" class="tool-link">Launch Solver →</a>
                 </div>
 
-                <h3 style="margin-top: 40px;">🎮 Game AI Algorithms</h3>
-                <div class="algorithm-grid">
-                    <div class="algorithm-box">
-                        <h4>Minimax Algorithm</h4>
-                        <p>Game tree search that minimizes maximum possible loss. Used in two-player zero-sum games like chess and Connect Four.</p>
-                    </div>
+                <div class="tool-card">
+                    <div class="tool-icon">🔢</div>
+                    <h3>Sudoku Solver</h3>
+                    <p>Solve Sudoku puzzles using CSP backtracking</p>
+                    <ul class="features">
+                        <li>Easy, Medium, Hard, Expert puzzles</li>
+                        <li>Step-through solution mode</li>
+                        <li>Backtrack visualization</li>
+                        <li>Constraint checking display</li>
+                    </ul>
+                    <a href="csp/sudoku/index.html" class="tool-link">Launch Solver →</a>
+                </div>
 
-                    <div class="algorithm-box">
-                        <h4>Alpha-Beta Pruning</h4>
-                        <p>Optimization technique for minimax that eliminates branches that won't affect the final decision. Drastically reduces computation.</p>
-                    </div>
+                <div class="tool-card">
+                    <div class="tool-icon">📝</div>
+                    <h3>Crossword Puzzle Solver</h3>
+                    <p>Fill crossword grids using CSP techniques</p>
+                    <ul class="features">
+                        <li>Multiple puzzle sizes</li>
+                        <li>Word list matching</li>
+                        <li>Backtracking algorithm</li>
+                        <li>Step-by-step solving</li>
+                    </ul>
+                    <a href="csp/crossword/index.html" class="tool-link">Launch Solver →</a>
                 </div>
             </div>
         </div>
 
         <footer>
-            <p><strong>AI 1 - Search Algorithms, Machine Learning & Game AI</strong></p>
-            <p>Interactive learning tools for high school students (Grades 9-12)</p>
-            <p>9 Interactive Tools • 20 Algorithms • Built with HTML5, CSS3, and JavaScript</p>
+            <p><strong>AI 1 - Complete Interactive Learning Platform</strong></p>
+            <p>Interactive tools for high school students (Grades 9-12)</p>
+            <p>
+                <strong>7 Lessons • 5 Games • 30+ Visualizers & Solvers</strong><br>
+                Search Algorithms • Machine Learning • Deep Learning • NLP • Game AI • Optimization • Reinforcement Learning • CSP
+            </p>
+            <p style="margin-top: 15px; opacity: 0.8;">Built with HTML5, CSS3, and JavaScript</p>
         </footer>
     </div>
 </body>
