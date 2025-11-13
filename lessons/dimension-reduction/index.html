@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dimension Reduction - Interactive Lesson</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 0; }
+.nav-header { background: #2d3748; padding: 15px 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; }
+.nav-header a { color: #90cdf4; text-decoration: none; font-weight: 600; font-size: 1.1em; }
+.nav-title { color: #fff; font-size: 1.2em; font-weight: 700; }
+.container { max-width: 1400px; margin: 20px auto; background: #fff; border-radius: 15px; padding: 30px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+h1 { text-align: center; color: #2d3748; font-size: 2.5em; margin-bottom: 20px; }
+.intro { background: #e3f2fd; padding: 20px; border-radius: 10px; margin-bottom: 30px; line-height: 1.6; }
+.intro h2 { color: #1976d2; margin-bottom: 10px; }
+.main-content { display: grid; grid-template-columns: 350px 1fr; gap: 30px; }
+.sidebar { background: #f8f9fa; padding: 20px; border-radius: 10px; height: fit-content; }
+button { width: 100%; padding: 12px; margin: 5px 0; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }
+.btn-primary { background: #4CAF50; color: #fff; }
+.btn-secondary { background: #2196F3; color: #fff; }
+canvas { border: 2px solid #ddd; border-radius: 8px; display: block; background: #fafafa; }
+.viz-container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.viz-box { text-align: center; }
+.viz-box h3 { color: #2d3748; margin-bottom: 10px; }
+.explanation { background: #fff9c4; padding: 15px; border-radius: 8px; margin: 15px 0; border-left: 4px solid #fbc02d; }
+.explanation h4 { color: #f57c00; margin-bottom: 8px; }
+.stats { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; padding: 15px; border-radius: 10px; margin-top: 15px; }
+.stat-row { display: flex; justify-content: space-between; margin: 8px 0; }
+.key-concepts { background: #e8f5e9; padding: 15px; border-radius: 8px; margin: 15px 0; }
+.key-concepts ul { margin-left: 20px; line-height: 1.8; }
+.method-cards { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 15px; }
+.method-card { background: #fff; padding: 12px; border-radius: 8px; border: 2px solid #ddd; cursor: pointer; transition: all 0.2s; }
+.method-card:hover { border-color: #667eea; transform: translateY(-2px); }
+.method-card.active { border-color: #667eea; background: #e3f2fd; }
+</style>
+</head>
+<body>
+<nav class="nav-header">
+    <div class="nav-title">📊 Dimension Reduction</div>
+    <a href="../../index.html">← Back to Home</a>
+</nav>
+<div class="container">
+    <h1>📊 Dimension Reduction - Interactive Lesson</h1>
+
+    <div class="intro">
+        <h2>What is Dimension Reduction?</h2>
+        <p>
+            Dimension reduction is the process of reducing the number of features (dimensions) in your data
+            while preserving as much information as possible. It's essential for visualizing high-dimensional
+            data, improving model performance, and reducing computational costs. Common techniques include
+            PCA (Principal Component Analysis), t-SNE, and autoencoders.
+        </p>
+    </div>
+
+    <div class="main-content">
+        <div class="sidebar">
+            <h3>Controls</h3>
+            <button class="btn-primary" onclick="generateData()">Generate New Data</button>
+            <button class="btn-secondary" onclick="runPCA()">Run PCA</button>
+            <button class="btn-secondary" onclick="reset()">Reset</button>
+
+            <div class="method-cards">
+                <div class="method-card active" onclick="selectMethod('pca')">
+                    <strong>PCA</strong>
+                    <p style="font-size: 0.85em; margin-top: 5px;">Linear dimensionality reduction</p>
+                </div>
+                <div class="method-card" onclick="selectMethod('random')">
+                    <strong>Random Projection</strong>
+                    <p style="font-size: 0.85em; margin-top: 5px;">Fast approximation method</p>
+                </div>
+            </div>
+
+            <div class="stats">
+                <div class="stat-row"><span>Original Dimensions:</span><span id="origDim">3</span></div>
+                <div class="stat-row"><span>Reduced Dimensions:</span><span id="redDim">2</span></div>
+                <div class="stat-row"><span>Variance Retained:</span><span id="variance">0%</span></div>
+                <div class="stat-row"><span>Data Points:</span><span id="points">100</span></div>
+            </div>
+
+            <div class="key-concepts">
+                <h4>Key Concepts:</h4>
+                <ul>
+                    <li><strong>Principal Components:</strong> Directions of maximum variance</li>
+                    <li><strong>Eigenvalues:</strong> Amount of variance in each component</li>
+                    <li><strong>Variance Explained:</strong> Information preserved after reduction</li>
+                    <li><strong>Feature Space:</strong> Original high-dimensional space</li>
+                </ul>
+            </div>
+
+            <div class="explanation">
+                <h4>Why Reduce Dimensions?</h4>
+                <ul style="margin-left: 20px; line-height: 1.6;">
+                    <li>Visualize high-dimensional data</li>
+                    <li>Remove noise and redundancy</li>
+                    <li>Speed up algorithms</li>
+                    <li>Avoid curse of dimensionality</li>
+                </ul>
+            </div>
+        </div>
+
+        <div>
+            <div class="viz-container">
+                <div class="viz-box">
+                    <h3>Original 3D Data</h3>
+                    <canvas id="canvas3d" width="400" height="400"></canvas>
+                </div>
+                <div class="viz-box">
+                    <h3>PCA Reduced to 2D</h3>
+                    <canvas id="canvas2d" width="400" height="400"></canvas>
+                </div>
+            </div>
+
+            <div class="explanation" style="margin-top: 20px;">
+                <h4>How PCA Works:</h4>
+                <ol style="margin-left: 20px; line-height: 1.8;">
+                    <li><strong>Standardize the data:</strong> Center data around origin</li>
+                    <li><strong>Compute covariance matrix:</strong> Measure how variables relate</li>
+                    <li><strong>Find eigenvectors & eigenvalues:</strong> Directions of max variance</li>
+                    <li><strong>Project data:</strong> Transform to new coordinate system</li>
+                    <li><strong>Keep top components:</strong> Retain most important dimensions</li>
+                </ol>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 20px;">
+                <div style="background: #e3f2fd; padding: 15px; border-radius: 8px;">
+                    <strong>🖼️ Image Compression</strong>
+                    <p style="margin-top: 8px; font-size: 0.9em;">Reduce image data while keeping quality</p>
+                </div>
+                <div style="background: #f3e5f5; padding: 15px; border-radius: 8px;">
+                    <strong>🔍 Data Visualization</strong>
+                    <p style="margin-top: 8px; font-size: 0.9em;">Plot high-D data in 2D/3D</p>
+                </div>
+                <div style="background: #e8f5e9; padding: 15px; border-radius: 8px;">
+                    <strong>🚀 ML Preprocessing</strong>
+                    <p style="margin-top: 8px; font-size: 0.9em;">Improve model training speed</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const canvas3d = document.getElementById('canvas3d');
+const ctx3d = canvas3d.getContext('2d');
+const canvas2d = document.getElementById('canvas2d');
+const ctx2d = canvas2d.getContext('2d');
+
+let data3d = [];
+let data2d = [];
+let currentMethod = 'pca';
+let varianceRetained = 0;
+
+function generateData() {
+    data3d = [];
+    const numPoints = 100;
+    const numClusters = 3;
+    const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1'];
+
+    for (let c = 0; c < numClusters; c++) {
+        const centerX = (Math.random() - 0.5) * 3;
+        const centerY = (Math.random() - 0.5) * 3;
+        const centerZ = (Math.random() - 0.5) * 3;
+
+        for (let i = 0; i < numPoints / numClusters; i++) {
+            data3d.push({
+                x: centerX + (Math.random() - 0.5) * 1.5,
+                y: centerY + (Math.random() - 0.5) * 1.5,
+                z: centerZ + (Math.random() - 0.5) * 1.5,
+                cluster: c,
+                color: colors[c]
+            });
+        }
+    }
+
+    document.getElementById('points').textContent = data3d.length;
+    draw3D();
+    data2d = [];
+    draw2D();
+}
+
+function runPCA() {
+    if (data3d.length === 0) {
+        generateData();
+    }
+
+    // Center the data
+    const meanX = data3d.reduce((sum, p) => sum + p.x, 0) / data3d.length;
+    const meanY = data3d.reduce((sum, p) => sum + p.y, 0) / data3d.length;
+    const meanZ = data3d.reduce((sum, p) => sum + p.z, 0) / data3d.length;
+
+    const centered = data3d.map(p => ({
+        x: p.x - meanX,
+        y: p.y - meanY,
+        z: p.z - meanZ,
+        cluster: p.cluster,
+        color: p.color
+    }));
+
+    // Compute covariance matrix (simplified)
+    let cov_xx = 0, cov_yy = 0, cov_zz = 0;
+    let cov_xy = 0, cov_xz = 0, cov_yz = 0;
+
+    centered.forEach(p => {
+        cov_xx += p.x * p.x;
+        cov_yy += p.y * p.y;
+        cov_zz += p.z * p.z;
+        cov_xy += p.x * p.y;
+        cov_xz += p.x * p.z;
+        cov_yz += p.y * p.z;
+    });
+
+    const n = centered.length;
+    cov_xx /= n; cov_yy /= n; cov_zz /= n;
+    cov_xy /= n; cov_xz /= n; cov_yz /= n;
+
+    // Simplified: use first two principal components
+    // PC1: direction of maximum variance
+    const pc1_x = 1, pc1_y = cov_xy / cov_xx, pc1_z = cov_xz / cov_xx;
+    const pc1_len = Math.sqrt(pc1_x*pc1_x + pc1_y*pc1_y + pc1_z*pc1_z);
+
+    // PC2: orthogonal to PC1
+    const pc2_x = 0, pc2_y = 1, pc2_z = -pc1_y / pc1_z;
+    const pc2_len = Math.sqrt(pc2_x*pc2_x + pc2_y*pc2_y + pc2_z*pc2_z);
+
+    // Project onto first 2 PCs
+    data2d = centered.map(p => ({
+        x: (p.x * pc1_x + p.y * pc1_y + p.z * pc1_z) / pc1_len,
+        y: (p.x * pc2_x + p.y * pc2_y + p.z * pc2_z) / pc2_len,
+        cluster: p.cluster,
+        color: p.color
+    }));
+
+    // Calculate variance retained (simplified)
+    const totalVariance = cov_xx + cov_yy + cov_zz;
+    const retainedVariance = cov_xx + cov_yy; // First two components
+    varianceRetained = (retainedVariance / totalVariance * 100);
+
+    document.getElementById('variance').textContent = varianceRetained.toFixed(1) + '%';
+
+    draw2D();
+}
+
+function draw3D() {
+    ctx3d.clearRect(0, 0, canvas3d.width, canvas3d.height);
+
+    // Simple 3D projection
+    const angle = Date.now() * 0.0003;
+    const scale = 40;
+    const centerX = canvas3d.width / 2;
+    const centerY = canvas3d.height / 2;
+
+    // Draw axes
+    ctx3d.strokeStyle = '#ccc';
+    ctx3d.lineWidth = 1;
+    ctx3d.beginPath();
+    ctx3d.moveTo(centerX, centerY);
+    ctx3d.lineTo(centerX + 100, centerY);
+    ctx3d.moveTo(centerX, centerY);
+    ctx3d.lineTo(centerX, centerY - 100);
+    ctx3d.stroke();
+
+    ctx3d.fillStyle = '#666';
+    ctx3d.font = '12px Arial';
+    ctx3d.fillText('X', centerX + 110, centerY);
+    ctx3d.fillText('Y', centerX, centerY - 110);
+
+    // Draw points
+    data3d.forEach(point => {
+        const x = point.x * Math.cos(angle) - point.z * Math.sin(angle);
+        const z = point.x * Math.sin(angle) + point.z * Math.cos(angle);
+        const y = point.y;
+
+        const screenX = centerX + x * scale;
+        const screenY = centerY - y * scale - z * 10;
+
+        ctx3d.fillStyle = point.color;
+        ctx3d.globalAlpha = 0.7;
+        ctx3d.beginPath();
+        ctx3d.arc(screenX, screenY, 4, 0, Math.PI * 2);
+        ctx3d.fill();
+    });
+
+    ctx3d.globalAlpha = 1;
+
+    if (data3d.length > 0) {
+        requestAnimationFrame(draw3D);
+    }
+}
+
+function draw2D() {
+    ctx2d.clearRect(0, 0, canvas2d.width, canvas2d.height);
+
+    if (data2d.length === 0) {
+        ctx2d.fillStyle = '#999';
+        ctx2d.font = '16px Arial';
+        ctx2d.textAlign = 'center';
+        ctx2d.fillText('Run PCA to see reduced data', canvas2d.width/2, canvas2d.height/2);
+        return;
+    }
+
+    const scale = 50;
+    const centerX = canvas2d.width / 2;
+    const centerY = canvas2d.height / 2;
+
+    // Draw axes
+    ctx2d.strokeStyle = '#ccc';
+    ctx2d.lineWidth = 1;
+    ctx2d.beginPath();
+    ctx2d.moveTo(50, centerY);
+    ctx2d.lineTo(canvas2d.width - 50, centerY);
+    ctx2d.moveTo(centerX, 50);
+    ctx2d.lineTo(centerX, canvas2d.height - 50);
+    ctx2d.stroke();
+
+    ctx2d.fillStyle = '#666';
+    ctx2d.font = '12px Arial';
+    ctx2d.textAlign = 'center';
+    ctx2d.fillText('PC1', canvas2d.width - 30, centerY - 10);
+    ctx2d.fillText('PC2', centerX + 20, 40);
+
+    // Draw points
+    data2d.forEach(point => {
+        const screenX = centerX + point.x * scale;
+        const screenY = centerY - point.y * scale;
+
+        ctx2d.fillStyle = point.color;
+        ctx2d.globalAlpha = 0.7;
+        ctx2d.beginPath();
+        ctx2d.arc(screenX, screenY, 5, 0, Math.PI * 2);
+        ctx2d.fill();
+    });
+
+    ctx2d.globalAlpha = 1;
+}
+
+function selectMethod(method) {
+    currentMethod = method;
+    document.querySelectorAll('.method-card').forEach(card => {
+        card.classList.remove('active');
+    });
+    event.target.closest('.method-card').classList.add('active');
+}
+
+function reset() {
+    data3d = [];
+    data2d = [];
+    varianceRetained = 0;
+    document.getElementById('variance').textContent = '0%';
+    ctx3d.clearRect(0, 0, canvas3d.width, canvas3d.height);
+    ctx2d.clearRect(0, 0, canvas2d.width, canvas2d.height);
+}
+
+generateData();
+</script>
+</body>
+</html>

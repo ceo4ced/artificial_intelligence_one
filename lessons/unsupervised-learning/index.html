@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unsupervised Learning - Interactive Lesson</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 0; }
+.nav-header { background: #2d3748; padding: 15px 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; }
+.nav-header a { color: #90cdf4; text-decoration: none; font-weight: 600; font-size: 1.1em; }
+.nav-title { color: #fff; font-size: 1.2em; font-weight: 700; }
+.container { max-width: 1400px; margin: 20px auto; background: #fff; border-radius: 15px; padding: 30px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+h1 { text-align: center; color: #2d3748; font-size: 2.5em; margin-bottom: 20px; }
+.intro { background: #e3f2fd; padding: 20px; border-radius: 10px; margin-bottom: 30px; line-height: 1.6; }
+.intro h2 { color: #1976d2; margin-bottom: 10px; }
+.main-content { display: grid; grid-template-columns: 350px 1fr; gap: 30px; }
+.sidebar { background: #f8f9fa; padding: 20px; border-radius: 10px; height: fit-content; }
+button { width: 100%; padding: 12px; margin: 5px 0; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }
+.btn-primary { background: #4CAF50; color: #fff; }
+.btn-secondary { background: #2196F3; color: #fff; }
+canvas { border: 2px solid #ddd; border-radius: 8px; display: block; background: #fafafa; margin: 0 auto; }
+.task-tabs { display: flex; gap: 10px; margin-bottom: 15px; }
+.tab { flex: 1; padding: 10px; background: #e0e0e0; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.2s; }
+.tab.active { background: #667eea; color: #fff; }
+.explanation { background: #fff9c4; padding: 15px; border-radius: 8px; margin: 15px 0; border-left: 4px solid #fbc02d; }
+.explanation h4 { color: #f57c00; margin-bottom: 8px; }
+.stats { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; padding: 15px; border-radius: 10px; margin-top: 15px; }
+.stat-row { display: flex; justify-content: space-between; margin: 8px 0; }
+.control-group { margin: 15px 0; }
+.control-group label { display: block; margin-bottom: 5px; font-weight: 600; }
+.control-group input[type="range"] { width: 100%; }
+.control-group .value { float: right; color: #667eea; }
+.info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 20px; }
+.info-card { background: #f0f0f0; padding: 15px; border-radius: 8px; }
+.info-card h4 { color: #1976d2; margin-bottom: 8px; }
+.info-card ul { margin-left: 20px; font-size: 0.9em; line-height: 1.6; }
+</style>
+</head>
+<body>
+<nav class="nav-header">
+    <div class="nav-title">🔍 Unsupervised Learning</div>
+    <a href="../../index.html">← Back to Home</a>
+</nav>
+<div class="container">
+    <h1>🔍 Unsupervised Learning - Interactive Lesson</h1>
+
+    <div class="intro">
+        <h2>What is Unsupervised Learning?</h2>
+        <p>
+            Unsupervised learning is machine learning with <strong>unlabeled data</strong>. The algorithm
+            discovers hidden patterns and structures in the data without being told what to look for.
+            Common tasks include clustering (grouping similar items), dimensionality reduction, and
+            anomaly detection. Unlike supervised learning, there are no "correct answers" provided during training.
+        </p>
+    </div>
+
+    <div class="main-content">
+        <div class="sidebar">
+            <h3>Task Type</h3>
+            <div class="task-tabs">
+                <button class="tab active" onclick="switchTask('clustering')">Clustering</button>
+                <button class="tab" onclick="switchTask('anomaly')">Anomaly Detection</button>
+            </div>
+
+            <button class="btn-primary" style="margin-top: 15px;" onclick="generateData()">Generate Data</button>
+            <button class="btn-secondary" onclick="runAlgorithm()">Run Algorithm</button>
+            <button class="btn-secondary" onclick="step()">Step</button>
+            <button class="btn-secondary" onclick="reset()">Reset</button>
+
+            <div class="control-group" id="clustersControl">
+                <label>Number of Clusters: <span class="value" id="kVal">3</span></label>
+                <input type="range" min="2" max="6" value="3" id="kSlider" onchange="updateK()">
+            </div>
+
+            <div class="stats">
+                <div class="stat-row"><span>Data Points:</span><span id="dataPoints">0</span></div>
+                <div class="stat-row"><span>Clusters Found:</span><span id="clusters">0</span></div>
+                <div class="stat-row"><span>Iterations:</span><span id="iterations">0</span></div>
+                <div class="stat-row"><span>Status:</span><span id="status">Ready</span></div>
+            </div>
+
+            <div class="explanation">
+                <h4>Key Difference:</h4>
+                <p><strong>Supervised:</strong> "This is a cat, this is a dog" (labeled)</p>
+                <p><strong>Unsupervised:</strong> "Find groups in this data" (unlabeled)</p>
+            </div>
+
+            <div style="background: #e8f5e9; padding: 15px; border-radius: 8px; margin-top: 15px;">
+                <h4 style="margin-bottom: 10px;">Common Algorithms:</h4>
+                <ul style="margin-left: 20px; line-height: 1.8; font-size: 0.9em;">
+                    <li><strong>K-Means:</strong> Partition data into K clusters</li>
+                    <li><strong>DBSCAN:</strong> Density-based clustering</li>
+                    <li><strong>Hierarchical:</strong> Build cluster tree</li>
+                    <li><strong>PCA:</strong> Reduce dimensions</li>
+                </ul>
+            </div>
+        </div>
+
+        <div>
+            <canvas id="canvas" width="800" height="500"></canvas>
+
+            <div class="info-grid">
+                <div class="info-card">
+                    <h4>🎯 Clustering</h4>
+                    <ul>
+                        <li>Group similar data points together</li>
+                        <li>No predefined categories</li>
+                        <li>Examples: Customer segmentation, image compression</li>
+                        <li>Algorithms: K-Means, DBSCAN</li>
+                    </ul>
+                </div>
+                <div class="info-card">
+                    <h4>🚨 Anomaly Detection</h4>
+                    <ul>
+                        <li>Identify unusual patterns</li>
+                        <li>Find outliers in data</li>
+                        <li>Examples: Fraud detection, system monitoring</li>
+                        <li>Algorithms: Isolation Forest, LOF</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="explanation" style="margin-top: 20px;">
+                <h4>The Unsupervised Learning Process:</h4>
+                <ol style="margin-left: 20px; line-height: 1.8;">
+                    <li><strong>Collect unlabeled data:</strong> Gather raw, untagged data</li>
+                    <li><strong>Choose algorithm:</strong> Select clustering, reduction, etc.</li>
+                    <li><strong>Set parameters:</strong> Number of clusters, distance metric</li>
+                    <li><strong>Run algorithm:</strong> Discover patterns automatically</li>
+                    <li><strong>Interpret results:</strong> Understand what was found</li>
+                    <li><strong>Validate:</strong> Check if patterns make sense</li>
+                </ol>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 20px;">
+                <div style="background: #e3f2fd; padding: 15px; border-radius: 8px;">
+                    <strong>🛒 Customer Segmentation</strong>
+                    <p style="margin-top: 8px; font-size: 0.9em;">Group customers by behavior</p>
+                </div>
+                <div style="background: #f3e5f5; padding: 15px; border-radius: 8px;">
+                    <strong>🔐 Fraud Detection</strong>
+                    <p style="margin-top: 8px; font-size: 0.9em;">Identify unusual transactions</p>
+                </div>
+                <div style="background: #e8f5e9; padding: 15px; border-radius: 8px;">
+                    <strong>📰 Topic Modeling</strong>
+                    <p style="margin-top: 8px; font-size: 0.9em;">Discover themes in documents</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+
+let currentTask = 'clustering';
+let k = 3;
+let dataPoints = [];
+let centroids = [];
+let assignments = [];
+let iterations = 0;
+let anomalies = [];
+
+const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8', '#DDA15E'];
+
+function switchTask(task) {
+    currentTask = task;
+    document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+    event.target.classList.add('active');
+
+    document.getElementById('clustersControl').style.display =
+        task === 'clustering' ? 'block' : 'none';
+
+    reset();
+}
+
+function generateData() {
+    dataPoints = [];
+    const numClusters = currentTask === 'clustering' ? k : 3;
+    const pointsPerCluster = currentTask === 'clustering' ? 30 : 40;
+
+    for (let i = 0; i < numClusters; i++) {
+        const centerX = 150 + Math.random() * 500;
+        const centerY = 100 + Math.random() * 300;
+
+        for (let j = 0; j < pointsPerCluster; j++) {
+            dataPoints.push({
+                x: centerX + (Math.random() - 0.5) * 80,
+                y: centerY + (Math.random() - 0.5) * 80
+            });
+        }
+    }
+
+    if (currentTask === 'anomaly') {
+        // Add some anomalies
+        for (let i = 0; i < 5; i++) {
+            dataPoints.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                isAnomaly: true
+            });
+        }
+    }
+
+    document.getElementById('dataPoints').textContent = dataPoints.length;
+    draw();
+}
+
+function runAlgorithm() {
+    if (dataPoints.length === 0) {
+        generateData();
+    }
+
+    if (currentTask === 'clustering') {
+        runKMeans();
+    } else {
+        detectAnomalies();
+    }
+}
+
+function runKMeans() {
+    // Initialize centroids randomly
+    centroids = [];
+    for (let i = 0; i < k; i++) {
+        const randomPoint = dataPoints[Math.floor(Math.random() * dataPoints.length)];
+        centroids.push({ x: randomPoint.x, y: randomPoint.y });
+    }
+
+    iterations = 0;
+    document.getElementById('status').textContent = 'Clustering...';
+
+    const interval = setInterval(() => {
+        // Assign points to nearest centroid
+        assignments = dataPoints.map(point => {
+            let minDist = Infinity;
+            let cluster = 0;
+
+            centroids.forEach((centroid, i) => {
+                const dist = Math.sqrt(
+                    (point.x - centroid.x) ** 2 +
+                    (point.y - centroid.y) ** 2
+                );
+                if (dist < minDist) {
+                    minDist = dist;
+                    cluster = i;
+                }
+            });
+
+            return cluster;
+        });
+
+        // Update centroids
+        const newCentroids = [];
+        for (let i = 0; i < k; i++) {
+            const clusterPoints = dataPoints.filter((_, idx) => assignments[idx] === i);
+
+            if (clusterPoints.length > 0) {
+                const avgX = clusterPoints.reduce((sum, p) => sum + p.x, 0) / clusterPoints.length;
+                const avgY = clusterPoints.reduce((sum, p) => sum + p.y, 0) / clusterPoints.length;
+                newCentroids.push({ x: avgX, y: avgY });
+            } else {
+                newCentroids.push({ ...centroids[i] });
+            }
+        }
+
+        // Check convergence
+        let converged = true;
+        for (let i = 0; i < k; i++) {
+            const dist = Math.sqrt(
+                (centroids[i].x - newCentroids[i].x) ** 2 +
+                (centroids[i].y - newCentroids[i].y) ** 2
+            );
+            if (dist > 0.1) {
+                converged = false;
+                break;
+            }
+        }
+
+        centroids = newCentroids;
+        iterations++;
+
+        document.getElementById('iterations').textContent = iterations;
+        document.getElementById('clusters').textContent = k;
+        draw();
+
+        if (converged || iterations >= 50) {
+            clearInterval(interval);
+            document.getElementById('status').textContent = 'Converged!';
+        }
+    }, 300);
+}
+
+function detectAnomalies() {
+    anomalies = [];
+
+    // Simple anomaly detection: find points far from their neighbors
+    dataPoints.forEach((point, i) => {
+        // Find average distance to 5 nearest neighbors
+        const distances = dataPoints
+            .map((p, idx) => ({
+                dist: Math.sqrt((point.x - p.x) ** 2 + (point.y - p.y) ** 2),
+                idx
+            }))
+            .filter(d => d.idx !== i)
+            .sort((a, b) => a.dist - b.dist)
+            .slice(0, 5);
+
+        const avgDist = distances.reduce((sum, d) => sum + d.dist, 0) / 5;
+
+        // If average distance is high, it's an anomaly
+        if (avgDist > 100) {
+            anomalies.push(i);
+        }
+    });
+
+    document.getElementById('clusters').textContent = anomalies.length + ' anomalies';
+    document.getElementById('status').textContent = 'Detection complete!';
+    draw();
+}
+
+function step() {
+    // Single iteration of K-Means
+    if (centroids.length === 0) {
+        centroids = [];
+        for (let i = 0; i < k; i++) {
+            const randomPoint = dataPoints[Math.floor(Math.random() * dataPoints.length)];
+            centroids.push({ x: randomPoint.x, y: randomPoint.y });
+        }
+    }
+
+    // Assign
+    assignments = dataPoints.map(point => {
+        let minDist = Infinity;
+        let cluster = 0;
+
+        centroids.forEach((centroid, i) => {
+            const dist = Math.sqrt(
+                (point.x - centroid.x) ** 2 +
+                (point.y - centroid.y) ** 2
+            );
+            if (dist < minDist) {
+                minDist = dist;
+                cluster = i;
+            }
+        });
+
+        return cluster;
+    });
+
+    // Update
+    for (let i = 0; i < k; i++) {
+        const clusterPoints = dataPoints.filter((_, idx) => assignments[idx] === i);
+        if (clusterPoints.length > 0) {
+            centroids[i].x = clusterPoints.reduce((sum, p) => sum + p.x, 0) / clusterPoints.length;
+            centroids[i].y = clusterPoints.reduce((sum, p) => sum + p.y, 0) / clusterPoints.length;
+        }
+    }
+
+    iterations++;
+    document.getElementById('iterations').textContent = iterations;
+    draw();
+}
+
+function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    if (currentTask === 'clustering') {
+        // Draw Voronoi-like background
+        if (centroids.length > 0) {
+            const gridSize = 10;
+            for (let x = 0; x < canvas.width; x += gridSize) {
+                for (let y = 0; y < canvas.height; y += gridSize) {
+                    let minDist = Infinity;
+                    let cluster = 0;
+
+                    centroids.forEach((c, i) => {
+                        const dist = Math.sqrt((x - c.x) ** 2 + (y - c.y) ** 2);
+                        if (dist < minDist) {
+                            minDist = dist;
+                            cluster = i;
+                        }
+                    });
+
+                    ctx.fillStyle = colors[cluster] + '15';
+                    ctx.fillRect(x, y, gridSize, gridSize);
+                }
+            }
+        }
+
+        // Draw points
+        dataPoints.forEach((point, i) => {
+            const cluster = assignments[i] !== undefined ? assignments[i] : 0;
+            ctx.fillStyle = assignments.length > 0 ? colors[cluster] : '#999';
+            ctx.globalAlpha = 0.7;
+            ctx.beginPath();
+            ctx.arc(point.x, point.y, 5, 0, Math.PI * 2);
+            ctx.fill();
+        });
+
+        ctx.globalAlpha = 1;
+
+        // Draw centroids
+        centroids.forEach((centroid, i) => {
+            ctx.fillStyle = colors[i];
+            ctx.beginPath();
+            ctx.arc(centroid.x, centroid.y, 10, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+        });
+    } else {
+        // Anomaly detection
+        dataPoints.forEach((point, i) => {
+            ctx.fillStyle = anomalies.includes(i) ? '#F44336' : '#2196F3';
+            ctx.globalAlpha = anomalies.includes(i) ? 1 : 0.5;
+            ctx.beginPath();
+            ctx.arc(point.x, point.y, anomalies.includes(i) ? 8 : 5, 0, Math.PI * 2);
+            ctx.fill();
+
+            if (anomalies.includes(i)) {
+                ctx.strokeStyle = '#fff';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            }
+        });
+
+        ctx.globalAlpha = 1;
+    }
+}
+
+function updateK() {
+    k = parseInt(document.getElementById('kSlider').value);
+    document.getElementById('kVal').textContent = k;
+}
+
+function reset() {
+    dataPoints = [];
+    centroids = [];
+    assignments = [];
+    iterations = 0;
+    anomalies = [];
+
+    document.getElementById('dataPoints').textContent = '0';
+    document.getElementById('clusters').textContent = '0';
+    document.getElementById('iterations').textContent = '0';
+    document.getElementById('status').textContent = 'Ready';
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+}
+
+// Initialize
+generateData();
+</script>
+</body>
+</html>

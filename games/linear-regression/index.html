@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stock Market Prophet - Linear Regression Game</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 0; }
+.nav-header { background: #2d3748; padding: 15px 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; }
+.nav-header a { color: #90cdf4; text-decoration: none; font-weight: 600; font-size: 1.1em; }
+.nav-title { color: #fff; font-size: 1.2em; font-weight: 700; }
+.container { max-width: 1400px; margin: 20px auto; background: #fff; border-radius: 15px; padding: 30px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+h1 { text-align: center; color: #2d3748; font-size: 2.5em; margin-bottom: 10px; }
+.subtitle { text-align: center; color: #666; margin-bottom: 30px; font-size: 1.1em; }
+.game-area { display: grid; grid-template-columns: 350px 1fr; gap: 30px; }
+.sidebar { background: #f8f9fa; padding: 20px; border-radius: 10px; height: fit-content; }
+button { width: 100%; padding: 12px; margin: 5px 0; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }
+.btn-primary { background: #4CAF50; color: #fff; }
+.btn-secondary { background: #2196F3; color: #fff; }
+.btn-danger { background: #f44336; color: #fff; }
+canvas { border: 2px solid #ddd; border-radius: 8px; display: block; background: #fff; }
+.prediction-input { margin: 20px 0; }
+.prediction-input input { width: 100%; padding: 15px; font-size: 1.2em; border: 2px solid #ddd; border-radius: 8px; text-align: center; }
+.prediction-input label { display: block; margin-bottom: 10px; font-weight: 600; text-align: center; }
+.stats { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; padding: 15px; border-radius: 10px; margin-top: 15px; }
+.stat-row { display: flex; justify-content: space-between; margin: 8px 0; }
+.score-board { background: #fff9c4; padding: 20px; border-radius: 10px; text-align: center; margin: 20px 0; border: 2px solid #fbc02d; }
+.score-board h2 { color: #f57c00; margin-bottom: 10px; }
+.score-value { font-size: 3em; font-weight: bold; color: #667eea; }
+.accuracy-badge { background: #4CAF50; color: #fff; padding: 8px 15px; border-radius: 20px; display: inline-block; margin: 10px 0; font-weight: 600; }
+.stock-selector { margin: 15px 0; }
+.stock-btn { width: 100%; padding: 12px; margin: 5px 0; border: 2px solid #667eea; background: #fff; color: #667eea; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.2s; }
+.stock-btn:hover { background: #667eea; color: #fff; }
+.stock-btn.active { background: #667eea; color: #fff; }
+.info-box { background: #e3f2fd; padding: 15px; border-radius: 8px; margin: 15px 0; }
+.info-box h4 { color: #1976d2; margin-bottom: 8px; }
+.result-box { background: #f0f0f0; padding: 20px; border-radius: 10px; margin: 20px 0; text-align: center; display: none; }
+.result-box.show { display: block; animation: slideIn 0.3s; }
+@keyframes slideIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+.difficulty-selector { margin: 15px 0; }
+.difficulty-btn { width: 32%; display: inline-block; padding: 10px; margin: 2px; border: 2px solid #ddd; background: #fff; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.9em; transition: all 0.2s; }
+.difficulty-btn:hover { border-color: #667eea; }
+.difficulty-btn.active { background: #667eea; color: #fff; border-color: #667eea; }
+</style>
+</head>
+<body>
+<nav class="nav-header">
+    <div class="nav-title">📈 Stock Market Prophet</div>
+    <a href="../../index.html">← Back to Home</a>
+</nav>
+<div class="container">
+    <h1>📈 Stock Market Prophet</h1>
+    <p class="subtitle">Predict future stock prices using linear regression!</p>
+
+    <div class="game-area">
+        <div class="sidebar">
+            <h3>🎮 Game Controls</h3>
+
+            <div class="stock-selector">
+                <h4 style="margin-bottom: 10px;">Select Stock:</h4>
+                <button class="stock-btn active" onclick="selectStock('TECH')">💻 Tech Corp</button>
+                <button class="stock-btn" onclick="selectStock('RETAIL')">🛒 Retail Inc</button>
+                <button class="stock-btn" onclick="selectStock('ENERGY')">⚡ Energy Co</button>
+            </div>
+
+            <div class="difficulty-selector">
+                <h4 style="margin-bottom: 10px;">Difficulty:</h4>
+                <button class="difficulty-btn active" onclick="setDifficulty('easy')">Easy</button>
+                <button class="difficulty-btn" onclick="setDifficulty('medium')">Medium</button>
+                <button class="difficulty-btn" onclick="setDifficulty('hard')">Hard</button>
+            </div>
+
+            <button class="btn-primary" onclick="newRound()">🎲 New Round</button>
+            <button class="btn-secondary" onclick="showRegression()">📊 Show Trend</button>
+            <button class="btn-danger" onclick="reset()">🔄 Reset Score</button>
+
+            <div class="prediction-input">
+                <label>Predict Day 11 Price:</label>
+                <input type="number" id="predictionInput" placeholder="Enter price ($)" step="0.01">
+                <button class="btn-primary" style="margin-top: 10px;" onclick="submitPrediction()">✅ Submit Prediction</button>
+            </div>
+
+            <div class="stats">
+                <div class="stat-row"><span>Round:</span><span id="round">0</span></div>
+                <div class="stat-row"><span>Total Score:</span><span id="totalScore">0</span></div>
+                <div class="stat-row"><span>Avg Error:</span><span id="avgError">$0.00</span></div>
+                <div class="stat-row"><span>Best Accuracy:</span><span id="bestAccuracy">0%</span></div>
+            </div>
+
+            <div class="info-box">
+                <h4>💡 How to Play:</h4>
+                <p style="font-size: 0.9em; line-height: 1.6;">
+                    1. Study the historical stock prices<br>
+                    2. Predict the next day's price<br>
+                    3. See the regression line and compare<br>
+                    4. Score based on accuracy!<br><br>
+                    <strong>Closer prediction = Higher score!</strong>
+                </p>
+            </div>
+        </div>
+
+        <div>
+            <div class="score-board">
+                <h2>Current Round Score</h2>
+                <div class="score-value" id="roundScore">0</div>
+                <div class="accuracy-badge" id="accuracyBadge">Not Submitted</div>
+            </div>
+
+            <canvas id="canvas" width="900" height="500"></canvas>
+
+            <div class="result-box" id="resultBox">
+                <h3 style="margin-bottom: 15px;">📊 Results</h3>
+                <div style="font-size: 1.2em; margin: 10px 0;">
+                    <strong>Your Prediction:</strong> $<span id="yourPrediction">0</span>
+                </div>
+                <div style="font-size: 1.2em; margin: 10px 0;">
+                    <strong>Actual (Regression):</strong> $<span id="actualValue">0</span>
+                </div>
+                <div style="font-size: 1.2em; margin: 10px 0; color: #f44336;">
+                    <strong>Error:</strong> $<span id="error">0</span>
+                </div>
+                <div style="font-size: 1.5em; margin: 20px 0; font-weight: bold; color: #667eea;">
+                    Round Score: <span id="displayRoundScore">0</span> points
+                </div>
+            </div>
+
+            <div style="background: #fff3e0; padding: 20px; border-radius: 10px; margin-top: 20px; border-left: 4px solid #ff9800;">
+                <h4 style="color: #e65100; margin-bottom: 10px;">📚 Linear Regression in Finance</h4>
+                <p style="line-height: 1.6;">
+                    Linear regression is widely used in finance for trend analysis, price prediction, and risk assessment.
+                    By fitting a line through historical data points, we can identify trends and make educated predictions
+                    about future values. The equation y = mx + b gives us the trend line, where m is the slope (rate of change)
+                    and b is the y-intercept (starting value).
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+
+let currentStock = 'TECH';
+let difficulty = 'easy';
+let round = 0;
+let totalScore = 0;
+let errors = [];
+let bestAccuracy = 0;
+
+let stockData = [];
+let slope = 0;
+let intercept = 0;
+let showLine = false;
+let actualDay11 = 0;
+
+const stockProfiles = {
+    TECH: { base: 100, growth: 3, volatility: 5, name: 'Tech Corp' },
+    RETAIL: { base: 50, growth: 1, volatility: 3, name: 'Retail Inc' },
+    ENERGY: { base: 150, growth: -2, volatility: 8, name: 'Energy Co' }
+};
+
+const difficultySettings = {
+    easy: { noise: 2, pointCount: 10 },
+    medium: { noise: 5, pointCount: 10 },
+    hard: { noise: 10, pointCount: 10 }
+};
+
+function selectStock(stock) {
+    currentStock = stock;
+    document.querySelectorAll('.stock-btn').forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+    newRound();
+}
+
+function setDifficulty(diff) {
+    difficulty = diff;
+    document.querySelectorAll('.difficulty-btn').forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+}
+
+function newRound() {
+    round++;
+    showLine = false;
+    document.getElementById('round').textContent = round;
+    document.getElementById('resultBox').classList.remove('show');
+    document.getElementById('accuracyBadge').textContent = 'Not Submitted';
+    document.getElementById('accuracyBadge').style.background = '#999';
+    document.getElementById('roundScore').textContent = '0';
+    document.getElementById('predictionInput').value = '';
+
+    generateStockData();
+    draw();
+}
+
+function generateStockData() {
+    const profile = stockProfiles[currentStock];
+    const settings = difficultySettings[difficulty];
+
+    stockData = [];
+
+    for (let day = 1; day <= 10; day++) {
+        const trend = profile.base + profile.growth * day;
+        const noise = (Math.random() - 0.5) * settings.noise * 2;
+        const price = trend + noise;
+        stockData.push({ day, price });
+    }
+
+    calculateRegression();
+}
+
+function calculateRegression() {
+    const n = stockData.length;
+    let sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0;
+
+    stockData.forEach(point => {
+        sumX += point.day;
+        sumY += point.price;
+        sumXY += point.day * point.price;
+        sumX2 += point.day * point.day;
+    });
+
+    slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+    intercept = (sumY - slope * sumX) / n;
+
+    actualDay11 = slope * 11 + intercept;
+}
+
+function showRegression() {
+    showLine = true;
+    draw();
+}
+
+function submitPrediction() {
+    const userPrediction = parseFloat(document.getElementById('predictionInput').value);
+
+    if (isNaN(userPrediction) || userPrediction <= 0) {
+        alert('Please enter a valid price prediction!');
+        return;
+    }
+
+    showLine = true;
+
+    const error = Math.abs(userPrediction - actualDay11);
+    errors.push(error);
+
+    // Calculate score (max 1000 points, decreases with error)
+    const errorPercent = (error / actualDay11) * 100;
+    const roundScore = Math.max(0, Math.round(1000 * (1 - errorPercent / 100)));
+
+    totalScore += roundScore;
+
+    const accuracy = Math.max(0, 100 - errorPercent);
+    if (accuracy > bestAccuracy) {
+        bestAccuracy = accuracy;
+    }
+
+    // Update displays
+    document.getElementById('roundScore').textContent = roundScore;
+    document.getElementById('totalScore').textContent = totalScore;
+    document.getElementById('avgError').textContent = '$' + (errors.reduce((a, b) => a + b, 0) / errors.length).toFixed(2);
+    document.getElementById('bestAccuracy').textContent = bestAccuracy.toFixed(1) + '%';
+
+    // Accuracy badge
+    const badge = document.getElementById('accuracyBadge');
+    if (accuracy >= 95) {
+        badge.textContent = '🏆 Excellent!';
+        badge.style.background = '#FFD700';
+        badge.style.color = '#000';
+    } else if (accuracy >= 90) {
+        badge.textContent = '⭐ Great!';
+        badge.style.background = '#4CAF50';
+    } else if (accuracy >= 80) {
+        badge.textContent = '👍 Good';
+        badge.style.background = '#2196F3';
+    } else if (accuracy >= 70) {
+        badge.textContent = '😐 Fair';
+        badge.style.background = '#FF9800';
+    } else {
+        badge.textContent = '😞 Poor';
+        badge.style.background = '#F44336';
+    }
+
+    // Show results
+    document.getElementById('yourPrediction').textContent = userPrediction.toFixed(2);
+    document.getElementById('actualValue').textContent = actualDay11.toFixed(2);
+    document.getElementById('error').textContent = error.toFixed(2);
+    document.getElementById('displayRoundScore').textContent = roundScore;
+    document.getElementById('resultBox').classList.add('show');
+
+    draw();
+}
+
+function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Draw grid
+    ctx.strokeStyle = '#f0f0f0';
+    ctx.lineWidth = 1;
+    for (let i = 0; i <= 10; i++) {
+        const x = 100 + i * 70;
+        ctx.beginPath();
+        ctx.moveTo(x, 50);
+        ctx.lineTo(x, 450);
+        ctx.stroke();
+    }
+
+    for (let i = 0; i <= 10; i++) {
+        const y = 50 + i * 40;
+        ctx.beginPath();
+        ctx.moveTo(100, y);
+        ctx.lineTo(870, y);
+        ctx.stroke();
+    }
+
+    // Draw axes
+    ctx.strokeStyle = '#333';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(100, 450);
+    ctx.lineTo(870, 450);
+    ctx.moveTo(100, 50);
+    ctx.lineTo(100, 450);
+    ctx.stroke();
+
+    // Labels
+    ctx.fillStyle = '#666';
+    ctx.font = '14px Arial';
+    ctx.textAlign = 'center';
+
+    for (let i = 1; i <= 11; i++) {
+        ctx.fillText('Day ' + i, 100 + (i - 1) * 70, 470);
+    }
+
+    ctx.save();
+    ctx.translate(70, 250);
+    ctx.rotate(-Math.PI / 2);
+    ctx.fillText('Price ($)', 0, 0);
+    ctx.restore();
+
+    // Find min/max for scaling
+    const prices = stockData.map(d => d.price);
+    const minPrice = Math.min(...prices) - 10;
+    const maxPrice = Math.max(...prices) + 10;
+
+    function priceToY(price) {
+        return 450 - ((price - minPrice) / (maxPrice - minPrice)) * 400;
+    }
+
+    // Draw data points
+    stockData.forEach(point => {
+        const x = 100 + (point.day - 1) * 70;
+        const y = priceToY(point.price);
+
+        ctx.fillStyle = '#2196F3';
+        ctx.beginPath();
+        ctx.arc(x, y, 6, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Price label
+        ctx.fillStyle = '#333';
+        ctx.font = '11px Arial';
+        ctx.fillText('$' + point.price.toFixed(0), x, y - 15);
+    });
+
+    // Draw regression line if shown
+    if (showLine) {
+        ctx.strokeStyle = '#4CAF50';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+
+        for (let day = 1; day <= 11; day++) {
+            const price = slope * day + intercept;
+            const x = 100 + (day - 1) * 70;
+            const y = priceToY(price);
+
+            if (day === 1) {
+                ctx.moveTo(x, y);
+            } else {
+                ctx.lineTo(x, y);
+            }
+        }
+
+        ctx.stroke();
+
+        // Draw day 11 prediction
+        const x11 = 100 + 10 * 70;
+        const y11 = priceToY(actualDay11);
+
+        ctx.fillStyle = '#4CAF50';
+        ctx.beginPath();
+        ctx.arc(x11, y11, 8, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Label
+        ctx.fillStyle = '#4CAF50';
+        ctx.font = 'bold 12px Arial';
+        ctx.fillText('$' + actualDay11.toFixed(2), x11, y11 - 15);
+    }
+
+    // Title
+    ctx.fillStyle = '#2d3748';
+    ctx.font = 'bold 18px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText(stockProfiles[currentStock].name + ' - Stock Price History', 450, 30);
+}
+
+function reset() {
+    if (confirm('Reset all scores?')) {
+        round = 0;
+        totalScore = 0;
+        errors = [];
+        bestAccuracy = 0;
+
+        document.getElementById('round').textContent = '0';
+        document.getElementById('totalScore').textContent = '0';
+        document.getElementById('avgError').textContent = '$0.00';
+        document.getElementById('bestAccuracy').textContent = '0%';
+        document.getElementById('resultBox').classList.remove('show');
+    }
+}
+
+// Initialize
+newRound();
+</script>
+</body>
+</html>

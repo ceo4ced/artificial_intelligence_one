@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deep Learning - Interactive Lesson</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 0; }
+.nav-header { background: #2d3748; padding: 15px 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; }
+.nav-header a { color: #90cdf4; text-decoration: none; font-weight: 600; font-size: 1.1em; }
+.nav-title { color: #fff; font-size: 1.2em; font-weight: 700; }
+.container { max-width: 1400px; margin: 20px auto; background: #fff; border-radius: 15px; padding: 30px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+h1 { text-align: center; color: #2d3748; font-size: 2.5em; margin-bottom: 20px; }
+.intro { background: #e3f2fd; padding: 20px; border-radius: 10px; margin-bottom: 30px; line-height: 1.6; }
+.intro h2 { color: #1976d2; margin-bottom: 10px; }
+.main-content { display: grid; grid-template-columns: 350px 1fr; gap: 30px; }
+.sidebar { background: #f8f9fa; padding: 20px; border-radius: 10px; height: fit-content; }
+button { width: 100%; padding: 12px; margin: 5px 0; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }
+.btn-primary { background: #4CAF50; color: #fff; }
+.btn-secondary { background: #2196F3; color: #fff; }
+.network-viz { background: #fafafa; border: 2px solid #ddd; border-radius: 10px; padding: 30px; min-height: 500px; position: relative; }
+canvas { display: block; margin: 0 auto; border-radius: 8px; }
+.explanation { background: #fff9c4; padding: 15px; border-radius: 8px; margin: 15px 0; border-left: 4px solid #fbc02d; }
+.explanation h4 { color: #f57c00; margin-bottom: 8px; }
+.stats { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; padding: 15px; border-radius: 10px; margin-top: 15px; }
+.stat-row { display: flex; justify-content: space-between; margin: 8px 0; }
+.control-group { margin: 15px 0; }
+.control-group label { display: block; margin-bottom: 5px; font-weight: 600; }
+.control-group input[type="range"] { width: 100%; }
+.control-group .value { float: right; color: #667eea; }
+.key-concepts { background: #e8f5e9; padding: 15px; border-radius: 8px; margin: 15px 0; }
+.key-concepts ul { margin-left: 20px; line-height: 1.8; font-size: 0.9em; }
+.layer-list { margin: 15px 0; }
+.layer-item { background: #fff; padding: 10px; margin: 5px 0; border-radius: 5px; border-left: 4px solid #667eea; display: flex; justify-content: space-between; align-items: center; }
+.layer-item .layer-name { font-weight: 600; }
+.layer-item .layer-size { color: #666; font-size: 0.9em; }
+.comparison-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 20px 0; }
+.comparison-box { background: #f0f0f0; padding: 15px; border-radius: 8px; }
+.comparison-box h4 { color: #1976d2; margin-bottom: 10px; }
+.comparison-box ul { margin-left: 20px; font-size: 0.9em; line-height: 1.6; }
+.depth-indicator { background: linear-gradient(to right, #ffeb3b, #4caf50); height: 8px; border-radius: 4px; margin: 10px 0; position: relative; }
+.depth-marker { position: absolute; width: 4px; height: 16px; background: #f44336; top: -4px; transition: left 0.3s; }
+</style>
+</head>
+<body>
+<nav class="nav-header">
+    <div class="nav-title">🧠 Deep Learning</div>
+    <a href="../../index.html">← Back to Home</a>
+</nav>
+<div class="container">
+    <h1>🧠 Deep Learning - Interactive Lesson</h1>
+
+    <div class="intro">
+        <h2>What is Deep Learning?</h2>
+        <p>
+            Deep Learning uses neural networks with <strong>many layers</strong> (4+ layers, sometimes hundreds!) to learn
+            hierarchical representations of data. Each layer learns increasingly complex features: early layers detect
+            edges and colors, middle layers recognize shapes and textures, and deep layers understand entire objects
+            and concepts. This depth is what makes modern AI possible - from facial recognition to self-driving cars.
+        </p>
+    </div>
+
+    <div class="main-content">
+        <div class="sidebar">
+            <h3>Network Configuration</h3>
+
+            <div class="control-group">
+                <label>Network Depth: <span class="value" id="depthVal">4 layers</span></label>
+                <input type="range" min="2" max="10" value="4" id="depthSlider" onchange="updateDepth()">
+                <div class="depth-indicator">
+                    <div class="depth-marker" id="depthMarker"></div>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 0.8em; color: #666;">
+                    <span>Shallow</span>
+                    <span>Deep</span>
+                </div>
+            </div>
+
+            <button class="btn-primary" onclick="buildNetwork()">Build Network</button>
+            <button class="btn-secondary" onclick="trainNetwork()">Train Network</button>
+            <button class="btn-secondary" onclick="testNetwork()">Test on Sample</button>
+
+            <div class="layer-list" id="layerList">
+                <h4 style="margin-bottom: 10px;">Network Architecture:</h4>
+            </div>
+
+            <div class="stats">
+                <div class="stat-row"><span>Total Layers:</span><span id="totalLayers">4</span></div>
+                <div class="stat-row"><span>Parameters:</span><span id="params">0</span></div>
+                <div class="stat-row"><span>Training Epoch:</span><span id="epoch">0</span></div>
+                <div class="stat-row"><span>Accuracy:</span><span id="accuracy">0%</span></div>
+            </div>
+
+            <div class="key-concepts">
+                <h4>Why Deep Learning?</h4>
+                <ul>
+                    <li><strong>Hierarchical Learning:</strong> Simple → Complex features</li>
+                    <li><strong>Representation Learning:</strong> Automatic feature extraction</li>
+                    <li><strong>More Capacity:</strong> Can learn more complex patterns</li>
+                    <li><strong>Better Performance:</strong> Excels on large datasets</li>
+                </ul>
+            </div>
+
+            <div class="explanation">
+                <h4>Layer Types:</h4>
+                <p style="font-size: 0.9em; line-height: 1.6;">
+                    <strong>Dense:</strong> Fully connected neurons<br>
+                    <strong>Conv:</strong> Feature detection (images)<br>
+                    <strong>Pool:</strong> Downsampling<br>
+                    <strong>Dropout:</strong> Prevents overfitting
+                </p>
+            </div>
+        </div>
+
+        <div>
+            <div class="network-viz">
+                <canvas id="canvas" width="900" height="500"></canvas>
+            </div>
+
+            <div class="comparison-grid">
+                <div class="comparison-box">
+                    <h4>Shallow Networks (2-3 layers)</h4>
+                    <ul>
+                        <li>Simple pattern recognition</li>
+                        <li>Fewer parameters, faster training</li>
+                        <li>Limited representational power</li>
+                        <li>Good for simple tasks</li>
+                        <li>Example: Linear classifiers</li>
+                    </ul>
+                </div>
+                <div class="comparison-box">
+                    <h4>Deep Networks (4+ layers)</h4>
+                    <ul>
+                        <li>Complex hierarchical features</li>
+                        <li>More parameters, slower training</li>
+                        <li>Powerful representations</li>
+                        <li>Excels at complex tasks</li>
+                        <li>Example: Image recognition, NLP</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="explanation">
+                <h4>The Deep Learning Revolution:</h4>
+                <ol style="margin-left: 20px; line-height: 1.8;">
+                    <li><strong>Layer 1:</strong> Detects edges, lines, basic shapes</li>
+                    <li><strong>Layer 2:</strong> Combines edges into textures, simple patterns</li>
+                    <li><strong>Layer 3:</strong> Recognizes object parts (eyes, wheels, corners)</li>
+                    <li><strong>Layer 4+:</strong> Understands complete objects and concepts</li>
+                    <li><strong>Output:</strong> Makes final decision based on high-level features</li>
+                </ol>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 20px;">
+                <div style="background: #e3f2fd; padding: 15px; border-radius: 8px;">
+                    <strong>👁️ Computer Vision</strong>
+                    <p style="margin-top: 8px; font-size: 0.9em;">Image classification, object detection, facial recognition</p>
+                </div>
+                <div style="background: #f3e5f5; padding: 15px; border-radius: 8px;">
+                    <strong>🗣️ Speech & NLP</strong>
+                    <p style="margin-top: 8px; font-size: 0.9em;">Voice assistants, translation, text generation</p>
+                </div>
+                <div style="background: #e8f5e9; padding: 15px; border-radius: 8px;">
+                    <strong>🚗 Autonomous Systems</strong>
+                    <p style="margin-top: 8px; font-size: 0.9em;">Self-driving cars, robotics, game AI</p>
+                </div>
+            </div>
+
+            <div style="background: #fff3e0; padding: 20px; border-radius: 10px; margin-top: 20px; border-left: 4px solid #ff9800;">
+                <h4 style="color: #e65100; margin-bottom: 10px;">⚡ Fun Fact: The Deep Learning Breakthrough</h4>
+                <p style="line-height: 1.6;">
+                    In 2012, a deep neural network called <strong>AlexNet</strong> with 8 layers shocked the world by
+                    winning the ImageNet competition with 85% accuracy (vs 74% for traditional methods). This moment
+                    sparked the AI revolution we're living through today! Modern networks like ResNet have 152+ layers
+                    and achieve 96%+ accuracy.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+
+let networkDepth = 4;
+let layers = [];
+let isTraining = false;
+let epoch = 0;
+
+const layerColors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8', '#DDA15E', '#F7DC6F', '#BB8FCE', '#85C1E2', '#F8B88B'];
+
+function updateDepth() {
+    networkDepth = parseInt(document.getElementById('depthSlider').value);
+    document.getElementById('depthVal').textContent = networkDepth + ' layers';
+
+    const marker = document.getElementById('depthMarker');
+    const percentage = ((networkDepth - 2) / 8) * 100;
+    marker.style.left = percentage + '%';
+
+    buildNetwork();
+}
+
+function buildNetwork() {
+    epoch = 0;
+    document.getElementById('epoch').textContent = '0';
+    document.getElementById('accuracy').textContent = '0%';
+
+    layers = [];
+
+    // Input layer
+    layers.push({ neurons: 784, type: 'Input', name: 'Input (28×28 image)' });
+
+    // Hidden layers - decrease neurons gradually
+    let neuronsCount = 512;
+    for (let i = 1; i < networkDepth - 1; i++) {
+        const layerType = i % 2 === 1 ? 'Dense' : 'Dense + Dropout';
+        layers.push({
+            neurons: neuronsCount,
+            type: layerType,
+            name: `Hidden Layer ${i} (${neuronsCount})`
+        });
+        neuronsCount = Math.max(64, Math.floor(neuronsCount / 2));
+    }
+
+    // Output layer
+    layers.push({ neurons: 10, type: 'Output', name: 'Output (10 classes)' });
+
+    updateLayerList();
+    drawNetwork();
+    calculateParams();
+}
+
+function updateLayerList() {
+    const layerList = document.getElementById('layerList');
+    let html = '<h4 style="margin-bottom: 10px;">Network Architecture:</h4>';
+
+    layers.forEach((layer, i) => {
+        html += `
+            <div class="layer-item" style="border-left-color: ${layerColors[i % layerColors.length]}">
+                <div>
+                    <div class="layer-name">${layer.name}</div>
+                    <div class="layer-size">${layer.type}</div>
+                </div>
+                <div style="color: ${layerColors[i % layerColors.length]}; font-weight: bold;">${layer.neurons}</div>
+            </div>
+        `;
+    });
+
+    layerList.innerHTML = html;
+    document.getElementById('totalLayers').textContent = layers.length;
+}
+
+function calculateParams() {
+    let totalParams = 0;
+    for (let i = 1; i < layers.length; i++) {
+        totalParams += layers[i-1].neurons * layers[i].neurons + layers[i].neurons; // weights + biases
+    }
+
+    if (totalParams > 1000000) {
+        document.getElementById('params').textContent = (totalParams / 1000000).toFixed(2) + 'M';
+    } else if (totalParams > 1000) {
+        document.getElementById('params').textContent = (totalParams / 1000).toFixed(1) + 'K';
+    } else {
+        document.getElementById('params').textContent = totalParams;
+    }
+}
+
+function drawNetwork() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const maxNeuronsPerLayer = Math.max(...layers.map(l => Math.min(l.neurons, 20)));
+    const layerSpacing = canvas.width / (layers.length + 1);
+    const neuronRadius = 8;
+
+    // Draw connections first
+    for (let i = 0; i < layers.length - 1; i++) {
+        const x1 = layerSpacing * (i + 1);
+        const x2 = layerSpacing * (i + 2);
+
+        const displayNeurons1 = Math.min(layers[i].neurons, 20);
+        const displayNeurons2 = Math.min(layers[i + 1].neurons, 20);
+
+        const spacing1 = canvas.height / (displayNeurons1 + 1);
+        const spacing2 = canvas.height / (displayNeurons2 + 1);
+
+        // Draw sample connections (not all to avoid clutter)
+        for (let n1 = 0; n1 < Math.min(displayNeurons1, 5); n1++) {
+            for (let n2 = 0; n2 < Math.min(displayNeurons2, 5); n2++) {
+                const y1 = spacing1 * (n1 + 1);
+                const y2 = spacing2 * (n2 + 1);
+
+                ctx.strokeStyle = isTraining ? 'rgba(102, 126, 234, 0.3)' : 'rgba(200, 200, 200, 0.2)';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(x1, y1);
+                ctx.lineTo(x2, y2);
+                ctx.stroke();
+            }
+        }
+    }
+
+    // Draw neurons
+    layers.forEach((layer, i) => {
+        const x = layerSpacing * (i + 1);
+        const displayNeurons = Math.min(layer.neurons, 20);
+        const spacing = canvas.height / (displayNeurons + 1);
+
+        for (let j = 0; j < displayNeurons; j++) {
+            const y = spacing * (j + 1);
+
+            ctx.fillStyle = isTraining ? layerColors[i % layerColors.length] : '#ddd';
+            ctx.beginPath();
+            ctx.arc(x, y, neuronRadius, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        }
+
+        // Draw layer label
+        ctx.fillStyle = '#333';
+        ctx.font = 'bold 12px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText(layer.type, x, canvas.height - 10);
+
+        // Show neuron count if abbreviated
+        if (layer.neurons > 20) {
+            ctx.font = '10px Arial';
+            ctx.fillStyle = '#666';
+            ctx.fillText(`(${layer.neurons} total)`, x, canvas.height - 25);
+        }
+    });
+}
+
+function trainNetwork() {
+    if (isTraining) return;
+
+    isTraining = true;
+    epoch = 0;
+    document.getElementById('accuracy').textContent = '0%';
+
+    const maxEpochs = 50;
+
+    const interval = setInterval(() => {
+        epoch++;
+
+        // Simulate accuracy improvement (logarithmic growth)
+        const accuracy = Math.min(95, 20 + 75 * (1 - Math.exp(-epoch / 15)));
+
+        document.getElementById('epoch').textContent = epoch;
+        document.getElementById('accuracy').textContent = accuracy.toFixed(1) + '%';
+
+        drawNetwork();
+
+        if (epoch >= maxEpochs) {
+            clearInterval(interval);
+            isTraining = false;
+            drawNetwork();
+        }
+    }, 100);
+}
+
+function testNetwork() {
+    if (!isTraining && epoch > 0) {
+        // Flash the network
+        const originalColors = layers.map((l, i) => layerColors[i % layerColors.length]);
+
+        let flashCount = 0;
+        const flashInterval = setInterval(() => {
+            isTraining = !isTraining;
+            drawNetwork();
+            flashCount++;
+
+            if (flashCount >= 6) {
+                clearInterval(flashInterval);
+                isTraining = false;
+                drawNetwork();
+
+                // Show result
+                alert('Prediction: Class 7 (digit "7")\nConfidence: 94.2%\n\nThe network successfully recognized the digit!');
+            }
+        }, 200);
+    } else {
+        alert('Please train the network first!');
+    }
+}
+
+// Initialize
+buildNetwork();
+updateDepth();
+</script>
+</body>
+</html>
