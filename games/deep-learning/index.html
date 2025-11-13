@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Image Classifier Challenge - Deep Learning Game</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 0; }
+.nav-header { background: #2d3748; padding: 15px 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; }
+.nav-header a { color: #90cdf4; text-decoration: none; font-weight: 600; font-size: 1.1em; }
+.nav-title { color: #fff; font-size: 1.2em; font-weight: 700; }
+.container { max-width: 1400px; margin: 20px auto; background: #fff; border-radius: 15px; padding: 30px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+h1 { text-align: center; color: #2d3748; font-size: 2.5em; margin-bottom: 10px; }
+.subtitle { text-align: center; color: #666; margin-bottom: 30px; font-size: 1.1em; }
+.game-area { display: grid; grid-template-columns: 350px 1fr; gap: 30px; }
+.sidebar { background: #f8f9fa; padding: 20px; border-radius: 10px; height: fit-content; }
+button { width: 100%; padding: 12px; margin: 5px 0; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.2s; }
+.btn-primary { background: #4CAF50; color: #fff; }
+.btn-primary:hover { background: #45a049; }
+.btn-secondary { background: #2196F3; color: #fff; }
+.btn-secondary:hover { background: #1976d2; }
+.btn-danger { background: #f44336; color: #fff; }
+.layer-builder { margin: 15px 0; }
+.layer-option { background: #fff; padding: 12px; margin: 8px 0; border: 2px solid #ddd; border-radius: 8px; cursor: pointer; transition: all 0.2s; display: flex; justify-content: space-between; align-items: center; }
+.layer-option:hover { border-color: #667eea; transform: translateX(5px); }
+.layer-option.selected { border-color: #667eea; background: #e3f2fd; }
+.network-display { background: #fafafa; border: 2px solid #ddd; border-radius: 10px; padding: 20px; min-height: 300px; }
+.layer-item { background: #fff; padding: 10px 15px; margin: 8px 0; border-radius: 8px; border-left: 4px solid #667eea; display: flex; justify-content: space-between; align-items: center; }
+.remove-btn { background: #f44336; color: #fff; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 0.85em; }
+canvas { border: 2px solid #ddd; border-radius: 8px; display: block; margin: 20px auto; background: #fff; }
+.stats { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; padding: 15px; border-radius: 10px; margin-top: 15px; }
+.stat-row { display: flex; justify-content: space-between; margin: 8px 0; }
+.progress-bar { height: 30px; background: #e0e0e0; border-radius: 15px; overflow: hidden; margin: 10px 0; position: relative; }
+.progress-fill { height: 100%; background: linear-gradient(90deg, #4CAF50, #8BC34A); transition: width 0.3s; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 600; }
+.test-images { display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px; margin: 20px 0; }
+.test-image { border: 3px solid #ddd; border-radius: 10px; cursor: pointer; transition: all 0.2s; position: relative; overflow: hidden; aspect-ratio: 1; }
+.test-image:hover { transform: scale(1.05); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+.test-image.correct { border-color: #4CAF50; }
+.test-image.incorrect { border-color: #f44336; }
+.test-image canvas { width: 100%; height: 100%; }
+.prediction-label { position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.8); color: #fff; padding: 5px; text-align: center; font-size: 0.8em; font-weight: 600; }
+.score-board { background: #fff9c4; padding: 20px; border-radius: 10px; text-align: center; margin: 20px 0; border: 2px solid #fbc02d; }
+.score-board h2 { color: #f57c00; margin-bottom: 10px; }
+.score-display { font-size: 3em; font-weight: bold; color: #667eea; }
+.level-badge { background: #4CAF50; color: #fff; padding: 8px 15px; border-radius: 20px; display: inline-block; margin: 10px 0; font-weight: 600; }
+</style>
+</head>
+<body>
+<nav class="nav-header">
+    <div class="nav-title">🧠 Image Classifier Challenge</div>
+    <a href="../../index.html">← Back to Home</a>
+</nav>
+<div class="container">
+    <h1>🧠 Image Classifier Challenge</h1>
+    <p class="subtitle">Build a deep neural network and train it to classify images!</p>
+
+    <div class="game-area">
+        <div class="sidebar">
+            <h3>🏗️ Build Your Network</h3>
+            <div class="layer-builder">
+                <p style="font-size: 0.9em; color: #666; margin-bottom: 10px;">Click to add layers:</p>
+
+                <div class="layer-option" onclick="addLayer('dense', 128)">
+                    <div>
+                        <strong>Dense (128)</strong>
+                        <div style="font-size: 0.85em; color: #666;">Fully connected layer</div>
+                    </div>
+                    <span style="font-size: 1.5em;">➕</span>
+                </div>
+
+                <div class="layer-option" onclick="addLayer('dense', 64)">
+                    <div>
+                        <strong>Dense (64)</strong>
+                        <div style="font-size: 0.85em; color: #666;">Smaller dense layer</div>
+                    </div>
+                    <span style="font-size: 1.5em;">➕</span>
+                </div>
+
+                <div class="layer-option" onclick="addLayer('dropout', 0.3)">
+                    <div>
+                        <strong>Dropout (30%)</strong>
+                        <div style="font-size: 0.85em; color: #666;">Prevents overfitting</div>
+                    </div>
+                    <span style="font-size: 1.5em;">➕</span>
+                </div>
+            </div>
+
+            <button class="btn-primary" onclick="trainModel()">🚀 Train Model</button>
+            <button class="btn-secondary" onclick="testModel()">🧪 Test Model</button>
+            <button class="btn-danger" onclick="reset()">🔄 Reset</button>
+
+            <div class="stats">
+                <div class="stat-row"><span>Layers:</span><span id="layerCount">2</span></div>
+                <div class="stat-row"><span>Parameters:</span><span id="paramCount">0</span></div>
+                <div class="stat-row"><span>Training:</span><span id="trainingStatus">Not Started</span></div>
+                <div class="stat-row"><span>Accuracy:</span><span id="accuracy">0%</span></div>
+            </div>
+
+            <div style="background: #e3f2fd; padding: 15px; border-radius: 8px; margin-top: 15px;">
+                <h4 style="margin-bottom: 10px; color: #1976d2;">💡 Tips:</h4>
+                <ul style="margin-left: 20px; font-size: 0.9em; line-height: 1.6;">
+                    <li>More layers = deeper learning</li>
+                    <li>Dropout helps prevent overfitting</li>
+                    <li>Balance depth vs training time</li>
+                    <li>Aim for 90%+ accuracy!</li>
+                </ul>
+            </div>
+        </div>
+
+        <div>
+            <div class="score-board">
+                <h2>Your Score</h2>
+                <div class="score-display" id="scoreDisplay">0</div>
+                <div class="level-badge" id="levelBadge">Beginner</div>
+                <p style="margin-top: 10px; color: #666;">Build a network with 90%+ accuracy to level up!</p>
+            </div>
+
+            <div class="network-display">
+                <h3>Current Network Architecture</h3>
+                <div id="layerList" style="margin-top: 15px;">
+                    <div class="layer-item">
+                        <span><strong>Input Layer</strong> (28×28 = 784 neurons)</span>
+                    </div>
+                    <div class="layer-item">
+                        <span><strong>Output Layer</strong> (3 classes: Circle, Square, Triangle)</span>
+                    </div>
+                </div>
+            </div>
+
+            <h3 style="margin-top: 30px;">Training Progress</h3>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 0%;">0%</div>
+            </div>
+
+            <canvas id="trainingChart" width="900" height="200"></canvas>
+
+            <h3 style="margin-top: 30px;">Test Results</h3>
+            <div class="test-images" id="testImages">
+                <p style="grid-column: 1 / -1; text-align: center; color: #999;">Train your model first, then test it!</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const canvas = document.getElementById('trainingChart');
+const ctx = canvas.getContext('2d');
+
+let layers = [];
+let trained = false;
+let trainingHistory = [];
+let score = 0;
+
+const shapes = ['circle', 'square', 'triangle'];
+
+function addLayer(type, param) {
+    const layer = {
+        type,
+        param,
+        id: Date.now()
+    };
+
+    layers.push(layer);
+    updateLayerDisplay();
+    updateStats();
+}
+
+function removeLayer(id) {
+    layers = layers.filter(l => l.id !== id);
+    updateLayerDisplay();
+    updateStats();
+}
+
+function updateLayerDisplay() {
+    const container = document.getElementById('layerList');
+    let html = '<div class="layer-item"><span><strong>Input Layer</strong> (28×28 = 784 neurons)</span></div>';
+
+    layers.forEach(layer => {
+        let layerText = '';
+        if (layer.type === 'dense') {
+            layerText = `<strong>Dense Layer</strong> (${layer.param} neurons)`;
+        } else if (layer.type === 'dropout') {
+            layerText = `<strong>Dropout Layer</strong> (${layer.param * 100}%)`;
+        }
+
+        html += `
+            <div class="layer-item">
+                <span>${layerText}</span>
+                <button class="remove-btn" onclick="removeLayer(${layer.id})">Remove</button>
+            </div>
+        `;
+    });
+
+    html += '<div class="layer-item"><span><strong>Output Layer</strong> (3 classes: Circle, Square, Triangle)</span></div>';
+
+    container.innerHTML = html;
+}
+
+function updateStats() {
+    const totalLayers = 2 + layers.length;
+    document.getElementById('layerCount').textContent = totalLayers;
+
+    // Calculate approximate parameters
+    let params = 784 * 128; // input to first hidden
+    let prevNeurons = 784;
+
+    layers.forEach(layer => {
+        if (layer.type === 'dense') {
+            params += prevNeurons * layer.param + layer.param;
+            prevNeurons = layer.param;
+        }
+    });
+
+    params += prevNeurons * 3 + 3; // to output
+
+    if (params > 1000000) {
+        document.getElementById('paramCount').textContent = (params / 1000000).toFixed(2) + 'M';
+    } else if (params > 1000) {
+        document.getElementById('paramCount').textContent = (params / 1000).toFixed(1) + 'K';
+    } else {
+        document.getElementById('paramCount').textContent = params;
+    }
+}
+
+function trainModel() {
+    if (layers.length === 0) {
+        alert('Add at least one hidden layer to your network!');
+        return;
+    }
+
+    trained = false;
+    trainingHistory = [];
+    document.getElementById('trainingStatus').textContent = 'Training...';
+    document.getElementById('testImages').innerHTML = '<p style="grid-column: 1 / -1; text-align: center; color: #999;">Training in progress...</p>';
+
+    const epochs = 30;
+    let currentEpoch = 0;
+
+    const interval = setInterval(() => {
+        currentEpoch++;
+
+        // Simulate training: accuracy improves with more layers
+        const layerBonus = Math.min(layers.length * 5, 20);
+        const baseAccuracy = 60 + layerBonus;
+        const noise = Math.random() * 5;
+        const accuracy = Math.min(98, baseAccuracy + (currentEpoch / epochs) * (95 - baseAccuracy) + noise);
+
+        trainingHistory.push(accuracy);
+
+        const progress = (currentEpoch / epochs) * 100;
+        document.getElementById('progressFill').style.width = progress + '%';
+        document.getElementById('progressFill').textContent = Math.round(progress) + '%';
+
+        document.getElementById('accuracy').textContent = accuracy.toFixed(1) + '%';
+
+        drawTrainingChart();
+
+        if (currentEpoch >= epochs) {
+            clearInterval(interval);
+            trained = true;
+            document.getElementById('trainingStatus').textContent = 'Complete!';
+
+            // Calculate score
+            const finalAccuracy = trainingHistory[trainingHistory.length - 1];
+            score = Math.round(finalAccuracy * (1 + layers.length * 0.1));
+            document.getElementById('scoreDisplay').textContent = score;
+
+            // Update level
+            if (score >= 150) {
+                document.getElementById('levelBadge').textContent = 'Expert 🏆';
+                document.getElementById('levelBadge').style.background = '#FFD700';
+                document.getElementById('levelBadge').style.color = '#000';
+            } else if (score >= 110) {
+                document.getElementById('levelBadge').textContent = 'Advanced 🌟';
+                document.getElementById('levelBadge').style.background = '#9C27B0';
+            } else if (score >= 90) {
+                document.getElementById('levelBadge').textContent = 'Intermediate 📈';
+                document.getElementById('levelBadge').style.background = '#2196F3';
+            }
+
+            alert(`Training complete! Final accuracy: ${finalAccuracy.toFixed(1)}%\nYour score: ${score}`);
+        }
+    }, 100);
+}
+
+function drawTrainingChart() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Draw axes
+    ctx.strokeStyle = '#ddd';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(50, 180);
+    ctx.lineTo(850, 180);
+    ctx.moveTo(50, 20);
+    ctx.lineTo(50, 180);
+    ctx.stroke();
+
+    // Labels
+    ctx.fillStyle = '#666';
+    ctx.font = '12px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('Epoch', 450, 198);
+    ctx.save();
+    ctx.translate(20, 100);
+    ctx.rotate(-Math.PI / 2);
+    ctx.fillText('Accuracy (%)', 0, 0);
+    ctx.restore();
+
+    if (trainingHistory.length === 0) return;
+
+    // Draw line
+    ctx.strokeStyle = '#667eea';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+
+    trainingHistory.forEach((acc, i) => {
+        const x = 50 + (i / (trainingHistory.length - 1)) * 800;
+        const y = 180 - ((acc / 100) * 160);
+
+        if (i === 0) {
+            ctx.moveTo(x, y);
+        } else {
+            ctx.lineTo(x, y);
+        }
+    });
+
+    ctx.stroke();
+
+    // Draw points
+    trainingHistory.forEach((acc, i) => {
+        const x = 50 + (i / (trainingHistory.length - 1)) * 800;
+        const y = 180 - ((acc / 100) * 160);
+
+        ctx.fillStyle = '#667eea';
+        ctx.beginPath();
+        ctx.arc(x, y, 4, 0, Math.PI * 2);
+        ctx.fill();
+    });
+}
+
+function testModel() {
+    if (!trained) {
+        alert('Please train your model first!');
+        return;
+    }
+
+    const container = document.getElementById('testImages');
+    const finalAccuracy = trainingHistory[trainingHistory.length - 1] / 100;
+
+    let html = '';
+    const testCount = 10;
+    let correct = 0;
+
+    for (let i = 0; i < testCount; i++) {
+        const actualShape = shapes[Math.floor(Math.random() * shapes.length)];
+        const isCorrect = Math.random() < finalAccuracy;
+        const predictedShape = isCorrect ? actualShape : shapes[Math.floor(Math.random() * shapes.length)];
+
+        if (isCorrect) correct++;
+
+        const testCanvas = document.createElement('canvas');
+        testCanvas.width = 100;
+        testCanvas.height = 100;
+        const testCtx = testCanvas.getContext('2d');
+
+        // Draw shape
+        testCtx.fillStyle = '#667eea';
+        testCtx.strokeStyle = '#667eea';
+        testCtx.lineWidth = 3;
+
+        if (actualShape === 'circle') {
+            testCtx.beginPath();
+            testCtx.arc(50, 50, 30, 0, Math.PI * 2);
+            testCtx.fill();
+        } else if (actualShape === 'square') {
+            testCtx.fillRect(20, 20, 60, 60);
+        } else {
+            testCtx.beginPath();
+            testCtx.moveTo(50, 20);
+            testCtx.lineTo(80, 70);
+            testCtx.lineTo(20, 70);
+            testCtx.closePath();
+            testCtx.fill();
+        }
+
+        html += `
+            <div class="test-image ${isCorrect ? 'correct' : 'incorrect'}">
+                <canvas width="100" height="100" id="test-${i}"></canvas>
+                <div class="prediction-label">${isCorrect ? '✓' : '✗'} ${predictedShape}</div>
+            </div>
+        `;
+    }
+
+    container.innerHTML = html;
+
+    // Redraw canvases
+    for (let i = 0; i < testCount; i++) {
+        const testCanvas = document.getElementById(`test-${i}`);
+        const testCtx = testCanvas.getContext('2d');
+
+        const actualShape = shapes[Math.floor(Math.random() * shapes.length)];
+
+        testCtx.fillStyle = '#667eea';
+
+        if (actualShape === 'circle') {
+            testCtx.beginPath();
+            testCtx.arc(50, 50, 30, 0, Math.PI * 2);
+            testCtx.fill();
+        } else if (actualShape === 'square') {
+            testCtx.fillRect(20, 20, 60, 60);
+        } else {
+            testCtx.beginPath();
+            testCtx.moveTo(50, 20);
+            testCtx.lineTo(80, 70);
+            testCtx.lineTo(20, 70);
+            testCtx.closePath();
+            testCtx.fill();
+        }
+    }
+
+    alert(`Test Results: ${correct}/${testCount} correct (${(correct/testCount*100).toFixed(0)}% accuracy)`);
+}
+
+function reset() {
+    layers = [];
+    trained = false;
+    trainingHistory = [];
+    score = 0;
+
+    document.getElementById('progressFill').style.width = '0%';
+    document.getElementById('progressFill').textContent = '0%';
+    document.getElementById('trainingStatus').textContent = 'Not Started';
+    document.getElementById('accuracy').textContent = '0%';
+    document.getElementById('scoreDisplay').textContent = '0';
+    document.getElementById('levelBadge').textContent = 'Beginner';
+    document.getElementById('levelBadge').style.background = '#4CAF50';
+    document.getElementById('levelBadge').style.color = '#fff';
+    document.getElementById('testImages').innerHTML = '<p style="grid-column: 1 / -1; text-align: center; color: #999;">Train your model first, then test it!</p>';
+
+    updateLayerDisplay();
+    updateStats();
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+}
+
+// Initialize
+updateLayerDisplay();
+updateStats();
+</script>
+</body>
+</html>
