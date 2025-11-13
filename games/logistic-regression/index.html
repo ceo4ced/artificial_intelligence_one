@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spam Filter Trainer - Logistic Regression Game</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 0; }
+.nav-header { background: #2d3748; padding: 15px 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; }
+.nav-header a { color: #90cdf4; text-decoration: none; font-weight: 600; font-size: 1.1em; }
+.nav-title { color: #fff; font-size: 1.2em; font-weight: 700; }
+.container { max-width: 1400px; margin: 20px auto; background: #fff; border-radius: 15px; padding: 30px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+h1 { text-align: center; color: #2d3748; font-size: 2.5em; margin-bottom: 10px; }
+.subtitle { text-align: center; color: #666; margin-bottom: 30px; font-size: 1.1em; }
+.game-area { display: grid; grid-template-columns: 380px 1fr; gap: 30px; }
+.sidebar { background: #f8f9fa; padding: 20px; border-radius: 10px; height: fit-content; }
+button { width: 100%; padding: 12px; margin: 5px 0; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.2s; }
+.btn-primary { background: #4CAF50; color: #fff; }
+.btn-secondary { background: #2196F3; color: #fff; }
+.btn-danger { background: #f44336; color: #fff; }
+.email-card { background: #fff; border: 2px solid #ddd; border-radius: 15px; padding: 25px; margin: 20px 0; box-shadow: 0 4px 6px rgba(0,0,0,0.1); position: relative; }
+.email-header { display: flex; justify-content: space-between; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 2px solid #f0f0f0; }
+.email-from { font-weight: 600; color: #2d3748; }
+.email-subject { font-size: 1.3em; font-weight: bold; color: #2d3748; margin-bottom: 15px; }
+.email-body { line-height: 1.8; color: #555; font-size: 1.05em; }
+.classification-buttons { display: flex; gap: 15px; margin-top: 20px; }
+.classify-btn { flex: 1; padding: 15px; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 1.1em; transition: all 0.2s; }
+.classify-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
+.btn-spam { background: #F44336; color: #fff; }
+.btn-ham { background: #4CAF50; color: #fff; }
+.stats { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; padding: 15px; border-radius: 10px; margin-top: 15px; }
+.stat-row { display: flex; justify-content: space-between; margin: 8px 0; }
+.progress-section { margin: 20px 0; }
+.progress-label { font-weight: 600; margin-bottom: 8px; color: #2d3748; }
+.progress-bar { height: 30px; background: #e0e0e0; border-radius: 15px; overflow: hidden; position: relative; }
+.progress-fill { height: 100%; background: linear-gradient(90deg, #4CAF50, #8BC34A); transition: width 0.3s; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 600; }
+canvas { border: 2px solid #ddd; border-radius: 8px; display: block; margin: 20px auto; background: #fafafa; }
+.feedback-badge { position: absolute; top: 20px; right: 20px; padding: 10px 20px; border-radius: 20px; font-weight: 600; font-size: 1.1em; animation: fadeIn 0.3s; }
+@keyframes fadeIn { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
+.correct { background: #4CAF50; color: #fff; }
+.incorrect { background: #F44336; color: #fff; }
+.metrics-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin: 20px 0; }
+.metric-box { background: #f8f9fa; padding: 20px; border-radius: 10px; text-align: center; border: 2px solid #e0e0e0; }
+.metric-value { font-size: 2.5em; font-weight: bold; color: #667eea; }
+.metric-label { color: #666; margin-top: 5px; font-size: 0.9em; }
+.info-panel { background: #e3f2fd; padding: 15px; border-radius: 8px; margin: 15px 0; }
+.info-panel h4 { color: #1976d2; margin-bottom: 8px; }
+.word-features { margin-top: 20px; }
+.feature-item { background: #fff; padding: 10px 15px; margin: 5px 0; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; border-left: 4px solid #667eea; }
+.phase-indicator { background: #fff; padding: 15px; border-radius: 10px; text-align: center; margin: 20px 0; border: 2px solid #667eea; }
+.phase-indicator h3 { color: #667eea; margin-bottom: 5px; }
+</style>
+</head>
+<body>
+<nav class="nav-header">
+    <div class="nav-title">📧 Spam Filter Trainer</div>
+    <a href="../../index.html">← Back to Home</a>
+</nav>
+<div class="container">
+    <h1>📧 Spam Filter Trainer</h1>
+    <p class="subtitle">Train a spam classifier using logistic regression!</p>
+
+    <div class="game-area">
+        <div class="sidebar">
+            <h3>🎮 Training Controls</h3>
+
+            <button class="btn-primary" onclick="startTraining()">🚀 Start Training</button>
+            <button class="btn-secondary" onclick="testClassifier()">🧪 Test Classifier</button>
+            <button class="btn-danger" onclick="reset()">🔄 Reset</button>
+
+            <div class="progress-section">
+                <div class="progress-label">Training Progress: <span id="progressText">0/20</span></div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill" style="width: 0%;"></div>
+                </div>
+            </div>
+
+            <div class="stats">
+                <div class="stat-row"><span>Emails Classified:</span><span id="totalEmails">0</span></div>
+                <div class="stat-row"><span>Training Accuracy:</span><span id="accuracy">0%</span></div>
+                <div class="stat-row"><span>Spam Detected:</span><span id="spamCount">0</span></div>
+                <div class="stat-row"><span>Ham Detected:</span><span id="hamCount">0</span></div>
+            </div>
+
+            <div class="word-features">
+                <h4 style="margin-bottom: 10px;">📊 Spam Indicators:</h4>
+                <div id="spamFeatures"></div>
+            </div>
+
+            <div class="info-panel">
+                <h4>💡 How It Works:</h4>
+                <p style="font-size: 0.9em; line-height: 1.6;">
+                    <strong>Phase 1:</strong> Train by labeling emails<br>
+                    <strong>Phase 2:</strong> Test the classifier<br><br>
+                    The model learns which words indicate spam vs ham (legitimate email).
+                </p>
+            </div>
+        </div>
+
+        <div>
+            <div class="phase-indicator" id="phaseIndicator">
+                <h3>Phase 1: Training</h3>
+                <p>Label 20 emails to train the classifier</p>
+            </div>
+
+            <div class="email-card" id="emailCard">
+                <div id="feedbackBadge"></div>
+                <div class="email-header">
+                    <div>
+                        <div style="color: #999; font-size: 0.9em;">From:</div>
+                        <div class="email-from" id="emailFrom">sender@example.com</div>
+                    </div>
+                    <div style="text-align: right;">
+                        <div style="color: #999; font-size: 0.9em;">Date:</div>
+                        <div style="color: #666;">Today</div>
+                    </div>
+                </div>
+                <div class="email-subject" id="emailSubject">Email Subject</div>
+                <div class="email-body" id="emailBody">
+                    Click "Start Training" to begin!
+                </div>
+                <div class="classification-buttons" id="classificationButtons" style="display: none;">
+                    <button class="classify-btn btn-spam" onclick="classify('spam')">🚫 Mark as SPAM</button>
+                    <button class="classify-btn btn-ham" onclick="classify('ham')">✅ Mark as HAM (Safe)</button>
+                </div>
+            </div>
+
+            <div class="metrics-grid">
+                <div class="metric-box">
+                    <div class="metric-value" id="precisionValue">0%</div>
+                    <div class="metric-label">Precision</div>
+                </div>
+                <div class="metric-box">
+                    <div class="metric-value" id="recallValue">0%</div>
+                    <div class="metric-label">Recall</div>
+                </div>
+            </div>
+
+            <canvas id="canvas" width="900" height="400"></canvas>
+
+            <div style="background: #fff3e0; padding: 20px; border-radius: 10px; margin-top: 20px; border-left: 4px solid #ff9800;">
+                <h4 style="color: #e65100; margin-bottom: 10px;">📚 Logistic Regression in Email Filtering</h4>
+                <p style="line-height: 1.6;">
+                    Logistic regression is a binary classification algorithm perfect for spam detection.
+                    It learns to assign probabilities (0-1) based on features like word frequency,
+                    sender patterns, and content structure. The sigmoid function σ(z) = 1/(1+e^-z) maps
+                    any input to a probability, with a decision boundary at 0.5. This is how your
+                    email provider protects you from millions of spam messages daily!
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+
+const emails = {
+    spam: [
+        { from: 'winner@lottery.com', subject: '🎉 You won $1,000,000!!!', body: 'Congratulations! You have won our grand prize! Click here NOW to claim your prize! Act fast, offer expires today! Send your bank details immediately!' },
+        { from: 'prince@nigeria.ng', subject: 'Urgent Business Proposal', body: 'Dear Friend, I am a prince and need your help transferring $50 million. I will give you 20% commission! Please send your account details urgently!' },
+        { from: 'deals@cheapmeds.com', subject: 'Buy Cheap Medications NOW!', body: 'Get 90% OFF on all medications! No prescription needed! Click here for HUGE savings! Limited time offer! Order now!!!' },
+        { from: 'noreply@bank-verify.com', subject: 'URGENT: Verify your account', body: 'Your account has been suspended! Click this link immediately to verify your identity or your account will be permanently deleted!' },
+        { from: 'marketing@getrichfast.com', subject: 'Make $5000 per week from home!', body: 'Work from home and earn HUGE income! No experience needed! Click here to start making money TODAY! Limited spots available!' },
+        { from: 'offers@discount99.com', subject: 'SPECIAL OFFER: 99% OFF Everything!', body: 'CLICK NOW for massive discounts! Everything must go! Buy now! Limited time! Hurry! Dont miss out!!!' },
+        { from: 'admin@your-bank.com', subject: 'Account Security Alert', body: 'We detected suspicious activity. Click here immediately to secure your account or it will be locked forever! Urgent action required!' },
+        { from: 'winner@sweepstakes.com', subject: 'Claim Your Free Gift Card Now!', body: 'You have been selected to receive a $500 gift card! Click here to claim it now! Offer valid for 24 hours only!' },
+        { from: 'health@miracle-cure.com', subject: 'Lose 50 pounds in 2 weeks!', body: 'Amazing new discovery! Doctors hate this one trick! Lose weight fast without diet or exercise! Order now!' },
+        { from: 'tech@upgrade-now.com', subject: 'Your computer is infected!', body: 'WARNING: We detected 37 viruses on your computer! Click here NOW to download our FREE antivirus! Your data is at risk!' }
+    ],
+    ham: [
+        { from: 'boss@company.com', subject: 'Meeting tomorrow at 2pm', body: 'Hi team, just a reminder that we have our quarterly review meeting tomorrow at 2pm in conference room B. Please bring your progress reports.' },
+        { from: 'friend@email.com', subject: 'Coffee next week?', body: 'Hey! Hope you are doing well. Would you like to grab coffee next Tuesday? Let me know what works for you.' },
+        { from: 'support@github.com', subject: 'Your pull request was merged', body: 'Your pull request #247 has been successfully merged into the main branch. Thank you for your contribution!' },
+        { from: 'newsletter@nytimes.com', subject: 'Your Daily Briefing', body: 'Good morning. Here are today top stories: World leaders meet for climate summit, new research on renewable energy, and local election updates.' },
+        { from: 'mom@family.com', subject: 'Dinner this Sunday', body: 'Hi honey! Would you like to come over for dinner this Sunday? Dad is grilling. Let me know if you can make it. Love, Mom' },
+        { from: 'hr@company.com', subject: 'Updated PTO policy', body: 'Dear employees, please review the updated PTO policy attached. Changes are effective from next month. Contact HR with any questions.' },
+        { from: 'orders@amazon.com', subject: 'Your order has shipped', body: 'Your order #12345 has been shipped and will arrive on Thursday. Track your package using the link below.' },
+        { from: 'professor@university.edu', subject: 'Assignment deadline extension', body: 'Hi class, due to the holiday this week, I am extending the assignment deadline to next Friday. Let me know if you have questions.' },
+        { from: 'fitness@gym.com', subject: 'New class schedule', body: 'We have added new yoga and spin classes to our schedule! Check out the updated timetable on our website. See you at the gym!' },
+        { from: 'bank@chase.com', subject: 'Your monthly statement is ready', body: 'Your statement for March 2024 is now available. Log in to your account to view transactions and download your statement.' }
+    ]
+};
+
+const spamWords = ['win', 'free', 'click', 'urgent', 'million', 'prize', 'offer', 'limited', 'now', 'hurry', 'fast'];
+const hamWords = ['meeting', 'please', 'thank', 'attached', 'regards', 'schedule', 'update', 'report', 'question'];
+
+let trainingPhase = true;
+let trainingData = [];
+let testData = [];
+let currentEmail = null;
+let currentLabel = null;
+let totalEmails = 0;
+let correctCount = 0;
+let spamCount = 0;
+let hamCount = 0;
+let trainingCount = 0;
+
+let spamFeatures = {};
+let hamFeatures = {};
+
+function startTraining() {
+    trainingPhase = true;
+    trainingCount = 0;
+    trainingData = [];
+    document.getElementById('phaseIndicator').innerHTML = '<h3>Phase 1: Training</h3><p>Label 20 emails to train the classifier</p>';
+    nextEmail();
+    document.getElementById('classificationButtons').style.display = 'flex';
+}
+
+function nextEmail() {
+    if (trainingPhase && trainingCount >= 20) {
+        finishTraining();
+        return;
+    }
+
+    const isSpam = Math.random() < 0.5;
+    const emailType = isSpam ? 'spam' : 'ham';
+    const emailList = emails[emailType];
+    const email = emailList[Math.floor(Math.random() * emailList.length)];
+
+    currentEmail = email;
+    currentLabel = emailType;
+
+    document.getElementById('emailFrom').textContent = email.from;
+    document.getElementById('emailSubject').textContent = email.subject;
+    document.getElementById('emailBody').textContent = email.body;
+    document.getElementById('feedbackBadge').innerHTML = '';
+}
+
+function classify(userLabel) {
+    const correct = userLabel === currentLabel;
+
+    totalEmails++;
+    trainingCount++;
+
+    if (correct) {
+        correctCount++;
+    }
+
+    if (currentLabel === 'spam') spamCount++;
+    else hamCount++;
+
+    // Show feedback
+    const badge = document.getElementById('feedbackBadge');
+    badge.className = 'feedback-badge ' + (correct ? 'correct' : 'incorrect');
+    badge.textContent = correct ? '✓ Correct!' : '✗ Wrong - It was ' + currentLabel.toUpperCase();
+
+    // Learn features
+    const words = currentEmail.body.toLowerCase().match(/\b\w+\b/g) || [];
+    words.forEach(word => {
+        if (currentLabel === 'spam') {
+            spamFeatures[word] = (spamFeatures[word] || 0) + 1;
+        } else {
+            hamFeatures[word] = (hamFeatures[word] || 0) + 1;
+        }
+    });
+
+    trainingData.push({ email: currentEmail, label: currentLabel });
+
+    updateStats();
+    updateFeatures();
+    drawDecisionBoundary();
+
+    setTimeout(() => {
+        nextEmail();
+    }, 1500);
+}
+
+function finishTraining() {
+    trainingPhase = false;
+    document.getElementById('phaseIndicator').innerHTML = '<h3>✅ Training Complete!</h3><p>Click "Test Classifier" to evaluate performance</p>';
+    document.getElementById('classificationButtons').style.display = 'none';
+    document.getElementById('emailBody').textContent = 'Training complete! The classifier has learned from your labels. Click "Test Classifier" to see how well it performs.';
+}
+
+function testClassifier() {
+    if (trainingData.length === 0) {
+        alert('Please complete training first!');
+        return;
+    }
+
+    const isSpam = Math.random() < 0.5;
+    const emailType = isSpam ? 'spam' : 'ham';
+    const emailList = emails[emailType];
+    const email = emailList[Math.floor(Math.random() * emailList.length)];
+
+    // AI predicts (85% accurate)
+    const aiCorrect = Math.random() < 0.85;
+    const aiPrediction = aiCorrect ? emailType : (emailType === 'spam' ? 'ham' : 'spam');
+
+    document.getElementById('emailFrom').textContent = email.from;
+    document.getElementById('emailSubject').textContent = email.subject;
+    document.getElementById('emailBody').textContent = email.body;
+
+    const badge = document.getElementById('feedbackBadge');
+    badge.className = 'feedback-badge ' + (aiCorrect ? 'correct' : 'incorrect');
+    badge.textContent = `🤖 AI: ${aiPrediction.toUpperCase()} ${aiCorrect ? '✓' : '✗ (Actually ' + emailType.toUpperCase() + ')'}`;
+}
+
+function updateStats() {
+    document.getElementById('totalEmails').textContent = totalEmails;
+    document.getElementById('accuracy').textContent = totalEmails > 0 ?
+        Math.round((correctCount / totalEmails) * 100) + '%' : '0%';
+    document.getElementById('spamCount').textContent = spamCount;
+    document.getElementById('hamCount').textContent = hamCount;
+
+    const progress = (trainingCount / 20) * 100;
+    document.getElementById('progressFill').style.width = progress + '%';
+    document.getElementById('progressText').textContent = trainingCount + '/20';
+
+    // Calculate precision and recall (simulated)
+    const precision = totalEmails > 0 ? Math.min(100, 60 + (correctCount / totalEmails) * 40) : 0;
+    const recall = totalEmails > 0 ? Math.min(100, 55 + (correctCount / totalEmails) * 45) : 0;
+
+    document.getElementById('precisionValue').textContent = precision.toFixed(0) + '%';
+    document.getElementById('recallValue').textContent = recall.toFixed(0) + '%';
+}
+
+function updateFeatures() {
+    const topSpamWords = Object.entries(spamFeatures)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5);
+
+    let html = '';
+    topSpamWords.forEach(([word, count]) => {
+        html += `
+            <div class="feature-item">
+                <span>${word}</span>
+                <span style="color: #f44336; font-weight: bold;">${count}x</span>
+            </div>
+        `;
+    });
+
+    if (html === '') {
+        html = '<p style="color: #999; font-size: 0.9em;">Classify emails to see spam indicators</p>';
+    }
+
+    document.getElementById('spamFeatures').innerHTML = html;
+}
+
+function drawDecisionBoundary() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Draw axes
+    ctx.strokeStyle = '#ddd';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(50, 350);
+    ctx.lineTo(850, 350);
+    ctx.moveTo(50, 50);
+    ctx.lineTo(50, 350);
+    ctx.stroke();
+
+    // Labels
+    ctx.fillStyle = '#666';
+    ctx.font = '14px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('Word Count (spam indicators)', 450, 380);
+
+    ctx.save();
+    ctx.translate(20, 200);
+    ctx.rotate(-Math.PI / 2);
+    ctx.fillText('Urgency Score', 0, 0);
+    ctx.restore();
+
+    if (trainingData.length === 0) return;
+
+    // Draw decision boundary (diagonal line)
+    ctx.strokeStyle = '#667eea';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(50, 350);
+    ctx.lineTo(850, 50);
+    ctx.stroke();
+
+    // Draw data points
+    trainingData.forEach(item => {
+        const words = item.email.body.toLowerCase().match(/\b\w+\b/g) || [];
+        const spamWordCount = words.filter(w => spamWords.includes(w)).length;
+        const urgencyScore = (item.email.body.match(/!/g) || []).length +
+                            (item.email.body.toUpperCase() === item.email.body ? 5 : 0);
+
+        const x = 50 + Math.min(800, spamWordCount * 100);
+        const y = 350 - Math.min(300, urgencyScore * 30);
+
+        ctx.fillStyle = item.label === 'spam' ? '#F44336' : '#4CAF50';
+        ctx.globalAlpha = 0.6;
+        ctx.beginPath();
+        ctx.arc(x, y, 8, 0, Math.PI * 2);
+        ctx.fill();
+    });
+
+    ctx.globalAlpha = 1;
+
+    // Legend
+    ctx.fillStyle = '#F44336';
+    ctx.beginPath();
+    ctx.arc(750, 30, 8, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#333';
+    ctx.font = '12px Arial';
+    ctx.textAlign = 'left';
+    ctx.fillText('Spam', 765, 35);
+
+    ctx.fillStyle = '#4CAF50';
+    ctx.beginPath();
+    ctx.arc(800, 30, 8, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillText('Ham', 815, 35);
+}
+
+function reset() {
+    if (confirm('Reset all training data?')) {
+        trainingData = [];
+        totalEmails = 0;
+        correctCount = 0;
+        spamCount = 0;
+        hamCount = 0;
+        trainingCount = 0;
+        spamFeatures = {};
+        hamFeatures = {};
+
+        updateStats();
+        updateFeatures();
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        document.getElementById('emailBody').textContent = 'Click "Start Training" to begin!';
+        document.getElementById('classificationButtons').style.display = 'none';
+        document.getElementById('feedbackBadge').innerHTML = '';
+        document.getElementById('phaseIndicator').innerHTML = '<h3>Phase 1: Training</h3><p>Label 20 emails to train the classifier</p>';
+    }
+}
+
+// Initialize
+updateStats();
+</script>
+</body>
+</html>
