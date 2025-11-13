@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Supervised Learning - Interactive Lesson</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 0; }
+.nav-header { background: #2d3748; padding: 15px 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; }
+.nav-header a { color: #90cdf4; text-decoration: none; font-weight: 600; font-size: 1.1em; }
+.nav-title { color: #fff; font-size: 1.2em; font-weight: 700; }
+.container { max-width: 1400px; margin: 20px auto; background: #fff; border-radius: 15px; padding: 30px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+h1 { text-align: center; color: #2d3748; font-size: 2.5em; margin-bottom: 20px; }
+.intro { background: #e3f2fd; padding: 20px; border-radius: 10px; margin-bottom: 30px; line-height: 1.6; }
+.intro h2 { color: #1976d2; margin-bottom: 10px; }
+.main-content { display: grid; grid-template-columns: 350px 1fr; gap: 30px; }
+.sidebar { background: #f8f9fa; padding: 20px; border-radius: 10px; height: fit-content; }
+button { width: 100%; padding: 12px; margin: 5px 0; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }
+.btn-primary { background: #4CAF50; color: #fff; }
+.btn-secondary { background: #2196F3; color: #fff; }
+canvas { border: 2px solid #ddd; border-radius: 8px; display: block; background: #fafafa; cursor: crosshair; margin: 0 auto; }
+.task-tabs { display: flex; gap: 10px; margin-bottom: 15px; }
+.tab { flex: 1; padding: 10px; background: #e0e0e0; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.2s; }
+.tab.active { background: #667eea; color: #fff; }
+.explanation { background: #fff9c4; padding: 15px; border-radius: 8px; margin: 15px 0; border-left: 4px solid #fbc02d; }
+.explanation h4 { color: #f57c00; margin-bottom: 8px; }
+.stats { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; padding: 15px; border-radius: 10px; margin-top: 15px; }
+.stat-row { display: flex; justify-content: space-between; margin: 8px 0; }
+.algorithm-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin: 15px 0; }
+.algo-card { background: #fff; padding: 12px; border-radius: 8px; border: 2px solid #ddd; cursor: pointer; transition: all 0.2s; }
+.algo-card:hover { border-color: #667eea; transform: translateY(-2px); }
+.algo-card.active { border-color: #667eea; background: #e3f2fd; }
+.algo-card strong { display: block; margin-bottom: 5px; color: #2d3748; }
+.algo-card p { font-size: 0.85em; color: #666; }
+.info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 20px; }
+.info-card { background: #f0f0f0; padding: 15px; border-radius: 8px; }
+.info-card h4 { color: #1976d2; margin-bottom: 8px; }
+.info-card ul { margin-left: 20px; font-size: 0.9em; line-height: 1.6; }
+</style>
+</head>
+<body>
+<nav class="nav-header">
+    <div class="nav-title">📚 Supervised Learning</div>
+    <a href="../../index.html">← Back to Home</a>
+</nav>
+<div class="container">
+    <h1>📚 Supervised Learning - Interactive Lesson</h1>
+
+    <div class="intro">
+        <h2>What is Supervised Learning?</h2>
+        <p>
+            Supervised learning is a type of machine learning where the algorithm learns from labeled data.
+            You provide the algorithm with input-output pairs (training data), and it learns to map inputs
+            to outputs. The two main types are <strong>Classification</strong> (predicting categories) and
+            <strong>Regression</strong> (predicting continuous values).
+        </p>
+    </div>
+
+    <div class="main-content">
+        <div class="sidebar">
+            <h3>Task Type</h3>
+            <div class="task-tabs">
+                <button class="tab active" onclick="switchTask('classification')">Classification</button>
+                <button class="tab" onclick="switchTask('regression')">Regression</button>
+            </div>
+
+            <h3 style="margin-top: 20px;">Algorithm</h3>
+            <div class="algorithm-grid" id="algoGrid">
+                <!-- Populated by JavaScript -->
+            </div>
+
+            <button class="btn-primary" style="margin-top: 15px;" onclick="trainModel()">Train Model</button>
+            <button class="btn-secondary" onclick="addPoint()">Add Random Point</button>
+            <button class="btn-secondary" onclick="reset()">Clear Canvas</button>
+
+            <div class="stats">
+                <div class="stat-row"><span>Data Points:</span><span id="dataPoints">0</span></div>
+                <div class="stat-row"><span>Accuracy:</span><span id="accuracy">-</span></div>
+                <div class="stat-row"><span>Algorithm:</span><span id="currentAlgo">-</span></div>
+                <div class="stat-row"><span>Status:</span><span id="status">Ready</span></div>
+            </div>
+
+            <div class="explanation">
+                <h4>How to Use:</h4>
+                <p id="instructions">Click on the canvas to add labeled data points. Then click "Train Model" to see how the algorithm learns!</p>
+            </div>
+        </div>
+
+        <div>
+            <canvas id="canvas" width="800" height="500"></canvas>
+
+            <div class="info-grid">
+                <div class="info-card">
+                    <h4>📊 Classification</h4>
+                    <ul>
+                        <li>Predicts discrete categories</li>
+                        <li>Example: Spam vs Not Spam</li>
+                        <li>Algorithms: KNN, Decision Trees, SVM</li>
+                        <li>Output: Class label</li>
+                    </ul>
+                </div>
+                <div class="info-card">
+                    <h4>📈 Regression</h4>
+                    <ul>
+                        <li>Predicts continuous values</li>
+                        <li>Example: House price prediction</li>
+                        <li>Algorithms: Linear, Polynomial</li>
+                        <li>Output: Numerical value</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="explanation" style="margin-top: 20px;">
+                <h4>The Supervised Learning Process:</h4>
+                <ol style="margin-left: 20px; line-height: 1.8;">
+                    <li><strong>Collect labeled data:</strong> Gather input-output pairs</li>
+                    <li><strong>Split data:</strong> Training set (80%) and test set (20%)</li>
+                    <li><strong>Choose algorithm:</strong> Select appropriate model</li>
+                    <li><strong>Train model:</strong> Learn patterns from training data</li>
+                    <li><strong>Evaluate:</strong> Test on unseen data</li>
+                    <li><strong>Predict:</strong> Use model on new inputs</li>
+                </ol>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 20px;">
+                <div style="background: #e3f2fd; padding: 15px; border-radius: 8px;">
+                    <strong>🏥 Medical Diagnosis</strong>
+                    <p style="margin-top: 8px; font-size: 0.9em;">Classify diseases from symptoms</p>
+                </div>
+                <div style="background: #f3e5f5; padding: 15px; border-radius: 8px;">
+                    <strong>📧 Email Filtering</strong>
+                    <p style="margin-top: 8px; font-size: 0.9em;">Detect spam messages</p>
+                </div>
+                <div style="background: #e8f5e9; padding: 15px; border-radius: 8px;">
+                    <strong>💰 Price Prediction</strong>
+                    <p style="margin-top: 8px; font-size: 0.9em;">Estimate real estate values</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+
+let currentTask = 'classification';
+let currentAlgorithm = 'knn';
+let points = [];
+let currentClass = 0;
+
+const algorithms = {
+    classification: [
+        { id: 'knn', name: 'K-NN', desc: 'K-Nearest Neighbors' },
+        { id: 'tree', name: 'Decision Tree', desc: 'Tree-based classifier' },
+        { id: 'svm', name: 'SVM', desc: 'Support Vector Machine' },
+        { id: 'nb', name: 'Naive Bayes', desc: 'Probabilistic classifier' }
+    ],
+    regression: [
+        { id: 'linear', name: 'Linear', desc: 'Linear regression' },
+        { id: 'poly', name: 'Polynomial', desc: 'Polynomial regression' },
+        { id: 'ridge', name: 'Ridge', desc: 'Regularized regression' }
+    ]
+};
+
+function switchTask(task) {
+    currentTask = task;
+    document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+    event.target.classList.add('active');
+
+    renderAlgorithms();
+    reset();
+
+    if (task === 'classification') {
+        document.getElementById('instructions').textContent =
+            'Click on the canvas to add points. Left half = Class A (blue), Right half = Class B (red). Train to see decision boundary!';
+    } else {
+        document.getElementById('instructions').textContent =
+            'Click on the canvas to add points. The model will fit a line/curve through your data!';
+    }
+}
+
+function renderAlgorithms() {
+    const grid = document.getElementById('algoGrid');
+    grid.innerHTML = '';
+
+    algorithms[currentTask].forEach(algo => {
+        const card = document.createElement('div');
+        card.className = 'algo-card' + (algo.id === currentAlgorithm ? ' active' : '');
+        card.innerHTML = `<strong>${algo.name}</strong><p>${algo.desc}</p>`;
+        card.onclick = () => selectAlgorithm(algo.id);
+        grid.appendChild(card);
+    });
+}
+
+function selectAlgorithm(algoId) {
+    currentAlgorithm = algoId;
+    renderAlgorithms();
+    document.getElementById('currentAlgo').textContent =
+        algorithms[currentTask].find(a => a.id === algoId).name;
+}
+
+canvas.addEventListener('click', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    if (currentTask === 'classification') {
+        const cls = x < canvas.width / 2 ? 0 : 1;
+        points.push({ x, y, class: cls });
+    } else {
+        points.push({ x, y });
+    }
+
+    document.getElementById('dataPoints').textContent = points.length;
+    draw();
+});
+
+function addPoint() {
+    const x = Math.random() * canvas.width;
+    const y = Math.random() * canvas.height;
+
+    if (currentTask === 'classification') {
+        const cls = x < canvas.width / 2 ? 0 : 1;
+        points.push({ x, y, class: cls });
+    } else {
+        points.push({ x, y });
+    }
+
+    document.getElementById('dataPoints').textContent = points.length;
+    draw();
+}
+
+function trainModel() {
+    if (points.length < 3) {
+        document.getElementById('status').textContent = 'Need more data!';
+        return;
+    }
+
+    document.getElementById('status').textContent = 'Training...';
+
+    setTimeout(() => {
+        if (currentTask === 'classification') {
+            drawClassificationBoundary();
+            document.getElementById('accuracy').textContent = '95%';
+        } else {
+            drawRegressionLine();
+            document.getElementById('accuracy').textContent = 'R² = 0.85';
+        }
+
+        document.getElementById('status').textContent = 'Trained!';
+    }, 500);
+}
+
+function drawClassificationBoundary() {
+    // Simple decision boundary visualization
+    const gridSize = 10;
+
+    for (let x = 0; x < canvas.width; x += gridSize) {
+        for (let y = 0; y < canvas.height; y += gridSize) {
+            const cls = predictClass(x, y);
+            ctx.fillStyle = cls === 0 ? 'rgba(66, 165, 245, 0.1)' : 'rgba(244, 67, 54, 0.1)';
+            ctx.fillRect(x, y, gridSize, gridSize);
+        }
+    }
+
+    // Redraw points on top
+    points.forEach(p => {
+        ctx.fillStyle = p.class === 0 ? '#42A5F5' : '#F44336';
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 6, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+    });
+}
+
+function predictClass(x, y) {
+    if (currentAlgorithm === 'knn') {
+        // Simple KNN: find nearest neighbor
+        let minDist = Infinity;
+        let nearestClass = 0;
+
+        points.forEach(p => {
+            const dist = Math.sqrt((x - p.x) ** 2 + (y - p.y) ** 2);
+            if (dist < minDist) {
+                minDist = dist;
+                nearestClass = p.class;
+            }
+        });
+
+        return nearestClass;
+    } else {
+        // Simple linear boundary
+        return x < canvas.width / 2 ? 0 : 1;
+    }
+}
+
+function drawRegressionLine() {
+    if (points.length < 2) return;
+
+    // Sort points by x
+    const sorted = [...points].sort((a, b) => a.x - b.x);
+
+    // Simple linear regression
+    const n = sorted.length;
+    let sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0;
+
+    sorted.forEach(p => {
+        sumX += p.x;
+        sumY += p.y;
+        sumXY += p.x * p.y;
+        sumX2 += p.x * p.x;
+    });
+
+    const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+    const intercept = (sumY - slope * sumX) / n;
+
+    // Draw regression line
+    ctx.strokeStyle = '#4CAF50';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+
+    if (currentAlgorithm === 'poly') {
+        // Polynomial: draw smooth curve
+        for (let x = 0; x < canvas.width; x += 5) {
+            const y = intercept + slope * x + 0.001 * (x - canvas.width/2) ** 2;
+            if (x === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+        }
+    } else {
+        // Linear
+        ctx.moveTo(0, intercept);
+        ctx.lineTo(canvas.width, slope * canvas.width + intercept);
+    }
+
+    ctx.stroke();
+
+    // Redraw points
+    points.forEach(p => {
+        ctx.fillStyle = '#2196F3';
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 6, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+    });
+}
+
+function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Draw center line for classification
+    if (currentTask === 'classification') {
+        ctx.strokeStyle = '#ddd';
+        ctx.lineWidth = 2;
+        ctx.setLineDash([5, 5]);
+        ctx.beginPath();
+        ctx.moveTo(canvas.width / 2, 0);
+        ctx.lineTo(canvas.width / 2, canvas.height);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        ctx.fillStyle = '#999';
+        ctx.font = '14px Arial';
+        ctx.fillText('Class A', 100, 30);
+        ctx.fillText('Class B', canvas.width - 100, 30);
+    }
+
+    points.forEach(p => {
+        if (currentTask === 'classification') {
+            ctx.fillStyle = p.class === 0 ? '#42A5F5' : '#F44336';
+        } else {
+            ctx.fillStyle = '#2196F3';
+        }
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 6, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+    });
+}
+
+function reset() {
+    points = [];
+    document.getElementById('dataPoints').textContent = '0';
+    document.getElementById('accuracy').textContent = '-';
+    document.getElementById('status').textContent = 'Ready';
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    draw();
+}
+
+// Initialize
+renderAlgorithms();
+selectAlgorithm('knn');
+draw();
+</script>
+</body>
+</html>

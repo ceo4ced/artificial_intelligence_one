@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reinforcement Learning - Interactive Lesson</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 0; }
+.nav-header { background: #2d3748; padding: 15px 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; }
+.nav-header a { color: #90cdf4; text-decoration: none; font-weight: 600; font-size: 1.1em; }
+.nav-title { color: #fff; font-size: 1.2em; font-weight: 700; }
+.container { max-width: 1400px; margin: 20px auto; background: #fff; border-radius: 15px; padding: 30px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+h1 { text-align: center; color: #2d3748; font-size: 2.5em; margin-bottom: 20px; }
+.intro { background: #e3f2fd; padding: 20px; border-radius: 10px; margin-bottom: 30px; line-height: 1.6; }
+.intro h2 { color: #1976d2; margin-bottom: 10px; }
+.main-content { display: grid; grid-template-columns: 350px 1fr; gap: 30px; }
+.sidebar { background: #f8f9fa; padding: 20px; border-radius: 10px; height: fit-content; }
+button { width: 100%; padding: 12px; margin: 5px 0; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }
+.btn-primary { background: #4CAF50; color: #fff; }
+.btn-secondary { background: #2196F3; color: #fff; }
+.grid-world { display: inline-grid; gap: 2px; background: #2d3748; padding: 5px; border-radius: 10px; margin: 20px auto; display: block; width: fit-content; }
+.cell { width: 60px; height: 60px; background: #fff; display: flex; align-items: center; justify-content: center; font-size: 1.5em; position: relative; border-radius: 4px; }
+.cell.wall { background: #2d3748; }
+.cell.goal { background: #4CAF50; color: #fff; font-size: 2em; }
+.cell.trap { background: #F44336; color: #fff; }
+.cell.agent { background: #2196F3; color: #fff; font-size: 2em; }
+.q-value { font-size: 0.6em; position: absolute; color: #666; }
+.q-value.up { top: 2px; left: 50%; transform: translateX(-50%); }
+.q-value.down { bottom: 2px; left: 50%; transform: translateX(-50%); }
+.q-value.left { left: 2px; top: 50%; transform: translateY(-50%); }
+.q-value.right { right: 2px; top: 50%; transform: translateY(-50%); }
+.explanation { background: #fff9c4; padding: 15px; border-radius: 8px; margin: 15px 0; border-left: 4px solid #fbc02d; }
+.explanation h4 { color: #f57c00; margin-bottom: 8px; }
+.stats { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; padding: 15px; border-radius: 10px; margin-top: 15px; }
+.stat-row { display: flex; justify-content: space-between; margin: 8px 0; }
+.control-group { margin: 15px 0; }
+.control-group label { display: block; margin-bottom: 5px; font-weight: 600; }
+.control-group input[type="range"] { width: 100%; }
+.control-group .value { float: right; color: #667eea; }
+.key-concepts { background: #e8f5e9; padding: 15px; border-radius: 8px; margin: 15px 0; }
+.key-concepts ul { margin-left: 20px; line-height: 1.8; font-size: 0.9em; }
+.legend { display: flex; gap: 15px; justify-content: center; margin: 15px 0; flex-wrap: wrap; }
+.legend-item { display: flex; align-items: center; gap: 8px; }
+.legend-box { width: 30px; height: 30px; border-radius: 4px; }
+</style>
+</head>
+<body>
+<nav class="nav-header">
+    <div class="nav-title">🤖 Reinforcement Learning</div>
+    <a href="../../index.html">← Back to Home</a>
+</nav>
+<div class="container">
+    <h1>🤖 Reinforcement Learning - Interactive Lesson</h1>
+
+    <div class="intro">
+        <h2>What is Reinforcement Learning?</h2>
+        <p>
+            Reinforcement Learning (RL) is learning by trial and error through interactions with an environment.
+            An <strong>agent</strong> takes <strong>actions</strong>, receives <strong>rewards</strong> or penalties,
+            and learns to maximize cumulative reward over time. Unlike supervised learning (which uses labeled data)
+            or unsupervised learning (which finds patterns), RL learns from consequences of actions.
+        </p>
+    </div>
+
+    <div class="main-content">
+        <div class="sidebar">
+            <h3>Controls</h3>
+            <button class="btn-primary" onclick="train()">Train Agent</button>
+            <button class="btn-secondary" onclick="step()">Single Episode</button>
+            <button class="btn-secondary" onclick="showOptimalPath()">Show Optimal Path</button>
+            <button class="btn-secondary" onclick="reset()">Reset</button>
+
+            <div class="control-group">
+                <label>Learning Rate (α): <span class="value" id="alphaVal">0.1</span></label>
+                <input type="range" min="1" max="50" value="10" id="alpha" onchange="updateParams()">
+            </div>
+
+            <div class="control-group">
+                <label>Discount (γ): <span class="value" id="gammaVal">0.9</span></label>
+                <input type="range" min="1" max="99" value="90" id="gamma" onchange="updateParams()">
+            </div>
+
+            <div class="control-group">
+                <label>Exploration (ε): <span class="value" id="epsilonVal">0.3</span></label>
+                <input type="range" min="0" max="100" value="30" id="epsilon" onchange="updateParams()">
+            </div>
+
+            <div class="stats">
+                <div class="stat-row"><span>Episodes:</span><span id="episodes">0</span></div>
+                <div class="stat-row"><span>Steps (Last):</span><span id="steps">-</span></div>
+                <div class="stat-row"><span>Reward (Last):</span><span id="reward">0</span></div>
+                <div class="stat-row"><span>Status:</span><span id="status">Ready</span></div>
+            </div>
+
+            <div class="key-concepts">
+                <h4>RL Components:</h4>
+                <ul>
+                    <li><strong>Agent:</strong> The learner (🤖)</li>
+                    <li><strong>Environment:</strong> The world</li>
+                    <li><strong>State:</strong> Current situation</li>
+                    <li><strong>Action:</strong> What agent can do</li>
+                    <li><strong>Reward:</strong> Feedback signal</li>
+                    <li><strong>Policy:</strong> Strategy for actions</li>
+                </ul>
+            </div>
+
+            <div class="explanation">
+                <h4>Q-Learning Formula:</h4>
+                <p style="font-family: monospace; background: #fff; padding: 10px; border-radius: 5px; margin-top: 8px;">
+                    Q(s,a) ← Q(s,a) + α[r + γ·max Q(s',a') - Q(s,a)]
+                </p>
+                <p style="margin-top: 8px; font-size: 0.9em;">
+                    Update Q-value based on reward and best future value
+                </p>
+            </div>
+        </div>
+
+        <div>
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-box" style="background: #2196F3;"></div>
+                    <span>Agent 🤖</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-box" style="background: #4CAF50;"></div>
+                    <span>Goal 🎯 (+10)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-box" style="background: #F44336;"></div>
+                    <span>Trap ⚡ (-10)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-box" style="background: #2d3748;"></div>
+                    <span>Wall 🧱</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-box" style="background: #fff; border: 2px solid #ddd;"></div>
+                    <span>Empty (-1)</span>
+                </div>
+            </div>
+
+            <div class="grid-world" id="gridWorld"></div>
+
+            <div class="explanation">
+                <h4>How Q-Learning Works:</h4>
+                <ol style="margin-left: 20px; line-height: 1.8;">
+                    <li><strong>Initialize Q-table:</strong> Set all Q(state, action) values to 0</li>
+                    <li><strong>Choose action:</strong> ε-greedy (explore vs exploit)</li>
+                    <li><strong>Take action:</strong> Move to new state, get reward</li>
+                    <li><strong>Update Q-value:</strong> Use Q-learning formula</li>
+                    <li><strong>Repeat:</strong> Until convergence or max episodes</li>
+                </ol>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 20px;">
+                <div style="background: #e3f2fd; padding: 15px; border-radius: 8px;">
+                    <strong>🎮 Game AI</strong>
+                    <p style="margin-top: 8px; font-size: 0.9em;">Train agents to play games like Chess, Go</p>
+                </div>
+                <div style="background: #f3e5f5; padding: 15px; border-radius: 8px;">
+                    <strong>🚗 Autonomous Driving</strong>
+                    <p style="margin-top: 8px; font-size: 0.9em;">Learn to navigate roads safely</p>
+                </div>
+                <div style="background: #e8f5e9; padding: 15px; border-radius: 8px;">
+                    <strong>🤖 Robotics</strong>
+                    <p style="margin-top: 8px; font-size: 0.9em;">Robot learns to walk, grasp objects</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const gridSize = 5;
+let grid = [];
+let qTable = {};
+let agentPos = { x: 0, y: 0 };
+let goalPos = { x: 4, y: 4 };
+let trapPos = [{ x: 2, y: 2 }, { x: 1, y: 3 }];
+let wallPos = [{ x: 1, y: 1 }, { x: 3, y: 1 }];
+
+let alpha = 0.1;  // Learning rate
+let gamma = 0.9;  // Discount factor
+let epsilon = 0.3; // Exploration rate
+
+let episodes = 0;
+let isTraining = false;
+
+const actions = ['up', 'down', 'left', 'right'];
+
+function initGrid() {
+    const gridWorld = document.getElementById('gridWorld');
+    gridWorld.style.gridTemplateColumns = `repeat(${gridSize}, 60px)`;
+    gridWorld.innerHTML = '';
+
+    for (let y = 0; y < gridSize; y++) {
+        for (let x = 0; x < gridSize; x++) {
+            const cell = document.createElement('div');
+            cell.className = 'cell';
+            cell.dataset.x = x;
+            cell.dataset.y = y;
+            cell.id = `cell-${x}-${y}`;
+
+            if (wallPos.some(w => w.x === x && w.y === y)) {
+                cell.classList.add('wall');
+                cell.textContent = '🧱';
+            } else if (x === goalPos.x && y === goalPos.y) {
+                cell.classList.add('goal');
+                cell.textContent = '🎯';
+            } else if (trapPos.some(t => t.x === x && t.y === y)) {
+                cell.classList.add('trap');
+                cell.textContent = '⚡';
+            }
+
+            gridWorld.appendChild(cell);
+        }
+    }
+
+    updateAgentDisplay();
+}
+
+function initQTable() {
+    qTable = {};
+    for (let y = 0; y < gridSize; y++) {
+        for (let x = 0; x < gridSize; x++) {
+            const state = `${x},${y}`;
+            qTable[state] = { up: 0, down: 0, left: 0, right: 0 };
+        }
+    }
+}
+
+function getState(pos) {
+    return `${pos.x},${pos.y}`;
+}
+
+function isValidMove(pos) {
+    if (pos.x < 0 || pos.x >= gridSize || pos.y < 0 || pos.y >= gridSize) return false;
+    if (wallPos.some(w => w.x === pos.x && w.y === pos.y)) return false;
+    return true;
+}
+
+function takeAction(pos, action) {
+    const newPos = { ...pos };
+
+    switch (action) {
+        case 'up': newPos.y--; break;
+        case 'down': newPos.y++; break;
+        case 'left': newPos.x--; break;
+        case 'right': newPos.x++; break;
+    }
+
+    if (!isValidMove(newPos)) {
+        return { pos, reward: -1 }; // Hit wall, stay in place
+    }
+
+    let reward = -1; // Step cost
+
+    if (newPos.x === goalPos.x && newPos.y === goalPos.y) {
+        reward = 10; // Goal!
+    } else if (trapPos.some(t => t.x === newPos.x && t.y === newPos.y)) {
+        reward = -10; // Trap!
+    }
+
+    return { pos: newPos, reward };
+}
+
+function chooseAction(state) {
+    // ε-greedy policy
+    if (Math.random() < epsilon) {
+        // Explore: random action
+        return actions[Math.floor(Math.random() * actions.length)];
+    } else {
+        // Exploit: best action
+        const qValues = qTable[state];
+        let maxQ = -Infinity;
+        let bestAction = actions[0];
+
+        for (let action of actions) {
+            if (qValues[action] > maxQ) {
+                maxQ = qValues[action];
+                bestAction = action;
+            }
+        }
+
+        return bestAction;
+    }
+}
+
+function runEpisode() {
+    let pos = { x: 0, y: 0 };
+    let totalReward = 0;
+    let steps = 0;
+    const maxSteps = 50;
+
+    while (steps < maxSteps) {
+        const state = getState(pos);
+        const action = chooseAction(state);
+        const { pos: newPos, reward } = takeAction(pos, action);
+        const newState = getState(newPos);
+
+        // Q-learning update
+        const currentQ = qTable[state][action];
+        const maxNextQ = Math.max(...Object.values(qTable[newState]));
+        const newQ = currentQ + alpha * (reward + gamma * maxNextQ - currentQ);
+        qTable[state][action] = newQ;
+
+        totalReward += reward;
+        pos = newPos;
+        steps++;
+
+        // Check if reached goal or trap
+        if (reward === 10 || reward === -10) {
+            break;
+        }
+    }
+
+    episodes++;
+    document.getElementById('episodes').textContent = episodes;
+    document.getElementById('steps').textContent = steps;
+    document.getElementById('reward').textContent = totalReward.toFixed(1);
+
+    return totalReward;
+}
+
+function train() {
+    if (isTraining) return;
+
+    isTraining = true;
+    document.getElementById('status').textContent = 'Training...';
+
+    let episodeCount = 0;
+    const maxEpisodes = 200;
+
+    const interval = setInterval(() => {
+        runEpisode();
+        episodeCount++;
+
+        if (episodeCount >= maxEpisodes) {
+            clearInterval(interval);
+            isTraining = false;
+            document.getElementById('status').textContent = 'Training complete!';
+            displayQValues();
+        }
+    }, 10);
+}
+
+function step() {
+    runEpisode();
+    displayQValues();
+}
+
+function displayQValues() {
+    for (let y = 0; y < gridSize; y++) {
+        for (let x = 0; x < gridSize; x++) {
+            const cell = document.getElementById(`cell-${x}-${y}`);
+            if (cell.classList.contains('wall') || cell.classList.contains('goal') ||
+                cell.classList.contains('trap')) {
+                continue;
+            }
+
+            const state = `${x},${y}`;
+            const qValues = qTable[state];
+
+            // Clear previous Q-values
+            cell.querySelectorAll('.q-value').forEach(el => el.remove());
+
+            // Add Q-value displays
+            ['up', 'down', 'left', 'right'].forEach(action => {
+                const span = document.createElement('span');
+                span.className = `q-value ${action}`;
+                span.textContent = qValues[action].toFixed(1);
+                cell.appendChild(span);
+            });
+        }
+    }
+}
+
+function showOptimalPath() {
+    // Clear previous path
+    document.querySelectorAll('.cell').forEach(cell => {
+        cell.style.background = '';
+    });
+
+    let pos = { x: 0, y: 0 };
+    const maxSteps = 20;
+    let steps = 0;
+
+    const path = [{ ...pos }];
+
+    while (steps < maxSteps) {
+        const state = getState(pos);
+        const qValues = qTable[state];
+
+        // Choose best action (greedy)
+        let maxQ = -Infinity;
+        let bestAction = actions[0];
+
+        for (let action of actions) {
+            if (qValues[action] > maxQ) {
+                maxQ = qValues[action];
+                bestAction = action;
+            }
+        }
+
+        const { pos: newPos, reward } = takeAction(pos, bestAction);
+        pos = newPos;
+        path.push({ ...pos });
+        steps++;
+
+        if (reward === 10 || reward === -10) {
+            break;
+        }
+    }
+
+    // Highlight path
+    path.forEach((p, i) => {
+        setTimeout(() => {
+            const cell = document.getElementById(`cell-${p.x}-${p.y}`);
+            if (!cell.classList.contains('goal') && !cell.classList.contains('trap')) {
+                cell.style.background = '#90CAF9';
+            }
+
+            if (i === path.length - 1) {
+                document.getElementById('status').textContent = `Optimal path: ${path.length} steps`;
+            }
+        }, i * 200);
+    });
+}
+
+function updateAgentDisplay() {
+    document.querySelectorAll('.cell').forEach(cell => {
+        cell.classList.remove('agent');
+    });
+
+    const cell = document.getElementById(`cell-${agentPos.x}-${agentPos.y}`);
+    if (cell && !cell.classList.contains('wall')) {
+        cell.classList.add('agent');
+        if (!cell.classList.contains('goal') && !cell.classList.contains('trap')) {
+            cell.textContent = '🤖';
+        }
+    }
+}
+
+function updateParams() {
+    alpha = parseInt(document.getElementById('alpha').value) / 100;
+    gamma = parseInt(document.getElementById('gamma').value) / 100;
+    epsilon = parseInt(document.getElementById('epsilon').value) / 100;
+
+    document.getElementById('alphaVal').textContent = alpha.toFixed(2);
+    document.getElementById('gammaVal').textContent = gamma.toFixed(2);
+    document.getElementById('epsilonVal').textContent = epsilon.toFixed(2);
+}
+
+function reset() {
+    episodes = 0;
+    agentPos = { x: 0, y: 0 };
+    initQTable();
+    initGrid();
+
+    document.getElementById('episodes').textContent = '0';
+    document.getElementById('steps').textContent = '-';
+    document.getElementById('reward').textContent = '0';
+    document.getElementById('status').textContent = 'Ready';
+}
+
+// Initialize
+initQTable();
+initGrid();
+updateParams();
+</script>
+</body>
+</html>

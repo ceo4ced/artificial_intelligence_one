@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Minimax Algorithm - Interactive Lesson</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 0; }
+.nav-header { background: #2d3748; padding: 15px 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; }
+.nav-header a { color: #90cdf4; text-decoration: none; font-weight: 600; font-size: 1.1em; }
+.nav-title { color: #fff; font-size: 1.2em; font-weight: 700; }
+.container { max-width: 1400px; margin: 20px auto; background: #fff; border-radius: 15px; padding: 30px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+h1 { text-align: center; color: #2d3748; font-size: 2.5em; margin-bottom: 20px; }
+.intro { background: #e3f2fd; padding: 20px; border-radius: 10px; margin-bottom: 30px; line-height: 1.6; }
+.intro h2 { color: #1976d2; margin-bottom: 10px; }
+.main-content { display: grid; grid-template-columns: 350px 1fr; gap: 30px; }
+.sidebar { background: #f8f9fa; padding: 20px; border-radius: 10px; height: fit-content; }
+button { width: 100%; padding: 12px; margin: 5px 0; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }
+.btn-primary { background: #4CAF50; color: #fff; }
+.btn-secondary { background: #2196F3; color: #fff; }
+canvas { border: 2px solid #ddd; border-radius: 8px; display: block; background: #fafafa; margin: 0 auto; }
+.explanation { background: #fff9c4; padding: 15px; border-radius: 8px; margin: 15px 0; border-left: 4px solid #fbc02d; }
+.explanation h4 { color: #f57c00; margin-bottom: 8px; }
+.code-block { background: #2d3748; color: #fff; padding: 15px; border-radius: 8px; font-family: 'Courier New', monospace; font-size: 0.9em; margin: 10px 0; overflow-x: auto; }
+.step-info { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; padding: 15px; border-radius: 10px; margin: 15px 0; }
+.example-section { margin: 20px 0; }
+.example-section h3 { color: #2d3748; margin-bottom: 15px; }
+.key-concepts { background: #e8f5e9; padding: 15px; border-radius: 8px; margin: 15px 0; }
+.key-concepts ul { margin-left: 20px; line-height: 1.8; }
+</style>
+</head>
+<body>
+<nav class="nav-header">
+    <div class="nav-title">🎮 Minimax Algorithm</div>
+    <a href="../../index.html">← Back to Home</a>
+</nav>
+<div class="container">
+    <h1>🎮 Minimax Algorithm - Interactive Lesson</h1>
+
+    <div class="intro">
+        <h2>What is Minimax?</h2>
+        <p>
+            Minimax is a decision-making algorithm used in two-player, zero-sum games like chess, checkers,
+            and tic-tac-toe. It works by simulating all possible moves and choosing the one that minimizes
+            the maximum loss (hence "mini-max"). The algorithm assumes both players play optimally.
+        </p>
+    </div>
+
+    <div class="main-content">
+        <div class="sidebar">
+            <h3>Interactive Demo</h3>
+            <button class="btn-primary" onclick="generateNewTree()">Generate New Game Tree</button>
+            <button class="btn-secondary" onclick="runMinimax()">Run Minimax</button>
+            <button class="btn-secondary" onclick="stepThrough()">Step Through</button>
+            <button class="btn-secondary" onclick="reset()">Reset</button>
+
+            <div class="step-info" id="stepInfo">
+                <h4>Current Step:</h4>
+                <p id="stepText">Click "Run Minimax" to start</p>
+            </div>
+
+            <div class="key-concepts">
+                <h4>Key Concepts:</h4>
+                <ul>
+                    <li><strong>Maximizer:</strong> Player trying to maximize score</li>
+                    <li><strong>Minimizer:</strong> Player trying to minimize score</li>
+                    <li><strong>Terminal States:</strong> End game positions with scores</li>
+                    <li><strong>Backpropagation:</strong> Values bubble up from leaves to root</li>
+                </ul>
+            </div>
+        </div>
+
+        <div>
+            <canvas id="canvas" width="900" height="600"></canvas>
+
+            <div class="explanation">
+                <h4>How Minimax Works:</h4>
+                <ol style="margin-left: 20px; line-height: 1.8;">
+                    <li><strong>Build the game tree:</strong> Represent all possible moves</li>
+                    <li><strong>Evaluate leaf nodes:</strong> Assign scores to terminal states</li>
+                    <li><strong>Propagate values upward:</strong>
+                        <ul style="margin-left: 20px; margin-top: 5px;">
+                            <li>MAX nodes choose the highest value from children</li>
+                            <li>MIN nodes choose the lowest value from children</li>
+                        </ul>
+                    </li>
+                    <li><strong>Choose best move:</strong> Root picks child with best value</li>
+                </ol>
+            </div>
+
+            <div class="code-block">
+<pre>function minimax(node, depth, isMaximizing):
+    if node is terminal or depth == 0:
+        return evaluate(node)
+
+    if isMaximizing:
+        maxEval = -∞
+        for each child of node:
+            eval = minimax(child, depth-1, false)
+            maxEval = max(maxEval, eval)
+        return maxEval
+    else:
+        minEval = +∞
+        for each child of node:
+            eval = minimax(child, depth-1, true)
+            minEval = min(minEval, eval)
+        return minEval</pre>
+            </div>
+
+            <div class="example-section">
+                <h3>Real-World Applications:</h3>
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 10px;">
+                    <div style="background: #e3f2fd; padding: 15px; border-radius: 8px;">
+                        <strong>♟️ Chess Engines</strong>
+                        <p style="margin-top: 8px; font-size: 0.9em;">Evaluating millions of positions to find the best move</p>
+                    </div>
+                    <div style="background: #f3e5f5; padding: 15px; border-radius: 8px;">
+                        <strong>🎮 Game AI</strong>
+                        <p style="margin-top: 8px; font-size: 0.9em;">Creating challenging opponents in strategy games</p>
+                    </div>
+                    <div style="background: #e8f5e9; padding: 15px; border-radius: 8px;">
+                        <strong>🤖 Decision Making</strong>
+                        <p style="margin-top: 8px; font-size: 0.9em;">Optimal choices in competitive scenarios</p>
+                    </div>
+                    <div style="background: #fff3e0; padding: 15px; border-radius: 8px;">
+                        <strong>📊 Game Theory</strong>
+                        <p style="margin-top: 8px; font-size: 0.9em;">Analyzing strategic interactions</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+
+let tree = null;
+let evaluationOrder = [];
+let currentStep = 0;
+let stepMode = false;
+
+class TreeNode {
+    constructor(level, index, isMax) {
+        this.level = level;
+        this.index = index;
+        this.isMax = isMax;
+        this.children = [];
+        this.value = null;
+        this.evaluated = false;
+        this.bestChild = null;
+        this.x = 0;
+        this.y = 0;
+    }
+}
+
+function generateNewTree() {
+    reset();
+    tree = buildTree(0, 0, true);
+    assignPositions(tree);
+    assignLeafValues(tree);
+    draw();
+    document.getElementById('stepText').textContent = 'Tree generated! Click "Run Minimax" or "Step Through"';
+}
+
+function buildTree(level, index, isMax) {
+    const node = new TreeNode(level, index, isMax);
+
+    if (level < 3) {
+        const numChildren = level === 0 ? 3 : 2;
+        for (let i = 0; i < numChildren; i++) {
+            const child = buildTree(level + 1, i, !isMax);
+            node.children.push(child);
+        }
+    }
+
+    return node;
+}
+
+function assignPositions(node, x = canvas.width / 2, y = 60, spacing = 350) {
+    node.x = x;
+    node.y = y;
+
+    if (node.children.length > 0) {
+        const totalWidth = spacing;
+        const childSpacing = totalWidth / (node.children.length + 1);
+        const startX = x - totalWidth / 2;
+
+        node.children.forEach((child, i) => {
+            assignPositions(
+                child,
+                startX + childSpacing * (i + 1),
+                y + 140,
+                spacing / 2.2
+            );
+        });
+    }
+}
+
+function assignLeafValues(node) {
+    if (node.children.length === 0) {
+        node.value = Math.floor(Math.random() * 18) - 5;
+    } else {
+        node.children.forEach(child => assignLeafValues(child));
+    }
+}
+
+function minimax(node) {
+    if (node.children.length === 0) {
+        node.evaluated = true;
+        evaluationOrder.push({node, value: node.value, description: `Leaf node evaluated: ${node.value}`});
+        return node.value;
+    }
+
+    if (node.isMax) {
+        let maxValue = -Infinity;
+        let bestChild = null;
+
+        for (let child of node.children) {
+            const value = minimax(child);
+            if (value > maxValue) {
+                maxValue = value;
+                bestChild = child;
+            }
+        }
+
+        node.value = maxValue;
+        node.evaluated = true;
+        node.bestChild = bestChild;
+        evaluationOrder.push({
+            node,
+            value: maxValue,
+            description: `MAX node: chose maximum value ${maxValue}`
+        });
+        return maxValue;
+    } else {
+        let minValue = Infinity;
+        let bestChild = null;
+
+        for (let child of node.children) {
+            const value = minimax(child);
+            if (value < minValue) {
+                minValue = value;
+                bestChild = child;
+            }
+        }
+
+        node.value = minValue;
+        node.evaluated = true;
+        node.bestChild = bestChild;
+        evaluationOrder.push({
+            node,
+            value: minValue,
+            description: `MIN node: chose minimum value ${minValue}`
+        });
+        return minValue;
+    }
+}
+
+function runMinimax() {
+    if (!tree) {
+        generateNewTree();
+    }
+
+    evaluationOrder = [];
+    resetEvaluation(tree);
+    minimax(tree);
+    currentStep = evaluationOrder.length;
+    stepMode = false;
+    draw();
+
+    document.getElementById('stepText').textContent =
+        `Complete! Best move value: ${tree.value}. The maximizer should choose the child with value ${tree.value}.`;
+}
+
+function stepThrough() {
+    if (!tree) {
+        generateNewTree();
+    }
+
+    if (!stepMode) {
+        evaluationOrder = [];
+        resetEvaluation(tree);
+        minimax(tree);
+        currentStep = 0;
+        stepMode = true;
+        resetEvaluation(tree);
+    }
+
+    if (currentStep < evaluationOrder.length) {
+        const step = evaluationOrder[currentStep];
+        step.node.evaluated = true;
+        step.node.value = step.value;
+
+        document.getElementById('stepText').textContent =
+            `Step ${currentStep + 1}/${evaluationOrder.length}: ${step.description}`;
+
+        currentStep++;
+        draw();
+    } else {
+        document.getElementById('stepText').textContent = 'Evaluation complete!';
+    }
+}
+
+function resetEvaluation(node) {
+    node.evaluated = false;
+    if (node.children.length > 0) {
+        node.value = null;
+    }
+    node.children.forEach(child => resetEvaluation(child));
+}
+
+function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    if (!tree) return;
+
+    drawConnections(tree);
+    drawNodes(tree);
+}
+
+function drawConnections(node) {
+    node.children.forEach(child => {
+        const isBestPath = node.bestChild === child && node.evaluated && child.evaluated;
+
+        ctx.strokeStyle = isBestPath ? '#4CAF50' : '#ccc';
+        ctx.lineWidth = isBestPath ? 4 : 2;
+        ctx.beginPath();
+        ctx.moveTo(node.x, node.y + 25);
+        ctx.lineTo(child.x, child.y - 25);
+        ctx.stroke();
+
+        drawConnections(child);
+    });
+}
+
+function drawNodes(node) {
+    // Draw children first
+    node.children.forEach(child => drawNodes(child));
+
+    // Draw node circle
+    const radius = 25;
+    ctx.fillStyle = node.isMax ? '#2196F3' : '#f44336';
+    ctx.globalAlpha = node.evaluated ? 1 : 0.3;
+
+    ctx.beginPath();
+    ctx.arc(node.x, node.y, radius, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.globalAlpha = 1;
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 3;
+    ctx.stroke();
+
+    // Draw value if evaluated
+    if (node.value !== null && node.evaluated) {
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold 18px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(node.value, node.x, node.y);
+    }
+
+    // Draw label
+    ctx.fillStyle = '#333';
+    ctx.font = '13px Arial';
+    ctx.fillText(node.isMax ? 'MAX' : 'MIN', node.x, node.y + radius + 18);
+}
+
+function reset() {
+    tree = null;
+    evaluationOrder = [];
+    currentStep = 0;
+    stepMode = false;
+    draw();
+    document.getElementById('stepText').textContent = 'Click "Generate New Game Tree" to start';
+}
+
+// Initialize
+generateNewTree();
+</script>
+</body>
+</html>
