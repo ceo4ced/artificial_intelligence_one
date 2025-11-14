@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Interactive Support Vector Machine (SVM) visualizer showing decision boundaries, support vectors, and margin maximization">
+    <title>Support Vector Machines - SVM Visualizer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            font-size: 1.2em;
+            opacity: 0.95;
+        }
+
+        .nav-link {
+            display: inline-block;
+            margin-top: 15px;
+            color: white;
+            text-decoration: none;
+            font-size: 1em;
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+
+        .nav-link:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .content {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 0;
+            min-height: 600px;
+        }
+
+        .sidebar {
+            background: #f8f9fa;
+            padding: 30px;
+            border-right: 2px solid #e9ecef;
+        }
+
+        .sidebar h2 {
+            color: #2d3748;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        .control-group {
+            margin-bottom: 25px;
+        }
+
+        .control-group label {
+            display: block;
+            color: #4a5568;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .control-group select,
+        .control-group input[type="range"] {
+            width: 100%;
+            padding: 8px;
+            border: 2px solid #e2e8f0;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+
+        .control-group input[type="range"] {
+            padding: 0;
+        }
+
+        .param-value {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+        }
+
+        .stats {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            border: 2px solid #e2e8f0;
+        }
+
+        .stats h3 {
+            color: #2d3748;
+            margin-bottom: 12px;
+            font-size: 1.2em;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            color: #4a5568;
+        }
+
+        .stat-value {
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .canvas-container {
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        canvas {
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            cursor: crosshair;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .legend {
+            margin-top: 20px;
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95em;
+            color: #4a5568;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 2px solid #333;
+        }
+
+        .info-box {
+            background: #ebf8ff;
+            border-left: 4px solid #4299e1;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+
+        .info-box p {
+            color: #2c5282;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+
+        .class-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .class-btn {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+        .class-btn.active {
+            border-color: #667eea;
+            background: #667eea;
+            color: white;
+        }
+
+        @media (max-width: 1200px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                border-right: none;
+                border-bottom: 2px solid #e9ecef;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎯 Support Vector Machines</h1>
+            <p>Find optimal hyperplanes to separate classes with maximum margin</p>
+            <a href="../../index.html" class="nav-link">← Back to Home</a>
+        </header>
+
+        <div class="content">
+            <div class="sidebar">
+                <h2>SVM Configuration</h2>
+
+                <div class="info-box">
+                    <p><strong>How to use:</strong> Click on the canvas to add points. Choose class below, then click to place points. The SVM finds the optimal separating hyperplane.</p>
+                </div>
+
+                <div class="class-selector">
+                    <button class="class-btn active" id="class0Btn" onclick="selectClass(0)">
+                        Class 0 (Blue)
+                    </button>
+                    <button class="class-btn" id="class1Btn" onclick="selectClass(1)">
+                        Class 1 (Red)
+                    </button>
+                </div>
+
+                <div class="control-group">
+                    <label for="kernelSelect">Kernel Type</label>
+                    <select id="kernelSelect" onchange="updateSVM()">
+                        <option value="linear">Linear</option>
+                        <option value="rbf">RBF (Radial Basis Function)</option>
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <label for="cParam">
+                        Regularization (C) <span class="param-value" id="cValue">1.0</span>
+                    </label>
+                    <input type="range" id="cParam" min="0.1" max="10" step="0.1" value="1.0" oninput="updateParams()">
+                    <small style="color: #718096;">Higher C = Less margin violations allowed</small>
+                </div>
+
+                <div class="control-group" id="gammaControl">
+                    <label for="gammaParam">
+                        Gamma (RBF) <span class="param-value" id="gammaValue">0.5</span>
+                    </label>
+                    <input type="range" id="gammaParam" min="0.1" max="2.0" step="0.1" value="0.5" oninput="updateParams()">
+                    <small style="color: #718096;">Higher gamma = More complex boundaries</small>
+                </div>
+
+                <button class="btn btn-primary" onclick="trainSVM()">Train SVM</button>
+                <button class="btn btn-secondary" onclick="clearCanvas()">Clear All Points</button>
+                <button class="btn btn-secondary" onclick="generateSampleData()">Generate Sample Data</button>
+
+                <div class="stats">
+                    <h3>Model Stats</h3>
+                    <div class="stat-row">
+                        <span>Total Points:</span>
+                        <span class="stat-value" id="totalPoints">0</span>
+                    </div>
+                    <div class="stat-row">
+                        <span>Class 0 (Blue):</span>
+                        <span class="stat-value" id="class0Count">0</span>
+                    </div>
+                    <div class="stat-row">
+                        <span>Class 1 (Red):</span>
+                        <span class="stat-value" id="class1Count">0</span>
+                    </div>
+                    <div class="stat-row">
+                        <span>Support Vectors:</span>
+                        <span class="stat-value" id="svCount">0</span>
+                    </div>
+                    <div class="stat-row">
+                        <span>Margin Width:</span>
+                        <span class="stat-value" id="marginWidth">-</span>
+                    </div>
+                </div>
+
+                <div class="info-box" style="margin-top: 20px;">
+                    <p><strong>About SVM:</strong> Support Vector Machines find the optimal hyperplane that maximizes the margin between classes. Support vectors are the critical points closest to the decision boundary.</p>
+                </div>
+            </div>
+
+            <div class="canvas-container">
+                <canvas id="svmCanvas" width="700" height="600"></canvas>
+
+                <div class="legend">
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #3b82f6;"></div>
+                        <span>Class 0 Points</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #ef4444;"></div>
+                        <span>Class 1 Points</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: white; border: 3px solid #fbbf24;"></div>
+                        <span>Support Vectors</span>
+                    </div>
+                    <div class="legend-item">
+                        <div style="width: 30px; height: 3px; background: #10b981;"></div>
+                        <span>Decision Boundary</span>
+                    </div>
+                    <div class="legend-item">
+                        <div style="width: 30px; height: 2px; border-top: 2px dashed #6b7280;"></div>
+                        <span>Margin</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('svmCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let points = [];
+        let currentClass = 0;
+        let supportVectors = [];
+        let weights = null;
+        let bias = 0;
+        let margin = 0;
+
+        // Initialize
+        updateParams();
+        draw();
+
+        canvas.addEventListener('click', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const x = (e.clientX - rect.left) / canvas.width;
+            const y = (e.clientY - rect.top) / canvas.height;
+
+            points.push({ x, y, class: currentClass });
+            updateStats();
+            draw();
+        });
+
+        function selectClass(classNum) {
+            currentClass = classNum;
+            document.getElementById('class0Btn').classList.toggle('active', classNum === 0);
+            document.getElementById('class1Btn').classList.toggle('active', classNum === 1);
+        }
+
+        function updateParams() {
+            const c = parseFloat(document.getElementById('cParam').value);
+            const gamma = parseFloat(document.getElementById('gammaParam').value);
+            document.getElementById('cValue').textContent = c.toFixed(1);
+            document.getElementById('gammaValue').textContent = gamma.toFixed(1);
+
+            const kernel = document.getElementById('kernelSelect').value;
+            document.getElementById('gammaControl').style.display =
+                kernel === 'rbf' ? 'block' : 'none';
+
+            if (points.length > 0) {
+                trainSVM();
+            }
+        }
+
+        function updateSVM() {
+            updateParams();
+        }
+
+        function clearCanvas() {
+            points = [];
+            supportVectors = [];
+            weights = null;
+            bias = 0;
+            margin = 0;
+            updateStats();
+            draw();
+        }
+
+        function generateSampleData() {
+            clearCanvas();
+            const kernel = document.getElementById('kernelSelect').value;
+
+            if (kernel === 'linear') {
+                // Linearly separable data
+                for (let i = 0; i < 15; i++) {
+                    points.push({
+                        x: 0.2 + Math.random() * 0.3,
+                        y: 0.2 + Math.random() * 0.3,
+                        class: 0
+                    });
+                    points.push({
+                        x: 0.6 + Math.random() * 0.3,
+                        y: 0.6 + Math.random() * 0.3,
+                        class: 1
+                    });
+                }
+            } else {
+                // Non-linear data (circular pattern)
+                for (let i = 0; i < 20; i++) {
+                    const angle = Math.random() * Math.PI * 2;
+                    const r = 0.15 + Math.random() * 0.1;
+                    points.push({
+                        x: 0.5 + r * Math.cos(angle),
+                        y: 0.5 + r * Math.sin(angle),
+                        class: 0
+                    });
+                }
+                for (let i = 0; i < 20; i++) {
+                    const angle = Math.random() * Math.PI * 2;
+                    const r = 0.3 + Math.random() * 0.15;
+                    points.push({
+                        x: 0.5 + r * Math.cos(angle),
+                        y: 0.5 + r * Math.sin(angle),
+                        class: 1
+                    });
+                }
+            }
+
+            updateStats();
+            trainSVM();
+        }
+
+        function trainSVM() {
+            if (points.length < 2) return;
+
+            const class0Points = points.filter(p => p.class === 0);
+            const class1Points = points.filter(p => p.class === 1);
+
+            if (class0Points.length === 0 || class1Points.length === 0) return;
+
+            const kernel = document.getElementById('kernelSelect').value;
+            const C = parseFloat(document.getElementById('cParam').value);
+            const gamma = parseFloat(document.getElementById('gammaParam').value);
+
+            if (kernel === 'linear') {
+                trainLinearSVM(C);
+            } else {
+                trainRBFSVM(C, gamma);
+            }
+
+            updateStats();
+            draw();
+        }
+
+        function trainLinearSVM(C) {
+            // Simplified SMO algorithm for linear SVM
+            const n = points.length;
+            const labels = points.map(p => p.class === 0 ? -1 : 1);
+            let alphas = new Array(n).fill(0);
+            bias = 0;
+
+            // Simple iterative optimization
+            for (let iter = 0; iter < 100; iter++) {
+                for (let i = 0; i < n; i++) {
+                    const Ei = predictLinear(points[i], alphas, labels) - labels[i];
+
+                    if ((labels[i] * Ei < -0.01 && alphas[i] < C) ||
+                        (labels[i] * Ei > 0.01 && alphas[i] > 0)) {
+
+                        let j = Math.floor(Math.random() * n);
+                        while (j === i) j = Math.floor(Math.random() * n);
+
+                        const Ej = predictLinear(points[j], alphas, labels) - labels[j];
+
+                        const alphaIOld = alphas[i];
+                        const alphaJOld = alphas[j];
+
+                        // Compute bounds
+                        let L, H;
+                        if (labels[i] !== labels[j]) {
+                            L = Math.max(0, alphas[j] - alphas[i]);
+                            H = Math.min(C, C + alphas[j] - alphas[i]);
+                        } else {
+                            L = Math.max(0, alphas[i] + alphas[j] - C);
+                            H = Math.min(C, alphas[i] + alphas[j]);
+                        }
+
+                        if (L === H) continue;
+
+                        const eta = 2 * dotProduct(points[i], points[j]) -
+                                   dotProduct(points[i], points[i]) -
+                                   dotProduct(points[j], points[j]);
+
+                        if (eta >= 0) continue;
+
+                        alphas[j] -= labels[j] * (Ei - Ej) / eta;
+                        alphas[j] = Math.max(L, Math.min(H, alphas[j]));
+
+                        if (Math.abs(alphas[j] - alphaJOld) < 0.00001) continue;
+
+                        alphas[i] += labels[i] * labels[j] * (alphaJOld - alphas[j]);
+
+                        // Update bias
+                        const b1 = bias - Ei - labels[i] * (alphas[i] - alphaIOld) *
+                                  dotProduct(points[i], points[i]) -
+                                  labels[j] * (alphas[j] - alphaJOld) *
+                                  dotProduct(points[i], points[j]);
+
+                        const b2 = bias - Ej - labels[i] * (alphas[i] - alphaIOld) *
+                                  dotProduct(points[i], points[j]) -
+                                  labels[j] * (alphas[j] - alphaJOld) *
+                                  dotProduct(points[j], points[j]);
+
+                        if (alphas[i] > 0 && alphas[i] < C) bias = b1;
+                        else if (alphas[j] > 0 && alphas[j] < C) bias = b2;
+                        else bias = (b1 + b2) / 2;
+                    }
+                }
+            }
+
+            // Compute weights
+            weights = { x: 0, y: 0 };
+            for (let i = 0; i < n; i++) {
+                weights.x += alphas[i] * labels[i] * points[i].x;
+                weights.y += alphas[i] * labels[i] * points[i].y;
+            }
+
+            // Find support vectors
+            supportVectors = [];
+            for (let i = 0; i < n; i++) {
+                if (alphas[i] > 0.01) {
+                    supportVectors.push(i);
+                }
+            }
+
+            // Calculate margin
+            const w_norm = Math.sqrt(weights.x * weights.x + weights.y * weights.y);
+            margin = w_norm > 0 ? 2 / w_norm : 0;
+        }
+
+        function trainRBFSVM(C, gamma) {
+            // Simplified RBF kernel SVM
+            const n = points.length;
+            const labels = points.map(p => p.class === 0 ? -1 : 1);
+            let alphas = new Array(n).fill(0.1);
+            bias = 0;
+
+            // Compute kernel matrix
+            const K = [];
+            for (let i = 0; i < n; i++) {
+                K[i] = [];
+                for (let j = 0; j < n; j++) {
+                    K[i][j] = rbfKernel(points[i], points[j], gamma);
+                }
+            }
+
+            // Simplified optimization
+            for (let iter = 0; iter < 50; iter++) {
+                for (let i = 0; i < n; i++) {
+                    let sum = 0;
+                    for (let j = 0; j < n; j++) {
+                        sum += alphas[j] * labels[j] * K[i][j];
+                    }
+                    const prediction = sum + bias;
+                    const error = prediction - labels[i];
+
+                    if ((labels[i] * error < -0.1 && alphas[i] < C) ||
+                        (labels[i] * error > 0.1 && alphas[i] > 0)) {
+                        alphas[i] = Math.max(0, Math.min(C, alphas[i] - 0.01 * labels[i] * error));
+                    }
+                }
+            }
+
+            // Update bias
+            let biasSum = 0;
+            let biasCount = 0;
+            for (let i = 0; i < n; i++) {
+                if (alphas[i] > 0.01 && alphas[i] < C - 0.01) {
+                    let sum = 0;
+                    for (let j = 0; j < n; j++) {
+                        sum += alphas[j] * labels[j] * K[i][j];
+                    }
+                    biasSum += labels[i] - sum;
+                    biasCount++;
+                }
+            }
+            bias = biasCount > 0 ? biasSum / biasCount : 0;
+
+            // Find support vectors
+            supportVectors = [];
+            for (let i = 0; i < n; i++) {
+                if (alphas[i] > 0.01) {
+                    supportVectors.push(i);
+                }
+            }
+
+            // Store alphas for prediction
+            weights = { alphas, labels, gamma };
+            margin = supportVectors.length > 0 ? 0.1 : 0;
+        }
+
+        function predictLinear(point, alphas, labels) {
+            let sum = 0;
+            for (let i = 0; i < points.length; i++) {
+                sum += alphas[i] * labels[i] * dotProduct(points[i], point);
+            }
+            return sum + bias;
+        }
+
+        function predictRBF(point) {
+            if (!weights || !weights.alphas) return 0;
+
+            let sum = 0;
+            for (let i = 0; i < points.length; i++) {
+                sum += weights.alphas[i] * weights.labels[i] *
+                       rbfKernel(points[i], point, weights.gamma);
+            }
+            return sum + bias;
+        }
+
+        function dotProduct(p1, p2) {
+            return p1.x * p2.x + p1.y * p2.y;
+        }
+
+        function rbfKernel(p1, p2, gamma) {
+            const dx = p1.x - p2.x;
+            const dy = p1.y - p2.y;
+            const dist2 = dx * dx + dy * dy;
+            return Math.exp(-gamma * dist2);
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw decision boundary and margin
+            if (weights !== null && points.length > 0) {
+                drawDecisionBoundary();
+            }
+
+            // Draw points
+            points.forEach((point, idx) => {
+                const x = point.x * canvas.width;
+                const y = point.y * canvas.height;
+
+                // Check if this is a support vector
+                const isSV = supportVectors.includes(idx);
+
+                ctx.beginPath();
+                ctx.arc(x, y, isSV ? 10 : 7, 0, Math.PI * 2);
+                ctx.fillStyle = point.class === 0 ? '#3b82f6' : '#ef4444';
+                ctx.fill();
+
+                // Highlight support vectors
+                if (isSV) {
+                    ctx.strokeStyle = '#fbbf24';
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                }
+
+                ctx.strokeStyle = '#1f2937';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            });
+        }
+
+        function drawDecisionBoundary() {
+            const kernel = document.getElementById('kernelSelect').value;
+            const resolution = 3;
+
+            // Draw decision regions
+            for (let x = 0; x < canvas.width; x += resolution) {
+                for (let y = 0; y < canvas.height; y += resolution) {
+                    const point = { x: x / canvas.width, y: y / canvas.height };
+
+                    let prediction;
+                    if (kernel === 'linear') {
+                        prediction = weights.x * point.x + weights.y * point.y + bias;
+                    } else {
+                        prediction = predictRBF(point);
+                    }
+
+                    const distance = Math.abs(prediction);
+
+                    // Color based on prediction
+                    if (prediction > 0) {
+                        const alpha = Math.min(0.3, distance * 0.5);
+                        ctx.fillStyle = `rgba(239, 68, 68, ${alpha})`;
+                    } else {
+                        const alpha = Math.min(0.3, distance * 0.5);
+                        ctx.fillStyle = `rgba(59, 130, 246, ${alpha})`;
+                    }
+
+                    ctx.fillRect(x, y, resolution, resolution);
+                }
+            }
+
+            // Draw decision boundary (green line where prediction = 0)
+            ctx.strokeStyle = '#10b981';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            let started = false;
+
+            for (let x = 0; x < canvas.width; x++) {
+                for (let y = 0; y < canvas.height; y++) {
+                    const point = { x: x / canvas.width, y: y / canvas.height };
+
+                    let prediction;
+                    if (kernel === 'linear') {
+                        prediction = weights.x * point.x + weights.y * point.y + bias;
+                    } else {
+                        prediction = predictRBF(point);
+                    }
+
+                    if (Math.abs(prediction) < 0.02) {
+                        if (!started) {
+                            ctx.moveTo(x, y);
+                            started = true;
+                        } else {
+                            ctx.lineTo(x, y);
+                        }
+                    }
+                }
+            }
+            ctx.stroke();
+
+            // Draw margin lines for linear SVM
+            if (kernel === 'linear' && supportVectors.length > 0) {
+                ctx.strokeStyle = '#6b7280';
+                ctx.lineWidth = 2;
+                ctx.setLineDash([5, 5]);
+
+                // Margin lines at prediction = ±1
+                for (let marginVal of [-1, 1]) {
+                    ctx.beginPath();
+                    started = false;
+
+                    for (let x = 0; x < canvas.width; x++) {
+                        for (let y = 0; y < canvas.height; y++) {
+                            const point = { x: x / canvas.width, y: y / canvas.height };
+                            const prediction = weights.x * point.x + weights.y * point.y + bias;
+
+                            if (Math.abs(prediction - marginVal) < 0.05) {
+                                if (!started) {
+                                    ctx.moveTo(x, y);
+                                    started = true;
+                                } else {
+                                    ctx.lineTo(x, y);
+                                }
+                            }
+                        }
+                    }
+                    ctx.stroke();
+                }
+
+                ctx.setLineDash([]);
+            }
+        }
+
+        function updateStats() {
+            const class0 = points.filter(p => p.class === 0).length;
+            const class1 = points.filter(p => p.class === 1).length;
+
+            document.getElementById('totalPoints').textContent = points.length;
+            document.getElementById('class0Count').textContent = class0;
+            document.getElementById('class1Count').textContent = class1;
+            document.getElementById('svCount').textContent = supportVectors.length;
+            document.getElementById('marginWidth').textContent =
+                margin > 0 ? margin.toFixed(3) : '-';
+        }
+    </script>
+</body>
+</html>
