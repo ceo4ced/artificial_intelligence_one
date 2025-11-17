@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Q-Learning Grid World - Reinforcement Learning Game</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 0; }
+.nav-header { background: #2d3748; padding: 15px 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; }
+.nav-header a { color: #90cdf4; text-decoration: none; font-weight: 600; font-size: 1.1em; }
+.nav-title { color: #fff; font-size: 1.2em; font-weight: 700; }
+.container { max-width: 1400px; margin: 20px auto; background: #fff; border-radius: 15px; padding: 30px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+h1 { text-align: center; color: #2d3748; font-size: 2.5em; margin-bottom: 10px; }
+.subtitle { text-align: center; color: #666; margin-bottom: 30px; font-size: 1.1em; }
+.game-area { display: grid; grid-template-columns: 300px 1fr; gap: 30px; }
+.sidebar { background: #f8f9fa; padding: 20px; border-radius: 10px; height: fit-content; position: sticky; top: 20px; }
+.score-display { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; padding: 20px; border-radius: 10px; text-align: center; margin-bottom: 20px; }
+.score-value { font-size: 3em; font-weight: bold; margin: 10px 0; }
+.stats { margin: 15px 0; }
+.stat-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e0e0e0; }
+button { padding: 15px 30px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 1.05em; transition: all 0.3s; }
+.btn-primary { background: #4CAF50; color: #fff; width: 100%; margin-top: 10px; }
+.btn-primary:hover { background: #45a049; transform: scale(1.02); }
+.btn-secondary { background: #2196F3; color: #fff; width: 100%; margin-top: 10px; }
+.btn-secondary:hover { background: #1976d2; }
+.btn-danger { background: #f44336; color: #fff; width: 100%; margin-top: 10px; }
+.btn-danger:hover { background: #da190b; }
+.instructions { background: #e3f2fd; padding: 15px; border-radius: 8px; margin: 15px 0; }
+.instructions h4 { color: #1976d2; margin-bottom: 10px; }
+.progress-bar { background: #e0e0e0; height: 8px; border-radius: 4px; margin: 20px 0; overflow: hidden; }
+.progress-fill { background: linear-gradient(90deg, #667eea, #764ba2); height: 100%; transition: width 0.3s; }
+.grid-container { background: #fff; padding: 20px; border-radius: 10px; text-align: center; }
+.grid { display: inline-grid; gap: 2px; background: #ddd; padding: 2px; border-radius: 8px; }
+.cell { width: 70px; height: 70px; background: #fff; border: 2px solid #ddd; display: flex; align-items: center; justify-content: center; font-size: 2em; cursor: pointer; transition: all 0.3s; position: relative; }
+.cell:hover { background: #f0f0f0; transform: scale(1.05); }
+.cell.start { background: #e3f2fd; border-color: #2196F3; }
+.cell.goal { background: #c8e6c9; border-color: #4CAF50; }
+.cell.obstacle { background: #333; cursor: not-allowed; }
+.cell.agent { background: #667eea; }
+.agent-icon { font-size: 2.5em; position: absolute; animation: bounce 0.5s; }
+@keyframes bounce { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
+.q-value { position: absolute; font-size: 0.5em; color: #666; }
+.q-up { top: 2px; left: 50%; transform: translateX(-50%); }
+.q-down { bottom: 2px; left: 50%; transform: translateX(-50%); }
+.q-left { left: 2px; top: 50%; transform: translateY(-50%); }
+.q-right { right: 2px; top: 50%; transform: translateY(-50%); }
+.toolbar { display: flex; gap: 10px; justify-content: center; margin: 20px 0; flex-wrap: wrap; }
+.tool-btn { padding: 12px 24px; background: #fff; border: 2px solid #667eea; color: #667eea; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.3s; }
+.tool-btn.active { background: #667eea; color: #fff; }
+.tool-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
+.challenge-card { background: #fff9c4; padding: 20px; border-radius: 10px; margin: 20px 0; border-left: 4px solid #fbc02d; }
+.challenge-card h3 { color: #f57c00; margin-bottom: 10px; }
+.learning-stats { background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 15px 0; }
+.learning-stats h4 { color: #2d3748; margin-bottom: 10px; }
+.episode-display { background: #667eea; color: #fff; padding: 10px 20px; border-radius: 8px; text-align: center; font-weight: bold; font-size: 1.2em; margin: 10px 0; }
+.legend { display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; margin: 20px 0; padding: 15px; background: #f8f9fa; border-radius: 8px; }
+.legend-item { display: flex; align-items: center; gap: 8px; }
+.legend-box { width: 30px; height: 30px; border-radius: 4px; border: 2px solid #ddd; }
+</style>
+</head>
+<body>
+<nav class="nav-header">
+    <div class="nav-title">🤖 Q-Learning Grid World</div>
+    <a href="../../index.html">← Back to Home</a>
+</nav>
+<div class="container">
+    <h1>🤖 Q-Learning Grid World</h1>
+    <p class="subtitle">Train an AI agent to navigate through rewards and penalties!</p>
+
+    <div class="game-area">
+        <div class="sidebar">
+            <div class="score-display">
+                <div>Total Score</div>
+                <div class="score-value" id="totalScore">0</div>
+                <div>Level: <span id="level">1</span></div>
+            </div>
+
+            <div class="episode-display" id="episodeDisplay">
+                Episode: 0 / 50
+            </div>
+
+            <div class="stats">
+                <div class="stat-row"><span>Successes:</span><span id="successes">0</span></div>
+                <div class="stat-row"><span>Avg Steps:</span><span id="avgSteps">0</span></div>
+                <div class="stat-row"><span>Best Score:</span><span id="bestScore">0</span></div>
+            </div>
+
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar" style="width: 0%"></div>
+            </div>
+
+            <button class="btn-primary" id="trainBtn" onclick="startTraining()">Start Training</button>
+            <button class="btn-secondary" onclick="showPolicy()">Show Learned Policy</button>
+            <button class="btn-secondary" onclick="nextLevel()">Next Level →</button>
+            <button class="btn-danger" onclick="resetLevel()">Reset Level</button>
+
+            <div class="instructions">
+                <h4>How to Play:</h4>
+                <p style="font-size: 0.9em; line-height: 1.6; color: #01579b;">
+                    1. Click cells to place rewards/penalties<br>
+                    2. Click "Start Training" to train agent<br>
+                    3. Watch the agent learn optimal path<br>
+                    4. Goal: Reach 🎯 with highest reward!<br><br>
+                    <strong>Green:</strong> Reward (+10)<br>
+                    <strong>Red:</strong> Penalty (-10)<br>
+                    <strong>Black:</strong> Obstacle (wall)
+                </p>
+            </div>
+        </div>
+
+        <div class="game-content" id="gameContent">
+            <!-- Content loads here -->
+        </div>
+    </div>
+</div>
+
+<script>
+const levels = [
+    {
+        title: "Level 1: Simple Path",
+        size: 5,
+        start: [0, 0],
+        goal: [4, 4],
+        obstacles: [[2, 2]],
+        description: "Learn to navigate to the goal while avoiding an obstacle."
+    },
+    {
+        title: "Level 2: The Choice",
+        size: 5,
+        start: [0, 2],
+        goal: [4, 2],
+        obstacles: [[2, 1], [2, 3]],
+        description: "Two paths available - which will the agent prefer?"
+    },
+    {
+        title: "Level 3: Risky Reward",
+        size: 6,
+        start: [0, 0],
+        goal: [5, 5],
+        obstacles: [[2, 1], [2, 2], [2, 3], [3, 3]],
+        description: "Place rewards to guide the agent around obstacles."
+    },
+    {
+        title: "Level 4: Complex Maze",
+        size: 7,
+        start: [0, 0],
+        goal: [6, 6],
+        obstacles: [[1, 2], [2, 2], [3, 2], [4, 4], [5, 4]],
+        description: "A more complex environment - careful reward placement matters!"
+    }
+];
+
+let currentLevel = 0;
+let score = 0;
+let grid = [];
+let qTable = {};
+let isTraining = false;
+let episode = 0;
+let maxEpisodes = 50;
+let successes = 0;
+let totalSteps = 0;
+let agentPosition = null;
+let selectedTool = 'reward';
+
+const ACTIONS = ['up', 'down', 'left', 'right'];
+const LEARNING_RATE = 0.1;
+const DISCOUNT_FACTOR = 0.9;
+const EPSILON = 0.1;
+
+function init() {
+    loadLevel();
+    updateStats();
+}
+
+function loadLevel() {
+    if (currentLevel >= levels.length) {
+        showGameComplete();
+        return;
+    }
+
+    const level = levels[currentLevel];
+    const content = document.getElementById('gameContent');
+
+    // Initialize grid
+    grid = Array(level.size).fill().map(() => Array(level.size).fill(0));
+
+    // Place obstacles
+    level.obstacles.forEach(([r, c]) => {
+        grid[r][c] = -999; // Obstacle marker
+    });
+
+    // Reset Q-table
+    qTable = {};
+    for (let r = 0; r < level.size; r++) {
+        for (let c = 0; c < level.size; c++) {
+            qTable[`${r},${c}`] = {up: 0, down: 0, left: 0, right: 0};
+        }
+    }
+
+    episode = 0;
+    successes = 0;
+    totalSteps = 0;
+
+    content.innerHTML = `
+        <div class="challenge-card">
+            <h3>${level.title}</h3>
+            <p style="line-height: 1.6; color: #4a5568; margin-top: 10px;">${level.description}</p>
+        </div>
+
+        <div class="toolbar">
+            <button class="tool-btn active" onclick="selectTool('reward')">✅ Reward (+10)</button>
+            <button class="tool-btn" onclick="selectTool('penalty')">❌ Penalty (-10)</button>
+            <button class="tool-btn" onclick="selectTool('obstacle')">⬛ Obstacle</button>
+            <button class="tool-btn" onclick="selectTool('clear')">🗑️ Clear</button>
+        </div>
+
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-box" style="background: #e3f2fd; border-color: #2196F3;"></div>
+                <span>🚀 Start</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-box" style="background: #c8e6c9; border-color: #4CAF50;"></div>
+                <span>🎯 Goal</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-box" style="background: #333;"></div>
+                <span>⬛ Obstacle</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-box" style="background: #c8e6c9;"></div>
+                <span>✅ Reward</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-box" style="background: #ffcdd2;"></div>
+                <span>❌ Penalty</span>
+            </div>
+        </div>
+
+        <div class="grid-container">
+            <div class="grid" id="gameGrid" style="grid-template-columns: repeat(${level.size}, 70px);"></div>
+        </div>
+
+        <div class="learning-stats" id="learningStats">
+            <h4>Training Progress:</h4>
+            <p id="statsText">Click "Start Training" to begin</p>
+        </div>
+    `;
+
+    drawGrid();
+}
+
+function drawGrid() {
+    const level = levels[currentLevel];
+    const gridEl = document.getElementById('gameGrid');
+    gridEl.innerHTML = '';
+
+    for (let r = 0; r < level.size; r++) {
+        for (let c = 0; c < level.size; c++) {
+            const cell = document.createElement('div');
+            cell.className = 'cell';
+            cell.dataset.row = r;
+            cell.dataset.col = c;
+            cell.onclick = () => handleCellClick(r, c);
+
+            // Mark special cells
+            if (r === level.start[0] && c === level.start[1]) {
+                cell.classList.add('start');
+                cell.innerHTML = '🚀';
+            } else if (r === level.goal[0] && c === level.goal[1]) {
+                cell.classList.add('goal');
+                cell.innerHTML = '🎯';
+            } else if (grid[r][c] === -999) {
+                cell.classList.add('obstacle');
+                cell.innerHTML = '⬛';
+            } else if (grid[r][c] === 10) {
+                cell.style.background = '#c8e6c9';
+                cell.innerHTML = '✅';
+            } else if (grid[r][c] === -10) {
+                cell.style.background = '#ffcdd2';
+                cell.innerHTML = '❌';
+            }
+
+            // Show agent
+            if (agentPosition && agentPosition[0] === r && agentPosition[1] === c) {
+                const agent = document.createElement('div');
+                agent.className = 'agent-icon';
+                agent.innerHTML = '🤖';
+                cell.appendChild(agent);
+            }
+
+            gridEl.appendChild(cell);
+        }
+    }
+}
+
+function selectTool(tool) {
+    selectedTool = tool;
+    document.querySelectorAll('.tool-btn').forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+}
+
+function handleCellClick(r, c) {
+    if (isTraining) return;
+
+    const level = levels[currentLevel];
+    if ((r === level.start[0] && c === level.start[1]) || (r === level.goal[0] && c === level.goal[1])) {
+        return; // Can't modify start or goal
+    }
+
+    if (selectedTool === 'reward') {
+        grid[r][c] = (grid[r][c] === 10) ? 0 : 10;
+    } else if (selectedTool === 'penalty') {
+        grid[r][c] = (grid[r][c] === -10) ? 0 : -10;
+    } else if (selectedTool === 'obstacle') {
+        grid[r][c] = (grid[r][c] === -999) ? 0 : -999;
+    } else if (selectedTool === 'clear') {
+        if (grid[r][c] !== -999 || !level.obstacles.some(([or, oc]) => or === r && oc === c)) {
+            grid[r][c] = 0;
+        }
+    }
+
+    drawGrid();
+}
+
+async function startTraining() {
+    if (isTraining) return;
+
+    isTraining = true;
+    episode = 0;
+    successes = 0;
+    totalSteps = 0;
+    document.getElementById('trainBtn').disabled = true;
+    document.getElementById('trainBtn').style.opacity = '0.5';
+
+    for (episode = 1; episode <= maxEpisodes; episode++) {
+        await runEpisode();
+        updateEpisodeDisplay();
+
+        if (episode % 10 === 0) {
+            await sleep(100); // Pause every 10 episodes to update UI
+        }
+    }
+
+    isTraining = false;
+    document.getElementById('trainBtn').disabled = false;
+    document.getElementById('trainBtn').style.opacity = '1';
+
+    const points = Math.round((successes / maxEpisodes) * 100);
+    score += points;
+
+    showResults(points);
+    updateStats();
+}
+
+async function runEpisode() {
+    const level = levels[currentLevel];
+    let state = [...level.start];
+    let steps = 0;
+    const maxSteps = level.size * level.size * 2;
+
+    while (steps < maxSteps) {
+        steps++;
+
+        // Epsilon-greedy action selection
+        let action;
+        if (Math.random() < EPSILON) {
+            action = ACTIONS[Math.floor(Math.random() * ACTIONS.length)];
+        } else {
+            const stateKey = `${state[0]},${state[1]}`;
+            const qValues = qTable[stateKey];
+            action = Object.keys(qValues).reduce((a, b) => qValues[a] > qValues[b] ? a : b);
+        }
+
+        // Take action
+        const nextState = getNextState(state, action);
+        const reward = getReward(nextState);
+
+        // Update Q-value
+        const stateKey = `${state[0]},${state[1]}`;
+        const nextStateKey = `${nextState[0]},${nextState[1]}`;
+        const currentQ = qTable[stateKey][action];
+        const maxNextQ = Math.max(...Object.values(qTable[nextStateKey]));
+
+        qTable[stateKey][action] = currentQ + LEARNING_RATE * (reward + DISCOUNT_FACTOR * maxNextQ - currentQ);
+
+        state = nextState;
+
+        // Check if reached goal
+        if (state[0] === level.goal[0] && state[1] === level.goal[1]) {
+            successes++;
+            totalSteps += steps;
+            break;
+        }
+    }
+}
+
+function getNextState(state, action) {
+    const level = levels[currentLevel];
+    let [r, c] = state;
+
+    if (action === 'up') r--;
+    else if (action === 'down') r++;
+    else if (action === 'left') c--;
+    else if (action === 'right') c++;
+
+    // Bound check
+    if (r < 0 || r >= level.size || c < 0 || c >= level.size || grid[r][c] === -999) {
+        return state; // Stay in place if invalid move
+    }
+
+    return [r, c];
+}
+
+function getReward(state) {
+    const level = levels[currentLevel];
+    const [r, c] = state;
+
+    if (r === level.goal[0] && c === level.goal[1]) {
+        return 100; // Goal reward
+    }
+
+    return grid[r][c] || -1; // Cell reward or small penalty for each step
+}
+
+function updateEpisodeDisplay() {
+    document.getElementById('episodeDisplay').textContent = `Episode: ${episode} / ${maxEpisodes}`;
+
+    const avgSteps = successes > 0 ? Math.round(totalSteps / successes) : 0;
+    document.getElementById('learningStats').innerHTML = `
+        <h4>Training Progress:</h4>
+        <p><strong>Episodes:</strong> ${episode} / ${maxEpisodes}</p>
+        <p><strong>Successful Runs:</strong> ${successes}</p>
+        <p><strong>Avg Steps to Goal:</strong> ${avgSteps}</p>
+        <p><strong>Success Rate:</strong> ${Math.round((successes / episode) * 100)}%</p>
+    `;
+}
+
+async function showPolicy() {
+    const level = levels[currentLevel];
+    agentPosition = [...level.start];
+
+    for (let step = 0; step < 50; step++) {
+        drawGrid();
+        await sleep(300);
+
+        const stateKey = `${agentPosition[0]},${agentPosition[1]}`;
+        const qValues = qTable[stateKey];
+        const bestAction = Object.keys(qValues).reduce((a, b) => qValues[a] > qValues[b] ? a : b);
+
+        agentPosition = getNextState(agentPosition, bestAction);
+
+        if (agentPosition[0] === level.goal[0] && agentPosition[1] === level.goal[1]) {
+            drawGrid();
+            break;
+        }
+    }
+
+    agentPosition = null;
+    drawGrid();
+}
+
+function showResults(points) {
+    const successRate = Math.round((successes / maxEpisodes) * 100);
+    const avgSteps = successes > 0 ? Math.round(totalSteps / successes) : 0;
+
+    let message = '';
+    if (successRate >= 90) {
+        message = '🎉 Excellent! Your agent learned an optimal policy!';
+    } else if (successRate >= 70) {
+        message = '✨ Great! The agent learned to reach the goal consistently!';
+    } else if (successRate >= 50) {
+        message = '👍 Good! The agent is learning, but could use better rewards.';
+    } else {
+        message = '💪 The agent struggled. Try adding more helpful rewards!';
+    }
+
+    alert(`${message}\n\nSuccess Rate: ${successRate}%\nAvg Steps: ${avgSteps}\nPoints: +${points}`);
+}
+
+function nextLevel() {
+    currentLevel++;
+    document.getElementById('level').textContent = currentLevel + 1;
+    agentPosition = null;
+
+    if (currentLevel >= levels.length) {
+        showGameComplete();
+    } else {
+        loadLevel();
+    }
+}
+
+function resetLevel() {
+    agentPosition = null;
+    loadLevel();
+}
+
+function showGameComplete() {
+    const content = document.getElementById('gameContent');
+
+    content.innerHTML = `
+        <div style="text-align: center; padding: 40px; background: #fff; border-radius: 10px;">
+            <h2 style="color: #4CAF50; font-size: 2.5em; margin-bottom: 20px;">🎉 All Levels Complete!</h2>
+
+            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; padding: 30px; border-radius: 15px; margin: 30px 0;">
+                <div style="font-size: 4em; font-weight: bold; margin-bottom: 10px;">${score}</div>
+                <div style="font-size: 1.5em;">Total Points</div>
+            </div>
+
+            <div style="background: #e3f2fd; padding: 25px; border-radius: 10px; margin: 20px 0; text-align: left;">
+                <h3 style="color: #1976d2; margin-bottom: 15px;">🎓 What You've Learned:</h3>
+                <ul style="line-height: 1.8; margin-left: 20px; color: #4a5568;">
+                    <li>Q-Learning: Agent learns optimal actions through trial and error</li>
+                    <li>Rewards and penalties shape behavior</li>
+                    <li>Exploration vs. Exploitation trade-off</li>
+                    <li>Convergence: Agent improves over time</li>
+                    <li>Policy: Learned strategy for action selection</li>
+                </ul>
+            </div>
+
+            <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin: 20px 0;">
+                <p style="line-height: 1.8; color: #4a5568;">
+                    <strong>Real-world applications:</strong> Reinforcement Learning powers game AI (AlphaGo),
+                    robotics, autonomous vehicles, recommendation systems, and more. It's how AI learns complex
+                    tasks without explicit programming!
+                </p>
+            </div>
+
+            <button class="btn-primary" style="max-width: 300px; margin: 20px auto;" onclick="resetGame()">Play Again</button>
+        </div>
+    `;
+}
+
+function resetGame() {
+    currentLevel = 0;
+    score = 0;
+    document.getElementById('level').textContent = '1';
+    agentPosition = null;
+    loadLevel();
+    updateStats();
+}
+
+function updateStats() {
+    document.getElementById('totalScore').textContent = score;
+    document.getElementById('successes').textContent = successes;
+
+    const avgSteps = successes > 0 ? Math.round(totalSteps / successes) : 0;
+    document.getElementById('avgSteps').textContent = avgSteps;
+
+    const bestScore = localStorage.getItem('reinforcementLearningBest') || 0;
+    if (score > bestScore) {
+        localStorage.setItem('reinforcementLearningBest', score);
+        document.getElementById('bestScore').textContent = score;
+    } else {
+        document.getElementById('bestScore').textContent = bestScore;
+    }
+}
+
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+// Initialize
+init();
+</script>
+</body>
+</html>
