@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Persona Builder - HCD Game</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 0; }
+.nav-header { background: #2d3748; padding: 15px 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; }
+.nav-header a { color: #90cdf4; text-decoration: none; font-weight: 600; font-size: 1.1em; }
+.nav-title { color: #fff; font-size: 1.2em; font-weight: 700; }
+.container { max-width: 1400px; margin: 20px auto; background: #fff; border-radius: 15px; padding: 30px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+h1 { text-align: center; color: #2d3748; font-size: 2.5em; margin-bottom: 10px; }
+.subtitle { text-align: center; color: #666; margin-bottom: 30px; font-size: 1.1em; }
+.game-area { display: grid; grid-template-columns: 300px 1fr; gap: 30px; }
+.sidebar { background: #f8f9fa; padding: 20px; border-radius: 10px; height: fit-content; position: sticky; top: 20px; }
+.score-display { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; padding: 20px; border-radius: 10px; text-align: center; margin-bottom: 20px; }
+.score-value { font-size: 3em; font-weight: bold; margin: 10px 0; }
+.stats { margin: 15px 0; }
+.stat-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e0e0e0; }
+button { padding: 15px 30px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 1.05em; transition: all 0.3s; }
+.btn-primary { background: #4CAF50; color: #fff; width: 100%; margin-top: 10px; }
+.btn-primary:hover { background: #45a049; transform: scale(1.02); }
+.btn-secondary { background: #2196F3; color: #fff; width: 100%; margin-top: 10px; }
+.btn-secondary:hover { background: #1976d2; }
+.instructions { background: #e3f2fd; padding: 15px; border-radius: 8px; margin: 15px 0; }
+.instructions h4 { color: #1976d2; margin-bottom: 10px; }
+.progress-bar { background: #e0e0e0; height: 8px; border-radius: 4px; margin: 20px 0; overflow: hidden; }
+.progress-fill { background: linear-gradient(90deg, #667eea, #764ba2); height: 100%; transition: width 0.3s; }
+.game-content { background: #fff; }
+.challenge-card { background: #f8f9fa; padding: 25px; border-radius: 10px; margin-bottom: 20px; border-left: 4px solid #667eea; }
+.challenge-card h3 { color: #2d3748; margin-bottom: 15px; }
+.interview-quote { background: #fff; padding: 15px; border-radius: 8px; margin: 10px 0; border-left: 3px solid #9c27b0; font-style: italic; color: #4a5568; line-height: 1.6; }
+.persona-card { background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%); padding: 20px; border-radius: 10px; margin: 15px 0; cursor: pointer; transition: all 0.3s; border: 3px solid transparent; }
+.persona-card:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+.persona-card.selected { border-color: #4CAF50; background: linear-gradient(135deg, #c8e6c9 0%, #e1bee7 100%); }
+.persona-card h4 { color: #667eea; margin-bottom: 10px; }
+.persona-details { font-size: 0.95em; color: #4a5568; line-height: 1.6; }
+.quote-matching { margin-top: 30px; }
+.draggable-quote { background: #fff9c4; padding: 15px; border-radius: 8px; margin: 10px 0; cursor: move; border: 2px dashed #fbc02d; transition: all 0.3s; }
+.draggable-quote:hover { transform: scale(1.02); box-shadow: 0 3px 10px rgba(0,0,0,0.15); }
+.draggable-quote.dragging { opacity: 0.5; }
+.drop-zone { background: #f0f0f0; border: 2px dashed #999; border-radius: 8px; padding: 20px; margin: 10px 0; min-height: 60px; transition: all 0.3s; }
+.drop-zone.drag-over { background: #e3f2fd; border-color: #2196F3; }
+.drop-zone .draggable-quote { border-style: solid; cursor: pointer; }
+.feedback-modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #fff; padding: 40px; border-radius: 15px; box-shadow: 0 10px 40px rgba(0,0,0,0.3); z-index: 1000; max-width: 600px; text-align: center; }
+.feedback-modal.show { display: block; animation: slideIn 0.3s; }
+.feedback-modal.correct { border: 5px solid #4CAF50; }
+.feedback-modal.incorrect { border: 5px solid #f44336; }
+.modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999; }
+.modal-overlay.show { display: block; }
+@keyframes slideIn { from { opacity: 0; transform: translate(-50%, -60%); } to { opacity: 1; transform: translate(-50%, -50%); } }
+.phase-indicator { text-align: center; background: #667eea; color: #fff; padding: 15px; border-radius: 8px; margin-bottom: 20px; font-weight: 600; }
+.input-field { width: 100%; padding: 10px; margin: 8px 0; border: 2px solid #ddd; border-radius: 6px; font-size: 1em; }
+textarea.input-field { min-height: 80px; resize: vertical; font-family: inherit; }
+.pain-point-list { margin: 15px 0; }
+.pain-point-item { background: #ffebee; padding: 10px 15px; border-radius: 6px; margin: 8px 0; border-left: 3px solid #f44336; }
+</style>
+</head>
+<body>
+<nav class="nav-header">
+    <div class="nav-title">🎭 Persona Builder</div>
+    <a href="../../index.html">← Back to Home</a>
+</nav>
+<div class="container">
+    <h1>🎭 Persona Builder</h1>
+    <p class="subtitle">Build personas from user research and match quotes!</p>
+
+    <div class="game-area">
+        <div class="sidebar">
+            <div class="score-display">
+                <div>Total Score</div>
+                <div class="score-value" id="totalScore">0</div>
+                <div>Level: <span id="level">1</span></div>
+            </div>
+
+            <div class="stats">
+                <div class="stat-row"><span>Phase:</span><span id="currentPhase">1/5</span></div>
+                <div class="stat-row"><span>Accuracy:</span><span id="accuracy">0%</span></div>
+                <div class="stat-row"><span>Best Score:</span><span id="bestScore">0</span></div>
+            </div>
+
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar" style="width: 0%"></div>
+            </div>
+
+            <button class="btn-primary" id="submitBtn" onclick="submitAnswer()">Submit Answer</button>
+            <button class="btn-secondary" onclick="skipPhase()">Skip Phase</button>
+            <button class="btn-secondary" onclick="resetGame()">New Game</button>
+
+            <div class="instructions">
+                <h4>How to Play:</h4>
+                <p style="font-size: 0.9em; line-height: 1.6; color: #01579b;">
+                    <strong>Phase 1-3:</strong> Read interviews and build personas<br>
+                    <strong>Phase 4:</strong> Match quotes to the right personas<br>
+                    <strong>Phase 5:</strong> Identify key insights<br><br>
+                    Build empathy through user research!
+                </p>
+            </div>
+        </div>
+
+        <div class="game-content">
+            <div class="phase-indicator" id="phaseIndicator">Phase 1: Reading User Interviews</div>
+            <div id="gameContent"></div>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="modalOverlay"></div>
+<div class="feedback-modal" id="feedbackModal">
+    <h2 id="feedbackTitle"></h2>
+    <p id="feedbackText" style="margin: 20px 0; line-height: 1.6;"></p>
+    <button class="btn-primary" onclick="closeModal()">Continue</button>
+</div>
+
+<script>
+const gameData = {
+    scenarios: [
+        {
+            title: "Food Delivery App Research",
+            interviews: [
+                {
+                    name: "Sarah",
+                    age: 28,
+                    occupation: "Marketing Manager",
+                    quotes: [
+                        "I order food at least 3 times a week because I work late hours.",
+                        "I hate when apps have too many steps - I just want to order quickly.",
+                        "Price isn't my main concern, I just want quality food delivered fast.",
+                        "I usually order from the same 3-4 restaurants because I know they're reliable."
+                    ],
+                    painPoints: ["Complex checkout process", "Unreliable delivery times"],
+                    goals: ["Quick ordering", "Reliable service"],
+                    behaviors: ["Orders frequently", "Values speed over price"]
+                },
+                {
+                    name: "Mike",
+                    age: 22,
+                    occupation: "College Student",
+                    quotes: [
+                        "I'm always looking for deals and coupons before ordering.",
+                        "I split orders with my roommates to save on delivery fees.",
+                        "Sometimes I wait an hour for food but that's okay if it's cheap.",
+                        "I try different restaurants based on what's on sale each week."
+                    ],
+                    painPoints: ["High delivery fees", "Can't easily split bills"],
+                    goals: ["Save money", "Share costs with friends"],
+                    behaviors: ["Price-conscious", "Orders less frequently", "Waits for deals"]
+                },
+                {
+                    name: "Lisa",
+                    age: 45,
+                    occupation: "Teacher",
+                    quotes: [
+                        "I order family dinners on weekends when I don't want to cook.",
+                        "I need to feed 4 people so portion size and value matter a lot.",
+                        "I'm not very tech-savvy, so simple apps are better for me.",
+                        "I always read reviews carefully before trying a new restaurant."
+                    ],
+                    painPoints: ["Small portion sizes", "Complex interfaces", "Lack of family meal options"],
+                    goals: ["Feed whole family", "Easy-to-use app"],
+                    behaviors: ["Orders for multiple people", "Reads reviews", "Prefers simple interfaces"]
+                }
+            ],
+            matchingQuotes: [
+                { text: "I need a family meal deal for 4 people", correctPersona: 2 },
+                { text: "Do you have any 20% off promo codes right now?", correctPersona: 1 },
+                { text: "Can I reorder from my favorites list with one click?", correctPersona: 0 },
+                { text: "This checkout has too many screens, I'm giving up", correctPersona: 0 },
+                { text: "Is there a student discount available?", correctPersona: 1 },
+                { text: "The interface is too complicated for me", correctPersona: 2 }
+            ]
+        }
+    ]
+};
+
+let currentScenario = 0;
+let currentPhase = 0;
+let score = 0;
+let totalCorrect = 0;
+let totalAttempts = 0;
+let selectedPersona = null;
+let quoteMatches = {};
+
+function init() {
+    loadScenario();
+}
+
+function loadScenario() {
+    currentPhase = 0;
+    selectedPersona = null;
+    quoteMatches = {};
+    loadPhase();
+}
+
+function loadPhase() {
+    const scenario = gameData.scenarios[currentScenario];
+    const content = document.getElementById('gameContent');
+    const phaseIndicator = document.getElementById('phaseIndicator');
+
+    updateProgress();
+
+    // Phase 0-2: Show interviews one by one
+    if (currentPhase < 3) {
+        const interview = scenario.interviews[currentPhase];
+        phaseIndicator.textContent = `Phase ${currentPhase + 1}: Interview with ${interview.name}`;
+
+        content.innerHTML = `
+            <div class="challenge-card">
+                <h3>📋 User Interview: ${interview.name}, ${interview.age}, ${interview.occupation}</h3>
+                <p style="margin-bottom: 15px; color: #666;">Read the interview below and identify key insights:</p>
+                ${interview.quotes.map(q => `<div class="interview-quote">"${q}"</div>`).join('')}
+
+                <div style="margin-top: 25px; background: #fff; padding: 20px; border-radius: 8px;">
+                    <h4 style="color: #667eea; margin-bottom: 15px;">What are ${interview.name}'s main pain points? (Identify 2-3)</h4>
+                    <textarea class="input-field" id="painPointsInput" placeholder="Example: Slow delivery times, expensive fees, confusing interface..."></textarea>
+
+                    <h4 style="color: #667eea; margin: 15px 0;">What are ${interview.name}'s primary goals?</h4>
+                    <textarea class="input-field" id="goalsInput" placeholder="Example: Save money, order quickly, feed family..."></textarea>
+
+                    <h4 style="color: #667eea; margin: 15px 0;">Describe ${interview.name}'s behavior patterns:</h4>
+                    <textarea class="input-field" id="behaviorsInput" placeholder="Example: Orders frequently, price-conscious, reads reviews..."></textarea>
+                </div>
+            </div>
+        `;
+
+        document.getElementById('submitBtn').textContent = 'Submit Analysis';
+    }
+    // Phase 3: Show all personas and ask to match quotes
+    else if (currentPhase === 3) {
+        phaseIndicator.textContent = 'Phase 4: Match Quotes to Personas';
+
+        const personasHTML = scenario.interviews.map((p, i) => `
+            <div class="persona-card" style="margin: 15px 0;">
+                <h4>${p.name}, ${p.age} - ${p.occupation}</h4>
+                <div class="persona-details">
+                    <strong>Pain Points:</strong> ${p.painPoints.join(', ')}<br>
+                    <strong>Goals:</strong> ${p.goals.join(', ')}<br>
+                    <strong>Behaviors:</strong> ${p.behaviors.join(', ')}
+                </div>
+                <div class="drop-zone" id="dropZone${i}" data-persona="${i}">
+                    <p style="color: #999; text-align: center;">Drop quotes here for ${p.name}</p>
+                </div>
+            </div>
+        `).join('');
+
+        const quotesHTML = scenario.matchingQuotes.map((q, i) => `
+            <div class="draggable-quote" draggable="true" id="quote${i}" data-quote="${i}">
+                "${q.text}"
+            </div>
+        `).join('');
+
+        content.innerHTML = `
+            <div class="challenge-card">
+                <h3>🎯 Match These Quotes to the Correct Persona</h3>
+                <p style="margin-bottom: 20px; color: #666;">Drag each quote to the persona who would most likely say it:</p>
+
+                <div style="background: #fff9c4; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                    <h4 style="color: #f57c00; margin-bottom: 10px;">Quotes to Match:</h4>
+                    ${quotesHTML}
+                </div>
+
+                <h4 style="margin: 20px 0;">Personas:</h4>
+                ${personasHTML}
+            </div>
+        `;
+
+        setupDragAndDrop();
+        document.getElementById('submitBtn').textContent = 'Check Matches';
+    }
+    // Phase 4: Final insights
+    else {
+        phaseIndicator.textContent = 'Phase 5: Key Insights';
+
+        content.innerHTML = `
+            <div class="challenge-card">
+                <h3>🎯 Final Challenge: Identify Design Opportunities</h3>
+                <p style="margin-bottom: 20px; color: #666;">Based on all three personas, what are the biggest design opportunities?</p>
+
+                <h4 style="color: #667eea; margin: 15px 0;">What problem should the design prioritize?</h4>
+                <textarea class="input-field" id="priorityInput" placeholder="Which pain point affects multiple users and has the biggest impact?"></textarea>
+
+                <h4 style="color: #667eea; margin: 15px 0;">Write a "How Might We" question:</h4>
+                <input type="text" class="input-field" id="hmwInput" placeholder="How might we...">
+
+                <div style="background: #e8f5e9; padding: 15px; border-radius: 8px; margin-top: 20px;">
+                    <h4 style="color: #2e7d32;">💡 Tip:</h4>
+                    <p style="color: #4a5568; line-height: 1.6;">Think about patterns across all three users. What would benefit Sarah, Mike, AND Lisa?</p>
+                </div>
+            </div>
+        `;
+
+        document.getElementById('submitBtn').textContent = 'Complete Game';
+    }
+}
+
+function setupDragAndDrop() {
+    const quotes = document.querySelectorAll('.draggable-quote');
+    const dropZones = document.querySelectorAll('.drop-zone');
+
+    quotes.forEach(quote => {
+        quote.addEventListener('dragstart', e => {
+            e.dataTransfer.setData('text/plain', e.target.id);
+            e.target.classList.add('dragging');
+        });
+
+        quote.addEventListener('dragend', e => {
+            e.target.classList.remove('dragging');
+        });
+
+        quote.addEventListener('click', e => {
+            // Allow clicking to remove from drop zone
+            if (e.target.parentElement.classList.contains('drop-zone')) {
+                document.querySelector('[style*="padding: 15px"]').appendChild(e.target);
+            }
+        });
+    });
+
+    dropZones.forEach(zone => {
+        zone.addEventListener('dragover', e => {
+            e.preventDefault();
+            zone.classList.add('drag-over');
+        });
+
+        zone.addEventListener('dragleave', () => {
+            zone.classList.remove('drag-over');
+        });
+
+        zone.addEventListener('drop', e => {
+            e.preventDefault();
+            zone.classList.remove('drag-over');
+            const quoteId = e.dataTransfer.getData('text/plain');
+            const quote = document.getElementById(quoteId);
+
+            // Remove placeholder text if present
+            const placeholder = zone.querySelector('p');
+            if (placeholder) placeholder.remove();
+
+            zone.appendChild(quote);
+        });
+    });
+}
+
+function submitAnswer() {
+    const scenario = gameData.scenarios[currentScenario];
+
+    if (currentPhase < 3) {
+        // Check interview analysis
+        const painPoints = document.getElementById('painPointsInput').value.trim();
+        const goals = document.getElementById('goalsInput').value.trim();
+        const behaviors = document.getElementById('behaviorsInput').value.trim();
+
+        if (!painPoints || !goals || !behaviors) {
+            showFeedback(false, 'Please fill in all fields before submitting!', 'Incomplete Analysis');
+            return;
+        }
+
+        // Award points for completing the analysis
+        const points = 20;
+        score += points;
+        totalCorrect++;
+        totalAttempts++;
+
+        showFeedback(true,
+            `Great analysis! You've identified key insights about ${scenario.interviews[currentPhase].name}. ` +
+            `Understanding these patterns is crucial for building accurate personas. +${points} points!`,
+            'Good Work!'
+        );
+
+        setTimeout(() => {
+            currentPhase++;
+            loadPhase();
+        }, 2000);
+    }
+    else if (currentPhase === 3) {
+        // Check quote matching
+        let correct = 0;
+        const dropZones = document.querySelectorAll('.drop-zone');
+
+        dropZones.forEach((zone, personaIndex) => {
+            const quotesInZone = zone.querySelectorAll('.draggable-quote');
+            quotesInZone.forEach(quoteEl => {
+                const quoteIndex = parseInt(quoteEl.getAttribute('data-quote'));
+                const correctPersona = scenario.matchingQuotes[quoteIndex].correctPersona;
+
+                if (personaIndex === correctPersona) {
+                    correct++;
+                    quoteEl.style.borderColor = '#4CAF50';
+                    quoteEl.style.background = '#c8e6c9';
+                } else {
+                    quoteEl.style.borderColor = '#f44336';
+                    quoteEl.style.background = '#ffcdd2';
+                }
+            });
+        });
+
+        const total = scenario.matchingQuotes.length;
+        const percentage = Math.round((correct / total) * 100);
+        const points = correct * 15;
+        score += points;
+        totalCorrect += correct;
+        totalAttempts += total;
+
+        showFeedback(
+            percentage >= 70,
+            `You matched ${correct} out of ${total} quotes correctly (${percentage}%)! ` +
+            (percentage >= 70 ?
+                `Excellent empathy skills! You understand these personas well. +${points} points!` :
+                `Keep practicing! Try to match behaviors and pain points to the quotes. +${points} points.`
+            ),
+            percentage >= 70 ? 'Great Job!' : 'Keep Learning!'
+        );
+
+        setTimeout(() => {
+            currentPhase++;
+            loadPhase();
+        }, 3000);
+    }
+    else {
+        // Final phase
+        const priority = document.getElementById('priorityInput').value.trim();
+        const hmw = document.getElementById('hmwInput').value.trim();
+
+        if (!priority || !hmw) {
+            showFeedback(false, 'Please complete both fields!', 'Incomplete');
+            return;
+        }
+
+        const points = 30;
+        score += points;
+
+        showFeedback(true,
+            `Excellent work completing the Persona Builder! You've developed strong empathy skills and learned ` +
+            `how to synthesize user research into actionable insights. Your "How Might We" question will guide ` +
+            `the ideation phase. Final Score: ${score} points!`,
+            '🎉 Game Complete!'
+        );
+
+        setTimeout(() => {
+            resetGame();
+        }, 4000);
+    }
+
+    updateStats();
+}
+
+function skipPhase() {
+    if (confirm('Skip this phase? You won\'t earn points.')) {
+        currentPhase++;
+        if (currentPhase >= 5) {
+            resetGame();
+        } else {
+            loadPhase();
+        }
+    }
+}
+
+function resetGame() {
+    score = 0;
+    totalCorrect = 0;
+    totalAttempts = 0;
+    currentPhase = 0;
+    loadScenario();
+    updateStats();
+}
+
+function updateProgress() {
+    const progress = (currentPhase / 5) * 100;
+    document.getElementById('progressBar').style.width = progress + '%';
+    document.getElementById('currentPhase').textContent = `${currentPhase + 1}/5`;
+}
+
+function updateStats() {
+    document.getElementById('totalScore').textContent = score;
+    const accuracy = totalAttempts > 0 ? Math.round((totalCorrect / totalAttempts) * 100) : 0;
+    document.getElementById('accuracy').textContent = accuracy + '%';
+
+    const bestScore = localStorage.getItem('personaBuilderBest') || 0;
+    if (score > bestScore) {
+        localStorage.setItem('personaBuilderBest', score);
+        document.getElementById('bestScore').textContent = score;
+    } else {
+        document.getElementById('bestScore').textContent = bestScore;
+    }
+}
+
+function showFeedback(isCorrect, message, title) {
+    const modal = document.getElementById('feedbackModal');
+    const overlay = document.getElementById('modalOverlay');
+
+    modal.className = 'feedback-modal show ' + (isCorrect ? 'correct' : 'incorrect');
+    overlay.className = 'modal-overlay show';
+
+    document.getElementById('feedbackTitle').textContent = title;
+    document.getElementById('feedbackText').textContent = message;
+}
+
+function closeModal() {
+    document.getElementById('feedbackModal').classList.remove('show');
+    document.getElementById('modalOverlay').classList.remove('show');
+}
+
+// Initialize game
+init();
+updateStats();
+</script>
+</body>
+</html>

@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Solution Sprint - HCD Game</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 0; }
+.nav-header { background: #2d3748; padding: 15px 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; }
+.nav-header a { color: #90cdf4; text-decoration: none; font-weight: 600; font-size: 1.1em; }
+.nav-title { color: #fff; font-size: 1.2em; font-weight: 700; }
+.container { max-width: 1400px; margin: 20px auto; background: #fff; border-radius: 15px; padding: 30px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+h1 { text-align: center; color: #2d3748; font-size: 2.5em; margin-bottom: 10px; }
+.subtitle { text-align: center; color: #666; margin-bottom: 30px; font-size: 1.1em; }
+.game-area { display: grid; grid-template-columns: 300px 1fr; gap: 30px; }
+.sidebar { background: #f8f9fa; padding: 20px; border-radius: 10px; height: fit-content; position: sticky; top: 20px; }
+.score-display { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; padding: 20px; border-radius: 10px; text-align: center; margin-bottom: 20px; }
+.score-value { font-size: 3em; font-weight: bold; margin: 10px 0; }
+.timer-display { background: #f44336; color: #fff; padding: 15px; border-radius: 10px; text-align: center; margin-bottom: 20px; font-size: 2em; font-weight: bold; }
+.timer-display.warning { animation: pulse 1s infinite; }
+@keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+.stats { margin: 15px 0; }
+.stat-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e0e0e0; }
+button { padding: 15px 30px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 1.05em; transition: all 0.3s; }
+.btn-primary { background: #4CAF50; color: #fff; width: 100%; margin-top: 10px; }
+.btn-primary:hover { background: #45a049; transform: scale(1.02); }
+.btn-primary:disabled { background: #ccc; cursor: not-allowed; transform: none; }
+.btn-secondary { background: #2196F3; color: #fff; width: 100%; margin-top: 10px; }
+.btn-secondary:hover { background: #1976d2; }
+.instructions { background: #e3f2fd; padding: 15px; border-radius: 8px; margin: 15px 0; }
+.instructions h4 { color: #1976d2; margin-bottom: 10px; }
+.progress-bar { background: #e0e0e0; height: 8px; border-radius: 4px; margin: 20px 0; overflow: hidden; }
+.progress-fill { background: linear-gradient(90deg, #667eea, #764ba2); height: 100%; transition: width 0.3s; }
+.challenge-card { background: linear-gradient(135deg, #fff9c4 0%, #ffecb3 100%); padding: 25px; border-radius: 10px; margin-bottom: 20px; border-left: 4px solid #fbc02d; }
+.challenge-card h3 { color: #f57c00; margin-bottom: 15px; }
+.persona-info { background: #e3f2fd; padding: 15px; border-radius: 8px; margin: 15px 0; border-left: 3px solid #2196F3; }
+.persona-info h4 { color: #1976d2; margin-bottom: 10px; }
+.canvas-container { background: #fff; border: 3px dashed #ddd; border-radius: 10px; padding: 20px; margin: 20px 0; min-height: 400px; text-align: center; }
+canvas { border: 2px solid #ddd; border-radius: 8px; cursor: crosshair; max-width: 100%; }
+.drawing-tools { display: flex; gap: 10px; justify-content: center; margin-bottom: 15px; flex-wrap: wrap; }
+.tool-btn { padding: 10px 20px; border: 2px solid #667eea; background: #fff; color: #667eea; border-radius: 6px; cursor: pointer; font-weight: 600; }
+.tool-btn.active { background: #667eea; color: #fff; }
+.idea-input { width: 100%; min-height: 120px; padding: 15px; border: 2px solid #ddd; border-radius: 8px; font-size: 1em; font-family: inherit; resize: vertical; margin: 10px 0; }
+.criteria-checklist { background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; }
+.criteria-item { padding: 12px; margin: 8px 0; background: #fff; border-radius: 6px; border-left: 3px solid #999; display: flex; align-items: center; gap: 10px; }
+.criteria-item input[type="checkbox"] { width: 20px; height: 20px; cursor: pointer; }
+.criteria-item.checked { border-left-color: #4CAF50; background: #e8f5e9; }
+.feedback-box { background: #fff; padding: 20px; border-radius: 8px; margin: 20px 0; border: 3px solid #ddd; }
+.feedback-box h4 { color: #667eea; margin-bottom: 15px; }
+.score-breakdown { background: #f8f9fa; padding: 15px; border-radius: 6px; margin: 10px 0; }
+.score-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e0e0e0; }
+.badge { display: inline-block; padding: 5px 12px; border-radius: 20px; font-size: 0.85em; font-weight: 600; margin: 5px; }
+.badge.excellent { background: #4CAF50; color: #fff; }
+.badge.good { background: #2196F3; color: #fff; }
+.badge.fair { background: #ff9800; color: #fff; }
+</style>
+</head>
+<body>
+<nav class="nav-header">
+    <div class="nav-title">🚀 Solution Sprint</div>
+    <a href="../../index.html">← Back to Home</a>
+</nav>
+<div class="container">
+    <h1>🚀 Solution Sprint</h1>
+    <p class="subtitle">Design user-centered solutions under time pressure!</p>
+
+    <div class="game-area">
+        <div class="sidebar">
+            <div class="score-display">
+                <div>Total Score</div>
+                <div class="score-value" id="totalScore">0</div>
+                <div>Sprint: <span id="sprintNumber">1</span>/5</div>
+            </div>
+
+            <div class="timer-display" id="timerDisplay">5:00</div>
+
+            <div class="stats">
+                <div class="stat-row"><span>Ideas:</span><span id="ideaCount">0</span></div>
+                <div class="stat-row"><span>Quality:</span><span id="qualityScore">0%</span></div>
+                <div class="stat-row"><span>Best Sprint:</span><span id="bestSprint">0</span></div>
+            </div>
+
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar" style="width: 0%"></div>
+            </div>
+
+            <button class="btn-primary" id="startBtn" onclick="startSprint()">Start Sprint</button>
+            <button class="btn-primary" id="submitBtn" onclick="submitSolution()" style="display: none;" disabled>Submit Solution</button>
+            <button class="btn-secondary" onclick="skipSprint()">Skip Sprint</button>
+            <button class="btn-secondary" onclick="resetGame()">New Game</button>
+
+            <div class="instructions">
+                <h4>How to Play:</h4>
+                <p style="font-size: 0.9em; line-height: 1.6; color: #01579b;">
+                    1. Read the user problem<br>
+                    2. Sketch or describe your solution<br>
+                    3. Check usability criteria<br>
+                    4. Submit before time runs out!<br><br>
+                    <strong>Tip:</strong> Focus on user needs, not tech features!
+                </p>
+            </div>
+        </div>
+
+        <div class="game-content" id="gameContent">
+            <div class="challenge-card">
+                <h3>🎯 Welcome to Solution Sprint!</h3>
+                <p style="line-height: 1.8; color: #4a5568;">
+                    You'll face 5 design challenges. For each challenge, you have 5 minutes to:
+                </p>
+                <ul style="margin: 15px 0 15px 30px; line-height: 1.8; color: #4a5568;">
+                    <li>Understand the user's problem</li>
+                    <li>Brainstorm and design a solution</li>
+                    <li>Sketch your idea (or describe it)</li>
+                    <li>Check it against usability criteria</li>
+                </ul>
+                <p style="line-height: 1.8; color: #4a5568; margin-top: 15px;">
+                    You'll earn points based on how well your solution addresses user needs, creativity, and feasibility.
+                    Ready to start your first sprint?
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const challenges = [
+    {
+        title: "College Student Meal Planning",
+        persona: {
+            name: "Alex, 20, College Student",
+            problem: "Struggles to eat healthy on a tight budget and limited cooking skills",
+            painPoints: ["No time to cook", "Limited budget ($50/week)", "Doesn't know healthy recipes", "Buys too much food that goes bad"],
+            goals: ["Eat healthier", "Stay within budget", "Reduce food waste", "Learn simple cooking"]
+        },
+        criteria: [
+            "Addresses budget constraints",
+            "Helps with meal planning/shopping",
+            "Includes simple, quick recipes",
+            "Reduces food waste",
+            "Easy for beginners to use"
+        ]
+    },
+    {
+        title: "Remote Worker Productivity",
+        persona: {
+            name: "Maya, 32, Remote Software Developer",
+            problem: "Struggles to separate work and personal life while working from home",
+            painPoints: ["Works too many hours", "Feels guilty taking breaks", "Home distractions", "Zoom fatigue", "Doesn't move enough"],
+            goals: ["Set better boundaries", "Take regular breaks", "Stay focused during work hours", "Maintain work-life balance"]
+        },
+        criteria: [
+            "Encourages healthy breaks",
+            "Helps with focus/productivity",
+            "Addresses work-life boundaries",
+            "Reduces screen time fatigue",
+            "Easy to integrate into daily routine"
+        ]
+    },
+    {
+        title: "Elderly Technology Access",
+        persona: {
+            name: "Robert, 68, Retired Teacher",
+            problem: "Wants to video call grandchildren but finds smartphones confusing",
+            painPoints: ["Small text and buttons", "Too many features", "Afraid of breaking things", "Forgets passwords", "Feels frustrated and embarrassed"],
+            goals: ["Connect with family easily", "Feel confident using technology", "Not feel overwhelmed", "Get help when stuck"]
+        },
+        criteria: [
+            "Simple, large interface",
+            "Minimal steps to complete tasks",
+            "Clear error prevention/recovery",
+            "Built-in help/tutorials",
+            "Addresses accessibility needs"
+        ]
+    },
+    {
+        title: "Urban Commuter Transportation",
+        persona: {
+            name: "Jasmine, 26, Marketing Coordinator",
+            problem: "Commute takes 90 minutes each way, involving bus, train, and walking",
+            painPoints: ["Multiple tickets/apps", "Unreliable arrival times", "Safety concerns at night", "Wasted commute time", "Expensive ($200/month)"],
+            goals: ["Reduce commute time/cost", "Feel safe traveling", "Make commute productive", "Simplify payment/planning"]
+        },
+        criteria: [
+            "Addresses multi-modal transit",
+            "Helps with timing/planning",
+            "Improves safety/security",
+            "Makes commute more valuable",
+            "Simplifies payment/ticketing"
+        ]
+    },
+    {
+        title: "Small Business Inventory Management",
+        persona: {
+            name: "Carlos, 45, Coffee Shop Owner",
+            problem: "Wastes money on inventory - orders too much of some items, runs out of others",
+            painPoints: ["Manual tracking is time-consuming", "Can't predict demand", "Loses money on spoiled goods", "Runs out during rush hours", "Too busy to learn complex software"],
+            goals: ["Reduce waste", "Never run out of popular items", "Save time on inventory", "Increase profits", "Simple system that works"]
+        },
+        criteria: [
+            "Predicts inventory needs",
+            "Easy to use without training",
+            "Reduces waste/spoilage",
+            "Alerts for low stock",
+            "Affordable for small business"
+        ]
+    }
+];
+
+let currentChallenge = 0;
+let score = 0;
+let timerInterval = null;
+let timeRemaining = 300; // 5 minutes
+let sprintStarted = false;
+let canvas, ctx;
+let isDrawing = false;
+let drawColor = '#000000';
+let drawWidth = 2;
+
+function startSprint() {
+    if (currentChallenge >= challenges.length) {
+        showGameComplete();
+        return;
+    }
+
+    sprintStarted = true;
+    timeRemaining = 300;
+    document.getElementById('startBtn').style.display = 'none';
+    document.getElementById('submitBtn').style.display = 'block';
+    document.getElementById('submitBtn').disabled = false;
+
+    loadChallenge();
+    startTimer();
+}
+
+function loadChallenge() {
+    const challenge = challenges[currentChallenge];
+    const content = document.getElementById('gameContent');
+
+    content.innerHTML = `
+        <div class="challenge-card">
+            <h3>🎯 Sprint ${currentChallenge + 1}: ${challenge.title}</h3>
+            <div class="persona-info">
+                <h4>👤 User: ${challenge.persona.name}</h4>
+                <p style="margin: 10px 0; line-height: 1.6;"><strong>Problem:</strong> ${challenge.persona.problem}</p>
+                <p style="margin: 10px 0;"><strong>Pain Points:</strong></p>
+                <ul style="margin-left: 20px; line-height: 1.6;">
+                    ${challenge.persona.painPoints.map(p => `<li>${p}</li>`).join('')}
+                </ul>
+                <p style="margin: 10px 0;"><strong>Goals:</strong></p>
+                <ul style="margin-left: 20px; line-height: 1.6;">
+                    ${challenge.persona.goals.map(g => `<li>${g}</li>`).join('')}
+                </ul>
+            </div>
+        </div>
+
+        <div style="background: #fff; padding: 25px; border-radius: 10px; margin: 20px 0;">
+            <h3 style="color: #2d3748; margin-bottom: 15px;">💡 Your Solution</h3>
+
+            <h4 style="color: #667eea; margin: 15px 0;">Describe your solution:</h4>
+            <textarea class="idea-input" id="solutionText" placeholder="What would you build to solve this problem? Describe your solution in detail - what is it, how does it work, and why it helps the user..."></textarea>
+
+            <h4 style="color: #667eea; margin: 15px 0;">Sketch your idea (optional but recommended!):</h4>
+            <div class="canvas-container">
+                <div class="drawing-tools">
+                    <button class="tool-btn active" onclick="setTool('pen')">✏️ Pen</button>
+                    <button class="tool-btn" onclick="setTool('eraser')">🗑️ Eraser</button>
+                    <button class="tool-btn" onclick="clearCanvas()">Clear</button>
+                    <select onchange="setColor(this.value)" style="padding: 10px; border: 2px solid #667eea; border-radius: 6px;">
+                        <option value="#000000">Black</option>
+                        <option value="#667eea">Blue</option>
+                        <option value="#f44336">Red</option>
+                        <option value="#4CAF50">Green</option>
+                    </select>
+                </div>
+                <canvas id="drawingCanvas" width="700" height="400"></canvas>
+            </div>
+        </div>
+
+        <div class="criteria-checklist">
+            <h4 style="color: #2d3748; margin-bottom: 15px;">✅ Check Your Solution Against These Criteria:</h4>
+            ${challenge.criteria.map((c, i) => `
+                <label class="criteria-item" id="criteria${i}">
+                    <input type="checkbox" onchange="updateCriteriaCheck(${i})">
+                    <span>${c}</span>
+                </label>
+            `).join('')}
+        </div>
+    `;
+
+    setupCanvas();
+    updateProgress();
+}
+
+function setupCanvas() {
+    canvas = document.getElementById('drawingCanvas');
+    ctx = canvas.getContext('2d');
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+
+    canvas.addEventListener('mousedown', startDrawing);
+    canvas.addEventListener('mousemove', draw);
+    canvas.addEventListener('mouseup', stopDrawing);
+    canvas.addEventListener('mouseout', stopDrawing);
+
+    // Touch support
+    canvas.addEventListener('touchstart', handleTouch);
+    canvas.addEventListener('touchmove', handleTouch);
+    canvas.addEventListener('touchend', stopDrawing);
+}
+
+function startDrawing(e) {
+    isDrawing = true;
+    const rect = canvas.getBoundingClientRect();
+    ctx.beginPath();
+    ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+}
+
+function draw(e) {
+    if (!isDrawing) return;
+    const rect = canvas.getBoundingClientRect();
+    ctx.strokeStyle = drawColor;
+    ctx.lineWidth = drawWidth;
+    ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+    ctx.stroke();
+}
+
+function stopDrawing() {
+    isDrawing = false;
+}
+
+function handleTouch(e) {
+    e.preventDefault();
+    const touch = e.touches[0];
+    const mouseEvent = new MouseEvent(e.type === 'touchstart' ? 'mousedown' : 'mousemove', {
+        clientX: touch.clientX,
+        clientY: touch.clientY
+    });
+    canvas.dispatchEvent(mouseEvent);
+}
+
+function setTool(tool) {
+    document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+    event.target.classList.add('active');
+
+    if (tool === 'eraser') {
+        drawColor = '#ffffff';
+        drawWidth = 20;
+    } else {
+        drawColor = document.querySelector('select').value;
+        drawWidth = 2;
+    }
+}
+
+function setColor(color) {
+    drawColor = color;
+}
+
+function clearCanvas() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+}
+
+function updateCriteriaCheck(index) {
+    const item = document.getElementById('criteria' + index);
+    const checkbox = item.querySelector('input');
+    if (checkbox.checked) {
+        item.classList.add('checked');
+    } else {
+        item.classList.remove('checked');
+    }
+}
+
+function startTimer() {
+    timerInterval = setInterval(() => {
+        timeRemaining--;
+        updateTimerDisplay();
+
+        if (timeRemaining <= 0) {
+            clearInterval(timerInterval);
+            submitSolution();
+        }
+    }, 1000);
+}
+
+function updateTimerDisplay() {
+    const minutes = Math.floor(timeRemaining / 60);
+    const seconds = timeRemaining % 60;
+    const display = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    const timerEl = document.getElementById('timerDisplay');
+    timerEl.textContent = display;
+
+    if (timeRemaining <= 30) {
+        timerEl.classList.add('warning');
+    }
+}
+
+function submitSolution() {
+    clearInterval(timerInterval);
+    document.getElementById('submitBtn').disabled = true;
+
+    const solutionText = document.getElementById('solutionText').value.trim();
+    const checkedCriteria = document.querySelectorAll('.criteria-item input:checked').length;
+    const totalCriteria = challenges[currentChallenge].criteria.length;
+
+    // Score calculation
+    let points = 0;
+    let feedback = [];
+
+    // Text description (0-40 points)
+    if (solutionText.length > 100) {
+        points += 40;
+        feedback.push("Detailed solution description (+40)");
+    } else if (solutionText.length > 50) {
+        points += 25;
+        feedback.push("Good solution description (+25)");
+    } else if (solutionText.length > 0) {
+        points += 10;
+        feedback.push("Basic solution description (+10)");
+    }
+
+    // Criteria checklist (0-40 points)
+    const criteriaScore = Math.round((checkedCriteria / totalCriteria) * 40);
+    points += criteriaScore;
+    feedback.push(`Addressed ${checkedCriteria}/${totalCriteria} criteria (+${criteriaScore})`);
+
+    // Time bonus (0-20 points)
+    if (timeRemaining > 180) {
+        points += 20;
+        feedback.push("Fast completion bonus (+20)");
+    } else if (timeRemaining > 60) {
+        points += 10;
+        feedback.push("Time bonus (+10)");
+    }
+
+    score += points;
+    updateStats();
+
+    showSprintFeedback(points, feedback, checkedCriteria, totalCriteria);
+}
+
+function showSprintFeedback(points, feedback, checked, total) {
+    const content = document.getElementById('gameContent');
+    const percentage = Math.round((checked / total) * 100);
+
+    let badge = '';
+    if (percentage >= 80) badge = '<span class="badge excellent">Excellent</span>';
+    else if (percentage >= 60) badge = '<span class="badge good">Good</span>';
+    else badge = '<span class="badge fair">Keep Practicing</span>';
+
+    content.innerHTML = `
+        <div class="feedback-box">
+            <h4>🎯 Sprint ${currentChallenge + 1} Complete! ${badge}</h4>
+
+            <div class="score-breakdown">
+                <h4 style="color: #667eea; margin-bottom: 10px;">Score Breakdown:</h4>
+                ${feedback.map(f => `<div class="score-item"><span>${f}</span></div>`).join('')}
+                <div class="score-item" style="font-weight: bold; font-size: 1.2em; border-top: 2px solid #667eea; padding-top: 10px;">
+                    <span>Total Sprint Score:</span><span>${points} points</span>
+                </div>
+            </div>
+
+            <div style="margin-top: 20px; padding: 15px; background: ${percentage >= 60 ? '#e8f5e9' : '#fff3e0'}; border-radius: 8px;">
+                <p style="line-height: 1.6; color: #4a5568;">
+                    ${percentage >= 80 ?
+                        "Outstanding work! Your solution thoroughly addresses the user's needs. You showed strong empathy and creativity." :
+                        percentage >= 60 ?
+                        "Good effort! Your solution addresses key user needs. Consider how you could address more of the user's pain points." :
+                        "Keep learning! In HCD, make sure your solution directly addresses the user's specific pain points and goals, not just features."
+                    }
+                </p>
+            </div>
+
+            <button class="btn-primary" onclick="nextSprint()" style="margin-top: 20px;">
+                ${currentChallenge + 1 < challenges.length ? 'Next Sprint →' : 'See Final Score →'}
+            </button>
+        </div>
+    `;
+}
+
+function nextSprint() {
+    currentChallenge++;
+    document.getElementById('sprintNumber').textContent = currentChallenge + 1;
+
+    if (currentChallenge >= challenges.length) {
+        showGameComplete();
+    } else {
+        sprintStarted = false;
+        document.getElementById('startBtn').style.display = 'block';
+        document.getElementById('submitBtn').style.display = 'none';
+        document.getElementById('timerDisplay').textContent = '5:00';
+        document.getElementById('timerDisplay').classList.remove('warning');
+
+        const content = document.getElementById('gameContent');
+        content.innerHTML = `
+            <div class="challenge-card">
+                <h3>🎯 Ready for Sprint ${currentChallenge + 1}?</h3>
+                <p style="line-height: 1.8; color: #4a5568;">
+                    Great work on the last sprint! When you're ready, click "Start Sprint" to begin the next challenge.
+                    Remember: focus on the user's needs, not just cool features!
+                </p>
+            </div>
+        `;
+    }
+
+    updateProgress();
+}
+
+function showGameComplete() {
+    const content = document.getElementById('gameContent');
+    const avgScore = Math.round(score / challenges.length);
+
+    content.innerHTML = `
+        <div class="feedback-box" style="border-color: #4CAF50;">
+            <h4 style="color: #4CAF50; font-size: 2em;">🎉 All Sprints Complete!</h4>
+
+            <div style="text-align: center; margin: 30px 0;">
+                <div style="font-size: 4em; font-weight: bold; color: #667eea;">${score}</div>
+                <div style="font-size: 1.5em; color: #666;">Total Points</div>
+                <div style="margin-top: 10px;">Average: ${avgScore} points per sprint</div>
+            </div>
+
+            <div style="background: #e3f2fd; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                <h4 style="color: #1976d2; margin-bottom: 15px;">🎯 What You've Learned:</h4>
+                <ul style="line-height: 1.8; margin-left: 20px; color: #4a5568;">
+                    <li>How to quickly understand user needs and pain points</li>
+                    <li>Brainstorming solutions under time pressure (like real design sprints!)</li>
+                    <li>Evaluating designs against usability criteria</li>
+                    <li>Focusing on user outcomes, not just features</li>
+                    <li>Sketching as a thinking tool</li>
+                </ul>
+            </div>
+
+            <div style="background: #f8f9fa; padding: 20px; border-radius: 8px;">
+                <p style="line-height: 1.8; color: #4a5568;">
+                    Real design sprints work exactly like this - teams tackle problems with time constraints to force
+                    creativity and avoid overthinking. You've practiced a key skill used by designers at companies
+                    like Google, Facebook, and Airbnb!
+                </p>
+            </div>
+
+            <button class="btn-primary" onclick="resetGame()" style="margin-top: 20px;">Play Again</button>
+        </div>
+    `;
+}
+
+function skipSprint() {
+    if (!sprintStarted) {
+        nextSprint();
+    } else {
+        if (confirm('Skip this sprint? You won\'t earn points.')) {
+            clearInterval(timerInterval);
+            nextSprint();
+        }
+    }
+}
+
+function resetGame() {
+    score = 0;
+    currentChallenge = 0;
+    sprintStarted = false;
+    timeRemaining = 300;
+    clearInterval(timerInterval);
+
+    document.getElementById('sprintNumber').textContent = '1';
+    document.getElementById('startBtn').style.display = 'block';
+    document.getElementById('submitBtn').style.display = 'none';
+    document.getElementById('timerDisplay').textContent = '5:00';
+    document.getElementById('timerDisplay').classList.remove('warning');
+
+    const content = document.getElementById('gameContent');
+    content.innerHTML = `
+        <div class="challenge-card">
+            <h3>🎯 Welcome to Solution Sprint!</h3>
+            <p style="line-height: 1.8; color: #4a5568;">
+                You'll face 5 design challenges. For each challenge, you have 5 minutes to understand the user's
+                problem and design a solution. Click "Start Sprint" when you're ready!
+            </p>
+        </div>
+    `;
+
+    updateStats();
+    updateProgress();
+}
+
+function updateProgress() {
+    const progress = (currentChallenge / challenges.length) * 100;
+    document.getElementById('progressBar').style.width = progress + '%';
+}
+
+function updateStats() {
+    document.getElementById('totalScore').textContent = score;
+    document.getElementById('ideaCount').textContent = currentChallenge;
+
+    const quality = currentChallenge > 0 ? Math.round((score / (currentChallenge * 100)) * 100) : 0;
+    document.getElementById('qualityScore').textContent = quality + '%';
+
+    const bestSprint = localStorage.getItem('solutionSprintBest') || 0;
+    if (score > bestSprint) {
+        localStorage.setItem('solutionSprintBest', score);
+        document.getElementById('bestSprint').textContent = score;
+    } else {
+        document.getElementById('bestSprint').textContent = bestSprint;
+    }
+}
+
+// Initialize
+updateStats();
+</script>
+</body>
+</html>

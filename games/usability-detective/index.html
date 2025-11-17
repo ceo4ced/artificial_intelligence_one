@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<parameter name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Usability Detective - HCD Game</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 0; }
+.nav-header { background: #2d3748; padding: 15px 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; }
+.nav-header a { color: #90cdf4; text-decoration: none; font-weight: 600; font-size: 1.1em; }
+.nav-title { color: #fff; font-size: 1.2em; font-weight: 700; }
+.container { max-width: 1600px; margin: 20px auto; background: #fff; border-radius: 15px; padding: 30px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+h1 { text-align: center; color: #2d3748; font-size: 2.5em; margin-bottom: 10px; }
+.subtitle { text-align: center; color: #666; margin-bottom: 30px; font-size: 1.1em; }
+.game-area { display: grid; grid-template-columns: 350px 1fr; gap: 30px; }
+.sidebar { background: #f8f9fa; padding: 20px; border-radius: 10px; height: fit-content; position: sticky; top: 20px; }
+.score-display { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; padding: 20px; border-radius: 10px; text-align: center; margin-bottom: 20px; }
+.score-value { font-size: 3em; font-weight: bold; margin: 10px 0; }
+.stats { margin: 15px 0; }
+.stat-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e0e0e0; }
+button { padding: 15px 30px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 1.05em; transition: all 0.3s; }
+.btn-primary { background: #4CAF50; color: #fff; width: 100%; margin-top: 10px; }
+.btn-primary:hover { background: #45a049; transform: scale(1.02); }
+.btn-secondary { background: #2196F3; color: #fff; width: 100%; margin-top: 10px; }
+.btn-secondary:hover { background: #1976d2; }
+.btn-danger { background: #f44336; color: #fff; width: 100%; margin-top: 10px; }
+.btn-danger:hover { background: #da190b; }
+.instructions { background: #e3f2fd; padding: 15px; border-radius: 8px; margin: 15px 0; }
+.instructions h4 { color: #1976d2; margin-bottom: 10px; }
+.progress-bar { background: #e0e0e0; height: 8px; border-radius: 4px; margin: 20px 0; overflow: hidden; }
+.progress-fill { background: linear-gradient(90deg, #667eea, #764ba2); height: 100%; transition: width 0.3s; }
+.mockup-container { background: #f8f9fa; padding: 20px; border-radius: 10px; text-align: center; position: relative; }
+.mockup { background: #fff; border: 3px solid #ddd; border-radius: 10px; padding: 20px; margin: 20px auto; max-width: 800px; text-align: left; position: relative; cursor: crosshair; }
+.issue-marker { position: absolute; width: 40px; height: 40px; background: #f44336; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; cursor: pointer; transition: all 0.3s; animation: pulse 2s infinite; z-index: 10; }
+.issue-marker:hover { transform: scale(1.2); }
+@keyframes pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(244, 67, 54, 0.7); } 50% { box-shadow: 0 0 0 10px rgba(244, 67, 54, 0); } }
+.issue-list { margin: 20px 0; }
+.issue-item { background: #fff; padding: 15px; margin: 10px 0; border-radius: 8px; border-left: 4px solid #999; cursor: pointer; transition: all 0.3s; }
+.issue-item:hover { border-left-color: #667eea; transform: translateX(5px); }
+.issue-item.selected { background: #e3f2fd; border-left-color: #2196F3; }
+.issue-item.correct { background: #c8e6c9; border-left-color: #4CAF50; }
+.issue-item.incorrect { background: #ffcdd2; border-left-color: #f44336; }
+.issue-category { display: inline-block; padding: 4px 10px; background: #667eea; color: #fff; border-radius: 12px; font-size: 0.85em; margin-right: 8px; }
+.feedback-panel { background: #fff9c4; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #fbc02d; display: none; }
+.feedback-panel.show { display: block; animation: slideIn 0.3s; }
+@keyframes slideIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+.difficulty-badge { display: inline-block; padding: 5px 12px; border-radius: 15px; font-size: 0.9em; font-weight: 600; margin-left: 10px; }
+.difficulty-easy { background: #4CAF50; color: #fff; }
+.difficulty-medium { background: #ff9800; color: #fff; }
+.difficulty-hard { background: #f44336; color: #fff; }
+.hint-box { background: #e1f5fe; padding: 15px; border-radius: 8px; margin: 15px 0; border-left: 3px solid #03a9f4; }
+.solution-box { background: #e8f5e9; padding: 15px; border-radius: 8px; margin: 15px 0; border-left: 3px solid #4CAF50; display: none; }
+.solution-box.show { display: block; }
+</style>
+</head>
+<body>
+<nav class="nav-header">
+    <div class="nav-title">🔍 Usability Detective</div>
+    <a href="../../index.html">← Back to Home</a>
+</nav>
+<div class="container">
+    <h1>🔍 Usability Detective</h1>
+    <p class="subtitle">Find and fix usability issues in interface mockups!</p>
+
+    <div class="game-area">
+        <div class="sidebar">
+            <div class="score-display">
+                <div>Total Score</div>
+                <div class="score-value" id="totalScore">0</div>
+                <div>Case: <span id="caseNumber">1</span>/6</div>
+            </div>
+
+            <div class="stats">
+                <div class="stat-row"><span>Found:</span><span id="issuesFound">0/0</span></div>
+                <div class="stat-row"><span>Accuracy:</span><span id="accuracy">0%</span></div>
+                <div class="stat-row"><span>Best Score:</span><span id="bestScore">0</span></div>
+            </div>
+
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar" style="width: 0%"></div>
+            </div>
+
+            <button class="btn-primary" onclick="checkAnswers()">Check Answers</button>
+            <button class="btn-secondary" onclick="showHints()">Show Hints</button>
+            <button class="btn-secondary" onclick="nextCase()">Next Case →</button>
+            <button class="btn-danger" onclick="resetGame()">New Game</button>
+
+            <div class="instructions">
+                <h4>How to Play:</h4>
+                <p style="font-size: 0.9em; line-height: 1.6; color: #01579b;">
+                    1. Examine the mockup carefully<br>
+                    2. Select issues from the list below<br>
+                    3. Click markers on the mockup (optional)<br>
+                    4. Check your answers<br>
+                    5. Learn from feedback!<br><br>
+                    <strong>Tip:</strong> Think about user confusion, accessibility, and cognitive load!
+                </p>
+            </div>
+        </div>
+
+        <div class="game-content" id="gameContent">
+            <!-- Content loads here -->
+        </div>
+    </div>
+</div>
+
+<script>
+const testCases = [
+    {
+        title: "E-commerce Checkout",
+        difficulty: "easy",
+        description: "Online store checkout page for buying shoes",
+        mockup: `
+            <div style="font-size: 24px; font-weight: bold; margin-bottom: 20px;">CHECKOUT</div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 10px; margin-bottom: 20px;">
+                <div style="padding: 15px; background: #e3f2fd; border-radius: 6px;">
+                    <div style="font-weight: bold; margin-bottom: 5px;">1</div>
+                    <div style="font-size: 12px;">Cart</div>
+                </div>
+                <div style="padding: 15px; background: #667eea; color: #fff; border-radius: 6px;">
+                    <div style="font-weight: bold; margin-bottom: 5px;">2</div>
+                    <div style="font-size: 12px;">Shipping</div>
+                </div>
+                <div style="padding: 15px; background: #e0e0e0; border-radius: 6px;">
+                    <div style="font-weight: bold; margin-bottom: 5px;">3</div>
+                    <div style="font-size: 12px;">Payment</div>
+                </div>
+                <div style="padding: 15px; background: #e0e0e0; border-radius: 6px;">
+                    <div style="font-weight: bold; margin-bottom: 5px;">4</div>
+                    <div style="font-size: 12px;">Confirm</div>
+                </div>
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; font-size: 11px; color: #999; margin-bottom: 3px;">Full Name</label>
+                <input type="text" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; font-size: 11px; color: #999; margin-bottom: 3px;">Address Line 1</label>
+                <input type="text" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
+                <div>
+                    <label style="display: block; font-size: 11px; color: #999; margin-bottom: 3px;">City</label>
+                    <input type="text" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
+                </div>
+                <div>
+                    <label style="display: block; font-size: 11px; color: #999; margin-bottom: 3px;">ZIP</label>
+                    <input type="text" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
+                </div>
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; font-size: 11px; color: #999; margin-bottom: 3px;">Phone Number</label>
+                <input type="text" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
+            </div>
+            <button style="width: 100%; padding: 15px; background: #4CAF50; color: #fff; border: none; border-radius: 6px; font-weight: bold; cursor: pointer;">CONTINUE</button>
+        `,
+        issues: [
+            { id: 1, text: "No indication of required vs optional fields", category: "Clarity", correct: true },
+            { id: 2, text: "Missing state/province field", category: "Functionality", correct: true },
+            { id: 3, text: "No validation feedback (real-time or on error)", category: "Feedback", correct: true },
+            { id: 4, text: "Phone number format unclear (international users?)", category: "Accessibility", correct: true },
+            { id: 5, text: "Button is too colorful", category: "Visual", correct: false },
+            { id: 6, text: "Form is too long", category: "Cognitive Load", correct: false }
+        ],
+        hints: [
+            "Look at the form fields - what information is missing for users?",
+            "Consider international users - what fields might need clarification?",
+            "What happens if a user enters invalid data?"
+        ],
+        explanation: "This checkout has several usability issues: no required field indicators, missing state field, no validation, and unclear phone format. Good forms provide clear guidance and real-time feedback."
+    },
+    {
+        title: "Mobile Banking App",
+        difficulty: "medium",
+        description: "Transfer money screen in a banking app",
+        mockup: `
+            <div style="background: #667eea; color: #fff; padding: 15px; margin: -20px -20px 20px -20px; border-radius: 10px 10px 0 0;">
+                <div style="font-size: 14px;">← Account</div>
+                <div style="font-size: 20px; font-weight: bold; margin-top: 10px;">Transfer Money</div>
+            </div>
+            <div style="margin-bottom: 20px;">
+                <div style="font-size: 12px; color: #999; margin-bottom: 5px;">From Account</div>
+                <select style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
+                    <option>Checking ****1234 - $5,234.19</option>
+                    <option>Savings ****5678 - $12,450.00</option>
+                </select>
+            </div>
+            <div style="margin-bottom: 20px;">
+                <div style="font-size: 12px; color: #999; margin-bottom: 5px;">To Account Number</div>
+                <input type="text" style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;" placeholder="Enter account number">
+            </div>
+            <div style="margin-bottom: 20px;">
+                <div style="font-size: 12px; color: #999; margin-bottom: 5px;">Amount</div>
+                <input type="text" style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;" placeholder="0.00">
+            </div>
+            <button style="width: 100%; padding: 15px; background: #f44336; color: #fff; border: none; border-radius: 6px; font-weight: bold; font-size: 16px; cursor: pointer;">Transfer Now</button>
+            <div style="margin-top: 15px; font-size: 11px; color: #999; text-align: center;">Transfers are processed immediately and cannot be reversed</div>
+        `,
+        issues: [
+            { id: 1, text: "No confirmation step before transfer", category: "Safety", correct: true },
+            { id: 2, text: "Destructive action (transfer) uses alarming red button", category: "Design", correct: true },
+            { id: 3, text: "No way to save/add frequent recipients", category: "Efficiency", correct: true },
+            { id: 4, text: "Warning text is too small and easy to miss", category: "Visibility", correct: true },
+            { id: 5, text: "No maximum transfer limit shown", category: "Guidance", correct: true },
+            { id: 6, text: "The app should use biometric authentication", category: "Security", correct: false }
+        ],
+        hints: [
+            "Financial transactions should have safety measures - what's missing?",
+            "Look at the button color - does it match the action's importance?",
+            "Consider users who transfer money regularly"
+        ],
+        explanation: "Banking apps need extra safety measures. This design lacks a confirmation step, uses an alarming button color for a normal action, has tiny warning text, and doesn't show transfer limits."
+    },
+    {
+        title: "Restaurant Website",
+        difficulty: "easy",
+        description: "Homepage of a local restaurant website",
+        mockup: `
+            <div style="position: relative; height: 200px; background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg"><rect fill="%23333" width="100%" height="100%"/></svg>'); background-size: cover; display: flex; align-items: center; justify-content: center; margin: -20px -20px 20px -20px;">
+                <h1 style="color: #fff; font-size: 48px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">Mario's Italian Kitchen</h1>
+            </div>
+            <div style="text-align: center; margin-bottom: 30px;">
+                <div style="font-size: 18px; line-height: 1.8; color: #333;">
+                    Welcome to Mario's! We serve the finest Italian cuisine in town.
+                    Visit us for lunch or dinner. We use only the freshest ingredients.
+                    Family owned since 1985. Come experience authentic Italian food!
+                </div>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-bottom: 30px;">
+                <div style="padding: 20px; background: #f5f5f5; border-radius: 8px; text-align: center;">
+                    <div style="font-size: 32px; margin-bottom: 10px;">🍝</div>
+                    <div style="font-weight: bold;">Pasta</div>
+                </div>
+                <div style="padding: 20px; background: #f5f5f5; border-radius: 8px; text-align: center;">
+                    <div style="font-size: 32px; margin-bottom: 10px;">🍕</div>
+                    <div style="font-weight: bold;">Pizza</div>
+                </div>
+                <div style="padding: 20px; background: #f5f5f5; border-radius: 8px; text-align: center;">
+                    <div style="font-size: 32px; margin-bottom: 10px;">🥗</div>
+                    <div style="font-weight: bold;">Salads</div>
+                </div>
+            </div>
+            <div style="text-align: center; font-size: 14px; color: #666;">
+                123 Main Street | info@marios.com
+            </div>
+        `,
+        issues: [
+            { id: 1, text: "No clear call-to-action (menu, order, reserve)", category: "Navigation", correct: true },
+            { id: 2, text: "Missing critical information: hours, phone number", category: "Information", correct: true },
+            { id: 3, text: "No visible navigation menu", category: "Navigation", correct: true },
+            { id: 4, text: "Location/map not prominent (hard to find)", category: "Findability", correct: true },
+            { id: 5, text: "Too much text in the description", category: "Content", correct: false },
+            { id: 6, text: "Colors are too plain", category: "Visual", correct: false }
+        ],
+        hints: [
+            "What would a hungry customer want to do first?",
+            "What essential information is missing?",
+            "How would someone contact or find the restaurant?"
+        ],
+        explanation: "Restaurant websites need clear actions (view menu, order, reserve) and essential info (hours, phone, location). This design buries important information and lacks clear navigation."
+    },
+    {
+        title: "Email Newsletter Signup",
+        difficulty: "medium",
+        description: "Pop-up modal for newsletter subscription",
+        mockup: `
+            <div style="position: relative; background: #fff; border: 3px solid #667eea; border-radius: 10px; padding: 30px; max-width: 400px; margin: 50px auto;">
+                <div style="position: absolute; top: 10px; right: 10px; font-size: 10px; color: #999; cursor: pointer;">✕</div>
+                <div style="text-align: center;">
+                    <div style="font-size: 28px; font-weight: bold; margin-bottom: 15px;">Don't Miss Out!</div>
+                    <div style="font-size: 14px; margin-bottom: 20px; line-height: 1.6;">
+                        Subscribe to our newsletter to get exclusive deals, tips, and updates delivered to your inbox!
+                    </div>
+                    <input type="email" placeholder="Enter your email" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 6px; margin-bottom: 15px; font-size: 14px;">
+                    <button style="width: 100%; padding: 15px; background: #667eea; color: #fff; border: none; border-radius: 6px; font-weight: bold; font-size: 16px; cursor: pointer;">Subscribe Now</button>
+                    <div style="margin-top: 20px; font-size: 10px; color: #999;">
+                        By subscribing you agree to receive marketing emails. We send 2-3 emails per week.
+                    </div>
+                </div>
+            </div>
+        `,
+        issues: [
+            { id: 1, text: "Close button (✕) is tiny and hard to click", category: "Accessibility", correct: true },
+            { id: 2, text: "No clear way to decline/dismiss ('No thanks' option)", category: "User Control", correct: true },
+            { id: 3, text: "Appears immediately on page load (interrupts user)", category: "Timing", correct: true },
+            { id: 4, text: "Terms/privacy link missing despite collecting email", category: "Trust", correct: true },
+            { id: 5, text: "Email frequency mentioned in tiny text after signup", category: "Transparency", correct: true },
+            { id: 6, text: "The modal should be bigger", category: "Size", correct: false }
+        ],
+        hints: [
+            "When should a popup appear to be least disruptive?",
+            "What's missing for users who don't want to subscribe?",
+            "What information should be clear BEFORE signing up?"
+        ],
+        explanation: "Pop-ups should respect users: provide easy dismissal, appear at appropriate times, be transparent about email frequency, and always link to privacy policies. This design is intrusive and lacks transparency."
+    },
+    {
+        title: "Password Reset Flow",
+        difficulty: "hard",
+        description: "Screen shown after requesting password reset",
+        mockup: `
+            <div style="max-width: 500px; margin: 50px auto; padding: 40px; background: #f8f9fa; border-radius: 10px; text-align: center;">
+                <div style="font-size: 48px; margin-bottom: 20px;">✅</div>
+                <div style="font-size: 24px; font-weight: bold; margin-bottom: 15px;">Check Your Email!</div>
+                <div style="font-size: 14px; line-height: 1.8; color: #666; margin-bottom: 30px;">
+                    We've sent a password reset link to your email address.
+                    Click the link in the email to reset your password.
+                </div>
+                <button style="padding: 12px 30px; background: #667eea; color: #fff; border: none; border-radius: 6px; font-weight: bold; cursor: pointer;">Back to Login</button>
+            </div>
+        `,
+        issues: [
+            { id: 1, text: "Doesn't show which email address was used", category: "Confirmation", correct: true },
+            { id: 2, text: "No 'didn't receive email' help option", category: "Error Recovery", correct: true },
+            { id: 3, text: "No indication of how long email might take", category: "Expectation", correct: true },
+            { id: 4, text: "Doesn't mention checking spam folder", category: "Guidance", correct: true },
+            { id: 5, text: "No option to resend email", category: "Recovery", correct: true },
+            { id: 6, text: "Success icon should be animated", category: "Visual", correct: false }
+        ],
+        hints: [
+            "What if the user entered the wrong email?",
+            "What if the email doesn't arrive?",
+            "What context helps users know what to do next?"
+        ],
+        explanation: "Password reset flows should show the email address used, set time expectations, provide resend options, and guide users to check spam. This design assumes everything works perfectly."
+    },
+    {
+        title: "Social Media Comment Section",
+        difficulty: "medium",
+        description: "Comments area under a social media post",
+        mockup: `
+            <div style="background: #f8f9fa; padding: 20px; border-radius: 8px;">
+                <div style="font-weight: bold; margin-bottom: 15px;">Comments (127)</div>
+                <div style="margin-bottom: 20px;">
+                    <textarea placeholder="Add a comment..." style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; min-height: 60px; resize: vertical;"></textarea>
+                    <div style="text-align: right; margin-top: 10px;">
+                        <button style="padding: 10px 24px; background: #667eea; color: #fff; border: none; border-radius: 6px; font-weight: bold; cursor: pointer;">Post</button>
+                    </div>
+                </div>
+                <div style="background: #fff; padding: 15px; border-radius: 8px; margin-bottom: 10px;">
+                    <div style="font-weight: bold; margin-bottom: 5px;">User123</div>
+                    <div style="font-size: 14px; color: #333; margin-bottom: 10px;">Great post! Thanks for sharing this information with us all.</div>
+                    <div style="font-size: 12px; color: #999;">2h ago</div>
+                </div>
+                <div style="background: #fff; padding: 15px; border-radius: 8px; margin-bottom: 10px;">
+                    <div style="font-weight: bold; margin-bottom: 5px;">JaneDoe</div>
+                    <div style="font-size: 14px; color: #333; margin-bottom: 10px;">I disagree with this completely.</div>
+                    <div style="font-size: 12px; color: #999;">5h ago</div>
+                </div>
+            </div>
+        `,
+        issues: [
+            { id: 1, text: "No sort/filter options (newest, oldest, top)", category: "Organization", correct: true },
+            { id: 2, text: "Missing like/react functionality on comments", category: "Engagement", correct: true },
+            { id: 3, text: "No way to reply to specific comments (threading)", category: "Conversation", correct: true },
+            { id: 4, text: "No report/block options for inappropriate content", category: "Safety", correct: true },
+            { id: 5, text: "Can't edit or delete own comments", category: "Control", correct: true },
+            { id: 6, text: "Comments should have profile pictures", category: "Visual", correct: false }
+        ],
+        hints: [
+            "How would users navigate through 127 comments?",
+            "What if someone wants to respond to a specific person?",
+            "What if a user posts something inappropriate?"
+        ],
+        explanation: "Comment sections need organization (sorting), engagement (likes/replies), and moderation (reporting). This basic implementation lacks features users expect from social platforms."
+    }
+];
+
+let currentCase = 0;
+let score = 0;
+let totalCorrect = 0;
+let totalAttempts = 0;
+let selectedIssues = new Set();
+
+function init() {
+    loadCase();
+    updateStats();
+}
+
+function loadCase() {
+    if (currentCase >= testCases.length) {
+        showGameComplete();
+        return;
+    }
+
+    const testCase = testCases[currentCase];
+    const content = document.getElementById('gameContent');
+
+    selectedIssues.clear();
+
+    content.innerHTML = `
+        <div style="margin-bottom: 20px;">
+            <h2 style="color: #2d3748; margin-bottom: 10px;">
+                Case ${currentCase + 1}: ${testCase.title}
+                <span class="difficulty-badge difficulty-${testCase.difficulty}">${testCase.difficulty.toUpperCase()}</span>
+            </h2>
+            <p style="color: #666; font-size: 1.1em;">${testCase.description}</p>
+        </div>
+
+        <div class="mockup-container">
+            <h3 style="color: #667eea; margin-bottom: 15px;">🔍 Examine This Design:</h3>
+            <div class="mockup" id="mockupArea">
+                ${testCase.mockup}
+            </div>
+        </div>
+
+        <div style="margin-top: 30px;">
+            <h3 style="color: #2d3748; margin-bottom: 15px;">🎯 Select All Usability Issues You Can Find:</h3>
+            <div class="issue-list" id="issueList">
+                ${testCase.issues.map(issue => `
+                    <div class="issue-item" onclick="toggleIssue(${issue.id})" data-issue-id="${issue.id}">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <span class="issue-category">${issue.category}</span>
+                                <span>${issue.text}</span>
+                            </div>
+                            <div style="font-size: 1.5em;">⬜</div>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+
+        <div class="hint-box" id="hintBox" style="display: none;">
+            <h4 style="color: #0277bd; margin-bottom: 10px;">💡 Hints:</h4>
+            <ul style="margin-left: 20px; line-height: 1.8;">
+                ${testCase.hints.map(hint => `<li>${hint}</li>`).join('')}
+            </ul>
+        </div>
+
+        <div class="feedback-panel" id="feedbackPanel"></div>
+        <div class="solution-box" id="solutionBox">
+            <h4 style="color: #2e7d32; margin-bottom: 10px;">✅ Correct Issues:</h4>
+            <ul style="margin-left: 20px; line-height: 1.8;">
+                ${testCase.issues.filter(i => i.correct).map(i => `<li><strong>${i.category}:</strong> ${i.text}</li>`).join('')}
+            </ul>
+            <p style="margin-top: 15px; padding-top: 15px; border-top: 2px solid #4CAF50;"><strong>Explanation:</strong> ${testCase.explanation}</p>
+        </div>
+    `;
+
+    updateProgress();
+    document.getElementById('issuesFound').textContent = `0/${testCase.issues.filter(i => i.correct).length}`;
+}
+
+function toggleIssue(issueId) {
+    const issueEl = document.querySelector(`[data-issue-id="${issueId}"]`);
+    const checkbox = issueEl.querySelector('div > div:last-child');
+
+    if (selectedIssues.has(issueId)) {
+        selectedIssues.delete(issueId);
+        issueEl.classList.remove('selected');
+        checkbox.textContent = '⬜';
+    } else {
+        selectedIssues.add(issueId);
+        issueEl.classList.add('selected');
+        checkbox.textContent = '✅';
+    }
+
+    updateFoundCount();
+}
+
+function updateFoundCount() {
+    const testCase = testCases[currentCase];
+    const correctTotal = testCase.issues.filter(i => i.correct).length;
+    document.getElementById('issuesFound').textContent = `${selectedIssues.size}/${correctTotal}`;
+}
+
+function checkAnswers() {
+    const testCase = testCases[currentCase];
+    let correct = 0;
+    let falsePositives = 0;
+
+    testCase.issues.forEach(issue => {
+        const issueEl = document.querySelector(`[data-issue-id="${issue.id}"]`);
+        const wasSelected = selectedIssues.has(issue.id);
+
+        if (issue.correct && wasSelected) {
+            correct++;
+            issueEl.classList.add('correct');
+            issueEl.classList.remove('incorrect');
+        } else if (!issue.correct && wasSelected) {
+            falsePositives++;
+            issueEl.classList.add('incorrect');
+            issueEl.classList.remove('correct');
+        } else if (issue.correct && !wasSelected) {
+            issueEl.style.opacity = '0.5';
+        }
+    });
+
+    const totalCorrectIssues = testCase.issues.filter(i => i.correct).length;
+    const points = Math.max(0, (correct * 20) - (falsePositives * 10));
+    score += points;
+    totalCorrect += correct;
+    totalAttempts += totalCorrectIssues;
+
+    showFeedback(correct, totalCorrectIssues, falsePositives, points);
+    document.getElementById('solutionBox').classList.add('show');
+    updateStats();
+}
+
+function showFeedback(correct, total, falsePositives, points) {
+    const percentage = Math.round((correct / total) * 100);
+    const feedbackPanel = document.getElementById('feedbackPanel');
+
+    let message = '';
+    if (percentage === 100 && falsePositives === 0) {
+        message = '🎉 Perfect! You found all issues and had no false positives!';
+    } else if (percentage >= 80) {
+        message = '✨ Excellent detective work! You caught most of the issues.';
+    } else if (percentage >= 60) {
+        message = '👍 Good job! You found several key issues.';
+    } else {
+        message = '💪 Keep practicing! Try using the hints next time.';
+    }
+
+    feedbackPanel.innerHTML = `
+        <h4 style="color: #f57c00; margin-bottom: 10px;">${message}</h4>
+        <div style="line-height: 1.8;">
+            <p>✅ Found: ${correct}/${total} correct issues</p>
+            ${falsePositives > 0 ? `<p>⚠️ False positives: ${falsePositives}</p>` : ''}
+            <p style="font-weight: bold; margin-top: 10px;">Points earned: ${points}</p>
+        </div>
+    `;
+
+    feedbackPanel.classList.add('show');
+}
+
+function showHints() {
+    const hintBox = document.getElementById('hintBox');
+    hintBox.style.display = 'block';
+}
+
+function nextCase() {
+    currentCase++;
+    document.getElementById('caseNumber').textContent = currentCase + 1;
+    loadCase();
+    document.getElementById('hintBox').style.display = 'none';
+}
+
+function showGameComplete() {
+    const content = document.getElementById('gameContent');
+    const accuracy = totalAttempts > 0 ? Math.round((totalCorrect / totalAttempts) * 100) : 0;
+
+    content.innerHTML = `
+        <div style="text-align: center; padding: 40px;">
+            <h2 style="color: #4CAF50; font-size: 2.5em; margin-bottom: 20px;">🎉 All Cases Solved!</h2>
+
+            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; padding: 30px; border-radius: 15px; margin: 30px 0;">
+                <div style="font-size: 4em; font-weight: bold; margin-bottom: 10px;">${score}</div>
+                <div style="font-size: 1.5em;">Total Points</div>
+                <div style="margin-top: 20px;">
+                    <div>Issues Found: ${totalCorrect}/${totalAttempts}</div>
+                    <div>Accuracy: ${accuracy}%</div>
+                </div>
+            </div>
+
+            <div style="background: #e3f2fd; padding: 25px; border-radius: 10px; margin: 20px 0; text-align: left;">
+                <h3 style="color: #1976d2; margin-bottom: 15px;">🎓 What You've Learned:</h3>
+                <ul style="line-height: 1.8; margin-left: 20px;">
+                    <li>How to identify common usability issues across different interfaces</li>
+                    <li>The importance of user feedback, error prevention, and recovery</li>
+                    <li>Accessibility considerations (button sizes, visibility, clarity)</li>
+                    <li>User control and freedom (undo, cancel, confirm actions)</li>
+                    <li>Consistency and standards in interface design</li>
+                    <li>How to think like a user during testing</li>
+                </ul>
+            </div>
+
+            <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin: 20px 0;">
+                <p style="line-height: 1.8; color: #4a5568;">
+                    These are real issues found in actual products! As a designer, your job is to catch
+                    these problems before users do. Keep practicing your usability detective skills!
+                </p>
+            </div>
+
+            <button class="btn-primary" style="max-width: 300px; margin: 20px auto;" onclick="resetGame()">Play Again</button>
+        </div>
+    `;
+}
+
+function resetGame() {
+    currentCase = 0;
+    score = 0;
+    totalCorrect = 0;
+    totalAttempts = 0;
+    selectedIssues.clear();
+    document.getElementById('caseNumber').textContent = '1';
+    loadCase();
+    updateStats();
+}
+
+function updateProgress() {
+    const progress = (currentCase / testCases.length) * 100;
+    document.getElementById('progressBar').style.width = progress + '%';
+}
+
+function updateStats() {
+    document.getElementById('totalScore').textContent = score;
+    const accuracy = totalAttempts > 0 ? Math.round((totalCorrect / totalAttempts) * 100) : 0;
+    document.getElementById('accuracy').textContent = accuracy + '%';
+
+    const bestScore = localStorage.getItem('usabilityDetectiveBest') || 0;
+    if (score > bestScore) {
+        localStorage.setItem('usabilityDetectiveBest', score);
+        document.getElementById('bestScore').textContent = score;
+    } else {
+        document.getElementById('bestScore').textContent = bestScore;
+    }
+}
+
+// Initialize
+init();
+</script>
+</body>
+</html>
