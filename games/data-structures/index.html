@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Data Structure Playground - Game</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 0; }
+.nav-header { background: #2d3748; padding: 15px 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; }
+.nav-header a { color: #90cdf4; text-decoration: none; font-weight: 600; font-size: 1.1em; }
+.nav-title { color: #fff; font-size: 1.2em; font-weight: 700; }
+.container { max-width: 1400px; margin: 20px auto; background: #fff; border-radius: 15px; padding: 30px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+h1 { text-align: center; color: #2d3748; font-size: 2.5em; margin-bottom: 10px; }
+.subtitle { text-align: center; color: #666; margin-bottom: 30px; font-size: 1.1em; }
+.game-area { display: grid; grid-template-columns: 300px 1fr; gap: 30px; }
+.sidebar { background: #f8f9fa; padding: 20px; border-radius: 10px; height: fit-content; }
+.score-display { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; padding: 20px; border-radius: 10px; text-align: center; margin-bottom: 20px; }
+.score-value { font-size: 3em; font-weight: bold; margin: 10px 0; }
+.stats { margin: 15px 0; }
+.stat-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e0e0e0; }
+button { width: 100%; padding: 12px; margin: 5px 0; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.3s; }
+.btn-primary { background: #4CAF50; color: #fff; }
+.btn-primary:hover { background: #45a049; }
+.btn-secondary { background: #2196F3; color: #fff; }
+.btn-secondary:hover { background: #1976d2; }
+.scenario-card { background: #fff; border: 2px solid #e0e0e0; border-radius: 10px; padding: 25px; margin-bottom: 20px; }
+.scenario-card h3 { color: #667eea; margin-bottom: 15px; font-size: 1.5em; }
+.scenario-description { background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px; line-height: 1.6; color: #2d3748; }
+.data-items { background: #fff9c4; padding: 20px; border-radius: 8px; margin-bottom: 25px; min-height: 150px; border: 2px dashed #fbc02d; }
+.data-items h4 { color: #f57c00; margin-bottom: 15px; }
+.data-item { background: #2196F3; color: #fff; padding: 10px 15px; border-radius: 6px; margin: 5px; display: inline-block; cursor: move; font-weight: 600; transition: all 0.2s; user-select: none; }
+.data-item:hover { background: #1976d2; transform: scale(1.05); }
+.data-item.dragging { opacity: 0.5; }
+.structure-options { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
+.structure-option { background: #fff; border: 3px solid #667eea; border-radius: 10px; padding: 20px; cursor: pointer; transition: all 0.3s; min-height: 180px; }
+.structure-option:hover { background: #f0f4ff; transform: translateY(-3px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+.structure-option h4 { color: #667eea; margin-bottom: 10px; font-size: 1.2em; }
+.structure-option p { color: #4a5568; font-size: 0.9em; line-height: 1.6; margin-bottom: 10px; }
+.structure-option.selected { background: #667eea; border-color: #667eea; }
+.structure-option.selected h4,
+.structure-option.selected p { color: #fff; }
+.structure-option.correct { background: #4CAF50; border-color: #4CAF50; }
+.structure-option.correct h4,
+.structure-option.correct p { color: #fff; }
+.structure-option.incorrect { background: #f44336; border-color: #f44336; }
+.structure-option.incorrect h4,
+.structure-option.incorrect p { color: #fff; }
+.structure-option.disabled { cursor: not-allowed; opacity: 0.6; }
+.feedback { background: #e3f2fd; padding: 20px; border-radius: 10px; margin-top: 20px; border-left: 4px solid #2196F3; display: none; }
+.feedback.show { display: block; animation: slideIn 0.3s; }
+.feedback h4 { color: #1976d2; margin-bottom: 10px; }
+.feedback ul { margin-left: 20px; line-height: 1.8; }
+.preview { background: #fafafa; padding: 15px; border-radius: 8px; margin-top: 10px; border: 2px solid #e0e0e0; min-height: 100px; }
+.progress-bar { background: #e0e0e0; height: 8px; border-radius: 4px; margin: 15px 0; overflow: hidden; }
+.progress-fill { background: linear-gradient(90deg, #667eea, #764ba2); height: 100%; transition: width 0.3s; }
+.hint-box { background: #e8f5e9; padding: 15px; border-radius: 8px; margin: 10px 0; }
+.hint-box h4 { color: #2e7d32; margin-bottom: 8px; }
+.hint-box ul { margin-left: 20px; line-height: 1.6; color: #1b5e20; font-size: 0.9em; }
+@keyframes slideIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+</head>
+<body>
+<nav class="nav-header">
+    <div class="nav-title">Data Structure Playground</div>
+    <a href="../../index.html">← Back to Home</a>
+</nav>
+<div class="container">
+    <h1>Data Structure Playground</h1>
+    <p class="subtitle">Organize messy data into the most appropriate structure!</p>
+
+    <div class="game-area">
+        <div class="sidebar">
+            <div class="score-display">
+                <div>Score</div>
+                <div class="score-value" id="score">0</div>
+                <div>Perfect: <span id="perfect">0</span></div>
+            </div>
+
+            <div class="stats">
+                <div class="stat-row">
+                    <span>Scenarios Solved:</span>
+                    <span id="solved">0/10</span>
+                </div>
+                <div class="stat-row">
+                    <span>Accuracy:</span>
+                    <span id="accuracy">0%</span>
+                </div>
+                <div class="stat-row">
+                    <span>Best Choice Bonus:</span>
+                    <span id="bonus">0</span>
+                </div>
+            </div>
+
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar" style="width: 0%"></div>
+            </div>
+
+            <button class="btn-primary" onclick="checkAnswer()">Check Answer</button>
+            <button class="btn-secondary" onclick="nextScenario()">Next Scenario →</button>
+
+            <div class="hint-box">
+                <h4>Quick Guide:</h4>
+                <ul>
+                    <li><strong>List:</strong> Ordered sequence</li>
+                    <li><strong>Table:</strong> Rows & columns</li>
+                    <li><strong>Tree:</strong> Parent-child hierarchy</li>
+                    <li><strong>Graph:</strong> Connected relationships</li>
+                </ul>
+            </div>
+        </div>
+
+        <div>
+            <div class="scenario-card">
+                <h3 id="scenarioTitle">Scenario 1</h3>
+                <div class="scenario-description" id="scenarioDescription">
+                    Loading scenario...
+                </div>
+
+                <div class="data-items" id="dataItems">
+                    <h4>The Messy Data:</h4>
+                    <!-- Data items will be populated by JavaScript -->
+                </div>
+
+                <h4 style="margin-bottom: 15px; color: #2d3748;">Choose the best data structure:</h4>
+                <div class="structure-options" id="structureOptions">
+                    <!-- Options will be populated by JavaScript -->
+                </div>
+
+                <div class="feedback" id="feedback">
+                    <h4 id="feedbackTitle">Feedback</h4>
+                    <p id="feedbackText"></p>
+                    <div class="preview" id="preview"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const scenarios = [
+    {
+        title: "Student Playlist",
+        description: "A student wants to store their favorite songs in the order they like to listen to them. They frequently add new songs at the end and sometimes skip to specific positions.",
+        data: ["Bohemian Rhapsody", "Stairway to Heaven", "Hotel California", "Imagine", "Sweet Child O' Mine"],
+        bestAnswer: "list",
+        acceptableAnswers: ["list"],
+        explanation: "A List/Array is perfect here! The songs have a specific order, and you can access them by position (play song #3). Lists maintain order and allow efficient sequential access.",
+        preview: "['Bohemian Rhapsody', 'Stairway to Heaven', 'Hotel California', 'Imagine', 'Sweet Child O\\'Mine']",
+        whyNotOthers: {
+            table: "Tables are for multiple related properties per item, not simple ordered lists",
+            tree: "Trees are for hierarchical relationships, not flat sequential data",
+            graph: "Graphs are for complex relationships between items, not simple sequences"
+        }
+    },
+    {
+        title: "Student Records Database",
+        description: "A school needs to store information about students including their ID, name, grade, GPA, and email. Teachers need to search, sort, and filter this information.",
+        data: ["ID: 1001, Name: Alice, Grade: 10, GPA: 3.8", "ID: 1002, Name: Bob, Grade: 11, GPA: 3.5", "ID: 1003, Name: Carol, Grade: 10, GPA: 3.9"],
+        bestAnswer: "table",
+        acceptableAnswers: ["table"],
+        explanation: "A Table is the best choice! Each student has multiple properties (columns), and you have multiple students (rows). Tables excel at structured data with consistent fields and support sorting, filtering, and searching.",
+        preview: "ID | Name  | Grade | GPA\n1001 | Alice | 10 | 3.8\n1002 | Bob | 11 | 3.5\n1003 | Carol | 10 | 3.9",
+        whyNotOthers: {
+            list: "Lists can't efficiently organize multiple properties per student",
+            tree: "Students don't have a parent-child hierarchy",
+            graph: "No complex relationships between students need modeling"
+        }
+    },
+    {
+        title: "User Profile Information",
+        description: "A website needs to store a user's account information: username, email, age, city, and premium status. This data needs to be quickly accessible by property name.",
+        data: ["username: alice123", "email: alice@example.com", "age: 25", "city: Seattle", "premium: true"],
+        bestAnswer: "dictionary",
+        acceptableAnswers: ["dictionary", "table"],
+        explanation: "A Dictionary/Object is ideal! You can quickly look up any property by name (user.email, user.age). Dictionaries are perfect for a single entity with multiple named properties.",
+        preview: "{\n  username: 'alice123',\n  email: 'alice@example.com',\n  age: 25,\n  city: 'Seattle',\n  premium: true\n}",
+        whyNotOthers: {
+            list: "Lists use numeric indexes, not descriptive property names",
+            tree: "No hierarchical structure in flat user properties",
+            graph: "No relationships between properties to model"
+        }
+    },
+    {
+        title: "Company Organization Chart",
+        description: "A company needs to represent its management structure: CEO at the top, with VPs reporting to CEO, Directors reporting to VPs, and Managers reporting to Directors.",
+        data: ["CEO", "├─ VP Engineering", "│  ├─ Director of Dev", "│  └─ Director of QA", "└─ VP Sales", "   └─ Sales Director"],
+        bestAnswer: "tree",
+        acceptableAnswers: ["tree"],
+        explanation: "A Tree is perfect! Org charts are classic hierarchical structures with clear parent-child relationships. Each person reports to exactly one boss (except CEO), creating a tree structure.",
+        preview: "CEO\n├── VP Engineering\n│   ├── Director of Dev\n│   └── Director of QA\n└── VP Sales\n    └── Sales Director",
+        whyNotOthers: {
+            list: "Lists can't represent hierarchical reporting relationships",
+            table: "Tables can't easily show parent-child hierarchies",
+            graph: "Too complex - trees are simpler for strict hierarchies where each node has one parent"
+        }
+    },
+    {
+        title: "Social Network Friendships",
+        description: "A social network needs to store who is friends with whom. Alice is friends with Bob and Carol. Bob is friends with Alice and Dave. Carol is friends with Alice and Dave. Dave is friends with Bob and Carol.",
+        data: ["Alice ↔ Bob", "Alice ↔ Carol", "Bob ↔ Dave", "Carol ↔ Dave"],
+        bestAnswer: "graph",
+        acceptableAnswers: ["graph"],
+        explanation: "A Graph is the best structure! Friendships are bidirectional relationships between people. Graphs excel at representing networks where items can have multiple connections to each other.",
+        preview: "Alice --- Bob\n  |        |\nCarol --- Dave",
+        whyNotOthers: {
+            list: "Can't efficiently represent bidirectional relationships",
+            table: "Would need complex lookups to find all friendships",
+            tree: "Friendship networks aren't hierarchical - people have multiple equal connections"
+        }
+    },
+    {
+        title: "Product Catalog Categories",
+        description: "An e-commerce site organizes products: Electronics contains Computers and Phones. Computers contains Laptops and Desktops. Phones contains iOS and Android. Each category can contain subcategories.",
+        data: ["Electronics", "├─ Computers", "│  ├─ Laptops", "│  └─ Desktops", "└─ Phones", "   ├─ iOS", "   └─ Android"],
+        bestAnswer: "tree",
+        acceptableAnswers: ["tree"],
+        explanation: "A Tree is ideal! Product categories form a natural hierarchy where each subcategory belongs to exactly one parent category. Trees make it easy to browse from general to specific.",
+        preview: "Electronics\n├── Computers\n│   ├── Laptops\n│   └── Desktops\n└── Phones\n    ├── iOS\n    └── Android",
+        whyNotOthers: {
+            list: "Can't show parent-child category relationships",
+            table: "Doesn't naturally represent nested hierarchies",
+            graph: "Too complex - categories have simple parent-child structure, not complex networks"
+        }
+    },
+    {
+        title: "City Road Network",
+        description: "A mapping app needs to store a city's roads. Each intersection connects to multiple other intersections. Main & 1st connects to Main & 2nd and Elm & 1st. Intersections can connect to any other nearby intersection.",
+        data: ["Main & 1st ↔ Main & 2nd", "Main & 1st ↔ Elm & 1st", "Main & 2nd ↔ Elm & 2nd", "Elm & 1st ↔ Elm & 2nd", "Elm & 2nd ↔ Oak & 2nd"],
+        bestAnswer: "graph",
+        acceptableAnswers: ["graph"],
+        explanation: "A Graph is perfect! Road networks are classic graph problems. Each intersection is a node, and roads are edges connecting them. Graphs enable finding shortest paths and navigation.",
+        preview: "Main&1st --- Main&2nd\n   |            |\nElm&1st --- Elm&2nd --- Oak&2nd",
+        whyNotOthers: {
+            list: "Can't represent complex interconnections between locations",
+            table: "Would require complex queries to find connected intersections",
+            tree: "Road networks aren't hierarchical - intersections connect in complex ways"
+        }
+    },
+    {
+        title: "Daily Todo List",
+        description: "A productivity app stores daily tasks in the order you plan to do them: Morning tasks first, then afternoon, then evening. You often reorder tasks and check them off sequentially.",
+        data: ["Wake up and exercise", "Reply to emails", "Team meeting at 10am", "Lunch break", "Finish project report", "Review code", "Dinner"],
+        bestAnswer: "list",
+        acceptableAnswers: ["list"],
+        explanation: "A List/Array is best! Tasks have a specific order you want to follow. Lists maintain sequence, allow reordering, and you can iterate through them checking items off one by one.",
+        preview: "['Wake up and exercise', 'Reply to emails', 'Team meeting at 10am', 'Lunch break', 'Finish project report', 'Review code', 'Dinner']",
+        whyNotOthers: {
+            table: "Tasks don't have multiple properties that need columns",
+            tree: "Tasks don't have parent-child relationships",
+            graph: "No complex relationships between tasks to model"
+        }
+    },
+    {
+        title: "Family Tree Genealogy",
+        description: "A genealogy app tracks family relationships. Grandparents have children (parents), who have their own children (you and siblings). Each person has exactly one set of biological parents.",
+        data: ["Grandma & Grandpa", "├─ Mom", "│  ├─ You", "│  └─ Sister", "└─ Uncle", "   └─ Cousin"],
+        bestAnswer: "tree",
+        acceptableAnswers: ["tree"],
+        explanation: "A Tree is the natural choice! Family trees are literally named after this data structure. Each person (except the root ancestors) has exactly one parent node, creating a clear hierarchy.",
+        preview: "Grandparents\n├── Mom\n│   ├── You\n│   └── Sister\n└── Uncle\n    └── Cousin",
+        whyNotOthers: {
+            list: "Can't show generational parent-child relationships",
+            table: "Doesn't naturally represent family hierarchies",
+            graph: "More complex than needed - family descent follows simple tree structure"
+        }
+    },
+    {
+        title: "E-commerce Order History",
+        description: "A shopping app stores your past orders, each with order number, date, items purchased, total cost, and shipping status. You want to search and sort by date or total.",
+        data: ["Order #1001, 2024-01-15, $49.99, Delivered", "Order #1002, 2024-02-03, $129.99, Shipped", "Order #1003, 2024-02-20, $24.99, Processing"],
+        bestAnswer: "table",
+        acceptableAnswers: ["table"],
+        explanation: "A Table is ideal! Each order has multiple properties (columns), and you have many orders (rows). Tables support efficient sorting by date or cost and filtering by status.",
+        preview: "Order # | Date | Total | Status\n1001 | 2024-01-15 | $49.99 | Delivered\n1002 | 2024-02-03 | $129.99 | Shipped\n1003 | 2024-02-20 | $24.99 | Processing",
+        whyNotOthers: {
+            list: "Can't efficiently organize multiple properties per order",
+            tree: "Orders don't have hierarchical relationships",
+            graph: "No complex relationships between orders"
+        }
+    }
+];
+
+const structureDefinitions = [
+    {
+        id: 'list',
+        name: 'List/Array',
+        description: 'Ordered sequence of items accessed by position (index 0, 1, 2...). Best for sequential data.',
+        icon: '📝'
+    },
+    {
+        id: 'dictionary',
+        name: 'Dictionary/Object',
+        description: 'Key-value pairs accessed by name. Best for properties of a single entity.',
+        icon: '📖'
+    },
+    {
+        id: 'table',
+        name: 'Table',
+        description: 'Rows and columns of structured data. Best for records with multiple fields.',
+        icon: '📊'
+    },
+    {
+        id: 'tree',
+        name: 'Tree',
+        description: 'Hierarchical parent-child structure. Best for categories, org charts, file systems.',
+        icon: '🌲'
+    },
+    {
+        id: 'graph',
+        name: 'Graph',
+        description: 'Nodes with connections between them. Best for networks, maps, social relationships.',
+        icon: '🕸️'
+    }
+];
+
+let currentScenario = 0;
+let score = 0;
+let perfectAnswers = 0;
+let correctAnswers = 0;
+let selectedStructure = null;
+let answered = false;
+
+function loadScenario() {
+    const scenario = scenarios[currentScenario];
+    answered = false;
+    selectedStructure = null;
+
+    document.getElementById('scenarioTitle').textContent = `Scenario ${currentScenario + 1}: ${scenario.title}`;
+    document.getElementById('scenarioDescription').textContent = scenario.description;
+    document.getElementById('feedback').classList.remove('show');
+
+    // Load data items
+    const dataContainer = document.getElementById('dataItems');
+    let dataHTML = '<h4>The Messy Data:</h4>';
+    scenario.data.forEach(item => {
+        dataHTML += `<div class="data-item">${item}</div>`;
+    });
+    dataContainer.innerHTML = dataHTML;
+
+    // Load structure options
+    const optionsContainer = document.getElementById('structureOptions');
+    optionsContainer.innerHTML = '';
+
+    // Filter structures - show relevant ones based on scenario
+    let structuresToShow = structureDefinitions;
+    if (!scenario.acceptableAnswers.includes('dictionary')) {
+        structuresToShow = structureDefinitions.filter(s => s.id !== 'dictionary');
+    }
+
+    structuresToShow.forEach(structure => {
+        const optionDiv = document.createElement('div');
+        optionDiv.className = 'structure-option';
+        optionDiv.innerHTML = `
+            <h4>${structure.icon} ${structure.name}</h4>
+            <p>${structure.description}</p>
+        `;
+        optionDiv.onclick = () => selectStructure(structure.id, optionDiv);
+        optionsContainer.appendChild(optionDiv);
+    });
+
+    updateProgress();
+}
+
+function selectStructure(structureId, element) {
+    if (answered) return;
+
+    // Remove previous selection
+    document.querySelectorAll('.structure-option').forEach(opt => {
+        opt.classList.remove('selected');
+    });
+
+    // Add new selection
+    element.classList.add('selected');
+    selectedStructure = structureId;
+}
+
+function checkAnswer() {
+    if (answered) {
+        alert('Already answered! Click "Next Scenario" to continue.');
+        return;
+    }
+
+    if (!selectedStructure) {
+        alert('Please select a data structure first!');
+        return;
+    }
+
+    answered = true;
+    const scenario = scenarios[currentScenario];
+    const isBestAnswer = selectedStructure === scenario.bestAnswer;
+    const isAcceptable = scenario.acceptableAnswers.includes(selectedStructure);
+
+    const options = document.querySelectorAll('.structure-option');
+    options.forEach(option => {
+        option.classList.add('disabled');
+        const optionId = structureDefinitions.find(s =>
+            option.textContent.includes(s.name)
+        )?.id;
+
+        if (optionId === scenario.bestAnswer) {
+            option.classList.add('correct');
+        } else if (optionId === selectedStructure && !isAcceptable) {
+            option.classList.add('incorrect');
+        }
+    });
+
+    const feedback = document.getElementById('feedback');
+    const feedbackTitle = document.getElementById('feedbackTitle');
+    const feedbackText = document.getElementById('feedbackText');
+    const preview = document.getElementById('preview');
+
+    if (isBestAnswer) {
+        perfectAnswers++;
+        correctAnswers++;
+        score += 100;
+
+        feedbackTitle.textContent = '✅ Perfect Choice!';
+        feedbackTitle.style.color = '#4CAF50';
+        feedbackText.innerHTML = `<strong>${scenario.explanation}</strong>`;
+    } else if (isAcceptable) {
+        correctAnswers++;
+        score += 60;
+
+        feedbackTitle.textContent = '👍 Acceptable, but not optimal';
+        feedbackTitle.style.color = '#ff9800';
+        feedbackText.innerHTML = `The best answer is <strong>${scenario.bestAnswer}</strong>. ${scenario.explanation}`;
+    } else {
+        feedbackTitle.textContent = '❌ Not the best choice';
+        feedbackTitle.style.color = '#f44336';
+        feedbackText.innerHTML = `<strong>Why not ${selectedStructure}?</strong> ${scenario.whyNotOthers[selectedStructure]}<br><br>${scenario.explanation}`;
+    }
+
+    preview.innerHTML = `<strong>How it looks as a ${scenario.bestAnswer}:</strong><br><pre style="margin-top: 10px; font-family: monospace; color: #2d3748;">${scenario.preview}</pre>`;
+
+    feedback.classList.add('show');
+    updateStats();
+}
+
+function nextScenario() {
+    if (!answered) {
+        alert('Please check your answer first!');
+        return;
+    }
+
+    currentScenario++;
+    if (currentScenario >= scenarios.length) {
+        showFinalScore();
+        return;
+    }
+
+    loadScenario();
+}
+
+function updateStats() {
+    document.getElementById('score').textContent = score;
+    document.getElementById('perfect').textContent = perfectAnswers;
+    document.getElementById('solved').textContent = `${currentScenario + (answered ? 1 : 0)}/${scenarios.length}`;
+    document.getElementById('accuracy').textContent = `${Math.round((correctAnswers / Math.max(currentScenario + (answered ? 1 : 0), 1)) * 100)}%`;
+    document.getElementById('bonus').textContent = `+${perfectAnswers * 10}`;
+}
+
+function updateProgress() {
+    const progress = ((currentScenario + (answered ? 1 : 0)) / scenarios.length) * 100;
+    document.getElementById('progressBar').style.width = `${progress}%`;
+}
+
+function showFinalScore() {
+    const accuracy = Math.round((correctAnswers / scenarios.length) * 100);
+    const totalScore = score + (perfectAnswers * 10);
+    let message = '';
+
+    if (perfectAnswers === scenarios.length) {
+        message = '🏆 Perfect! You\'re a Data Structure Master!';
+    } else if (accuracy === 100) {
+        message = '⭐ Excellent! You understand data structures well!';
+    } else if (accuracy >= 80) {
+        message = '👍 Great job! You have a solid grasp of data structures.';
+    } else if (accuracy >= 60) {
+        message = '📚 Good start! Review the lesson to improve your understanding.';
+    } else {
+        message = '💡 Keep learning! Data structures take practice to master.';
+    }
+
+    alert(`Game Complete!\n\nFinal Score: ${totalScore}\nPerfect Answers: ${perfectAnswers}/${scenarios.length}\nAccuracy: ${accuracy}%\n\n${message}`);
+}
+
+// Load first scenario on page load
+loadScenario();
+updateStats();
+</script>
+</body>
+</html>

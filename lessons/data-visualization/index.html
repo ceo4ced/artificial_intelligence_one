@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Data Visualization - Interactive Lesson</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 0; }
+.nav-header { background: #2d3748; padding: 15px 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; }
+.nav-header a { color: #90cdf4; text-decoration: none; font-weight: 600; font-size: 1.1em; }
+.nav-title { color: #fff; font-size: 1.2em; font-weight: 700; }
+.container { max-width: 1400px; margin: 20px auto; background: #fff; border-radius: 15px; padding: 30px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+h1 { text-align: center; color: #2d3748; font-size: 2.5em; margin-bottom: 20px; }
+.intro { background: #e3f2fd; padding: 20px; border-radius: 10px; margin-bottom: 30px; line-height: 1.6; }
+.intro h2 { color: #1976d2; margin-bottom: 10px; }
+.main-content { display: grid; grid-template-columns: 350px 1fr; gap: 30px; }
+.sidebar { background: #f8f9fa; padding: 20px; border-radius: 10px; height: fit-content; }
+button { width: 100%; padding: 12px; margin: 5px 0; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }
+.btn-primary { background: #4CAF50; color: #fff; }
+.btn-secondary { background: #2196F3; color: #fff; }
+canvas { border: 2px solid #ddd; border-radius: 8px; display: block; background: #fafafa; margin: 0 auto; }
+.explanation { background: #fff9c4; padding: 15px; border-radius: 8px; margin: 15px 0; border-left: 4px solid #fbc02d; }
+.explanation h4 { color: #f57c00; margin-bottom: 8px; }
+.principles-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin: 20px 0; }
+.principle-card { background: #f0f0f0; padding: 15px; border-radius: 8px; border-left: 4px solid #667eea; }
+.principle-card h4 { color: #1976d2; margin-bottom: 8px; }
+.principle-card ul { margin-left: 20px; font-size: 0.9em; line-height: 1.6; }
+.comparison-container { margin: 30px 0; }
+.comparison-title { text-align: center; font-size: 1.3em; color: #2d3748; margin-bottom: 20px; font-weight: 600; }
+.before-after { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 30px; }
+.viz-example { background: #fafafa; padding: 20px; border-radius: 10px; border: 2px solid #ddd; }
+.viz-example h3 { text-align: center; margin-bottom: 15px; padding: 10px; border-radius: 5px; }
+.viz-example.before h3 { background: #ffebee; color: #c62828; }
+.viz-example.after h3 { background: #e8f5e9; color: #2e7d32; }
+.viz-example canvas { display: block; margin: 0 auto; }
+.viz-example .caption { text-align: center; margin-top: 10px; font-size: 0.9em; color: #666; font-style: italic; }
+.chart-selector { margin: 15px 0; }
+.chart-btn { width: 100%; padding: 10px; margin: 5px 0; border: 2px solid #667eea; background: #fff; color: #667eea; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.2s; }
+.chart-btn:hover { background: #667eea; color: #fff; }
+.chart-btn.active { background: #667eea; color: #fff; }
+.key-points { background: #e8f5e9; padding: 15px; border-radius: 8px; margin: 15px 0; }
+.key-points ul { margin-left: 20px; line-height: 1.8; font-size: 0.9em; }
+.game-cta { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; padding: 30px; border-radius: 15px; text-align: center; margin-top: 30px; }
+.game-cta h3 { font-size: 1.8em; margin-bottom: 15px; }
+.game-cta p { font-size: 1.1em; margin-bottom: 20px; opacity: 0.9; }
+.game-cta a { display: inline-block; background: #fff; color: #667eea; padding: 15px 40px; border-radius: 10px; text-decoration: none; font-weight: 700; font-size: 1.2em; transition: all 0.3s; }
+.game-cta a:hover { transform: translateY(-3px); box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
+</style>
+</head>
+<body>
+<nav class="nav-header">
+    <div class="nav-title">Data Visualization</div>
+    <a href="../../index.html">← Back to Home</a>
+</nav>
+<div class="container">
+    <h1>Data Visualization - Telling a Story With Data</h1>
+
+    <div class="intro">
+        <h2>What is Data Visualization?</h2>
+        <p>
+            Data visualization is the art and science of presenting data in graphical form to make it easier
+            to understand, analyze, and communicate insights. A well-designed visualization can reveal patterns,
+            trends, and relationships that would be hidden in raw numbers. But poorly designed visualizations
+            can confuse, mislead, or obscure the truth. The difference between a good and bad visualization
+            often lies in a few key design principles.
+        </p>
+    </div>
+
+    <div class="main-content">
+        <div class="sidebar">
+            <h3>Visualization Examples</h3>
+            <div class="chart-selector">
+                <button class="chart-btn active" onclick="showExample(1)">Example 1: Color Choice</button>
+                <button class="chart-btn" onclick="showExample(2)">Example 2: Labeling</button>
+                <button class="chart-btn" onclick="showExample(3)">Example 3: Decluttering</button>
+            </div>
+
+            <div class="key-points">
+                <h4>Design Principles:</h4>
+                <ul>
+                    <li><strong>Clarity:</strong> Make the message obvious</li>
+                    <li><strong>Simplicity:</strong> Remove unnecessary elements</li>
+                    <li><strong>Accuracy:</strong> Don't distort the data</li>
+                    <li><strong>Accessibility:</strong> Consider colorblind viewers</li>
+                    <li><strong>Context:</strong> Provide necessary information</li>
+                </ul>
+            </div>
+
+            <div class="explanation">
+                <h4>Why It Matters:</h4>
+                <p style="font-size: 0.9em; line-height: 1.6;">
+                    Poor visualizations waste time, confuse decision-makers, and can lead to bad choices.
+                    Good visualizations save time, clarify complex information, and drive better decisions.
+                    The same data can tell very different stories depending on how it's presented!
+                </p>
+            </div>
+        </div>
+
+        <div>
+            <div class="comparison-container">
+                <div class="comparison-title" id="exampleTitle">Color Choice: Before & After</div>
+
+                <div class="before-after" id="exampleContainer">
+                    <!-- Populated by JavaScript -->
+                </div>
+            </div>
+
+            <div class="principles-grid">
+                <div class="principle-card">
+                    <h4>Choose Colors Wisely</h4>
+                    <ul>
+                        <li>Use colorblind-friendly palettes</li>
+                        <li>Avoid red-green combinations alone</li>
+                        <li>Use color to highlight key insights</li>
+                        <li>Maintain consistency across charts</li>
+                        <li>Consider cultural color associations</li>
+                    </ul>
+                </div>
+                <div class="principle-card">
+                    <h4>Label Clearly</h4>
+                    <ul>
+                        <li>Add descriptive axis labels with units</li>
+                        <li>Include a clear, informative title</li>
+                        <li>Label data points directly when possible</li>
+                        <li>Use legends only when necessary</li>
+                        <li>Make text large enough to read</li>
+                    </ul>
+                </div>
+                <div class="principle-card">
+                    <h4>Highlight Insights</h4>
+                    <ul>
+                        <li>Draw attention to key findings</li>
+                        <li>Use annotations to explain anomalies</li>
+                        <li>Emphasize important data points</li>
+                        <li>Add reference lines for context</li>
+                        <li>Tell a story with your data</li>
+                    </ul>
+                </div>
+                <div class="principle-card">
+                    <h4>Avoid Clutter</h4>
+                    <ul>
+                        <li>Remove unnecessary gridlines</li>
+                        <li>Eliminate redundant labels</li>
+                        <li>Simplify color schemes</li>
+                        <li>Use whitespace effectively</li>
+                        <li>Focus on the data, not decoration</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="explanation">
+                <h4>The Data-to-Ink Ratio:</h4>
+                <p style="line-height: 1.8;">
+                    Introduced by Edward Tufte, the data-to-ink ratio is the proportion of a graphic's ink devoted
+                    to displaying data versus non-data elements. <strong>Maximize the data-to-ink ratio</strong> by
+                    removing chart junk: unnecessary 3D effects, excessive gridlines, decorative elements, and
+                    redundant labels. Every element should serve a purpose in communicating the data.
+                </p>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 20px;">
+                <div style="background: #e3f2fd; padding: 15px; border-radius: 8px;">
+                    <strong>Business Analytics</strong>
+                    <p style="margin-top: 8px; font-size: 0.9em;">Sales dashboards, performance metrics, trend analysis</p>
+                </div>
+                <div style="background: #f3e5f5; padding: 15px; border-radius: 8px;">
+                    <strong>Scientific Research</strong>
+                    <p style="margin-top: 8px; font-size: 0.9em;">Experimental results, statistical analysis, data exploration</p>
+                </div>
+                <div style="background: #e8f5e9; padding: 15px; border-radius: 8px;">
+                    <strong>Journalism</strong>
+                    <p style="margin-top: 8px; font-size: 0.9em;">Data stories, infographics, public information</p>
+                </div>
+            </div>
+
+            <div style="background: #fff3e0; padding: 20px; border-radius: 10px; margin-top: 20px; border-left: 4px solid #ff9800;">
+                <h4 style="color: #e65100; margin-bottom: 10px;">Fun Fact: The Power of Visualization</h4>
+                <p style="line-height: 1.6;">
+                    One of the most famous visualizations in history is <strong>John Snow's 1854 cholera map</strong>.
+                    By plotting cholera deaths on a map of London, he identified a contaminated water pump as the source
+                    of an outbreak, revolutionizing epidemiology. A simple dot map saved thousands of lives and changed
+                    how we understand disease transmission!
+                </p>
+            </div>
+
+            <div class="game-cta">
+                <h3>Ready to Practice?</h3>
+                <p>Test your data interpretation skills with scatterplots and learn to spot patterns, outliers, and correlations!</p>
+                <a href="../../games/data-visualization/index.html">Play Story from a Scatterplot</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const examples = {
+    1: {
+        title: "Color Choice: Before & After",
+        before: {
+            title: "Before: Poor Color Choice",
+            caption: "Red and green bars are difficult for colorblind viewers to distinguish",
+            draw: (canvas) => drawBarChart(canvas, ['#d32f2f', '#388e3c', '#d32f2f', '#388e3c'], false)
+        },
+        after: {
+            title: "After: Colorblind-Friendly",
+            caption: "Blue and orange are distinguishable by most colorblind viewers",
+            draw: (canvas) => drawBarChart(canvas, ['#1976d2', '#f57c00', '#1976d2', '#f57c00'], true)
+        }
+    },
+    2: {
+        title: "Clear Labeling: Before & After",
+        before: {
+            title: "Before: Missing Context",
+            caption: "No axis labels, unclear title, no units - what does this show?",
+            draw: (canvas) => drawLineChart(canvas, false)
+        },
+        after: {
+            title: "After: Well Labeled",
+            caption: "Clear title, axis labels with units, and easy to understand",
+            draw: (canvas) => drawLineChart(canvas, true)
+        }
+    },
+    3: {
+        title: "Decluttering: Before & After",
+        before: {
+            title: "Before: Too Much Clutter",
+            caption: "Heavy gridlines, 3D effects, and decorative elements distract from data",
+            draw: (canvas) => drawScatterPlot(canvas, false)
+        },
+        after: {
+            title: "After: Clean & Simple",
+            caption: "Minimal gridlines, 2D, focus on the data and its message",
+            draw: (canvas) => drawScatterPlot(canvas, true)
+        }
+    }
+};
+
+let currentExample = 1;
+
+function showExample(num) {
+    currentExample = num;
+    document.querySelectorAll('.chart-btn').forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+    renderExample();
+}
+
+function renderExample() {
+    const example = examples[currentExample];
+    document.getElementById('exampleTitle').textContent = example.title;
+
+    const container = document.getElementById('exampleContainer');
+    container.innerHTML = `
+        <div class="viz-example before">
+            <h3>${example.before.title}</h3>
+            <canvas id="beforeCanvas" width="500" height="300"></canvas>
+            <div class="caption">${example.before.caption}</div>
+        </div>
+        <div class="viz-example after">
+            <h3>${example.after.title}</h3>
+            <canvas id="afterCanvas" width="500" height="300"></canvas>
+            <div class="caption">${example.after.caption}</div>
+        </div>
+    `;
+
+    const beforeCanvas = document.getElementById('beforeCanvas');
+    const afterCanvas = document.getElementById('afterCanvas');
+    example.before.draw(beforeCanvas);
+    example.after.draw(afterCanvas);
+}
+
+function drawBarChart(canvas, colors, improved) {
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const data = [65, 45, 80, 55];
+    const labels = ['Q1', 'Q2', 'Q3', 'Q4'];
+    const barWidth = 80;
+    const spacing = 100;
+    const maxValue = 100;
+    const chartHeight = 200;
+    const offsetX = 80;
+    const offsetY = 50;
+
+    // Draw axes if improved
+    if (improved) {
+        ctx.strokeStyle = '#333';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(offsetX, offsetY);
+        ctx.lineTo(offsetX, offsetY + chartHeight);
+        ctx.lineTo(offsetX + 400, offsetY + chartHeight);
+        ctx.stroke();
+
+        // Y-axis label
+        ctx.fillStyle = '#333';
+        ctx.font = 'bold 12px Arial';
+        ctx.save();
+        ctx.translate(20, 150);
+        ctx.rotate(-Math.PI / 2);
+        ctx.fillText('Sales ($1000s)', 0, 0);
+        ctx.restore();
+
+        // X-axis label
+        ctx.fillText('Quarter', 260, 280);
+    }
+
+    // Draw bars
+    data.forEach((value, i) => {
+        const x = offsetX + 20 + i * spacing;
+        const barHeight = (value / maxValue) * chartHeight;
+        const y = offsetY + chartHeight - barHeight;
+
+        // Add 3D effect if not improved
+        if (!improved) {
+            ctx.fillStyle = '#999';
+            ctx.fillRect(x + 5, y - 5, barWidth, barHeight);
+        }
+
+        ctx.fillStyle = colors[i];
+        ctx.fillRect(x, y, barWidth, barHeight);
+
+        // Labels
+        ctx.fillStyle = '#333';
+        ctx.font = '12px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText(labels[i], x + barWidth / 2, offsetY + chartHeight + 20);
+
+        if (improved) {
+            ctx.fillText(value, x + barWidth / 2, y - 5);
+        }
+    });
+
+    // Title
+    ctx.fillStyle = '#333';
+    ctx.font = improved ? 'bold 14px Arial' : '12px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText(improved ? 'Quarterly Sales Performance' : 'Chart', 250, 25);
+}
+
+function drawLineChart(canvas, improved) {
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const data = [30, 45, 38, 55, 48, 70, 65];
+    const offsetX = 70;
+    const offsetY = 40;
+    const chartWidth = 400;
+    const chartHeight = 200;
+
+    // Draw axes
+    ctx.strokeStyle = improved ? '#333' : '#ccc';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(offsetX, offsetY);
+    ctx.lineTo(offsetX, offsetY + chartHeight);
+    ctx.lineTo(offsetX + chartWidth, offsetY + chartHeight);
+    ctx.stroke();
+
+    if (improved) {
+        // Y-axis label
+        ctx.fillStyle = '#333';
+        ctx.font = 'bold 12px Arial';
+        ctx.save();
+        ctx.translate(20, 140);
+        ctx.rotate(-Math.PI / 2);
+        ctx.fillText('Temperature (°F)', 0, 0);
+        ctx.restore();
+
+        // X-axis label
+        ctx.fillText('Day of Week', 270, 270);
+
+        // Title
+        ctx.textAlign = 'center';
+        ctx.font = 'bold 14px Arial';
+        ctx.fillText('Weekly Temperature Trend', 270, 25);
+
+        // Day labels
+        const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+        ctx.font = '11px Arial';
+        days.forEach((day, i) => {
+            const x = offsetX + (i * chartWidth / 6);
+            ctx.fillText(day, x, offsetY + chartHeight + 20);
+        });
+    }
+
+    // Draw line
+    ctx.strokeStyle = improved ? '#1976d2' : '#666';
+    ctx.lineWidth = improved ? 3 : 2;
+    ctx.beginPath();
+
+    data.forEach((value, i) => {
+        const x = offsetX + (i * chartWidth / (data.length - 1));
+        const y = offsetY + chartHeight - (value / 80 * chartHeight);
+
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+    });
+
+    ctx.stroke();
+
+    // Draw points
+    data.forEach((value, i) => {
+        const x = offsetX + (i * chartWidth / (data.length - 1));
+        const y = offsetY + chartHeight - (value / 80 * chartHeight);
+
+        ctx.fillStyle = improved ? '#1976d2' : '#666';
+        ctx.beginPath();
+        ctx.arc(x, y, improved ? 5 : 3, 0, Math.PI * 2);
+        ctx.fill();
+
+        if (improved) {
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        }
+    });
+}
+
+function drawScatterPlot(canvas, improved) {
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const data = [];
+    for (let i = 0; i < 40; i++) {
+        const x = 20 + Math.random() * 60;
+        const y = x * 0.8 + (Math.random() - 0.5) * 20;
+        data.push({ x, y });
+    }
+
+    const offsetX = 70;
+    const offsetY = 40;
+    const chartWidth = 400;
+    const chartHeight = 200;
+
+    if (!improved) {
+        // Heavy gridlines
+        ctx.strokeStyle = '#999';
+        ctx.lineWidth = 1;
+        for (let i = 0; i <= 10; i++) {
+            ctx.beginPath();
+            ctx.moveTo(offsetX, offsetY + i * 20);
+            ctx.lineTo(offsetX + chartWidth, offsetY + i * 20);
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(offsetX + i * 40, offsetY);
+            ctx.lineTo(offsetX + i * 40, offsetY + chartHeight);
+            ctx.stroke();
+        }
+    } else {
+        // Light gridlines
+        ctx.strokeStyle = '#f0f0f0';
+        ctx.lineWidth = 1;
+        for (let i = 0; i <= 5; i++) {
+            ctx.beginPath();
+            ctx.moveTo(offsetX, offsetY + i * 40);
+            ctx.lineTo(offsetX + chartWidth, offsetY + i * 40);
+            ctx.stroke();
+        }
+    }
+
+    // Draw axes
+    ctx.strokeStyle = '#333';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(offsetX, offsetY);
+    ctx.lineTo(offsetX, offsetY + chartHeight);
+    ctx.lineTo(offsetX + chartWidth, offsetY + chartHeight);
+    ctx.stroke();
+
+    if (improved) {
+        // Labels
+        ctx.fillStyle = '#333';
+        ctx.font = 'bold 12px Arial';
+        ctx.save();
+        ctx.translate(20, 140);
+        ctx.rotate(-Math.PI / 2);
+        ctx.fillText('Sales Revenue ($1000s)', 0, 0);
+        ctx.restore();
+
+        ctx.fillText('Marketing Spend ($1000s)', 230, 270);
+
+        // Title
+        ctx.textAlign = 'center';
+        ctx.font = 'bold 14px Arial';
+        ctx.fillText('Marketing Spend vs. Sales Revenue', 270, 25);
+
+        // Trend line
+        ctx.strokeStyle = '#f57c00';
+        ctx.lineWidth = 2;
+        ctx.setLineDash([5, 5]);
+        ctx.beginPath();
+        ctx.moveTo(offsetX, offsetY + chartHeight - 20);
+        ctx.lineTo(offsetX + chartWidth, offsetY + 20);
+        ctx.stroke();
+        ctx.setLineDash([]);
+    }
+
+    // Draw points
+    data.forEach(point => {
+        const x = offsetX + (point.x / 80 * chartWidth);
+        const y = offsetY + chartHeight - (point.y / 80 * chartHeight);
+
+        if (!improved) {
+            // 3D shadow effect
+            ctx.fillStyle = '#999';
+            ctx.beginPath();
+            ctx.arc(x + 2, y - 2, 5, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        ctx.fillStyle = improved ? '#2196F3' : '#f44336';
+        ctx.beginPath();
+        ctx.arc(x, y, improved ? 5 : 6, 0, Math.PI * 2);
+        ctx.fill();
+
+        if (improved) {
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        }
+    });
+}
+
+// Initialize
+renderExample();
+</script>
+</body>
+</html>

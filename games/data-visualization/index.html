@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Story from a Scatterplot - Data Visualization Game</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 0; }
+.nav-header { background: #2d3748; padding: 15px 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; }
+.nav-header a { color: #90cdf4; text-decoration: none; font-weight: 600; font-size: 1.1em; }
+.nav-title { color: #fff; font-size: 1.2em; font-weight: 700; }
+.container { max-width: 1400px; margin: 20px auto; background: #fff; border-radius: 15px; padding: 30px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+h1 { text-align: center; color: #2d3748; font-size: 2.5em; margin-bottom: 10px; }
+.subtitle { text-align: center; color: #666; margin-bottom: 30px; font-size: 1.1em; }
+.game-area { display: grid; grid-template-columns: 350px 1fr; gap: 30px; }
+.sidebar { background: #f8f9fa; padding: 20px; border-radius: 10px; height: fit-content; }
+button { width: 100%; padding: 12px; margin: 5px 0; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.2s; }
+.btn-primary { background: #4CAF50; color: #fff; }
+.btn-primary:hover { background: #45a049; }
+.btn-secondary { background: #2196F3; color: #fff; }
+.btn-secondary:hover { background: #0b7dda; }
+canvas { border: 2px solid #ddd; border-radius: 8px; display: block; background: #fff; margin: 0 auto; }
+.stats { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; padding: 15px; border-radius: 10px; margin: 15px 0; }
+.stat-row { display: flex; justify-content: space-between; margin: 8px 0; }
+.score-board { background: #fff9c4; padding: 20px; border-radius: 10px; text-align: center; margin: 20px 0; border: 2px solid #fbc02d; }
+.score-board h2 { color: #f57c00; margin-bottom: 10px; }
+.score-value { font-size: 2.5em; font-weight: bold; color: #667eea; }
+.question-section { background: #f8f9fa; padding: 20px; border-radius: 10px; margin: 20px 0; }
+.question { font-size: 1.2em; font-weight: 600; color: #2d3748; margin-bottom: 15px; }
+.answer-options { display: flex; flex-direction: column; gap: 10px; }
+.answer-btn { padding: 15px; border: 2px solid #ddd; background: #fff; border-radius: 8px; cursor: pointer; font-weight: 600; text-align: left; transition: all 0.2s; font-size: 1em; }
+.answer-btn:hover { border-color: #667eea; background: #f0f0ff; transform: translateX(5px); }
+.answer-btn.selected { border-color: #667eea; background: #e3f2fd; }
+.answer-btn.correct { border-color: #4CAF50; background: #e8f5e9; }
+.answer-btn.incorrect { border-color: #f44336; background: #ffebee; }
+.answer-btn:disabled { cursor: not-allowed; opacity: 0.7; }
+.feedback { padding: 15px; border-radius: 8px; margin-top: 15px; display: none; }
+.feedback.show { display: block; animation: slideIn 0.3s; }
+.feedback.correct { background: #e8f5e9; border-left: 4px solid #4CAF50; color: #2e7d32; }
+.feedback.incorrect { background: #ffebee; border-left: 4px solid #f44336; color: #c62828; }
+.feedback strong { display: block; margin-bottom: 5px; font-size: 1.1em; }
+@keyframes slideIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+.progress-indicator { background: #e0e0e0; height: 8px; border-radius: 4px; margin: 15px 0; overflow: hidden; }
+.progress-bar { height: 100%; background: linear-gradient(90deg, #667eea, #764ba2); transition: width 0.3s; }
+.info-box { background: #e3f2fd; padding: 15px; border-radius: 8px; margin: 15px 0; }
+.info-box h4 { color: #1976d2; margin-bottom: 8px; }
+.scenario-info { background: #fff; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #667eea; }
+.scenario-info h3 { color: #667eea; margin-bottom: 5px; }
+.scenario-info p { color: #666; font-size: 0.95em; }
+.chart-title { text-align: center; font-size: 1.3em; font-weight: 600; color: #2d3748; margin-bottom: 10px; }
+</style>
+</head>
+<body>
+<nav class="nav-header">
+    <div class="nav-title">Story from a Scatterplot</div>
+    <a href="../../index.html">← Back to Home</a>
+</nav>
+<div class="container">
+    <h1>Story from a Scatterplot</h1>
+    <p class="subtitle">Interpret data patterns and tell the story hidden in scatterplots!</p>
+
+    <div class="game-area">
+        <div class="sidebar">
+            <h3>Game Progress</h3>
+
+            <div class="progress-indicator">
+                <div class="progress-bar" id="progressBar" style="width: 0%"></div>
+            </div>
+            <div style="text-align: center; margin-bottom: 15px; color: #666;">
+                <span id="progressText">Question 0 of 10</span>
+            </div>
+
+            <button class="btn-primary" onclick="startGame()">Start Game</button>
+            <button class="btn-secondary" onclick="nextQuestion()">Next Question</button>
+            <button class="btn-secondary" onclick="showHint()">Show Hint</button>
+
+            <div class="stats">
+                <div class="stat-row"><span>Questions Answered:</span><span id="answered">0</span></div>
+                <div class="stat-row"><span>Correct:</span><span id="correct">0</span></div>
+                <div class="stat-row"><span>Accuracy:</span><span id="accuracy">0%</span></div>
+                <div class="stat-row"><span>Score:</span><span id="score">0</span></div>
+            </div>
+
+            <div class="info-box">
+                <h4>What to Look For:</h4>
+                <p style="font-size: 0.9em; line-height: 1.6;">
+                    <strong>Correlation:</strong> Do points trend up/down?<br>
+                    <strong>Clusters:</strong> Are there groups?<br>
+                    <strong>Outliers:</strong> Any unusual points?<br>
+                    <strong>Strength:</strong> How tight is the pattern?<br>
+                    <strong>Direction:</strong> Positive, negative, or none?
+                </p>
+            </div>
+
+            <div id="hintBox" class="feedback" style="display: none; background: #fff3e0; border-left: 4px solid #ff9800; color: #e65100;">
+                <strong>Hint:</strong>
+                <span id="hintText"></span>
+            </div>
+        </div>
+
+        <div>
+            <div class="score-board">
+                <h2>Current Score</h2>
+                <div class="score-value" id="displayScore">0</div>
+            </div>
+
+            <div class="scenario-info" id="scenarioInfo">
+                <h3 id="scenarioTitle">Click "Start Game" to begin!</h3>
+                <p id="scenarioDesc">You'll see scatterplots and interpret the patterns they reveal.</p>
+            </div>
+
+            <div class="chart-title" id="chartTitle"></div>
+            <canvas id="canvas" width="900" height="500"></canvas>
+
+            <div class="question-section" id="questionSection" style="display: none;">
+                <div class="question" id="questionText"></div>
+                <div class="answer-options" id="answerOptions"></div>
+                <div class="feedback" id="feedback"></div>
+            </div>
+
+            <div style="background: #fff3e0; padding: 20px; border-radius: 10px; margin-top: 20px; border-left: 4px solid #ff9800;">
+                <h4 style="color: #e65100; margin-bottom: 10px;">Understanding Scatterplots</h4>
+                <p style="line-height: 1.6;">
+                    Scatterplots reveal relationships between two variables. A <strong>positive correlation</strong> means
+                    both variables increase together. A <strong>negative correlation</strong> means one increases as the other
+                    decreases. <strong>No correlation</strong> means there's no clear pattern. Look for clusters (groups of similar
+                    points) and outliers (unusual points far from the pattern) to tell the complete data story!
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+
+const scenarios = [
+    {
+        title: "Study Time vs. Test Scores",
+        description: "Students tracked their study hours and test scores",
+        xLabel: "Study Hours",
+        yLabel: "Test Score (%)",
+        type: "positive",
+        strength: "strong",
+        data: generateCorrelatedData(30, 0.85, 10, 100, 0, 100, 20),
+        questions: [
+            {
+                question: "What type of correlation does this scatterplot show?",
+                answers: [
+                    { text: "Strong positive correlation - more study time leads to higher scores", correct: true },
+                    { text: "Negative correlation - more study time leads to lower scores", correct: false },
+                    { text: "No correlation - study time doesn't affect scores", correct: false },
+                    { text: "Weak positive correlation - study time barely affects scores", correct: false }
+                ],
+                hint: "Look at the overall trend - as study hours increase (moving right), what happens to test scores (moving up or down)?"
+            },
+            {
+                question: "What can we conclude from this data?",
+                answers: [
+                    { text: "Students who study more tend to score higher on tests", correct: true },
+                    { text: "Studying has no impact on test performance", correct: false },
+                    { text: "Students should study less to score higher", correct: false },
+                    { text: "All students score the same regardless of study time", correct: false }
+                ],
+                hint: "The pattern shows a clear upward trend from left to right."
+            }
+        ]
+    },
+    {
+        title: "Car Age vs. Resale Value",
+        description: "Used car prices based on vehicle age",
+        xLabel: "Car Age (years)",
+        yLabel: "Resale Value ($1000s)",
+        type: "negative",
+        strength: "strong",
+        data: generateCorrelatedData(35, -0.8, 0, 10, 5, 40, 25),
+        questions: [
+            {
+                question: "What relationship exists between car age and resale value?",
+                answers: [
+                    { text: "Strong negative correlation - older cars have lower resale values", correct: true },
+                    { text: "Positive correlation - older cars are worth more", correct: false },
+                    { text: "No correlation - age doesn't affect car value", correct: false },
+                    { text: "Cars lose value initially then gain value", correct: false }
+                ],
+                hint: "As cars get older (moving right on the x-axis), observe what happens to their value (y-axis)."
+            },
+            {
+                question: "Based on this pattern, what happens to a car's value over time?",
+                answers: [
+                    { text: "Cars depreciate (lose value) as they age", correct: true },
+                    { text: "Cars appreciate (gain value) over time", correct: false },
+                    { text: "Car value remains constant regardless of age", correct: false },
+                    { text: "Value increases sharply after 5 years", correct: false }
+                ],
+                hint: "The downward trend shows the relationship between time and value."
+            }
+        ]
+    },
+    {
+        title: "Temperature vs. Ice Cream Sales",
+        description: "Daily ice cream sales at different temperatures",
+        xLabel: "Temperature (°F)",
+        yLabel: "Ice Cream Sales ($)",
+        type: "positive",
+        strength: "moderate",
+        data: generateCorrelatedData(40, 0.7, 50, 100, 100, 800, 80),
+        questions: [
+            {
+                question: "What pattern do you observe in this data?",
+                answers: [
+                    { text: "Moderate positive correlation - warmer days have higher ice cream sales", correct: true },
+                    { text: "Negative correlation - people buy less ice cream when it's hot", correct: false },
+                    { text: "Perfect correlation - temperature completely determines sales", correct: false },
+                    { text: "No pattern - temperature doesn't affect ice cream sales", correct: false }
+                ],
+                hint: "Notice the general upward trend, though there's some scatter in the points."
+            },
+            {
+                question: "Are there any outliers in this data?",
+                answers: [
+                    { text: "Yes, there are a few points that don't fit the general pattern", correct: true },
+                    { text: "No, all points follow the exact same trend line", correct: false },
+                    { text: "Every point is an outlier", correct: false },
+                    { text: "Outliers don't exist in scatterplots", correct: false }
+                ],
+                hint: "Look for points that are far away from where most points cluster along the trend."
+            }
+        ]
+    },
+    {
+        title: "Employee Experience vs. Salary",
+        description: "Annual salary based on years of experience",
+        xLabel: "Years of Experience",
+        yLabel: "Annual Salary ($1000s)",
+        type: "positive",
+        strength: "strong",
+        data: generateCorrelatedData(30, 0.82, 0, 20, 40, 120, 15),
+        questions: [
+            {
+                question: "What story does this scatterplot tell?",
+                answers: [
+                    { text: "More experienced employees generally earn higher salaries", correct: true },
+                    { text: "Experience has no impact on salary", correct: false },
+                    { text: "Experienced employees earn less than newcomers", correct: false },
+                    { text: "Everyone earns the same regardless of experience", correct: false }
+                ],
+                hint: "Follow the pattern from left (0 years) to right (20 years) and observe salary changes."
+            },
+            {
+                question: "How would you describe the strength of this relationship?",
+                answers: [
+                    { text: "Strong relationship - experience is a good predictor of salary", correct: true },
+                    { text: "Weak relationship - experience barely affects salary", correct: false },
+                    { text: "No relationship - the points are randomly scattered", correct: false },
+                    { text: "Perfect relationship - all points fall on one line", correct: false }
+                ],
+                hint: "Strong correlations have points tightly clustered around a trend line."
+            }
+        ]
+    },
+    {
+        title: "Random Numbers",
+        description: "Two sets of randomly generated numbers",
+        xLabel: "Random Variable A",
+        yLabel: "Random Variable B",
+        type: "none",
+        strength: "none",
+        data: generateCorrelatedData(50, 0.05, 0, 100, 0, 100, 30),
+        questions: [
+            {
+                question: "What correlation exists in this scatterplot?",
+                answers: [
+                    { text: "No correlation - the points show no clear pattern", correct: true },
+                    { text: "Strong positive correlation", correct: false },
+                    { text: "Strong negative correlation", correct: false },
+                    { text: "Multiple distinct clusters", correct: false }
+                ],
+                hint: "Look for any upward or downward trend - is there one?"
+            },
+            {
+                question: "What does this tell us about the relationship between these variables?",
+                answers: [
+                    { text: "These variables are independent - knowing one doesn't help predict the other", correct: true },
+                    { text: "They are perfectly related", correct: false },
+                    { text: "One causes the other to change", correct: false },
+                    { text: "There's a hidden pattern we can't see", correct: false }
+                ],
+                hint: "When points are scattered randomly with no pattern, the variables are independent."
+            }
+        ]
+    },
+    {
+        title: "Product Price vs. Quality Rating",
+        description: "Customer quality ratings for products at different prices",
+        xLabel: "Price ($)",
+        yLabel: "Quality Rating (1-10)",
+        type: "positive",
+        strength: "weak",
+        data: generateCorrelatedData(45, 0.35, 10, 200, 3, 10, 2),
+        questions: [
+            {
+                question: "What can we say about the price-quality relationship?",
+                answers: [
+                    { text: "Weak positive correlation - higher prices somewhat relate to better quality", correct: true },
+                    { text: "Strong correlation - expensive products are always better quality", correct: false },
+                    { text: "Negative correlation - expensive products have worse quality", correct: false },
+                    { text: "No correlation whatsoever", correct: false }
+                ],
+                hint: "There's a slight upward trend, but points are quite scattered."
+            },
+            {
+                question: "Based on this data, is price a reliable predictor of quality?",
+                answers: [
+                    { text: "Not very reliable - there's high variability in quality at all price points", correct: true },
+                    { text: "Very reliable - price perfectly predicts quality", correct: false },
+                    { text: "Perfectly reliable - all expensive items have high ratings", correct: false },
+                    { text: "Price and quality are completely unrelated", correct: false }
+                ],
+                hint: "Weak correlations mean one variable is not a strong predictor of the other."
+            }
+        ]
+    },
+    {
+        title: "Advertising Spend vs. Sales Revenue",
+        description: "Monthly sales revenue based on advertising expenditure",
+        xLabel: "Ad Spend ($1000s)",
+        yLabel: "Sales Revenue ($1000s)",
+        type: "positive",
+        strength: "strong",
+        data: generateCorrelatedData(35, 0.88, 5, 50, 50, 500, 40),
+        questions: [
+            {
+                question: "What does this scatterplot reveal about advertising?",
+                answers: [
+                    { text: "Strong positive correlation - more advertising leads to higher sales", correct: true },
+                    { text: "Advertising has no effect on sales", correct: false },
+                    { text: "Advertising decreases sales revenue", correct: false },
+                    { text: "The relationship is completely random", correct: false }
+                ],
+                hint: "Observe how sales change as advertising spending increases."
+            },
+            {
+                question: "If a company wanted to increase sales, what does this data suggest?",
+                answers: [
+                    { text: "Increasing advertising spend would likely increase sales revenue", correct: true },
+                    { text: "They should decrease advertising spending", correct: false },
+                    { text: "Advertising spending makes no difference", correct: false },
+                    { text: "They should eliminate all advertising", correct: false }
+                ],
+                hint: "The strong positive correlation suggests a predictable relationship."
+            }
+        ]
+    },
+    {
+        title: "Distance from City Center vs. Rent Price",
+        description: "Monthly apartment rent based on distance from downtown",
+        xLabel: "Distance from Center (miles)",
+        yLabel: "Monthly Rent ($)",
+        type: "negative",
+        strength: "moderate",
+        data: generateCorrelatedData(40, -0.65, 0, 15, 800, 2500, 180),
+        questions: [
+            {
+                question: "What pattern exists in this housing data?",
+                answers: [
+                    { text: "Moderate negative correlation - rent decreases with distance from downtown", correct: true },
+                    { text: "Positive correlation - rent increases with distance", correct: false },
+                    { text: "No correlation - location doesn't affect rent", correct: false },
+                    { text: "Perfect negative correlation - every mile costs the same", correct: false }
+                ],
+                hint: "As apartments get farther from the city center, what happens to rental prices?"
+            },
+            {
+                question: "Why might this pattern exist?",
+                answers: [
+                    { text: "Downtown locations are more desirable, commanding higher rents", correct: true },
+                    { text: "Distant apartments are more valuable", correct: false },
+                    { text: "Location has no impact on housing costs", correct: false },
+                    { text: "All apartments cost the same", correct: false }
+                ],
+                hint: "Consider why people might pay more to live closer to the city center."
+            }
+        ]
+    },
+    {
+        title: "Student Age vs. Video Game Score",
+        description: "High scores in a video game by player age",
+        xLabel: "Player Age",
+        yLabel: "High Score",
+        type: "clusters",
+        strength: "moderate",
+        data: generateClusteredData(),
+        questions: [
+            {
+                question: "What unique feature do you notice in this scatterplot?",
+                answers: [
+                    { text: "There are distinct clusters - possibly different skill groups", correct: true },
+                    { text: "Perfect linear correlation", correct: false },
+                    { text: "All points are outliers", correct: false },
+                    { text: "No pattern exists", correct: false }
+                ],
+                hint: "Look for groups of points that cluster together rather than one continuous pattern."
+            },
+            {
+                question: "What might these clusters represent?",
+                answers: [
+                    { text: "Different groups: casual players, regular players, and expert players", correct: true },
+                    { text: "Measurement errors in the data", correct: false },
+                    { text: "All players have identical skills", correct: false },
+                    { text: "Random noise with no meaning", correct: false }
+                ],
+                hint: "Clusters often represent distinct subgroups within the population."
+            }
+        ]
+    },
+    {
+        title: "Hours of Sleep vs. Productivity Score",
+        description: "Daily productivity scores based on hours of sleep",
+        xLabel: "Hours of Sleep",
+        yLabel: "Productivity Score",
+        type: "curved",
+        strength: "moderate",
+        data: generateCurvedData(),
+        questions: [
+            {
+                question: "What unusual pattern do you observe?",
+                answers: [
+                    { text: "Non-linear relationship - productivity is highest at moderate sleep hours", correct: true },
+                    { text: "Simple positive correlation - more sleep always means more productivity", correct: false },
+                    { text: "Negative correlation - sleep reduces productivity", correct: false },
+                    { text: "No relationship between sleep and productivity", correct: false }
+                ],
+                hint: "Look at the shape of the pattern - is it a straight line or curved?"
+            },
+            {
+                question: "What does this data suggest about optimal sleep?",
+                answers: [
+                    { text: "There's an optimal range (around 7-8 hours) - too little or too much reduces productivity", correct: true },
+                    { text: "More sleep is always better for productivity", correct: false },
+                    { text: "Less sleep improves productivity", correct: false },
+                    { text: "Sleep has no effect on productivity", correct: false }
+                ],
+                hint: "Notice how productivity peaks in the middle range of sleep hours."
+            }
+        ]
+    }
+];
+
+function generateCorrelatedData(count, correlation, xMin, xMax, yMin, yMax, noise) {
+    const data = [];
+    for (let i = 0; i < count; i++) {
+        const x = xMin + Math.random() * (xMax - xMin);
+        const y = yMin + correlation * ((x - xMin) / (xMax - xMin)) * (yMax - yMin) +
+                  (Math.random() - 0.5) * noise;
+        data.push({
+            x: Math.max(xMin, Math.min(xMax, x)),
+            y: Math.max(yMin, Math.min(yMax, y))
+        });
+    }
+    return data;
+}
+
+function generateClusteredData() {
+    const data = [];
+    // Cluster 1: Casual players (low scores)
+    for (let i = 0; i < 15; i++) {
+        data.push({
+            x: 8 + Math.random() * 8,
+            y: 1000 + Math.random() * 2000
+        });
+    }
+    // Cluster 2: Regular players (medium scores)
+    for (let i = 0; i < 15; i++) {
+        data.push({
+            x: 10 + Math.random() * 10,
+            y: 4000 + Math.random() * 3000
+        });
+    }
+    // Cluster 3: Expert players (high scores)
+    for (let i = 0; i < 12; i++) {
+        data.push({
+            x: 12 + Math.random() * 8,
+            y: 8000 + Math.random() * 2500
+        });
+    }
+    return data;
+}
+
+function generateCurvedData() {
+    const data = [];
+    for (let i = 0; i < 40; i++) {
+        const x = 4 + Math.random() * 8;
+        const optimal = 7.5;
+        const distance = Math.abs(x - optimal);
+        const y = 100 - distance * distance * 5 + (Math.random() - 0.5) * 15;
+        data.push({ x, y: Math.max(30, Math.min(100, y)) });
+    }
+    return data;
+}
+
+let currentScenarioIndex = 0;
+let currentQuestionIndex = 0;
+let totalAnswered = 0;
+let totalCorrect = 0;
+let score = 0;
+let gameStarted = false;
+
+function startGame() {
+    currentScenarioIndex = 0;
+    currentQuestionIndex = 0;
+    totalAnswered = 0;
+    totalCorrect = 0;
+    score = 0;
+    gameStarted = true;
+    updateStats();
+    loadScenario();
+}
+
+function loadScenario() {
+    if (currentScenarioIndex >= scenarios.length) {
+        endGame();
+        return;
+    }
+
+    const scenario = scenarios[currentScenarioIndex];
+    currentQuestionIndex = 0;
+
+    document.getElementById('scenarioTitle').textContent = scenario.title;
+    document.getElementById('scenarioDesc').textContent = scenario.description;
+    document.getElementById('chartTitle').textContent = scenario.title;
+
+    drawScatterplot(scenario);
+    loadQuestion();
+}
+
+function loadQuestion() {
+    const scenario = scenarios[currentScenarioIndex];
+    const question = scenario.questions[currentQuestionIndex];
+
+    document.getElementById('questionSection').style.display = 'block';
+    document.getElementById('questionText').textContent = question.question;
+    document.getElementById('hintBox').style.display = 'none';
+    document.getElementById('hintText').textContent = question.hint;
+
+    const optionsContainer = document.getElementById('answerOptions');
+    optionsContainer.innerHTML = '';
+
+    question.answers.forEach((answer, index) => {
+        const btn = document.createElement('button');
+        btn.className = 'answer-btn';
+        btn.textContent = answer.text;
+        btn.onclick = () => selectAnswer(index);
+        optionsContainer.appendChild(btn);
+    });
+
+    document.getElementById('feedback').className = 'feedback';
+    updateProgress();
+}
+
+function selectAnswer(answerIndex) {
+    const scenario = scenarios[currentScenarioIndex];
+    const question = scenario.questions[currentQuestionIndex];
+    const selectedAnswer = question.answers[answerIndex];
+
+    totalAnswered++;
+
+    const buttons = document.querySelectorAll('.answer-btn');
+    buttons.forEach(btn => btn.disabled = true);
+    buttons[answerIndex].classList.add('selected');
+
+    const feedbackEl = document.getElementById('feedback');
+
+    if (selectedAnswer.correct) {
+        totalCorrect++;
+        score += 100;
+        buttons[answerIndex].classList.add('correct');
+        feedbackEl.className = 'feedback correct show';
+        feedbackEl.innerHTML = '<strong>Correct!</strong> ' + getPositiveFeedback();
+    } else {
+        buttons[answerIndex].classList.add('incorrect');
+        const correctIndex = question.answers.findIndex(a => a.correct);
+        buttons[correctIndex].classList.add('correct');
+        feedbackEl.className = 'feedback incorrect show';
+        feedbackEl.innerHTML = '<strong>Incorrect.</strong> The correct answer is: ' +
+                               question.answers[correctIndex].text;
+    }
+
+    updateStats();
+
+    setTimeout(() => {
+        moveToNextQuestion();
+    }, 3000);
+}
+
+function moveToNextQuestion() {
+    const scenario = scenarios[currentScenarioIndex];
+    currentQuestionIndex++;
+
+    if (currentQuestionIndex >= scenario.questions.length) {
+        currentScenarioIndex++;
+        loadScenario();
+    } else {
+        loadQuestion();
+    }
+}
+
+function nextQuestion() {
+    if (!gameStarted) {
+        alert('Please start the game first!');
+        return;
+    }
+    moveToNextQuestion();
+}
+
+function showHint() {
+    const hintBox = document.getElementById('hintBox');
+    hintBox.style.display = hintBox.style.display === 'none' ? 'block' : 'none';
+}
+
+function getPositiveFeedback() {
+    const messages = [
+        "You're reading the data like a pro!",
+        "Excellent interpretation!",
+        "You've got a great eye for patterns!",
+        "Perfect analysis!",
+        "You understand scatterplots well!",
+        "Great data detective work!"
+    ];
+    return messages[Math.floor(Math.random() * messages.length)];
+}
+
+function updateStats() {
+    document.getElementById('answered').textContent = totalAnswered;
+    document.getElementById('correct').textContent = totalCorrect;
+    document.getElementById('accuracy').textContent =
+        totalAnswered > 0 ? Math.round((totalCorrect / totalAnswered) * 100) + '%' : '0%';
+    document.getElementById('score').textContent = score;
+    document.getElementById('displayScore').textContent = score;
+}
+
+function updateProgress() {
+    const totalQuestions = scenarios.reduce((sum, s) => sum + s.questions.length, 0);
+    const progress = (totalAnswered / totalQuestions) * 100;
+    document.getElementById('progressBar').style.width = progress + '%';
+    document.getElementById('progressText').textContent =
+        `Question ${totalAnswered + 1} of ${totalQuestions}`;
+}
+
+function endGame() {
+    const accuracy = Math.round((totalCorrect / totalAnswered) * 100);
+    let message = `Game Complete!\n\n`;
+    message += `Final Score: ${score}\n`;
+    message += `Accuracy: ${accuracy}%\n`;
+    message += `Correct: ${totalCorrect} / ${totalAnswered}\n\n`;
+
+    if (accuracy >= 90) {
+        message += "Outstanding! You're a scatterplot expert!";
+    } else if (accuracy >= 75) {
+        message += "Great work! You have strong data interpretation skills!";
+    } else if (accuracy >= 60) {
+        message += "Good job! Keep practicing to improve!";
+    } else {
+        message += "Keep learning! Review the patterns and try again.";
+    }
+
+    alert(message);
+    gameStarted = false;
+}
+
+function drawScatterplot(scenario) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const offsetX = 100;
+    const offsetY = 60;
+    const chartWidth = 700;
+    const chartHeight = 380;
+
+    // Light gridlines
+    ctx.strokeStyle = '#f0f0f0';
+    ctx.lineWidth = 1;
+    for (let i = 0; i <= 5; i++) {
+        ctx.beginPath();
+        ctx.moveTo(offsetX, offsetY + i * chartHeight / 5);
+        ctx.lineTo(offsetX + chartWidth, offsetY + i * chartHeight / 5);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.moveTo(offsetX + i * chartWidth / 5, offsetY);
+        ctx.lineTo(offsetX + i * chartWidth / 5, offsetY + chartHeight);
+        ctx.stroke();
+    }
+
+    // Axes
+    ctx.strokeStyle = '#333';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(offsetX, offsetY);
+    ctx.lineTo(offsetX, offsetY + chartHeight);
+    ctx.lineTo(offsetX + chartWidth, offsetY + chartHeight);
+    ctx.stroke();
+
+    // Axis labels
+    ctx.fillStyle = '#333';
+    ctx.font = 'bold 14px Arial';
+    ctx.textAlign = 'center';
+
+    // Y-axis label
+    ctx.save();
+    ctx.translate(30, offsetY + chartHeight / 2);
+    ctx.rotate(-Math.PI / 2);
+    ctx.fillText(scenario.yLabel, 0, 0);
+    ctx.restore();
+
+    // X-axis label
+    ctx.fillText(scenario.xLabel, offsetX + chartWidth / 2, offsetY + chartHeight + 40);
+
+    // Find min/max for scaling
+    const xValues = scenario.data.map(d => d.x);
+    const yValues = scenario.data.map(d => d.y);
+    const xMin = Math.min(...xValues);
+    const xMax = Math.max(...xValues);
+    const yMin = Math.min(...yValues);
+    const yMax = Math.max(...yValues);
+
+    const xRange = xMax - xMin || 1;
+    const yRange = yMax - yMin || 1;
+
+    // Draw data points
+    scenario.data.forEach(point => {
+        const x = offsetX + ((point.x - xMin) / xRange) * chartWidth;
+        const y = offsetY + chartHeight - ((point.y - yMin) / yRange) * chartHeight;
+
+        ctx.fillStyle = '#2196F3';
+        ctx.beginPath();
+        ctx.arc(x, y, 5, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+    });
+
+    // Axis tick marks
+    ctx.fillStyle = '#666';
+    ctx.font = '11px Arial';
+    ctx.textAlign = 'center';
+
+    for (let i = 0; i <= 5; i++) {
+        const xVal = (xMin + (xRange * i / 5)).toFixed(0);
+        const yVal = (yMin + (yRange * i / 5)).toFixed(0);
+
+        ctx.fillText(xVal, offsetX + i * chartWidth / 5, offsetY + chartHeight + 20);
+        ctx.textAlign = 'right';
+        ctx.fillText(yVal, offsetX - 10, offsetY + chartHeight - i * chartHeight / 5 + 5);
+        ctx.textAlign = 'center';
+    }
+}
+
+// Initialize
+ctx.fillStyle = '#999';
+ctx.font = 'bold 24px Arial';
+ctx.textAlign = 'center';
+ctx.fillText('Click "Start Game" to begin!', canvas.width / 2, canvas.height / 2);
+</script>
+</body>
+</html>

@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Digital Privacy & AI - Interactive Lesson</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 0; }
+.nav-header { background: #2d3748; padding: 15px 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; }
+.nav-header a { color: #90cdf4; text-decoration: none; font-weight: 600; font-size: 1.1em; }
+.nav-title { color: #fff; font-size: 1.2em; font-weight: 700; }
+.container { max-width: 1400px; margin: 20px auto; background: #fff; border-radius: 15px; padding: 30px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+h1 { text-align: center; color: #2d3748; font-size: 2.5em; margin-bottom: 20px; }
+.intro { background: #e3f2fd; padding: 20px; border-radius: 10px; margin-bottom: 30px; line-height: 1.6; }
+.intro h2 { color: #1976d2; margin-bottom: 10px; }
+.content-section { margin: 30px 0; }
+.content-section h2 { color: #2d3748; margin-bottom: 15px; font-size: 1.8em; }
+.content-section h3 { color: #667eea; margin: 20px 0 10px 0; font-size: 1.4em; }
+.content-section p { line-height: 1.8; color: #4a5568; margin-bottom: 15px; }
+.example-box { background: #fff9c4; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #fbc02d; }
+.example-box h4 { color: #f57c00; margin-bottom: 10px; }
+.key-concepts { background: #e8f5e9; padding: 20px; border-radius: 8px; margin: 20px 0; }
+.key-concepts h3 { color: #2e7d32; margin-bottom: 15px; }
+.key-concepts ul { margin-left: 20px; line-height: 1.8; }
+.privacy-types { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin: 20px 0; }
+.privacy-card { background: #f8f9fa; padding: 20px; border-radius: 10px; border: 2px solid #e9ecef; }
+.privacy-card h4 { color: #667eea; margin-bottom: 10px; }
+.privacy-card p { color: #4a5568; line-height: 1.6; font-size: 0.95em; }
+.interactive-demo { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; padding: 25px; border-radius: 10px; margin: 30px 0; text-align: center; }
+.demo-button { background: #fff; color: #667eea; padding: 15px 30px; border: none; border-radius: 8px; font-weight: 600; font-size: 1.1em; cursor: pointer; margin: 10px; transition: all 0.3s; }
+.demo-button:hover { transform: scale(1.05); box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+.canvas-container { text-align: center; margin: 20px 0; }
+canvas { border: 2px solid #ddd; border-radius: 8px; background: #fafafa; max-width: 100%; }
+.warning-box { background: #ffebee; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #c62828; }
+.warning-box h3 { color: #c62828; margin-bottom: 15px; }
+.data-flow { background: #f8f9fa; padding: 25px; border-radius: 10px; margin: 20px 0; border: 2px solid #e9ecef; }
+.data-flow h4 { color: #2d3748; margin-bottom: 15px; }
+</style>
+</head>
+<body>
+<nav class="nav-header">
+    <div class="nav-title">🔒 Digital Privacy & AI</div>
+    <a href="../../index.html">← Back to Home</a>
+</nav>
+<div class="container">
+    <h1>🔒 Digital Privacy & AI - How AI Tools Store and Infer Information</h1>
+
+    <div class="intro">
+        <h2>What is Digital Privacy in the AI Age?</h2>
+        <p>
+            Every time you interact with an AI system - whether it's a chatbot, voice assistant, or recommendation
+            algorithm - you're sharing data. Sometimes it's obvious: your name, location, or age. But AI can also
+            infer sensitive information from seemingly innocent inputs, creating privacy risks you might not expect.
+        </p>
+        <p>
+            Understanding what data AI collects, what it can deduce, and how to protect yourself is crucial in today's
+            digital world. This lesson will help you become a more privacy-aware AI user.
+        </p>
+    </div>
+
+    <div class="content-section">
+        <h2>What Data Does AI Collect?</h2>
+        <p>
+            AI systems collect data in multiple ways, both directly and indirectly. Understanding these collection
+            methods helps you make informed decisions about what to share.
+        </p>
+
+        <div class="privacy-types">
+            <div class="privacy-card">
+                <h4>📝 Direct Data</h4>
+                <p>
+                    Information you explicitly provide: your questions, prompts, uploaded files, and account
+                    details. This is data you knowingly share with the AI system.
+                </p>
+            </div>
+
+            <div class="privacy-card">
+                <h4>🔍 Metadata</h4>
+                <p>
+                    Information about your interaction: timestamps, device type, IP address, location, session
+                    duration, and usage patterns. Often collected automatically without explicit notice.
+                </p>
+            </div>
+
+            <div class="privacy-card">
+                <h4>🌐 Contextual Data</h4>
+                <p>
+                    Information embedded in your requests: language patterns, writing style, technical knowledge
+                    level, interests, concerns, and relationships revealed through conversation.
+                </p>
+            </div>
+
+            <div class="privacy-card">
+                <h4>📊 Behavioral Data</h4>
+                <p>
+                    Patterns from your usage: how often you use the service, what types of queries you make,
+                    which features you use, and how you interact with responses over time.
+                </p>
+            </div>
+
+            <div class="privacy-card">
+                <h4>🔗 Cross-Referenced Data</h4>
+                <p>
+                    Information linked from other sources: your social media profiles, public records, previous
+                    interactions with the same company, and data purchased from third parties.
+                </p>
+            </div>
+
+            <div class="privacy-card">
+                <h4>💬 Conversation History</h4>
+                <p>
+                    Your entire chat history and context: past queries, responses, corrections you've made,
+                    preferences you've expressed, and topics you've discussed across multiple sessions.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>What Can AI Infer From Your Data?</h2>
+        <p>
+            The real privacy risk isn't just what you explicitly share - it's what AI can deduce from seemingly
+            innocent information. AI systems are trained to find patterns and make connections that humans might miss.
+        </p>
+
+        <div class="example-box">
+            <h4>Example 1: Location Inference</h4>
+            <p>
+                <strong>You say:</strong> "What time does the bus on 5th Avenue run?"
+            </p>
+            <p>
+                <strong>AI can infer:</strong> Your approximate location (which city/neighborhood), that you use
+                public transportation (suggesting economic status), your likely daily routine, and potentially
+                where you work or live.
+            </p>
+        </div>
+
+        <div class="example-box">
+            <h4>Example 2: Health Information</h4>
+            <p>
+                <strong>You say:</strong> "How can I explain cancer treatment to my 8-year-old?"
+            </p>
+            <p>
+                <strong>AI can infer:</strong> You or someone close to you has cancer, you have a young child,
+                potential financial stress from medical bills, emotional state, and family structure.
+            </p>
+        </div>
+
+        <div class="example-box">
+            <h4>Example 3: Financial Status</h4>
+            <p>
+                <strong>You say:</strong> "Help me decide between the iPhone 15 Pro and Samsung Galaxy S24 Ultra."
+            </p>
+            <p>
+                <strong>AI can infer:</strong> Your income level (shopping for premium phones), tech preferences,
+                upgrade cycle, and potential brand loyalties.
+            </p>
+        </div>
+
+        <div class="example-box">
+            <h4>Example 4: Political Views</h4>
+            <p>
+                <strong>You say:</strong> "Summarize the latest climate policy debate."
+            </p>
+            <p>
+                <strong>AI can infer:</strong> Your interest in politics, environmental concerns, education level,
+                and potentially political leanings based on how you phrase questions over time.
+            </p>
+        </div>
+
+        <div class="example-box">
+            <h4>Example 5: Daily Routine & Habits</h4>
+            <p>
+                <strong>You say:</strong> "Set an alarm for 6 AM" (multiple days)
+            </p>
+            <p>
+                <strong>AI can infer:</strong> Your sleep schedule, likely employment (morning job), time zone,
+                consistency of routine, and potentially when your home is empty during the day.
+            </p>
+        </div>
+    </div>
+
+    <div class="warning-box">
+        <h3>🚨 Hidden Privacy Risks</h3>
+
+        <div class="data-flow" style="background: #fff; margin: 15px 0;">
+            <h4>Data Aggregation Risk</h4>
+            <p style="color: #4a5568; line-height: 1.7;">
+                Each individual query might seem harmless, but AI systems can aggregate data across all your
+                interactions. Ten queries about pregnancy symptoms, baby names, local pediatricians, and
+                parenting advice paint a complete picture - revealing you're expecting a child, your approximate
+                due date, and your location.
+            </p>
+        </div>
+
+        <div class="data-flow" style="background: #fff; margin: 15px 0;">
+            <h4>De-Anonymization Risk</h4>
+            <p style="color: #4a5568; line-height: 1.7;">
+                Even if you don't provide your name, AI can identify you through unique patterns. Your writing
+                style, specific interests, daily routine, and the combination of details you share create a
+                "fingerprint" that can be linked to your real identity.
+            </p>
+        </div>
+
+        <div class="data-flow" style="background: #fff; margin: 15px 0;">
+            <h4>Third-Party Sharing</h4>
+            <p style="color: #4a5568; line-height: 1.7;">
+                Your data might be shared with partners, advertisers, or sold to data brokers. What you tell
+                one AI service could end up with insurance companies, employers, or law enforcement, potentially
+                affecting your premiums, job prospects, or legal status.
+            </p>
+        </div>
+
+        <div class="data-flow" style="background: #fff; margin: 15px 0;">
+            <h4>Data Persistence</h4>
+            <p style="color: #4a5568; line-height: 1.7;">
+                Most AI companies store your conversations indefinitely. Questions you asked years ago, opinions
+                you've since changed, and mistakes you've made are permanently recorded. Even if you delete your
+                account, copies may remain in backups and training data.
+            </p>
+        </div>
+
+        <div class="data-flow" style="background: #fff; margin: 15px 0;">
+            <h4>Training Data Inclusion</h4>
+            <p style="color: #4a5568; line-height: 1.7;">
+                Your conversations might be used to train future AI models. This means your private information
+                could theoretically be reconstructed from the model or surface in responses to other users,
+                especially if you shared unique or identifiable details.
+            </p>
+        </div>
+    </div>
+
+    <div class="canvas-container">
+        <h2 style="margin-bottom: 20px;">Interactive Demonstration: Privacy Risk Visualization</h2>
+        <canvas id="privacyCanvas" width="800" height="400"></canvas>
+        <div style="margin-top: 20px;">
+            <button class="demo-button" onclick="showBasicQuery()">Basic Query</button>
+            <button class="demo-button" onclick="showDetailedQuery()">Detailed Query</button>
+            <button class="demo-button" onclick="showAggregatedData()">Data Aggregation</button>
+        </div>
+        <div id="demoExplanation" style="margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 8px; text-align: left;">
+            <strong>What you're seeing:</strong> This demo shows how different levels of detail in your queries
+            reveal different amounts of private information. Click the buttons above to see different scenarios.
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>How to Protect Your Privacy When Using AI</h2>
+
+        <div class="key-concepts">
+            <h3>Best Practices for Privacy Protection</h3>
+            <ul>
+                <li><strong>Minimize personal details:</strong> Avoid sharing names, addresses, phone numbers, or other identifying information unless absolutely necessary</li>
+                <li><strong>Use generic examples:</strong> Instead of "my daughter Emma," say "a child" or "my daughter"</li>
+                <li><strong>Generalize locations:</strong> Say "a major city" instead of your actual city, or "my area" instead of specific neighborhoods</li>
+                <li><strong>Avoid sensitive topics:</strong> Don't discuss medical conditions, financial details, legal issues, or relationship problems without considering the privacy implications</li>
+                <li><strong>Review privacy policies:</strong> Understand how each AI service stores, uses, and shares your data</li>
+                <li><strong>Use privacy modes:</strong> Some AI services offer modes that don't save conversations or use them for training</li>
+                <li><strong>Create separate accounts:</strong> Use different accounts for professional vs. personal use to compartmentalize your data</li>
+                <li><strong>Regularly delete history:</strong> Clear your conversation history periodically if the service allows it</li>
+                <li><strong>Be aware of metadata:</strong> Even if you anonymize your text, your location, device, and usage patterns can identify you</li>
+                <li><strong>Think before sharing:</strong> Ask yourself: "Would I be comfortable if this information became public?"</li>
+            </ul>
+        </div>
+
+        <div class="key-concepts" style="background: #e1f5fe;">
+            <h3 style="color: #01579b;">Safe Alternatives to Risky Prompts</h3>
+            <ul>
+                <li><strong>Instead of:</strong> "Help me write a cover letter for [specific company]"<br>
+                    <strong>Try:</strong> "Help me write a cover letter for a tech company position"</li>
+                <li><strong>Instead of:</strong> "I live at 123 Main St. What internet providers serve my area?"<br>
+                    <strong>Try:</strong> "What are the major internet providers in suburban areas?"</li>
+                <li><strong>Instead of:</strong> "My son Jake has ADHD. How can I help him focus on homework?"<br>
+                    <strong>Try:</strong> "What are strategies to help children with ADHD focus on homework?"</li>
+                <li><strong>Instead of:</strong> "I make $45,000/year. Can I afford a $300,000 house?"<br>
+                    <strong>Try:</strong> "What salary is typically needed to afford a $300,000 house?"</li>
+                <li><strong>Instead of:</strong> "I'm interviewing at Google tomorrow. What should I prepare?"<br>
+                    <strong>Try:</strong> "What should I prepare for a tech company interview?"</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Understanding Data Persistence</h2>
+        <p>
+            One of the most misunderstood aspects of AI privacy is how long your data lasts. Many people assume
+            that deleting a conversation removes it entirely, but the reality is more complex.
+        </p>
+
+        <div class="privacy-types">
+            <div class="privacy-card" style="border-color: #f44336;">
+                <h4>🗄️ Server Storage</h4>
+                <p>
+                    Your conversations are typically stored on company servers. Even if you delete them from your
+                    view, they may remain in backups, logs, and archives for months or years.
+                </p>
+            </div>
+
+            <div class="privacy-card" style="border-color: #f44336;">
+                <h4>🧠 Training Data</h4>
+                <p>
+                    If your data was used to train AI models, it becomes part of the model's "knowledge." It can't
+                    be fully removed, and might influence future responses.
+                </p>
+            </div>
+
+            <div class="privacy-card" style="border-color: #f44336;">
+                <h4>📤 Third-Party Copies</h4>
+                <p>
+                    Data shared with partners, advertisers, or analytics services creates copies beyond the original
+                    company's control. You can't delete these copies.
+                </p>
+            </div>
+
+            <div class="privacy-card" style="border-color: #4CAF50;">
+                <h4>✅ What You Can Control</h4>
+                <p>
+                    Use privacy-focused AI services, enable "do not train" options where available, delete
+                    conversations regularly, and most importantly: think before you share.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="warning-box">
+        <h3>⚠️ Special Considerations</h3>
+        <ul style="margin-left: 20px; line-height: 1.8; color: #4a5568;">
+            <li><strong>Children's Privacy:</strong> Never share children's personal information, photos, or identifying details. AI systems may not have adequate protections for minors.</li>
+            <li><strong>Professional Confidentiality:</strong> Don't use AI to discuss client information, trade secrets, or confidential business data unless using approved enterprise systems.</li>
+            <li><strong>Legal Privilege:</strong> Conversations with AI are not protected by attorney-client privilege, doctor-patient confidentiality, or other legal protections.</li>
+            <li><strong>Security Vulnerabilities:</strong> AI systems can be hacked, and data breaches can expose your entire conversation history to bad actors.</li>
+            <li><strong>Government Access:</strong> Law enforcement and government agencies may be able to access your AI conversations with subpoenas or national security requests.</li>
+        </ul>
+    </div>
+
+    <div class="interactive-demo">
+        <h2 style="margin-bottom: 15px;">🎮 Ready to Test Your Privacy Awareness?</h2>
+        <p style="margin-bottom: 20px;">Try the Digital Footprint Meter game to analyze privacy risks in real AI prompts!</p>
+        <a href="../../games/digital-privacy/index.html" style="text-decoration: none;">
+            <button class="demo-button">Play Digital Footprint Meter →</button>
+        </a>
+    </div>
+
+    <div class="key-concepts">
+        <h3>Key Takeaways</h3>
+        <ul>
+            <li>AI collects both the data you share explicitly and metadata about how you interact with the system</li>
+            <li>AI can infer sensitive information from seemingly innocent queries by finding patterns and making connections</li>
+            <li>Aggregating multiple interactions reveals much more than any single query</li>
+            <li>Your data may persist indefinitely, be used for training, and be shared with third parties</li>
+            <li>Protect yourself by minimizing personal details, using generic examples, and thinking before sharing</li>
+            <li>Read privacy policies and use privacy-focused features when available</li>
+            <li>Remember: if you wouldn't want information to become public, don't share it with AI</li>
+        </ul>
+    </div>
+</div>
+
+<script>
+const canvas = document.getElementById('privacyCanvas');
+const ctx = canvas.getContext('2d');
+
+function clearCanvas() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+}
+
+function drawPrivacyRisk(dataPoints) {
+    clearCanvas();
+
+    // Title
+    ctx.font = 'bold 18px Arial';
+    ctx.fillStyle = '#2d3748';
+    ctx.fillText('Privacy Risk Analysis', 250, 30);
+
+    // Draw risk meter background
+    const meterX = 50;
+    const meterY = 80;
+    const meterWidth = 700;
+    const meterHeight = 40;
+
+    // Gradient background
+    const gradient = ctx.createLinearGradient(meterX, 0, meterX + meterWidth, 0);
+    gradient.addColorStop(0, '#4CAF50');
+    gradient.addColorStop(0.5, '#FFC107');
+    gradient.addColorStop(1, '#f44336');
+
+    ctx.fillStyle = gradient;
+    ctx.fillRect(meterX, meterY, meterWidth, meterHeight);
+
+    // Risk level labels
+    ctx.font = '12px Arial';
+    ctx.fillStyle = '#333';
+    ctx.fillText('LOW RISK', meterX + 10, meterY + 25);
+    ctx.fillText('MEDIUM', meterX + 320, meterY + 25);
+    ctx.fillText('HIGH RISK', meterX + 620, meterY + 25);
+
+    // Calculate risk score
+    const riskScore = dataPoints.reduce((sum, point) => sum + point.risk, 0) / dataPoints.length;
+    const riskPosition = meterX + (riskScore / 100) * meterWidth;
+
+    // Draw risk indicator
+    ctx.fillStyle = '#2d3748';
+    ctx.beginPath();
+    ctx.moveTo(riskPosition, meterY + meterHeight + 5);
+    ctx.lineTo(riskPosition - 10, meterY + meterHeight + 20);
+    ctx.lineTo(riskPosition + 10, meterY + meterHeight + 20);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.font = 'bold 14px Arial';
+    ctx.fillText(`Risk Level: ${riskScore.toFixed(0)}%`, riskPosition - 40, meterY + meterHeight + 35);
+
+    // Draw data points
+    let yPos = 160;
+    ctx.font = '14px Arial';
+
+    dataPoints.forEach((point, index) => {
+        // Icon
+        ctx.font = '20px Arial';
+        ctx.fillText(point.icon, 60, yPos);
+
+        // Label
+        ctx.font = 'bold 14px Arial';
+        ctx.fillStyle = '#2d3748';
+        ctx.fillText(point.label, 90, yPos);
+
+        // Risk bar
+        const barWidth = point.risk * 4;
+        const barColor = point.risk < 30 ? '#4CAF50' : point.risk < 70 ? '#FFC107' : '#f44336';
+        ctx.fillStyle = barColor;
+        ctx.fillRect(350, yPos - 12, barWidth, 18);
+
+        // Risk percentage
+        ctx.font = '12px Arial';
+        ctx.fillStyle = '#666';
+        ctx.fillText(`${point.risk}%`, 760, yPos);
+
+        yPos += 40;
+    });
+}
+
+function showBasicQuery() {
+    const dataPoints = [
+        { icon: '📝', label: 'Query Content', risk: 20 },
+        { icon: '🕐', label: 'Timestamp', risk: 15 },
+        { icon: '💻', label: 'Device Type', risk: 10 },
+        { icon: '🔍', label: 'Inference Potential', risk: 15 }
+    ];
+
+    drawPrivacyRisk(dataPoints);
+
+    document.getElementById('demoExplanation').innerHTML =
+        '<strong>Basic Query:</strong> "What is machine learning?" - This query reveals minimal personal ' +
+        'information. The risk is low because there are no identifying details, sensitive topics, or patterns ' +
+        'that could be used to infer private information about you.';
+}
+
+function showDetailedQuery() {
+    const dataPoints = [
+        { icon: '📝', label: 'Personal Details', risk: 85 },
+        { icon: '📍', label: 'Location Data', risk: 75 },
+        { icon: '👤', label: 'Identity Markers', risk: 90 },
+        { icon: '💰', label: 'Financial Info', risk: 80 },
+        { icon: '🏥', label: 'Health Inference', risk: 70 },
+        { icon: '🔍', label: 'Overall Risk', risk: 80 }
+    ];
+
+    drawPrivacyRisk(dataPoints);
+
+    document.getElementById('demoExplanation').innerHTML =
+        '<strong>Detailed Query:</strong> "I\'m John Smith from Seattle. My daughter Emma has asthma. ' +
+        'What air purifiers under $300 work best?" - This query reveals your name, location, family structure, ' +
+        'child\'s name, health condition, and budget. An AI can infer your address, income level, and create ' +
+        'a detailed profile. This is HIGH RISK data sharing.';
+}
+
+function showAggregatedData() {
+    const dataPoints = [
+        { icon: '📊', label: 'Pattern Recognition', risk: 95 },
+        { icon: '🔗', label: 'Cross-Referencing', risk: 90 },
+        { icon: '🎯', label: 'Identity Certainty', risk: 95 },
+        { icon: '📅', label: 'Routine Mapping', risk: 85 },
+        { icon: '🧩', label: 'Complete Profile', risk: 100 }
+    ];
+
+    drawPrivacyRisk(dataPoints);
+
+    document.getElementById('demoExplanation').innerHTML =
+        '<strong>Data Aggregation:</strong> When AI combines multiple queries over time, even innocent ' +
+        'individual queries create a comprehensive profile. 10 queries about pregnancy, baby names, pediatricians, ' +
+        'and parenting reveal you\'re expecting, your location, due date, and more. This is EXTREME RISK because ' +
+        'the AI can build a complete picture of your life, habits, and private information.';
+}
+
+// Show basic query by default
+showBasicQuery();
+</script>
+</body>
+</html>

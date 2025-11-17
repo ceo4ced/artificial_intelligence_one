@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Data Structures - Interactive Lesson</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 0; }
+.nav-header { background: #2d3748; padding: 15px 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; }
+.nav-header a { color: #90cdf4; text-decoration: none; font-weight: 600; font-size: 1.1em; }
+.nav-title { color: #fff; font-size: 1.2em; font-weight: 700; }
+.container { max-width: 1400px; margin: 20px auto; background: #fff; border-radius: 15px; padding: 30px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+h1 { text-align: center; color: #2d3748; font-size: 2.5em; margin-bottom: 20px; }
+.intro { background: #e3f2fd; padding: 20px; border-radius: 10px; margin-bottom: 30px; line-height: 1.6; }
+.intro h2 { color: #1976d2; margin-bottom: 10px; }
+.main-content { display: grid; grid-template-columns: 350px 1fr; gap: 30px; }
+.sidebar { background: #f8f9fa; padding: 20px; border-radius: 10px; height: fit-content; }
+button { width: 100%; padding: 12px; margin: 5px 0; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.2s; }
+.btn-primary { background: #4CAF50; color: #fff; }
+.btn-primary:hover { background: #45a049; }
+.btn-secondary { background: #2196F3; color: #fff; }
+.btn-secondary:hover { background: #1976d2; }
+.structure-tabs { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }
+.tab { flex: 1; min-width: 80px; padding: 10px; background: #e0e0e0; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.2s; font-size: 0.9em; }
+.tab.active { background: #667eea; color: #fff; }
+.tab:hover { background: #b3b3d9; }
+.visualization { background: #fafafa; border: 2px solid #ddd; border-radius: 8px; padding: 20px; min-height: 400px; display: flex; align-items: center; justify-content: center; position: relative; }
+.explanation { background: #fff9c4; padding: 15px; border-radius: 8px; margin: 15px 0; border-left: 4px solid #fbc02d; }
+.explanation h4 { color: #f57c00; margin-bottom: 8px; }
+.stats { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; padding: 15px; border-radius: 10px; margin-top: 15px; }
+.stat-row { display: flex; justify-content: space-between; margin: 8px 0; }
+.structure-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 20px; }
+.structure-card { background: #fff; padding: 20px; border-radius: 8px; border: 2px solid #ddd; transition: all 0.3s; }
+.structure-card:hover { transform: translateY(-3px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+.structure-card h4 { color: #667eea; margin-bottom: 10px; font-size: 1.2em; }
+.structure-card ul { margin-left: 20px; font-size: 0.9em; line-height: 1.8; color: #4a5568; }
+.structure-card strong { color: #2d3748; }
+.use-cases { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 20px; }
+.use-case { background: #e8f5e9; padding: 15px; border-radius: 8px; }
+.use-case strong { display: block; margin-bottom: 8px; color: #2e7d32; }
+.use-case p { font-size: 0.9em; line-height: 1.6; color: #1b5e20; }
+.data-item { background: #2196F3; color: #fff; padding: 10px 15px; border-radius: 6px; margin: 5px; display: inline-block; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+.data-item:hover { background: #1976d2; transform: scale(1.05); }
+svg { max-width: 100%; height: auto; }
+.cta-box { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; padding: 25px; border-radius: 10px; margin-top: 30px; text-align: center; }
+.cta-box h3 { margin-bottom: 15px; font-size: 1.5em; }
+.cta-box a { display: inline-block; background: #fff; color: #667eea; padding: 12px 30px; border-radius: 8px; text-decoration: none; font-weight: 600; margin-top: 10px; transition: all 0.3s; }
+.cta-box a:hover { background: #f0f0f0; transform: scale(1.05); }
+</style>
+</head>
+<body>
+<nav class="nav-header">
+    <div class="nav-title">Data Structures</div>
+    <a href="../../index.html">← Back to Home</a>
+</nav>
+<div class="container">
+    <h1>Data Structures - What They Are and Why They Matter</h1>
+
+    <div class="intro">
+        <h2>Why Data Structures Matter</h2>
+        <p>
+            Data structures are ways of organizing and storing data so computers can work with it efficiently.
+            Just like you wouldn't pile all your clothes in a heap (you use drawers, hangers, and shelves),
+            programmers don't just dump data anywhere. The right data structure makes your program faster,
+            uses less memory, and is easier to understand. In AI and computer science, choosing the right
+            data structure can mean the difference between a program that takes seconds and one that takes hours!
+        </p>
+    </div>
+
+    <div class="main-content">
+        <div class="sidebar">
+            <h3>Data Structures</h3>
+            <div class="structure-tabs">
+                <button class="tab active" onclick="showStructure('array')">Array/List</button>
+                <button class="tab" onclick="showStructure('dictionary')">Dictionary</button>
+                <button class="tab" onclick="showStructure('table')">Table</button>
+                <button class="tab" onclick="showStructure('tree')">Tree</button>
+                <button class="tab" onclick="showStructure('graph')">Graph</button>
+            </div>
+
+            <button class="btn-primary" onclick="addSampleData()">Add Sample Data</button>
+            <button class="btn-secondary" onclick="clearData()">Clear</button>
+
+            <div class="stats">
+                <div class="stat-row"><span>Current Structure:</span><span id="currentStructure">Array/List</span></div>
+                <div class="stat-row"><span>Items Stored:</span><span id="itemCount">0</span></div>
+                <div class="stat-row"><span>Complexity:</span><span id="complexity">O(1) access</span></div>
+            </div>
+
+            <div class="explanation">
+                <h4>How to Use:</h4>
+                <p id="instructions">Click on different data structures to see how they organize information. Add sample data to see visual examples!</p>
+            </div>
+        </div>
+
+        <div>
+            <div class="visualization" id="visualization">
+                <div id="visualContent">
+                    <p style="color: #999; text-align: center;">Select a data structure and add sample data to see visualization</p>
+                </div>
+            </div>
+
+            <div class="structure-grid">
+                <div class="structure-card">
+                    <h4>Array/List</h4>
+                    <ul>
+                        <li><strong>What:</strong> Ordered collection of items</li>
+                        <li><strong>Access:</strong> By position (index 0, 1, 2...)</li>
+                        <li><strong>Best for:</strong> Sequential data, ordered lists</li>
+                        <li><strong>Example:</strong> Shopping list, playlist</li>
+                    </ul>
+                </div>
+                <div class="structure-card">
+                    <h4>Object/Dictionary</h4>
+                    <ul>
+                        <li><strong>What:</strong> Key-value pairs</li>
+                        <li><strong>Access:</strong> By key name</li>
+                        <li><strong>Best for:</strong> Related properties, lookups</li>
+                        <li><strong>Example:</strong> User profile, settings</li>
+                    </ul>
+                </div>
+                <div class="structure-card">
+                    <h4>Table</h4>
+                    <ul>
+                        <li><strong>What:</strong> Rows and columns of data</li>
+                        <li><strong>Access:</strong> By row and column</li>
+                        <li><strong>Best for:</strong> Structured records, databases</li>
+                        <li><strong>Example:</strong> Spreadsheet, student grades</li>
+                    </ul>
+                </div>
+                <div class="structure-card">
+                    <h4>Tree</h4>
+                    <ul>
+                        <li><strong>What:</strong> Hierarchical parent-child structure</li>
+                        <li><strong>Access:</strong> By traversing branches</li>
+                        <li><strong>Best for:</strong> Hierarchies, decisions</li>
+                        <li><strong>Example:</strong> File system, org chart</li>
+                    </ul>
+                </div>
+                <div class="structure-card">
+                    <h4>Graph</h4>
+                    <ul>
+                        <li><strong>What:</strong> Nodes connected by relationships</li>
+                        <li><strong>Access:</strong> By following connections</li>
+                        <li><strong>Best for:</strong> Networks, relationships</li>
+                        <li><strong>Example:</strong> Social network, maps</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="explanation" style="margin-top: 20px;">
+                <h4>Why Structure Matters in AI and Computer Science:</h4>
+                <ol style="margin-left: 20px; line-height: 1.8;">
+                    <li><strong>Speed:</strong> The right structure makes operations faster (searching, sorting, adding)</li>
+                    <li><strong>Memory:</strong> Efficient structures use less RAM and storage</li>
+                    <li><strong>Clarity:</strong> Good structures make code easier to understand and maintain</li>
+                    <li><strong>Scalability:</strong> Some structures handle millions of items better than others</li>
+                    <li><strong>AI Training:</strong> Neural networks, decision trees, and graphs are all data structures!</li>
+                </ol>
+            </div>
+
+            <div class="use-cases">
+                <div class="use-case">
+                    <strong>Machine Learning</strong>
+                    <p>Training data in tables, neural networks as graphs, feature vectors as arrays</p>
+                </div>
+                <div class="use-case">
+                    <strong>Search Engines</strong>
+                    <p>Web pages in graphs, indexes in trees, rankings in sorted lists</p>
+                </div>
+                <div class="use-case">
+                    <strong>Social Networks</strong>
+                    <p>Users as nodes in graphs, friends as connections, posts in lists</p>
+                </div>
+                <div class="use-case">
+                    <strong>Games</strong>
+                    <p>Game trees for AI moves, maps as graphs, inventories as lists</p>
+                </div>
+                <div class="use-case">
+                    <strong>Databases</strong>
+                    <p>Records in tables, indexes in B-trees, cache in hash tables</p>
+                </div>
+                <div class="use-case">
+                    <strong>File Systems</strong>
+                    <p>Folders as trees, files in directories, metadata in dictionaries</p>
+                </div>
+            </div>
+
+            <div class="cta-box">
+                <h3>Ready to Practice?</h3>
+                <p>Test your understanding in the Data Structure Playground game!</p>
+                <p>Organize different types of data into the most appropriate structures.</p>
+                <a href="../../games/data-structures/index.html">Play the Game →</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let currentStructure = 'array';
+let sampleData = [];
+
+const structureInfo = {
+    array: {
+        name: 'Array/List',
+        complexity: 'O(1) access',
+        samples: ['Apple', 'Banana', 'Cherry', 'Date', 'Elderberry']
+    },
+    dictionary: {
+        name: 'Object/Dictionary',
+        complexity: 'O(1) lookup',
+        samples: {
+            name: 'Alice',
+            age: 25,
+            city: 'Seattle',
+            email: 'alice@example.com'
+        }
+    },
+    table: {
+        name: 'Table',
+        complexity: 'O(n) search',
+        samples: [
+            { id: 1, name: 'Alice', grade: 95 },
+            { id: 2, name: 'Bob', grade: 87 },
+            { id: 3, name: 'Carol', grade: 92 },
+            { id: 4, name: 'Dave', grade: 88 }
+        ]
+    },
+    tree: {
+        name: 'Tree',
+        complexity: 'O(log n) search',
+        samples: {
+            value: 'CEO',
+            children: [
+                {
+                    value: 'CTO',
+                    children: [
+                        { value: 'Dev Lead', children: [] },
+                        { value: 'QA Lead', children: [] }
+                    ]
+                },
+                {
+                    value: 'CFO',
+                    children: [
+                        { value: 'Accountant', children: [] }
+                    ]
+                }
+            ]
+        }
+    },
+    graph: {
+        name: 'Graph',
+        complexity: 'O(V+E) traversal',
+        samples: {
+            nodes: ['Alice', 'Bob', 'Carol', 'Dave'],
+            edges: [
+                ['Alice', 'Bob'],
+                ['Alice', 'Carol'],
+                ['Bob', 'Dave'],
+                ['Carol', 'Dave']
+            ]
+        }
+    }
+};
+
+function showStructure(type) {
+    currentStructure = type;
+    document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+    event.target.classList.add('active');
+
+    const info = structureInfo[type];
+    document.getElementById('currentStructure').textContent = info.name;
+    document.getElementById('complexity').textContent = info.complexity;
+
+    sampleData = [];
+    document.getElementById('itemCount').textContent = '0';
+
+    updateVisualization();
+}
+
+function addSampleData() {
+    sampleData = structureInfo[currentStructure].samples;
+
+    if (currentStructure === 'table') {
+        document.getElementById('itemCount').textContent = sampleData.length;
+    } else if (currentStructure === 'dictionary') {
+        document.getElementById('itemCount').textContent = Object.keys(sampleData).length;
+    } else if (currentStructure === 'graph') {
+        document.getElementById('itemCount').textContent = sampleData.nodes.length;
+    } else if (currentStructure === 'array') {
+        document.getElementById('itemCount').textContent = sampleData.length;
+    } else {
+        document.getElementById('itemCount').textContent = '1';
+    }
+
+    updateVisualization();
+}
+
+function clearData() {
+    sampleData = [];
+    document.getElementById('itemCount').textContent = '0';
+    updateVisualization();
+}
+
+function updateVisualization() {
+    const container = document.getElementById('visualContent');
+
+    if (!sampleData || (Array.isArray(sampleData) && sampleData.length === 0)) {
+        container.innerHTML = '<p style="color: #999; text-align: center;">Click "Add Sample Data" to see a visualization</p>';
+        return;
+    }
+
+    let html = '';
+
+    switch(currentStructure) {
+        case 'array':
+            html = '<div style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;">';
+            sampleData.forEach((item, i) => {
+                html += `<div style="text-align: center;">
+                    <div style="background: #2196F3; color: #fff; padding: 20px 30px; border-radius: 8px; font-weight: 600;">${item}</div>
+                    <div style="margin-top: 5px; color: #666; font-size: 0.9em;">index ${i}</div>
+                </div>`;
+            });
+            html += '</div>';
+            break;
+
+        case 'dictionary':
+            html = '<div style="background: #fff; padding: 20px; border-radius: 8px; border: 2px solid #ddd; max-width: 400px; margin: 0 auto;">';
+            for (let [key, value] of Object.entries(sampleData)) {
+                html += `<div style="display: flex; justify-content: space-between; padding: 12px; border-bottom: 1px solid #e0e0e0;">
+                    <span style="color: #667eea; font-weight: 600;">${key}:</span>
+                    <span style="color: #2d3748;">${value}</span>
+                </div>`;
+            }
+            html += '</div>';
+            break;
+
+        case 'table':
+            html = '<table style="border-collapse: collapse; margin: 0 auto; background: #fff; border-radius: 8px; overflow: hidden;">';
+            html += '<tr style="background: #667eea; color: #fff;">';
+            html += '<th style="padding: 12px 20px; border: 1px solid #ddd;">ID</th>';
+            html += '<th style="padding: 12px 20px; border: 1px solid #ddd;">Name</th>';
+            html += '<th style="padding: 12px 20px; border: 1px solid #ddd;">Grade</th>';
+            html += '</tr>';
+            sampleData.forEach(row => {
+                html += '<tr>';
+                html += `<td style="padding: 12px 20px; border: 1px solid #ddd; text-align: center;">${row.id}</td>`;
+                html += `<td style="padding: 12px 20px; border: 1px solid #ddd;">${row.name}</td>`;
+                html += `<td style="padding: 12px 20px; border: 1px solid #ddd; text-align: center;">${row.grade}</td>`;
+                html += '</tr>';
+            });
+            html += '</table>';
+            break;
+
+        case 'tree':
+            html = '<svg width="600" height="350" style="margin: 0 auto; display: block;">';
+            html += renderTreeNode(sampleData, 300, 30, 150);
+            html += '</svg>';
+            break;
+
+        case 'graph':
+            html = '<svg width="600" height="350" style="margin: 0 auto; display: block;">';
+            const positions = {
+                'Alice': [150, 100],
+                'Bob': [450, 100],
+                'Carol': [150, 280],
+                'Dave': [450, 280]
+            };
+
+            // Draw edges
+            sampleData.edges.forEach(([from, to]) => {
+                const [x1, y1] = positions[from];
+                const [x2, y2] = positions[to];
+                html += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#ddd" stroke-width="3"/>`;
+            });
+
+            // Draw nodes
+            sampleData.nodes.forEach(node => {
+                const [x, y] = positions[node];
+                html += `<circle cx="${x}" cy="${y}" r="40" fill="#2196F3"/>`;
+                html += `<text x="${x}" y="${y+5}" text-anchor="middle" fill="#fff" font-weight="bold" font-size="14">${node}</text>`;
+            });
+
+            html += '</svg>';
+            break;
+    }
+
+    container.innerHTML = html;
+}
+
+function renderTreeNode(node, x, y, dx) {
+    let html = '';
+    const nodeRadius = 35;
+    const verticalGap = 80;
+
+    // Draw node
+    html += `<circle cx="${x}" cy="${y}" r="${nodeRadius}" fill="#4CAF50" stroke="#fff" stroke-width="2"/>`;
+    html += `<text x="${x}" y="${y+5}" text-anchor="middle" fill="#fff" font-weight="bold" font-size="12">${node.value}</text>`;
+
+    // Draw children
+    if (node.children && node.children.length > 0) {
+        const childCount = node.children.length;
+        const startX = x - (dx * (childCount - 1) / 2);
+
+        node.children.forEach((child, i) => {
+            const childX = startX + (i * dx);
+            const childY = y + verticalGap;
+
+            // Draw connecting line
+            html += `<line x1="${x}" y1="${y + nodeRadius}" x2="${childX}" y2="${childY - nodeRadius}" stroke="#999" stroke-width="2"/>`;
+
+            // Recursively draw child
+            html += renderTreeNode(child, childX, childY, dx / 2);
+        });
+    }
+
+    return html;
+}
+
+// Initialize
+updateVisualization();
+</script>
+</body>
+</html>

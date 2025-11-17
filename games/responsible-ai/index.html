@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Use Judge - Responsible AI Game</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 0; }
+.nav-header { background: #2d3748; padding: 15px 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; }
+.nav-header a { color: #90cdf4; text-decoration: none; font-weight: 600; font-size: 1.1em; }
+.nav-title { color: #fff; font-size: 1.2em; font-weight: 700; }
+.container { max-width: 1200px; margin: 20px auto; background: #fff; border-radius: 15px; padding: 30px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+h1 { text-align: center; color: #2d3748; font-size: 2.5em; margin-bottom: 10px; }
+.subtitle { text-align: center; color: #666; margin-bottom: 30px; font-size: 1.1em; }
+.game-area { display: grid; grid-template-columns: 300px 1fr; gap: 30px; }
+.sidebar { background: #f8f9fa; padding: 20px; border-radius: 10px; height: fit-content; }
+.score-display { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; padding: 20px; border-radius: 10px; text-align: center; margin-bottom: 20px; }
+.score-value { font-size: 3em; font-weight: bold; margin: 10px 0; }
+.stats { margin: 15px 0; }
+.stat-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e0e0e0; }
+.scenario-card { background: #fff; border: 2px solid #e0e0e0; border-radius: 10px; padding: 30px; margin-bottom: 20px; }
+.scenario-card h3 { color: #667eea; margin-bottom: 15px; font-size: 1.6em; }
+.scenario-text { background: #f8f9fa; padding: 20px; border-radius: 8px; line-height: 1.8; color: #2d3748; margin-bottom: 25px; font-size: 1.05em; }
+.judgment-options { display: grid; gap: 15px; }
+.judgment-option { background: #fff; border: 3px solid #e0e0e0; padding: 20px; border-radius: 10px; cursor: pointer; transition: all 0.3s; text-align: center; }
+.judgment-option:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+.judgment-option.green { border-color: #4CAF50; }
+.judgment-option.green:hover { background: #f1f8f4; }
+.judgment-option.yellow { border-color: #FFC107; }
+.judgment-option.yellow:hover { background: #fffbf0; }
+.judgment-option.red { border-color: #f44336; }
+.judgment-option.red:hover { background: #fef5f5; }
+.judgment-option h4 { margin-bottom: 8px; font-size: 1.2em; }
+.judgment-option.green h4 { color: #4CAF50; }
+.judgment-option.yellow h4 { color: #F57C00; }
+.judgment-option.red h4 { color: #f44336; }
+.judgment-option p { color: #4a5568; font-size: 0.95em; line-height: 1.6; }
+.judgment-option.correct { background: #4CAF50; border-color: #4CAF50; color: #fff; }
+.judgment-option.correct h4,
+.judgment-option.correct p { color: #fff; }
+.judgment-option.incorrect { background: #f44336; border-color: #f44336; color: #fff; }
+.judgment-option.incorrect h4,
+.judgment-option.incorrect p { color: #fff; }
+.judgment-option.disabled { cursor: not-allowed; opacity: 0.6; }
+.feedback { background: #e3f2fd; padding: 20px; border-radius: 10px; margin-top: 20px; border-left: 4px solid #2196F3; display: none; }
+.feedback.show { display: block; animation: slideIn 0.3s; }
+.feedback h4 { color: #1976d2; margin-bottom: 10px; }
+button { padding: 15px 30px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 1.05em; transition: all 0.3s; }
+.btn-primary { background: #4CAF50; color: #fff; width: 100%; margin-top: 10px; }
+.btn-primary:hover { background: #45a049; transform: scale(1.02); }
+.btn-secondary { background: #2196F3; color: #fff; width: 100%; }
+.btn-secondary:hover { background: #1976d2; }
+.progress-bar { background: #e0e0e0; height: 8px; border-radius: 4px; margin: 20px 0; overflow: hidden; }
+.progress-fill { background: linear-gradient(90deg, #667eea, #764ba2); height: 100%; transition: width 0.3s; }
+.achievement { background: #fff9c4; padding: 15px; border-radius: 8px; margin: 10px 0; text-align: center; border: 2px solid #fbc02d; display: none; }
+.achievement.show { display: block; animation: bounce 0.5s; }
+@keyframes slideIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes bounce { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+.how-to-play { background: #e8f5e9; padding: 15px; border-radius: 8px; margin: 15px 0; }
+.how-to-play h4 { color: #2e7d32; margin-bottom: 10px; }
+.how-to-play ul { margin-left: 20px; line-height: 1.8; color: #1b5e20; }
+.color-legend { background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 15px 0; }
+.color-legend h4 { color: #2d3748; margin-bottom: 10px; font-size: 0.95em; }
+.legend-item { display: flex; align-items: center; margin: 8px 0; font-size: 0.9em; }
+.legend-color { width: 20px; height: 20px; border-radius: 4px; margin-right: 10px; }
+</style>
+</head>
+<body>
+<nav class="nav-header">
+    <div class="nav-title">⚖️ AI Use Judge</div>
+    <a href="../../index.html">← Back to Home</a>
+</nav>
+<div class="container">
+    <h1>⚖️ AI Use Judge</h1>
+    <p class="subtitle">Judge whether each AI usage scenario is responsible, questionable, or inappropriate!</p>
+
+    <div class="game-area">
+        <div class="sidebar">
+            <div class="score-display">
+                <div>Score</div>
+                <div class="score-value" id="score">0</div>
+                <div>Streak: <span id="streak">0</span></div>
+            </div>
+
+            <div class="stats">
+                <div class="stat-row">
+                    <span>Scenarios Judged:</span>
+                    <span id="solved">0/15</span>
+                </div>
+                <div class="stat-row">
+                    <span>Accuracy:</span>
+                    <span id="accuracy">0%</span>
+                </div>
+                <div class="stat-row">
+                    <span>Best Streak:</span>
+                    <span id="bestStreak">0</span>
+                </div>
+            </div>
+
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar" style="width: 0%"></div>
+            </div>
+
+            <button class="btn-secondary" onclick="nextScenario()">Next Scenario →</button>
+            <button class="btn-primary" onclick="resetGame()">Start Over</button>
+
+            <div class="color-legend">
+                <h4>Judgment Categories:</h4>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #4CAF50;"></div>
+                    <span>Responsible Use</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #FFC107;"></div>
+                    <span>Gray Area</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #f44336;"></div>
+                    <span>Unsafe/Cheating</span>
+                </div>
+            </div>
+
+            <div class="how-to-play">
+                <h4>How to Play:</h4>
+                <ul>
+                    <li>Read each scenario</li>
+                    <li>Judge the AI usage</li>
+                    <li>Learn from explanations</li>
+                    <li>Build your judgment!</li>
+                </ul>
+            </div>
+
+            <div id="achievement" class="achievement">
+                <strong>Achievement Unlocked!</strong>
+                <div id="achievementText"></div>
+            </div>
+        </div>
+
+        <div>
+            <div class="scenario-card">
+                <h3 id="scenarioTitle">Scenario 1</h3>
+                <div class="scenario-text" id="scenarioText">
+                    Loading scenario...
+                </div>
+
+                <div class="judgment-options" id="judgmentOptions">
+                    <!-- Options will be populated by JavaScript -->
+                </div>
+
+                <div class="feedback" id="feedback">
+                    <h4 id="feedbackTitle">Feedback</h4>
+                    <p id="feedbackText"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const scenarios = [
+    {
+        title: "Math Homework Help",
+        text: "Sarah has been working on her calculus homework for 30 minutes and is stuck on one problem. She asks ChatGPT to explain the concept of derivatives and show her the general approach, then tries the problem herself with that understanding.",
+        correctAnswer: "Responsible Use",
+        explanation: "This is Responsible Use. Sarah made genuine effort first, used AI to understand the concept (not solve the specific problem), and then applied that knowledge herself. She's using AI as a learning tool, not a shortcut.",
+    },
+    {
+        title: "Essay Writing Shortcut",
+        text: "Marcus has an essay due tomorrow that he hasn't started. He types the prompt into Claude and asks it to write a 5-paragraph essay on the causes of World War I. He copies the output, changes a few words, and submits it as his own work.",
+        correctAnswer: "Unsafe/Cheating",
+        explanation: "This is Unsafe/Cheating. Marcus is submitting AI-generated work as his own without doing any actual thinking or writing. He's not learning, violating academic integrity, and misrepresenting his work. This is plagiarism.",
+    },
+    {
+        title: "Code Debugging Session",
+        text: "Aisha's Python program keeps crashing with an error she doesn't understand. She pastes her code and the error message into ChatGPT and asks, 'Why is this happening and what concept do I need to understand to fix it?' She then fixes the bug based on the explanation.",
+        correctAnswer: "Responsible Use",
+        explanation: "This is Responsible Use. Aisha is using AI like a tutor to understand what went wrong. She's learning about the error and fixing it herself rather than having AI rewrite her code. This builds her debugging skills.",
+    },
+    {
+        title: "Reading Summary Substitute",
+        text: "Tyler has a quiz tomorrow on chapters 5-7 of his history textbook. Instead of reading, he asks AI to summarize each chapter. He memorizes the summaries and uses that for the quiz.",
+        correctAnswer: "Unsafe/Cheating",
+        explanation: "This is Unsafe/Cheating. Tyler is using AI to completely bypass the assigned reading. He's avoiding the learning objective (reading comprehension and historical analysis) and will miss important details and critical thinking that comes from reading the actual text.",
+    },
+    {
+        title: "Brainstorming Research Topics",
+        text: "Emma needs to pick a topic for her research paper on environmental science. She asks Claude, 'What are some interesting and current topics in climate science that would work for a high school research paper?' She reviews the suggestions and picks one that interests her.",
+        correctAnswer: "Responsible Use",
+        explanation: "This is Responsible Use. Emma is using AI to generate ideas and explore possibilities, not to do the research or writing. Brainstorming is an appropriate use of AI that can help students find engaging topics. The actual research and analysis will still be her work.",
+    },
+    {
+        title: "Entire Coding Project",
+        text: "Jake has a computer science project to build a simple calculator app. He gives the full assignment requirements to ChatGPT and asks it to write the complete program. He submits it after checking that it runs.",
+        correctAnswer: "Unsafe/Cheating",
+        explanation: "This is Unsafe/Cheating. Jake is having AI complete his entire assignment. He's not learning programming skills, problem-solving, or code architecture. When exams come or when he needs to explain his code, he'll be unable to do so because he didn't actually write it.",
+    },
+    {
+        title: "Grammar and Style Feedback",
+        text: "After writing her college application essay through multiple drafts, Sofia pastes it into Claude and asks, 'Can you identify grammatical errors and suggest where my writing could be clearer?' She reviews the feedback and decides which suggestions to incorporate.",
+        correctAnswer: "Gray Area",
+        explanation: "This is a Gray Area. Using AI for grammar checking is generally acceptable, but for something as personal and important as a college essay, admissions officers want to see your authentic voice. If the AI significantly changes your writing style, it crosses a line. Light editing is okay; having AI polish your essay extensively is questionable. When in doubt, ask your counselor.",
+    },
+    {
+        title: "Vocabulary Practice",
+        text: "Nina is studying for the SAT and asks ChatGPT to quiz her on vocabulary words, provide example sentences, and explain the etymology of words she's struggling with. She practices until she can use the words correctly on her own.",
+        correctAnswer: "Responsible Use",
+        explanation: "This is Responsible Use. Nina is using AI as a study tool and practice partner. She's actively learning and testing her knowledge, not having AI take the test for her. This is an excellent example of using AI to enhance learning through practice and explanation.",
+    },
+    {
+        title: "Lab Report Data Analysis",
+        text: "Alex conducted a chemistry experiment but doesn't understand how to interpret the data. He gives his raw experimental results to AI and asks it to analyze the data, draw conclusions, and write the analysis section of his lab report, which he then submits.",
+        correctAnswer: "Unsafe/Cheating",
+        explanation: "This is Unsafe/Cheating. The entire point of a lab report is to learn how to analyze data and draw conclusions. By having AI do this critical thinking step, Alex is bypassing the main learning objective. He should ask AI to explain how to analyze data, then do the analysis himself.",
+    },
+    {
+        title: "Foreign Language Translation",
+        text: "Kenji has Spanish homework to write a paragraph about his summer vacation. He writes it in English first, then uses ChatGPT to translate it to Spanish. He doesn't verify the grammar or try to understand the Spanish version before submitting.",
+        correctAnswer: "Unsafe/Cheating",
+        explanation: "This is Unsafe/Cheating. Using AI as a direct translator defeats the purpose of language learning. Kenji isn't practicing Spanish composition, grammar, or vocabulary. He should write in Spanish (using a dictionary for unknown words) or use AI to check his Spanish after he writes it, not to translate from English.",
+    },
+    {
+        title: "Concept Explanation Request",
+        text: "During homework, Lily encounters the concept of photosynthesis and finds the textbook explanation confusing. She asks Claude, 'Can you explain photosynthesis in simpler terms and give me an analogy?' After understanding it, she closes the AI and completes her homework questions on her own.",
+        correctAnswer: "Responsible Use",
+        explanation: "This is Responsible Use. Lily is using AI to understand a concept that confuses her - exactly like asking a teacher for clarification. She's building understanding, not getting answers to her homework. Once she understands, she does the work herself. This is ideal AI use for learning.",
+    },
+    {
+        title: "Essay Outline Assistance",
+        text: "Jordan has a thesis and main ideas for his essay but is struggling with organization. He tells ChatGPT his thesis and asks, 'What's a logical way to structure these ideas?' He uses the suggested outline structure but writes all the content himself.",
+        correctAnswer: "Gray Area",
+        explanation: "This is a Gray Area. Getting help with essay structure is less problematic than having AI write content, but organization is part of the writing process you're supposed to learn. This might be acceptable for early drafts or if you're struggling with writing skills, but you should develop the ability to organize ideas on your own. If your teacher allows it, disclose it.",
+    },
+    {
+        title: "Practice Test Generation",
+        text: "Before her biology exam, Maya asks ChatGPT to create practice questions about cellular respiration based on her study guide. She answers them without AI help, then uses AI to check if her answers are correct and explain what she got wrong.",
+        correctAnswer: "Responsible Use",
+        explanation: "This is Responsible Use. Maya is using AI to create study materials and check her understanding - both excellent uses. She's doing the actual learning work herself (answering questions) and using AI to verify and explain. This is active learning enhanced by technology.",
+    },
+    {
+        title: "Avoiding Cited Research",
+        text: "Instead of finding and reading 5 scholarly sources for her research paper as required, Zoe asks ChatGPT to provide information about her topic and includes it in her paper without citing any actual sources. She formats it to look like she did research.",
+        correctAnswer: "Unsafe/Cheating",
+        explanation: "This is Unsafe/Cheating. Zoe is fabricating sources and bypassing the research process. Research assignments teach you to find, evaluate, and synthesize credible sources - critical academic skills. She's also potentially including inaccurate information since AI can make errors. This violates academic integrity on multiple levels.",
+    },
+    {
+        title: "Understanding Teacher Feedback",
+        text: "After getting his essay back with comments like 'thesis too broad' and 'needs stronger evidence,' Carlos doesn't understand what his teacher means. He asks Claude to explain what these comments mean and how to address them, then revises his essay based on his new understanding.",
+        correctAnswer: "Responsible Use",
+        explanation: "This is Responsible Use. Carlos is using AI to understand feedback - similar to going to office hours. He's learning what good writing looks like and applying that knowledge to improve his own work. The actual revision is his work, based on understanding the feedback better. This is excellent use of AI for learning.",
+    }
+];
+
+let currentScenario = 0;
+let score = 0;
+let streak = 0;
+let bestStreak = 0;
+let correct = 0;
+let answered = false;
+
+const judgmentTypes = [
+    {
+        type: "Responsible Use",
+        description: "Enhances learning and builds skills",
+        color: "green"
+    },
+    {
+        type: "Gray Area",
+        description: "Depends on context and disclosure",
+        color: "yellow"
+    },
+    {
+        type: "Unsafe/Cheating",
+        description: "Undermines learning or violates integrity",
+        color: "red"
+    }
+];
+
+function loadScenario() {
+    const scenario = scenarios[currentScenario];
+    answered = false;
+
+    document.getElementById('scenarioTitle').textContent = `Scenario ${currentScenario + 1}: ${scenario.title}`;
+    document.getElementById('scenarioText').textContent = scenario.text;
+    document.getElementById('feedback').classList.remove('show');
+
+    const optionsContainer = document.getElementById('judgmentOptions');
+    optionsContainer.innerHTML = '';
+
+    judgmentTypes.forEach(judgment => {
+        const optionDiv = document.createElement('div');
+        optionDiv.className = `judgment-option ${judgment.color}`;
+        optionDiv.innerHTML = `
+            <h4>${judgment.type}</h4>
+            <p>${judgment.description}</p>
+        `;
+        optionDiv.onclick = () => selectAnswer(judgment.type);
+        optionsContainer.appendChild(optionDiv);
+    });
+
+    updateProgress();
+}
+
+function selectAnswer(selectedType) {
+    if (answered) return;
+    answered = true;
+
+    const scenario = scenarios[currentScenario];
+    const isCorrect = selectedType === scenario.correctAnswer;
+    const options = document.querySelectorAll('.judgment-option');
+
+    options.forEach(option => {
+        const optionType = option.querySelector('h4').textContent;
+        option.classList.add('disabled');
+
+        if (optionType === scenario.correctAnswer) {
+            option.classList.add('correct');
+        } else if (optionType === selectedType && !isCorrect) {
+            option.classList.add('incorrect');
+        }
+    });
+
+    const feedback = document.getElementById('feedback');
+    const feedbackTitle = document.getElementById('feedbackTitle');
+    const feedbackText = document.getElementById('feedbackText');
+
+    if (isCorrect) {
+        correct++;
+        streak++;
+        bestStreak = Math.max(bestStreak, streak);
+        score += 100 + (streak * 10);
+
+        feedbackTitle.textContent = '✅ Correct Judgment!';
+        feedbackTitle.style.color = '#4CAF50';
+        feedbackText.textContent = scenario.explanation;
+
+        checkAchievements();
+    } else {
+        streak = 0;
+        feedbackTitle.textContent = '❌ Different Perspective';
+        feedbackTitle.style.color = '#f44336';
+        feedbackText.textContent = scenario.explanation;
+    }
+
+    feedback.classList.add('show');
+    updateStats();
+}
+
+function nextScenario() {
+    if (!answered) {
+        alert('Please make a judgment first!');
+        return;
+    }
+
+    currentScenario++;
+    if (currentScenario >= scenarios.length) {
+        showFinalScore();
+        return;
+    }
+
+    loadScenario();
+}
+
+function updateStats() {
+    document.getElementById('score').textContent = score;
+    document.getElementById('streak').textContent = streak;
+    document.getElementById('bestStreak').textContent = bestStreak;
+    document.getElementById('solved').textContent = `${currentScenario + (answered ? 1 : 0)}/${scenarios.length}`;
+    document.getElementById('accuracy').textContent = `${Math.round((correct / Math.max(currentScenario + (answered ? 1 : 0), 1)) * 100)}%`;
+}
+
+function updateProgress() {
+    const progress = ((currentScenario + (answered ? 1 : 0)) / scenarios.length) * 100;
+    document.getElementById('progressBar').style.width = `${progress}%`;
+}
+
+function checkAchievements() {
+    const achievementDiv = document.getElementById('achievement');
+    const achievementText = document.getElementById('achievementText');
+
+    if (streak === 3) {
+        achievementText.textContent = '🔥 3 in a row! Sharp judgment!';
+        achievementDiv.classList.add('show');
+        setTimeout(() => achievementDiv.classList.remove('show'), 3000);
+    } else if (streak === 5) {
+        achievementText.textContent = '⭐ 5 streak! Ethics Expert!';
+        achievementDiv.classList.add('show');
+        setTimeout(() => achievementDiv.classList.remove('show'), 3000);
+    } else if (streak === 10) {
+        achievementText.textContent = '🏆 10 streak! Master Judge!';
+        achievementDiv.classList.add('show');
+        setTimeout(() => achievementDiv.classList.remove('show'), 3000);
+    } else if (correct === scenarios.length && currentScenario === scenarios.length - 1) {
+        achievementText.textContent = '👑 Perfect Score! Ultimate AI Ethics Judge!';
+        achievementDiv.classList.add('show');
+        setTimeout(() => achievementDiv.classList.remove('show'), 3000);
+    }
+}
+
+function showFinalScore() {
+    const accuracy = Math.round((correct / scenarios.length) * 100);
+    let message = '';
+
+    if (accuracy === 100) {
+        message = '👑 Perfect! You have excellent judgment about responsible AI use!';
+    } else if (accuracy >= 85) {
+        message = '⭐ Excellent! You understand responsible AI use very well.';
+    } else if (accuracy >= 70) {
+        message = '👍 Good work! You have a solid grasp of AI ethics.';
+    } else if (accuracy >= 60) {
+        message = '📚 Not bad! Review the lesson to strengthen your understanding.';
+    } else {
+        message = '💡 Review the lesson and try again. Understanding these nuances is important!';
+    }
+
+    alert(`Game Complete!\n\nFinal Score: ${score}\nAccuracy: ${accuracy}%\nBest Streak: ${bestStreak}\n\n${message}`);
+}
+
+function resetGame() {
+    currentScenario = 0;
+    score = 0;
+    streak = 0;
+    bestStreak = 0;
+    correct = 0;
+    answered = false;
+    loadScenario();
+    updateStats();
+}
+
+// Load first scenario on page load
+loadScenario();
+updateStats();
+</script>
+</body>
+</html>

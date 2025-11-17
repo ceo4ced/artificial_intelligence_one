@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Graph Your World - Interactive Graph Building Game</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 0; }
+.nav-header { background: #2d3748; padding: 15px 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; }
+.nav-header a { color: #90cdf4; text-decoration: none; font-weight: 600; font-size: 1.1em; }
+.nav-title { color: #fff; font-size: 1.2em; font-weight: 700; }
+.container { max-width: 1400px; margin: 20px auto; background: #fff; border-radius: 15px; padding: 30px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+h1 { text-align: center; color: #2d3748; font-size: 2.5em; margin-bottom: 10px; }
+.subtitle { text-align: center; color: #666; margin-bottom: 30px; font-size: 1.1em; }
+.game-area { display: grid; grid-template-columns: 350px 1fr; gap: 30px; }
+.sidebar { background: #f8f9fa; padding: 20px; border-radius: 10px; height: fit-content; position: sticky; top: 20px; }
+button { width: 100%; padding: 12px; margin: 5px 0; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.2s; }
+button:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
+.btn-primary { background: #4CAF50; color: #fff; }
+.btn-secondary { background: #2196F3; color: #fff; }
+.btn-danger { background: #f44336; color: #fff; }
+.btn-warning { background: #ff9800; color: #fff; }
+canvas { border: 2px solid #ddd; border-radius: 8px; display: block; background: #fafafa; cursor: crosshair; }
+.scenario-selector { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 15px 0; }
+.scenario-btn { padding: 10px; border: 2px solid #667eea; background: #fff; color: #667eea; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.2s; text-align: center; font-size: 0.85em; }
+.scenario-btn:hover { background: #667eea; color: #fff; }
+.scenario-btn.active { background: #667eea; color: #fff; }
+.scenario-btn.completed { background: #4CAF50; color: #fff; border-color: #4CAF50; }
+.challenge { background: #e3f2fd; padding: 15px; border-radius: 10px; margin: 15px 0; border-left: 4px solid #2196F3; }
+.challenge h4 { color: #1976d2; margin-bottom: 8px; }
+.challenge p { font-size: 0.9em; line-height: 1.6; }
+.stats { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; padding: 15px; border-radius: 10px; margin-top: 15px; }
+.stat-row { display: flex; justify-content: space-between; margin: 8px 0; }
+.score-display { background: #fff9c4; padding: 20px; border-radius: 10px; text-align: center; margin: 20px 0; border: 2px solid #fbc02d; }
+.score-value { font-size: 2.5em; font-weight: bold; color: #667eea; margin: 10px 0; }
+.mode-selector { display: flex; gap: 5px; margin: 10px 0; }
+.mode-btn { flex: 1; padding: 8px; border: 2px solid #ddd; background: #fff; border-radius: 6px; cursor: pointer; font-size: 0.85em; font-weight: 600; color: #666; transition: all 0.2s; }
+.mode-btn.active { background: #667eea; color: #fff; border-color: #667eea; }
+.question-panel { background: #f3e5f5; padding: 20px; border-radius: 10px; margin: 20px 0; border-left: 4px solid #9c27b0; }
+.question-panel h3 { color: #7b1fa2; margin-bottom: 15px; }
+.question { background: #fff; padding: 15px; border-radius: 8px; margin: 10px 0; }
+.question-text { font-weight: 600; margin-bottom: 10px; color: #2d3748; }
+.answer-input { width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 6px; font-size: 1em; margin: 5px 0; }
+.answer-feedback { padding: 10px; border-radius: 6px; margin-top: 10px; font-weight: 600; }
+.answer-feedback.correct { background: #4CAF50; color: #fff; }
+.answer-feedback.incorrect { background: #f44336; color: #fff; }
+.instructions { background: #fff3e0; padding: 15px; border-radius: 8px; margin: 15px 0; border-left: 4px solid #ff9800; }
+.instructions h4 { color: #e65100; margin-bottom: 8px; }
+.instructions ul { margin-left: 20px; line-height: 1.8; font-size: 0.9em; }
+.completion-banner { background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%); color: #fff; padding: 30px; border-radius: 15px; text-align: center; margin: 20px 0; display: none; }
+.completion-banner h2 { margin-bottom: 15px; }
+.completion-banner.show { display: block; }
+</style>
+</head>
+<body>
+<nav class="nav-header">
+    <div class="nav-title">Graph Your World</div>
+    <a href="../../index.html">← Back to Home</a>
+</nav>
+<div class="container">
+    <h1>Graph Your World</h1>
+    <p class="subtitle">Build graphs to model real-world relationships and solve challenges!</p>
+
+    <div class="game-area">
+        <div class="sidebar">
+            <h3>Scenarios</h3>
+            <div class="scenario-selector">
+                <button class="scenario-btn active" onclick="loadScenario(0)">Social Network</button>
+                <button class="scenario-btn" onclick="loadScenario(1)">City Roads</button>
+                <button class="scenario-btn" onclick="loadScenario(2)">Website Links</button>
+                <button class="scenario-btn" onclick="loadScenario(3)">Flight Routes</button>
+                <button class="scenario-btn" onclick="loadScenario(4)">Task Dependencies</button>
+                <button class="scenario-btn" onclick="loadScenario(5)">Family Tree</button>
+            </div>
+
+            <div class="challenge" id="scenarioDescription">
+                <h4>Social Network</h4>
+                <p>Map out friendships between people. Create bidirectional connections!</p>
+            </div>
+
+            <h4 style="margin-top: 20px;">Building Tools</h4>
+            <div class="mode-selector">
+                <button class="mode-btn active" onclick="setMode('node')">Add Node</button>
+                <button class="mode-btn" onclick="setMode('edge')">Add Edge</button>
+                <button class="mode-btn" onclick="setMode('delete')">Delete</button>
+            </div>
+
+            <button class="btn-warning" onclick="clearGraph()">Clear Graph</button>
+            <button class="btn-primary" onclick="checkAnswers()">Check Answers</button>
+            <button class="btn-secondary" onclick="nextScenario()">Next Scenario</button>
+
+            <div class="instructions">
+                <h4>Instructions:</h4>
+                <ul>
+                    <li>Click canvas to add nodes</li>
+                    <li>Click two nodes to connect</li>
+                    <li>Answer questions about your graph</li>
+                    <li>Complete all scenarios!</li>
+                </ul>
+            </div>
+
+            <div class="stats">
+                <div class="stat-row"><span>Nodes:</span><span id="nodeCount">0</span></div>
+                <div class="stat-row"><span>Edges:</span><span id="edgeCount">0</span></div>
+                <div class="stat-row"><span>Scenarios Completed:</span><span id="scenariosCompleted">0/6</span></div>
+                <div class="stat-row"><span>Total Score:</span><span id="totalScore">0</span></div>
+            </div>
+        </div>
+
+        <div>
+            <div class="score-display">
+                <h3>Current Scenario Score</h3>
+                <div class="score-value" id="scenarioScore">0 / 100</div>
+                <p style="color: #666;">Build your graph and answer all questions correctly!</p>
+            </div>
+
+            <canvas id="canvas" width="900" height="500"></canvas>
+
+            <div class="question-panel" id="questionPanel">
+                <h3>Questions</h3>
+                <div id="questionsContainer">
+                    <p style="color: #999; text-align: center;">Load a scenario to see questions</p>
+                </div>
+            </div>
+
+            <div class="completion-banner" id="completionBanner">
+                <h2>Congratulations!</h2>
+                <p style="font-size: 1.2em; margin-bottom: 15px;">You've completed all scenarios!</p>
+                <div style="font-size: 2em; margin: 20px 0;">Final Score: <span id="finalScore">0</span></div>
+                <p>You've mastered graph modeling and relationships!</p>
+            </div>
+
+            <div style="background: #e8f5e9; padding: 20px; border-radius: 10px; margin-top: 20px; border-left: 4px solid #4CAF50;">
+                <h4 style="color: #2e7d32; margin-bottom: 10px;">About Graph Modeling</h4>
+                <p style="line-height: 1.6;">
+                    Graphs are one of the most powerful data structures in computer science. They model relationships
+                    in social networks (Facebook, LinkedIn), navigation systems (Google Maps), recommendation engines
+                    (Netflix, Amazon), web search (Google PageRank), project planning (dependency graphs), and much more.
+                    By understanding graphs, you can solve complex real-world problems involving connections, paths,
+                    networks, and relationships. Every time you use GPS, browse social media, or get recommendations,
+                    you're interacting with graph algorithms!
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+
+let nodes = [];
+let edges = [];
+let mode = 'node';
+let selectedNode = null;
+let nodeIdCounter = 0;
+let currentScenario = 0;
+let scenarioScores = [0, 0, 0, 0, 0, 0];
+let scenariosCompleted = 0;
+
+const scenarios = [
+    {
+        title: "Social Network",
+        description: "Map out friendships between people. Create bidirectional connections!",
+        directed: false,
+        weighted: false,
+        nodeLabels: ["Alice", "Bob", "Carol", "Dan", "Eve"],
+        questions: [
+            { text: "How many people are in this network?", answer: "5", type: "count-nodes" },
+            { text: "Who has the most friends? (name)", answer: "", type: "most-connected" },
+            { text: "Are Alice and Eve connected (directly or indirectly)? (yes/no)", answer: "", type: "connected" }
+        ]
+    },
+    {
+        title: "City Roads",
+        description: "Build a road network between cities. Bidirectional roads with distances!",
+        directed: false,
+        weighted: true,
+        nodeLabels: ["NYC", "Boston", "Philly", "DC", "Pittsburgh"],
+        questions: [
+            { text: "How many cities are in the network?", answer: "5", type: "count-nodes" },
+            { text: "How many roads connect the cities?", answer: "", type: "count-edges" },
+            { text: "What is the total of all road distances?", answer: "", type: "sum-weights" }
+        ]
+    },
+    {
+        title: "Website Links",
+        description: "Create hyperlinks between web pages. Links are one-directional!",
+        directed: true,
+        weighted: false,
+        nodeLabels: ["Home", "About", "Blog", "Contact", "Shop"],
+        questions: [
+            { text: "How many web pages are there?", answer: "5", type: "count-nodes" },
+            { text: "Which page has the most outgoing links? (name)", answer: "", type: "most-outgoing" },
+            { text: "How many total links exist?", answer: "", type: "count-edges" }
+        ]
+    },
+    {
+        title: "Flight Routes",
+        description: "Map airline routes with flight times. Directed, weighted connections!",
+        directed: true,
+        weighted: true,
+        nodeLabels: ["LAX", "JFK", "ORD", "DFW", "ATL"],
+        questions: [
+            { text: "How many airports are in the network?", answer: "5", type: "count-nodes" },
+            { text: "What is the shortest flight time in your network?", answer: "", type: "min-weight" },
+            { text: "How many direct flights exist?", answer: "", type: "count-edges" }
+        ]
+    },
+    {
+        title: "Task Dependencies",
+        description: "Show which tasks must be completed before others. Directed graph!",
+        directed: true,
+        weighted: false,
+        nodeLabels: ["Start", "Design", "Code", "Test", "Deploy"],
+        questions: [
+            { text: "How many tasks are there?", answer: "5", type: "count-nodes" },
+            { text: "Which task has the most dependencies pointing to it? (name)", answer: "", type: "most-incoming" },
+            { text: "Does your graph have a cycle? (yes/no)", answer: "no", type: "has-cycle" }
+        ]
+    },
+    {
+        title: "Family Tree",
+        description: "Create parent-child relationships. Directed edges from parent to child!",
+        directed: true,
+        weighted: false,
+        nodeLabels: ["Grandma", "Dad", "Mom", "You", "Sister"],
+        questions: [
+            { text: "How many family members are included?", answer: "5", type: "count-nodes" },
+            { text: "Who is the root ancestor? (has no incoming edges)", answer: "", type: "find-root" },
+            { text: "How many parent-child relationships exist?", answer: "", type: "count-edges" }
+        ]
+    }
+];
+
+class Node {
+    constructor(x, y, id, label) {
+        this.x = x;
+        this.y = y;
+        this.id = id;
+        this.label = label;
+        this.radius = 30;
+    }
+
+    draw() {
+        ctx.fillStyle = '#667eea';
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 3;
+        ctx.stroke();
+
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold 12px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(this.label, this.x, this.y);
+    }
+
+    contains(x, y) {
+        return Math.sqrt((x - this.x) ** 2 + (y - this.y) ** 2) <= this.radius;
+    }
+}
+
+class Edge {
+    constructor(from, to, weight = null, directed = false) {
+        this.from = from;
+        this.to = to;
+        this.weight = weight;
+        this.directed = directed;
+    }
+
+    draw() {
+        const fromNode = nodes.find(n => n.id === this.from);
+        const toNode = nodes.find(n => n.id === this.to);
+        if (!fromNode || !toNode) return;
+
+        ctx.strokeStyle = '#2d3748';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(fromNode.x, fromNode.y);
+        ctx.lineTo(toNode.x, toNode.y);
+        ctx.stroke();
+
+        // Draw arrow for directed edges
+        if (this.directed) {
+            const angle = Math.atan2(toNode.y - fromNode.y, toNode.x - fromNode.x);
+            const arrowX = toNode.x - 35 * Math.cos(angle);
+            const arrowY = toNode.y - 35 * Math.sin(angle);
+
+            ctx.fillStyle = '#2d3748';
+            ctx.beginPath();
+            ctx.moveTo(arrowX, arrowY);
+            ctx.lineTo(arrowX - 12 * Math.cos(angle - Math.PI / 6), arrowY - 12 * Math.sin(angle - Math.PI / 6));
+            ctx.lineTo(arrowX - 12 * Math.cos(angle + Math.PI / 6), arrowY - 12 * Math.sin(angle + Math.PI / 6));
+            ctx.closePath();
+            ctx.fill();
+        }
+
+        // Draw weight for weighted edges
+        if (this.weight !== null) {
+            const midX = (fromNode.x + toNode.x) / 2;
+            const midY = (fromNode.y + toNode.y) / 2;
+
+            ctx.fillStyle = '#fff';
+            ctx.strokeStyle = '#2d3748';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(midX, midY, 18, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.fillStyle = '#2d3748';
+            ctx.font = 'bold 13px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(this.weight, midX, midY);
+        }
+    }
+}
+
+function setMode(newMode) {
+    mode = newMode;
+    selectedNode = null;
+    document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+    draw();
+}
+
+function loadScenario(index) {
+    currentScenario = index;
+    document.querySelectorAll('.scenario-btn').forEach((btn, i) => {
+        btn.classList.remove('active');
+        if (i === index) btn.classList.add('active');
+    });
+
+    const scenario = scenarios[index];
+    document.getElementById('scenarioDescription').innerHTML =
+        `<h4>${scenario.title}</h4><p>${scenario.description}</p>`;
+
+    clearGraph();
+    renderQuestions();
+    updateScenarioScore();
+}
+
+function renderQuestions() {
+    const scenario = scenarios[currentScenario];
+    const container = document.getElementById('questionsContainer');
+
+    let html = '';
+    scenario.questions.forEach((q, i) => {
+        html += `
+            <div class="question">
+                <div class="question-text">${i + 1}. ${q.text}</div>
+                <input type="text" class="answer-input" id="answer${i}" placeholder="Enter your answer">
+                <div class="answer-feedback" id="feedback${i}" style="display: none;"></div>
+            </div>
+        `;
+    });
+
+    container.innerHTML = html;
+}
+
+function checkAnswers() {
+    const scenario = scenarios[currentScenario];
+    let correctAnswers = 0;
+    let totalQuestions = scenario.questions.length;
+
+    scenario.questions.forEach((q, i) => {
+        const userAnswer = document.getElementById(`answer${i}`).value.trim().toLowerCase();
+        const feedback = document.getElementById(`feedback${i}`);
+        let correctAnswer = computeAnswer(q);
+
+        const isCorrect = userAnswer === correctAnswer.toLowerCase();
+
+        if (isCorrect) {
+            correctAnswers++;
+            feedback.className = 'answer-feedback correct';
+            feedback.textContent = 'Correct!';
+        } else {
+            feedback.className = 'answer-feedback incorrect';
+            feedback.textContent = `Incorrect. Expected: ${correctAnswer}`;
+        }
+
+        feedback.style.display = 'block';
+    });
+
+    // Calculate score
+    const graphScore = Math.min(50, nodes.length * 10); // Up to 50 points for building
+    const answerScore = (correctAnswers / totalQuestions) * 50; // Up to 50 points for answers
+    const totalScore = Math.round(graphScore + answerScore);
+
+    scenarioScores[currentScenario] = totalScore;
+    updateScenarioScore();
+    updateStats();
+
+    // Mark scenario as completed if score > 70
+    if (totalScore >= 70) {
+        const btn = document.querySelectorAll('.scenario-btn')[currentScenario];
+        if (!btn.classList.contains('completed')) {
+            btn.classList.add('completed');
+            scenariosCompleted++;
+        }
+
+        if (scenariosCompleted === scenarios.length) {
+            showCompletionBanner();
+        }
+    }
+}
+
+function computeAnswer(question) {
+    switch (question.type) {
+        case 'count-nodes':
+            return nodes.length.toString();
+
+        case 'count-edges':
+            return edges.length.toString();
+
+        case 'sum-weights':
+            return edges.reduce((sum, e) => sum + (e.weight || 0), 0).toString();
+
+        case 'min-weight':
+            if (edges.length === 0) return '0';
+            return Math.min(...edges.map(e => e.weight || 0)).toString();
+
+        case 'most-connected':
+            if (nodes.length === 0) return '';
+            const degrees = nodes.map(n => {
+                const degree = edges.filter(e => e.from === n.id || e.to === n.id).length;
+                return { node: n, degree };
+            });
+            const maxDegree = Math.max(...degrees.map(d => d.degree));
+            const mostConnected = degrees.find(d => d.degree === maxDegree);
+            return mostConnected ? mostConnected.node.label.toLowerCase() : '';
+
+        case 'most-outgoing':
+            if (nodes.length === 0) return '';
+            const outgoing = nodes.map(n => {
+                const count = edges.filter(e => e.from === n.id).length;
+                return { node: n, count };
+            });
+            const maxOut = Math.max(...outgoing.map(o => o.count));
+            const mostOut = outgoing.find(o => o.count === maxOut);
+            return mostOut ? mostOut.node.label.toLowerCase() : '';
+
+        case 'most-incoming':
+            if (nodes.length === 0) return '';
+            const incoming = nodes.map(n => {
+                const count = edges.filter(e => e.to === n.id).length;
+                return { node: n, count };
+            });
+            const maxIn = Math.max(...incoming.map(i => i.count));
+            const mostIn = incoming.find(i => i.count === maxIn);
+            return mostIn ? mostIn.node.label.toLowerCase() : '';
+
+        case 'find-root':
+            if (nodes.length === 0) return '';
+            const root = nodes.find(n => !edges.some(e => e.to === n.id));
+            return root ? root.label.toLowerCase() : '';
+
+        case 'connected':
+            // Simple BFS to check if all nodes are connected
+            if (nodes.length === 0) return 'no';
+            const visited = new Set();
+            const queue = [nodes[0].id];
+            visited.add(nodes[0].id);
+
+            while (queue.length > 0) {
+                const current = queue.shift();
+                edges.forEach(e => {
+                    if (e.from === current && !visited.has(e.to)) {
+                        visited.add(e.to);
+                        queue.push(e.to);
+                    }
+                    if (!e.directed && e.to === current && !visited.has(e.from)) {
+                        visited.add(e.from);
+                        queue.push(e.from);
+                    }
+                });
+            }
+
+            return visited.size === nodes.length ? 'yes' : 'no';
+
+        case 'has-cycle':
+            return hasCycle() ? 'yes' : 'no';
+
+        default:
+            return question.answer;
+    }
+}
+
+function hasCycle() {
+    const visited = new Set();
+    const recStack = new Set();
+
+    function dfs(nodeId) {
+        visited.add(nodeId);
+        recStack.add(nodeId);
+
+        const outgoing = edges.filter(e => e.from === nodeId);
+        for (let edge of outgoing) {
+            if (!visited.has(edge.to)) {
+                if (dfs(edge.to)) return true;
+            } else if (recStack.has(edge.to)) {
+                return true;
+            }
+        }
+
+        recStack.delete(nodeId);
+        return false;
+    }
+
+    for (let node of nodes) {
+        if (!visited.has(node.id)) {
+            if (dfs(node.id)) return true;
+        }
+    }
+
+    return false;
+}
+
+function nextScenario() {
+    const next = (currentScenario + 1) % scenarios.length;
+    loadScenario(next);
+}
+
+function clearGraph() {
+    nodes = [];
+    edges = [];
+    selectedNode = null;
+    nodeIdCounter = 0;
+    draw();
+    updateStats();
+}
+
+function updateScenarioScore() {
+    document.getElementById('scenarioScore').textContent =
+        `${scenarioScores[currentScenario]} / 100`;
+}
+
+function updateStats() {
+    document.getElementById('nodeCount').textContent = nodes.length;
+    document.getElementById('edgeCount').textContent = edges.length;
+    document.getElementById('scenariosCompleted').textContent = `${scenariosCompleted}/6`;
+
+    const totalScore = scenarioScores.reduce((sum, score) => sum + score, 0);
+    document.getElementById('totalScore').textContent = totalScore;
+}
+
+function showCompletionBanner() {
+    const totalScore = scenarioScores.reduce((sum, score) => sum + score, 0);
+    document.getElementById('finalScore').textContent = totalScore;
+    document.getElementById('completionBanner').classList.add('show');
+}
+
+function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Draw edges first
+    edges.forEach(edge => edge.draw());
+
+    // Draw nodes on top
+    nodes.forEach(node => {
+        if (node === selectedNode) {
+            ctx.strokeStyle = '#4CAF50';
+            ctx.lineWidth = 5;
+            ctx.beginPath();
+            ctx.arc(node.x, node.y, node.radius + 5, 0, Math.PI * 2);
+            ctx.stroke();
+        }
+        node.draw();
+    });
+
+    updateStats();
+}
+
+canvas.addEventListener('click', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    const clickedNode = nodes.find(n => n.contains(x, y));
+
+    if (mode === 'node') {
+        if (!clickedNode) {
+            const scenario = scenarios[currentScenario];
+            if (nodes.length < scenario.nodeLabels.length) {
+                const label = scenario.nodeLabels[nodes.length];
+                nodes.push(new Node(x, y, nodeIdCounter++, label));
+                draw();
+            }
+        }
+    } else if (mode === 'edge') {
+        if (clickedNode) {
+            if (!selectedNode) {
+                selectedNode = clickedNode;
+                draw();
+            } else if (selectedNode !== clickedNode) {
+                // Check if edge already exists
+                const exists = edges.some(e =>
+                    (e.from === selectedNode.id && e.to === clickedNode.id) ||
+                    (!scenarios[currentScenario].directed && e.from === clickedNode.id && e.to === selectedNode.id)
+                );
+
+                if (!exists) {
+                    const scenario = scenarios[currentScenario];
+                    let weight = null;
+
+                    if (scenario.weighted) {
+                        weight = parseInt(prompt('Enter edge weight (distance, time, etc.):') || '1');
+                        if (isNaN(weight) || weight <= 0) weight = 1;
+                    }
+
+                    edges.push(new Edge(
+                        selectedNode.id,
+                        clickedNode.id,
+                        weight,
+                        scenario.directed
+                    ));
+                }
+
+                selectedNode = null;
+                draw();
+            }
+        }
+    } else if (mode === 'delete') {
+        if (clickedNode) {
+            // Remove node and connected edges
+            edges = edges.filter(e => e.from !== clickedNode.id && e.to !== clickedNode.id);
+            nodes = nodes.filter(n => n !== clickedNode);
+            draw();
+        } else {
+            // Check if clicked on an edge
+            edges = edges.filter(edge => {
+                const fromNode = nodes.find(n => n.id === edge.from);
+                const toNode = nodes.find(n => n.id === edge.to);
+                if (!fromNode || !toNode) return false;
+
+                const dist = distanceToLine(x, y, fromNode.x, fromNode.y, toNode.x, toNode.y);
+                return dist > 10;
+            });
+            draw();
+        }
+    }
+});
+
+function distanceToLine(px, py, x1, y1, x2, y2) {
+    const A = px - x1;
+    const B = py - y1;
+    const C = x2 - x1;
+    const D = y2 - y1;
+
+    const dot = A * C + B * D;
+    const lenSq = C * C + D * D;
+    let param = -1;
+
+    if (lenSq !== 0) param = dot / lenSq;
+
+    let xx, yy;
+
+    if (param < 0) {
+        xx = x1;
+        yy = y1;
+    } else if (param > 1) {
+        xx = x2;
+        yy = y2;
+    } else {
+        xx = x1 + param * C;
+        yy = y1 + param * D;
+    }
+
+    const dx = px - xx;
+    const dy = py - yy;
+
+    return Math.sqrt(dx * dx + dy * dy);
+}
+
+// Initialize
+loadScenario(0);
+draw();
+</script>
+</body>
+</html>

@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ethics Compass - Ethical AI Game</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 0; }
+.nav-header { background: #2d3748; padding: 15px 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; }
+.nav-header a { color: #90cdf4; text-decoration: none; font-weight: 600; font-size: 1.1em; }
+.nav-title { color: #fff; font-size: 1.2em; font-weight: 700; }
+.container { max-width: 1200px; margin: 20px auto; background: #fff; border-radius: 15px; padding: 30px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+h1 { text-align: center; color: #2d3748; font-size: 2.5em; margin-bottom: 10px; }
+.subtitle { text-align: center; color: #666; margin-bottom: 30px; font-size: 1.1em; }
+.game-area { display: grid; grid-template-columns: 300px 1fr; gap: 30px; }
+.sidebar { background: #f8f9fa; padding: 20px; border-radius: 10px; height: fit-content; }
+.score-display { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; padding: 20px; border-radius: 10px; text-align: center; margin-bottom: 20px; }
+.scenario-card { background: #fff; border: 2px solid #e0e0e0; border-radius: 10px; padding: 30px; }
+.scenario-card h3 { color: #667eea; margin-bottom: 15px; font-size: 1.6em; }
+.scenario-text { background: #f8f9fa; padding: 25px; border-radius: 8px; line-height: 1.8; color: #2d3748; margin-bottom: 25px; font-size: 1.05em; }
+.scenario-question { background: #e3f2fd; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #2196F3; }
+.scenario-question h4 { color: #1976d2; margin-bottom: 10px; }
+.risk-slider { margin: 30px 0; }
+.slider-container { position: relative; padding: 20px 0; }
+.slider { width: 100%; height: 15px; border-radius: 8px; background: linear-gradient(to right, #4CAF50 0%, #FFC107 50%, #f44336 100%); outline: none; -webkit-appearance: none; }
+.slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 30px; height: 30px; border-radius: 50%; background: #fff; cursor: pointer; border: 3px solid #667eea; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+.slider::-moz-range-thumb { width: 30px; height: 30px; border-radius: 50%; background: #fff; cursor: pointer; border: 3px solid #667eea; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+.slider-labels { display: flex; justify-content: space-between; margin-top: 10px; font-size: 0.9em; color: #666; }
+.risk-value-display { text-align: center; margin: 20px 0; font-size: 2em; font-weight: bold; padding: 15px; border-radius: 8px; }
+button { padding: 15px 30px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 1.05em; transition: all 0.3s; }
+.btn-primary { background: #4CAF50; color: #fff; width: 100%; margin-top: 10px; }
+.btn-primary:hover { background: #45a049; transform: scale(1.02); }
+.btn-secondary { background: #2196F3; color: #fff; width: 100%; }
+.btn-secondary:hover { background: #1976d2; }
+.feedback { padding: 25px; border-radius: 10px; margin-top: 25px; display: none; }
+.feedback.show { display: block; animation: slideIn 0.3s; }
+.feedback h4 { margin-bottom: 10px; font-size: 1.3em; }
+.feedback p { line-height: 1.7; }
+.stats { margin: 15px 0; }
+.stat-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e0e0e0; }
+@keyframes slideIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+.progress-bar { background: #e0e0e0; height: 8px; border-radius: 4px; margin: 20px 0; overflow: hidden; }
+.progress-fill { background: linear-gradient(90deg, #667eea, #764ba2); height: 100%; transition: width 0.3s; }
+</style>
+</head>
+<body>
+<nav class="nav-header">
+    <div class="nav-title">🧭 Ethics Compass</div>
+    <a href="../../index.html">← Back to Home</a>
+</nav>
+<div class="container">
+    <h1>🧭 Ethics Compass</h1>
+    <p class="subtitle">Rate AI scenarios on the ethical risk slider!</p>
+
+    <div class="game-area">
+        <div class="sidebar">
+            <div class="score-display">
+                <div>Total Score</div>
+                <div style="font-size: 3em; margin: 10px 0;" id="totalScore">0</div>
+            </div>
+
+            <div class="stats">
+                <div class="stat-row"><span>Scenarios:</span><span id="scenarioCount">0/10</span></div>
+                <div class="stat-row"><span>Avg Accuracy:</span><span id="avgAccuracy">0%</span></div>
+                <div class="stat-row"><span>Best Rating:</span><span id="bestRating">0</span></div>
+            </div>
+
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar" style="width: 0%"></div>
+            </div>
+
+            <button class="btn-secondary" onclick="nextScenario()">Next Scenario →</button>
+            <button class="btn-primary" onclick="resetGame()">Start Over</button>
+
+            <div style="background: #e8f5e9; padding: 15px; border-radius: 8px; margin-top: 20px;">
+                <h4 style="color: #2e7d32; margin-bottom: 10px;">How to Play:</h4>
+                <p style="font-size: 0.9em; line-height: 1.6; color: #1b5e20;">
+                    Read each AI scenario and move the slider to rate the ethical risk from LOW (acceptable) to HIGH (unacceptable).
+                    Closer to the expert rating = more points!
+                </p>
+            </div>
+        </div>
+
+        <div>
+            <div class="scenario-card">
+                <h3 id="scenarioTitle">Scenario 1</h3>
+                <div class="scenario-text" id="scenarioText">Loading...</div>
+
+                <div class="scenario-question">
+                    <h4>How would you rate the ethical risk of this AI application?</h4>
+                </div>
+
+                <div class="risk-slider">
+                    <div class="risk-value-display" id="riskDisplay" style="background: #4CAF50; color: #fff;">
+                        LOW RISK
+                    </div>
+                    <div class="slider-container">
+                        <input type="range" min="0" max="100" value="50" class="slider" id="riskSlider">
+                        <div class="slider-labels">
+                            <span>🟢 Low Risk<br>Acceptable</span>
+                            <span>🟡 Medium Risk<br>Concerning</span>
+                            <span>🔴 High Risk<br>Unacceptable</span>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="btn-primary" onclick="submitRating()">Submit Rating</button>
+
+                <div class="feedback" id="feedback">
+                    <h4 id="feedbackTitle"></h4>
+                    <p id="feedbackText"></p>
+                    <p id="expertRating" style="margin-top: 15px;"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const scenarios = [
+    {
+        title: "AI-Powered Crop Disease Detection",
+        text: "A free mobile app uses AI to help small-scale farmers identify crop diseases by taking photos of their plants. The app works offline, doesn't collect user data, and was trained on images from the regions where it's deployed. It provides treatment recommendations in local languages.",
+        expertRating: 15,
+        explanation: "This is LOW RISK and ethically sound. It solves a real problem, benefits vulnerable populations, respects privacy, was developed inclusively, and has minimal downsides.",
+        principles: "Social benefit, privacy protection, accessibility, informed design"
+    },
+    {
+        title: "Mass Facial Recognition Surveillance",
+        text: "A city installs AI cameras that identify every person in public spaces, tracking their movements throughout the day. The data is stored indefinitely and accessible to law enforcement without warrants. Citizens are not informed about the surveillance and cannot opt out.",
+        expertRating: 95,
+        explanation: "This is HIGH RISK and highly problematic. It violates privacy, lacks consent and transparency, enables mass surveillance, and can be abused. The chilling effect on freedom outweighs potential safety benefits.",
+        principles: "Privacy violation, lack of consent, potential for abuse, surveillance state concerns"
+    },
+    {
+        title: "Medical Diagnosis Assistant",
+        text: "An AI helps doctors detect cancer in medical scans. It highlights suspicious areas for doctor review but doesn't make final decisions. The system was tested on diverse populations, shows its confidence levels, and doctors can override it. Hospitals inform patients when AI assists their diagnosis.",
+        expertRating: 25,
+        explanation: "This is LOW-MEDIUM RISK. Human doctors remain in control, it's transparent, assists rather than replaces, and was tested fairly. The risk is appropriately managed through human oversight.",
+        principles: "Human oversight, transparency, augmentation not replacement, informed patients"
+    },
+    {
+        title: "Hiring Algorithm (Trained on Biased Data)",
+        text: "A company uses AI to screen resumes, trained on their past 15 years of hiring data. During that period, the company hired 80% men for technical roles. The AI now ranks candidates, and hiring managers typically accept its top recommendations without review.",
+        expertRating: 85,
+        explanation: "This is HIGH RISK. The system learned historical discrimination, lacks oversight, and perpetuates bias. It fails on fairness, accountability, and transparency. Human rubber-stamping doesn't constitute meaningful oversight.",
+        principles: "Historical bias, lack of oversight, discrimination, insufficient testing for fairness"
+    },
+    {
+        title: "Personalized Learning Platform",
+        text: "An educational AI adapts lessons to each student's pace and learning style. It identifies struggling students for teacher intervention, keeps data private and secure, requires parental consent, and allows students to opt out. Teachers can view the AI's reasoning for recommendations.",
+        expertRating: 20,
+        explanation: "This is LOW RISK. It benefits students, respects privacy, includes consent, maintains teacher oversight, and is transparent. The AI supports human teachers rather than replacing them.",
+        principles: "Educational benefit, privacy protection, consent, transparency, human oversight"
+    },
+    {
+        title: "Predictive Policing Algorithm",
+        text: "Police use AI trained on arrest records to predict where crimes will occur. This directs more officers to predicted areas, leading to more arrests there, which the AI then uses to predict future crime in the same areas, creating a feedback loop. Communities are not consulted.",
+        expertRating: 90,
+        explanation: "This is HIGH RISK. It creates a biased feedback loop, uses data reflecting over-policing rather than actual crime, lacks community input, and perpetuates systemic discrimination without addressing root causes.",
+        principles: "Feedback loop bias, lack of community consent, perpetuating discrimination"
+    },
+    {
+        title: "Social Media Content Moderation",
+        text: "An AI flags potentially harmful content (violence, hate speech, child exploitation) for human review. It has known error rates and biases which are publicly disclosed. Human moderators make final decisions on removal. Users can appeal decisions.",
+        expertRating: 35,
+        explanation: "This is MEDIUM RISK. The task (safety) is important, humans make final calls, and there's an appeal process. However, known biases exist, and content moderation involves complex judgment calls. The risk is managed but not eliminated.",
+        principles: "Important safety goal, human oversight, transparency about limitations, appeals process"
+    },
+    {
+        title: "Insurance Risk Pricing AI",
+        text: "A health insurance company uses AI to predict individual customers' future medical costs and prices premiums accordingly. People predicted to get expensive conditions pay much more, potentially making insurance unaffordable for those who need it most.",
+        expertRating: 80,
+        explanation: "This is HIGH RISK. While actuarially 'fair,' it violates social fairness by making healthcare unaffordable for sick people. It prioritizes profit over human welfare and could deny care to vulnerable populations.",
+        principles: "Social harm, prioritizing profit over welfare, discriminating against sick people"
+    },
+    {
+        title: "AI Writing Assistant",
+        text: "An AI helps students brainstorm ideas, check grammar, and improve writing clarity. It's transparent about being AI, teachers know students use it, and it's positioned as a learning tool to develop skills, not complete work. Students still write and think for themselves.",
+        expertRating: 30,
+        explanation: "This is LOW-MEDIUM RISK. When used transparently as a learning aid with teacher knowledge, it can benefit education. The risk is low if it supports learning rather than replacing it, though there are concerns about over-reliance.",
+        principles: "Educational benefit, transparency, skill development focus, appropriate use context"
+    },
+    {
+        title: "Autonomous Weapons System",
+        text: "An AI-powered weapons system can identify and engage targets without human approval. It makes kill decisions faster than humans can intervene. The system is designed to 'reduce civilian casualties' but operates independently in complex combat situations.",
+        expertRating: 98,
+        explanation: "This is EXTREMELY HIGH RISK. Autonomous weapons that make kill decisions without human oversight raise fundamental ethical concerns. Delegating life-and-death decisions to AI, especially in complex situations, violates human autonomy and accountability principles.",
+        principles: "Life-and-death decisions without human control, accountability vacuum, existential risk"
+    }
+];
+
+let currentScenario = 0;
+let totalScore = 0;
+let answered = false;
+let accuracySum = 0;
+let bestRating = 0;
+
+const slider = document.getElementById('riskSlider');
+const riskDisplay = document.getElementById('riskDisplay');
+
+slider.addEventListener('input', function() {
+    const value = this.value;
+    let text, color;
+
+    if (value < 33) {
+        text = 'LOW RISK';
+        color = '#4CAF50';
+    } else if (value < 67) {
+        text = 'MEDIUM RISK';
+        color = '#FFC107';
+    } else {
+        text = 'HIGH RISK';
+        color = '#f44336';
+    }
+
+    riskDisplay.textContent = text;
+    riskDisplay.style.background = color;
+});
+
+function loadScenario() {
+    const scenario = scenarios[currentScenario];
+    answered = false;
+
+    document.getElementById('scenarioTitle').textContent = `Scenario ${currentScenario + 1}: ${scenario.title}`;
+    document.getElementById('scenarioText').textContent = scenario.text;
+    document.getElementById('feedback').classList.remove('show');
+
+    slider.value = 50;
+    slider.dispatchEvent(new Event('input'));
+
+    updateProgress();
+}
+
+function submitRating() {
+    if (answered) return;
+    answered = true;
+
+    const scenario = scenarios[currentScenario];
+    const userRating = parseInt(slider.value);
+    const expertRating = scenario.expertRating;
+
+    const difference = Math.abs(userRating - expertRating);
+    const accuracy = Math.max(0, 100 - difference);
+    const points = Math.round(accuracy * 10);
+
+    totalScore += points;
+    accuracySum += accuracy;
+    bestRating = Math.max(bestRating, accuracy);
+
+    const feedback = document.getElementById('feedback');
+    const feedbackTitle = document.getElementById('feedbackTitle');
+    const feedbackText = document.getElementById('feedbackText');
+    const expertRatingText = document.getElementById('expertRating');
+
+    if (accuracy >= 90) {
+        feedback.style.background = '#e8f5e9';
+        feedback.style.borderLeft = '4px solid #4CAF50';
+        feedbackTitle.style.color = '#2e7d32';
+        feedbackTitle.textContent = '🎯 Excellent! Almost perfect!';
+    } else if (accuracy >= 70) {
+        feedback.style.background = '#fff9c4';
+        feedback.style.borderLeft = '4px solid #FFC107';
+        feedbackTitle.style.color = '#f57c00';
+        feedbackTitle.textContent = '👍 Good judgment!';
+    } else {
+        feedback.style.background = '#ffebee';
+        feedback.style.borderLeft = '4px solid #f44336';
+        feedbackTitle.style.color = '#c62828';
+        feedbackTitle.textContent = '🤔 Consider this perspective...';
+    }
+
+    feedbackText.textContent = scenario.explanation;
+    expertRatingText.innerHTML = `<strong>Expert Rating:</strong> ${expertRating}/100 (${scenario.expertRating < 33 ? 'Low' : scenario.expertRating < 67 ? 'Medium' : 'High'} Risk)<br><br><strong>Key Principles:</strong> ${scenario.principles}<br><br><strong>Your Score:</strong> +${points} points (${accuracy.toFixed(0)}% accuracy)`;
+
+    feedback.classList.add('show');
+    updateStats();
+}
+
+function nextScenario() {
+    if (!answered) {
+        alert('Please submit your rating first!');
+        return;
+    }
+
+    currentScenario++;
+    if (currentScenario >= scenarios.length) {
+        showFinalScore();
+        return;
+    }
+
+    loadScenario();
+}
+
+function updateStats() {
+    document.getElementById('totalScore').textContent = totalScore;
+    document.getElementById('scenarioCount').textContent = `${currentScenario + 1}/${scenarios.length}`;
+    const avgAcc = accuracySum / (currentScenario + 1);
+    document.getElementById('avgAccuracy').textContent = `${avgAcc.toFixed(0)}%`;
+    document.getElementById('bestRating').textContent = `${bestRating.toFixed(0)}%`;
+}
+
+function updateProgress() {
+    const progress = ((currentScenario + 1) / scenarios.length) * 100;
+    document.getElementById('progressBar').style.width = `${progress}%`;
+}
+
+function showFinalScore() {
+    const avgAcc = accuracySum / scenarios.length;
+    let message = '';
+
+    if (avgAcc >= 85) {
+        message = '👑 Outstanding! You have exceptional ethical judgment!';
+    } else if (avgAcc >= 70) {
+        message = '⭐ Great work! You understand AI ethics well.';
+    } else if (avgAcc >= 55) {
+        message = '👍 Good effort! Keep learning about AI ethics.';
+    } else {
+        message = '📚 Review the lesson and try again!';
+    }
+
+    alert(`Game Complete!\n\nFinal Score: ${totalScore}\nAverage Accuracy: ${avgAcc.toFixed(0)}%\nBest Rating: ${bestRating.toFixed(0)}%\n\n${message}`);
+}
+
+function resetGame() {
+    currentScenario = 0;
+    totalScore = 0;
+    answered = false;
+    accuracySum = 0;
+    bestRating = 0;
+    loadScenario();
+    updateStats();
+}
+
+loadScenario();
+updateStats();
+</script>
+</body>
+</html>

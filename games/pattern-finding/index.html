@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Manual Clustering Board - Pattern Finding Game</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 0; }
+.nav-header { background: #2d3748; padding: 15px 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; }
+.nav-header a { color: #90cdf4; text-decoration: none; font-weight: 600; font-size: 1.1em; }
+.nav-title { color: #fff; font-size: 1.2em; font-weight: 700; }
+.container { max-width: 1400px; margin: 20px auto; background: #fff; border-radius: 15px; padding: 30px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+h1 { text-align: center; color: #2d3748; font-size: 2.5em; margin-bottom: 10px; }
+.subtitle { text-align: center; color: #666; margin-bottom: 30px; font-size: 1.1em; }
+.game-area { display: grid; grid-template-columns: 350px 1fr; gap: 30px; }
+.sidebar { background: #f8f9fa; padding: 20px; border-radius: 10px; height: fit-content; }
+button { width: 100%; padding: 12px; margin: 5px 0; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.2s; }
+.btn-primary { background: #4CAF50; color: #fff; }
+.btn-primary:hover { background: #45a049; }
+.btn-secondary { background: #2196F3; color: #fff; }
+.btn-secondary:hover { background: #0b7dda; }
+.btn-danger { background: #f44336; color: #fff; }
+.btn-danger:hover { background: #da190b; }
+.dataset-selector { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 15px 0; }
+.dataset-btn { padding: 10px; border: 2px solid #667eea; background: #fff; color: #667eea; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.2s; text-align: center; font-size: 0.9em; }
+.dataset-btn:hover { background: #f0f0ff; }
+.dataset-btn.active { background: #667eea; color: #fff; }
+.cluster-controls { display: flex; gap: 10px; margin: 15px 0; }
+.cluster-btn { flex: 1; padding: 10px; border: 2px solid #ddd; background: #fff; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.2s; }
+.cluster-btn.selected { border-color: #667eea; border-width: 3px; transform: scale(1.05); }
+.score-display { background: #fff9c4; padding: 20px; border-radius: 10px; text-align: center; margin: 20px 0; border: 2px solid #fbc02d; }
+.score-value { font-size: 2.5em; font-weight: bold; color: #667eea; margin: 10px 0; }
+.stats { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; padding: 15px; border-radius: 10px; margin-top: 15px; }
+.stat-row { display: flex; justify-content: space-between; margin: 8px 0; }
+.challenge { background: #e8f5e9; padding: 15px; border-radius: 10px; margin: 15px 0; border-left: 4px solid #4CAF50; }
+.challenge h4 { color: #2e7d32; margin-bottom: 8px; }
+.info-panel { background: #e3f2fd; padding: 15px; border-radius: 8px; margin: 15px 0; }
+.info-panel h4 { color: #1976d2; margin-bottom: 8px; }
+.canvas-container { position: relative; margin: 20px 0; }
+canvas { border: 2px solid #ddd; border-radius: 8px; display: block; background: #fafafa; cursor: crosshair; }
+.mode-indicator { background: #667eea; color: #fff; padding: 10px 15px; border-radius: 8px; margin-bottom: 10px; text-align: center; font-weight: 600; }
+.comparison-view { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 20px 0; }
+.comparison-box { border: 2px solid #ddd; border-radius: 10px; overflow: hidden; }
+.comparison-box h3 { background: #f8f9fa; padding: 12px; text-align: center; color: #2d3748; margin: 0; }
+.comparison-box canvas { width: 100%; border: none; }
+.legend { display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; margin: 15px 0; }
+.legend-item { display: flex; align-items: center; gap: 8px; }
+.legend-color { width: 20px; height: 20px; border-radius: 4px; border: 2px solid #ddd; }
+</style>
+</head>
+<body>
+<nav class="nav-header">
+    <div class="nav-title">Manual Clustering Board</div>
+    <a href="../../index.html">← Back to Home</a>
+</nav>
+<div class="container">
+    <h1>Manual Clustering Board</h1>
+    <p class="subtitle">Find patterns in data by manually grouping similar points, then compare with K-means!</p>
+
+    <div class="game-area">
+        <div class="sidebar">
+            <h3>Dataset</h3>
+            <div class="dataset-selector">
+                <button class="dataset-btn active" onclick="selectDataset('customers')">Customers</button>
+                <button class="dataset-btn" onclick="selectDataset('students')">Students</button>
+                <button class="dataset-btn" onclick="selectDataset('products')">Products</button>
+                <button class="dataset-btn" onclick="selectDataset('cities')">Cities</button>
+                <button class="dataset-btn" onclick="selectDataset('animals')">Animals</button>
+                <button class="dataset-btn" onclick="selectDataset('plants')">Plants</button>
+                <button class="dataset-btn" onclick="selectDataset('weather')">Weather</button>
+                <button class="dataset-btn" onclick="selectDataset('sports')">Sports</button>
+            </div>
+
+            <h3 style="margin-top: 20px;">Number of Clusters</h3>
+            <div class="cluster-controls">
+                <button class="cluster-btn" onclick="setK(2)">2</button>
+                <button class="cluster-btn selected" onclick="setK(3)">3</button>
+                <button class="cluster-btn" onclick="setK(4)">4</button>
+                <button class="cluster-btn" onclick="setK(5)">5</button>
+            </div>
+
+            <h3 style="margin-top: 20px;">Current Cluster Color</h3>
+            <div class="cluster-controls" id="colorSelector">
+                <!-- Dynamically generated -->
+            </div>
+
+            <button class="btn-primary" onclick="compareWithKMeans()" style="margin-top: 15px;">Compare with K-Means</button>
+            <button class="btn-secondary" onclick="autoCluster()">Show K-Means Solution</button>
+            <button class="btn-danger" onclick="clearClustering()">Clear My Clusters</button>
+            <button class="btn-secondary" onclick="newDataset()">New Random Data</button>
+
+            <div class="challenge">
+                <h4>Challenge:</h4>
+                <p style="font-size: 0.9em; line-height: 1.6;">
+                    Try to match K-means clustering!
+                    <br><br>
+                    <strong>Goal:</strong> Achieve 80%+ similarity
+                </p>
+            </div>
+
+            <div class="stats">
+                <div class="stat-row"><span>Dataset:</span><span id="datasetName">Customers</span></div>
+                <div class="stat-row"><span>Data Points:</span><span id="pointCount">0</span></div>
+                <div class="stat-row"><span>Clusters (K):</span><span id="kValue">3</span></div>
+                <div class="stat-row"><span>Points Clustered:</span><span id="clusteredCount">0 / 0</span></div>
+                <div class="stat-row"><span>Similarity Score:</span><span id="similarity">--</span></div>
+            </div>
+
+            <div class="info-panel">
+                <h4>How to Play:</h4>
+                <p style="font-size: 0.9em; line-height: 1.6;">
+                    1. Select a cluster color below<br>
+                    2. Click on points to assign them<br>
+                    3. Try to group similar points<br>
+                    4. Compare with K-means algorithm!
+                </p>
+            </div>
+        </div>
+
+        <div>
+            <div class="mode-indicator" id="modeIndicator">
+                Select points to assign to clusters
+            </div>
+
+            <div id="singleView">
+                <div class="canvas-container">
+                    <canvas id="canvas" width="900" height="500"></canvas>
+                </div>
+
+                <div class="legend" id="legend">
+                    <!-- Dynamically generated -->
+                </div>
+            </div>
+
+            <div id="comparisonView" style="display: none;">
+                <div class="comparison-view">
+                    <div class="comparison-box">
+                        <h3>Your Clustering</h3>
+                        <canvas id="userCanvas" width="440" height="300"></canvas>
+                    </div>
+                    <div class="comparison-box">
+                        <h3>K-Means Clustering</h3>
+                        <canvas id="kmeansCanvas" width="440" height="300"></canvas>
+                    </div>
+                </div>
+
+                <div class="score-display">
+                    <h3>Clustering Similarity</h3>
+                    <div class="score-value" id="scoreValue">0%</div>
+                    <p style="color: #666;" id="scoreMessage">Compare your clustering with K-means!</p>
+                </div>
+            </div>
+
+            <div style="background: #fff3e0; padding: 20px; border-radius: 10px; margin-top: 20px; border-left: 4px solid #ff9800;">
+                <h4 style="color: #e65100; margin-bottom: 10px;">About This Game</h4>
+                <p style="line-height: 1.6;">
+                    This game demonstrates the power of both human intuition and machine learning in pattern recognition.
+                    Humans excel at visual pattern recognition and can often identify meaningful clusters quickly.
+                    The <strong>K-means algorithm</strong> systematically groups data by minimizing the distance between
+                    points and cluster centers. By comparing your manual clustering with K-means, you can see how
+                    human insight and algorithmic precision complement each other in data analysis!
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+const userCanvas = document.getElementById('userCanvas');
+const userCtx = userCanvas.getContext('2d');
+const kmeansCanvas = document.getElementById('kmeansCanvas');
+const kmeansCtx = kmeansCanvas.getContext('2d');
+
+let k = 3;
+let currentCluster = 0;
+let dataPoints = [];
+let userAssignments = [];
+let kmeansAssignments = [];
+let kmeansCentroids = [];
+let currentDataset = 'customers';
+
+const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8'];
+
+const datasets = {
+    customers: {
+        name: 'Customer Segments',
+        xLabel: 'Purchase Frequency',
+        yLabel: 'Average Spend',
+        clusters: 3,
+        description: 'Customer shopping behavior'
+    },
+    students: {
+        name: 'Student Performance',
+        xLabel: 'Study Hours',
+        yLabel: 'Test Scores',
+        clusters: 3,
+        description: 'Student achievement groups'
+    },
+    products: {
+        name: 'Product Categories',
+        xLabel: 'Price',
+        yLabel: 'Popularity',
+        clusters: 4,
+        description: 'Product market segments'
+    },
+    cities: {
+        name: 'City Types',
+        xLabel: 'Population',
+        yLabel: 'Area (sq km)',
+        clusters: 3,
+        description: 'Urban classification'
+    },
+    animals: {
+        name: 'Animal Species',
+        xLabel: 'Size (kg)',
+        yLabel: 'Lifespan (years)',
+        clusters: 4,
+        description: 'Animal categorization'
+    },
+    plants: {
+        name: 'Plant Types',
+        xLabel: 'Height (m)',
+        yLabel: 'Water Needs',
+        clusters: 3,
+        description: 'Botanical groups'
+    },
+    weather: {
+        name: 'Weather Patterns',
+        xLabel: 'Temperature (°C)',
+        yLabel: 'Humidity (%)',
+        clusters: 3,
+        description: 'Climate zones'
+    },
+    sports: {
+        name: 'Athlete Stats',
+        xLabel: 'Speed',
+        yLabel: 'Endurance',
+        clusters: 4,
+        description: 'Athletic profiles'
+    }
+};
+
+function selectDataset(dataset) {
+    currentDataset = dataset;
+    document.querySelectorAll('.dataset-btn').forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+
+    // Set recommended K for dataset
+    k = datasets[dataset].clusters;
+    setK(k);
+
+    generateData();
+}
+
+function generateData() {
+    dataPoints = [];
+    userAssignments = [];
+    kmeansAssignments = [];
+    kmeansCentroids = [];
+
+    const numClusters = datasets[currentDataset].clusters;
+    const pointsPerCluster = 15 + Math.floor(Math.random() * 10);
+
+    for (let i = 0; i < numClusters; i++) {
+        const centerX = 100 + Math.random() * (canvas.width - 200);
+        const centerY = 100 + Math.random() * (canvas.height - 200);
+        const spreadX = 40 + Math.random() * 40;
+        const spreadY = 40 + Math.random() * 40;
+
+        for (let j = 0; j < pointsPerCluster; j++) {
+            dataPoints.push({
+                x: centerX + (Math.random() - 0.5) * spreadX * 2,
+                y: centerY + (Math.random() - 0.5) * spreadY * 2,
+                trueCluster: i
+            });
+        }
+    }
+
+    userAssignments = new Array(dataPoints.length).fill(-1);
+
+    document.getElementById('datasetName').textContent = datasets[currentDataset].name;
+    document.getElementById('pointCount').textContent = dataPoints.length;
+    updateClusteredCount();
+    hideComparison();
+    updateColorSelector();
+    updateLegend();
+    draw();
+}
+
+function setK(newK) {
+    k = newK;
+    currentCluster = 0;
+    document.querySelectorAll('.cluster-btn').forEach(btn => btn.classList.remove('selected'));
+    event.target.classList.add('selected');
+    document.getElementById('kValue').textContent = k;
+
+    // Reset assignments
+    userAssignments = new Array(dataPoints.length).fill(-1);
+    kmeansAssignments = [];
+    kmeansCentroids = [];
+
+    updateColorSelector();
+    updateLegend();
+    updateClusteredCount();
+    hideComparison();
+    draw();
+}
+
+function updateColorSelector() {
+    const selector = document.getElementById('colorSelector');
+    let html = '';
+
+    for (let i = 0; i < k; i++) {
+        html += `<button class="cluster-btn ${i === currentCluster ? 'selected' : ''}"
+                 style="background: ${colors[i]}; color: #fff; border-color: ${colors[i]};"
+                 onclick="selectCluster(${i})">
+                 ${i + 1}
+                 </button>`;
+    }
+
+    selector.innerHTML = html;
+}
+
+function updateLegend() {
+    const legend = document.getElementById('legend');
+    let html = '';
+
+    const dataset = datasets[currentDataset];
+    html += `<div style="font-weight: 600; width: 100%; text-align: center; margin-bottom: 10px;">
+             ${dataset.xLabel} (horizontal) vs ${dataset.yLabel} (vertical)
+             </div>`;
+
+    for (let i = 0; i < k; i++) {
+        html += `<div class="legend-item">
+                 <div class="legend-color" style="background: ${colors[i]};"></div>
+                 <span>Cluster ${i + 1}</span>
+                 </div>`;
+    }
+
+    legend.innerHTML = html;
+}
+
+function selectCluster(cluster) {
+    currentCluster = cluster;
+    updateColorSelector();
+    document.getElementById('modeIndicator').textContent =
+        `Assigning points to Cluster ${cluster + 1} - Click points on the chart`;
+}
+
+function newDataset() {
+    generateData();
+}
+
+function clearClustering() {
+    userAssignments = new Array(dataPoints.length).fill(-1);
+    updateClusteredCount();
+    hideComparison();
+    draw();
+}
+
+canvas.addEventListener('click', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    // Find closest point within click radius
+    let closestIdx = -1;
+    let closestDist = 15;
+
+    dataPoints.forEach((point, idx) => {
+        const dist = Math.sqrt((x - point.x) ** 2 + (y - point.y) ** 2);
+        if (dist < closestDist) {
+            closestDist = dist;
+            closestIdx = idx;
+        }
+    });
+
+    if (closestIdx >= 0) {
+        userAssignments[closestIdx] = currentCluster;
+        updateClusteredCount();
+        draw();
+    }
+});
+
+function updateClusteredCount() {
+    const clustered = userAssignments.filter(a => a >= 0).length;
+    document.getElementById('clusteredCount').textContent = `${clustered} / ${dataPoints.length}`;
+}
+
+function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Draw grid
+    ctx.strokeStyle = '#f0f0f0';
+    ctx.lineWidth = 1;
+    for (let i = 0; i < canvas.width; i += 50) {
+        ctx.beginPath();
+        ctx.moveTo(i, 0);
+        ctx.lineTo(i, canvas.height);
+        ctx.stroke();
+    }
+    for (let i = 0; i < canvas.height; i += 50) {
+        ctx.beginPath();
+        ctx.moveTo(0, i);
+        ctx.lineTo(canvas.width, i);
+        ctx.stroke();
+    }
+
+    // Draw points
+    dataPoints.forEach((point, idx) => {
+        const assignment = userAssignments[idx];
+
+        if (assignment >= 0) {
+            ctx.fillStyle = colors[assignment];
+            ctx.globalAlpha = 0.8;
+        } else {
+            ctx.fillStyle = '#999';
+            ctx.globalAlpha = 0.5;
+        }
+
+        ctx.beginPath();
+        ctx.arc(point.x, point.y, 6, 0, Math.PI * 2);
+        ctx.fill();
+
+        if (assignment >= 0) {
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        }
+    });
+
+    ctx.globalAlpha = 1;
+
+    // Draw axis labels
+    ctx.fillStyle = '#666';
+    ctx.font = '14px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText(datasets[currentDataset].xLabel, canvas.width / 2, canvas.height - 10);
+    ctx.save();
+    ctx.translate(15, canvas.height / 2);
+    ctx.rotate(-Math.PI / 2);
+    ctx.fillText(datasets[currentDataset].yLabel, 0, 0);
+    ctx.restore();
+}
+
+function runKMeans() {
+    // Initialize centroids randomly from data points
+    kmeansCentroids = [];
+    const usedIndices = new Set();
+
+    for (let i = 0; i < k; i++) {
+        let idx;
+        do {
+            idx = Math.floor(Math.random() * dataPoints.length);
+        } while (usedIndices.has(idx));
+        usedIndices.add(idx);
+
+        kmeansCentroids.push({
+            x: dataPoints[idx].x,
+            y: dataPoints[idx].y
+        });
+    }
+
+    // Run K-means iterations
+    for (let iter = 0; iter < 20; iter++) {
+        // Assignment step
+        kmeansAssignments = dataPoints.map(point => {
+            let minDist = Infinity;
+            let cluster = 0;
+
+            kmeansCentroids.forEach((centroid, i) => {
+                const dist = Math.sqrt(
+                    (point.x - centroid.x) ** 2 +
+                    (point.y - centroid.y) ** 2
+                );
+
+                if (dist < minDist) {
+                    minDist = dist;
+                    cluster = i;
+                }
+            });
+
+            return cluster;
+        });
+
+        // Update step
+        const newCentroids = [];
+        for (let i = 0; i < k; i++) {
+            const clusterPoints = dataPoints.filter((_, idx) => kmeansAssignments[idx] === i);
+
+            if (clusterPoints.length > 0) {
+                const avgX = clusterPoints.reduce((sum, p) => sum + p.x, 0) / clusterPoints.length;
+                const avgY = clusterPoints.reduce((sum, p) => sum + p.y, 0) / clusterPoints.length;
+                newCentroids.push({ x: avgX, y: avgY });
+            } else {
+                newCentroids.push({ ...kmeansCentroids[i] });
+            }
+        }
+
+        // Check convergence
+        let converged = true;
+        for (let i = 0; i < k; i++) {
+            const dist = Math.sqrt(
+                (kmeansCentroids[i].x - newCentroids[i].x) ** 2 +
+                (kmeansCentroids[i].y - newCentroids[i].y) ** 2
+            );
+            if (dist > 0.1) {
+                converged = false;
+                break;
+            }
+        }
+
+        kmeansCentroids = newCentroids;
+
+        if (converged) break;
+    }
+}
+
+function compareWithKMeans() {
+    // Check if user has clustered all points
+    const clustered = userAssignments.filter(a => a >= 0).length;
+    if (clustered < dataPoints.length) {
+        alert(`Please cluster all points first! (${clustered}/${dataPoints.length} clustered)`);
+        return;
+    }
+
+    runKMeans();
+    showComparison();
+    calculateSimilarity();
+}
+
+function autoCluster() {
+    runKMeans();
+    userAssignments = [...kmeansAssignments];
+    updateClusteredCount();
+    draw();
+    document.getElementById('modeIndicator').textContent = 'K-Means solution loaded! Try comparing with your own clustering.';
+}
+
+function showComparison() {
+    document.getElementById('singleView').style.display = 'none';
+    document.getElementById('comparisonView').style.display = 'block';
+
+    drawComparison(userCtx, userAssignments, null);
+    drawComparison(kmeansCtx, kmeansAssignments, kmeansCentroids);
+}
+
+function hideComparison() {
+    document.getElementById('singleView').style.display = 'block';
+    document.getElementById('comparisonView').style.display = 'none';
+    document.getElementById('similarity').textContent = '--';
+}
+
+function drawComparison(context, assignments, centroids) {
+    const scaleX = context.canvas.width / canvas.width;
+    const scaleY = context.canvas.height / canvas.height;
+
+    context.clearRect(0, 0, context.canvas.width, context.canvas.height);
+
+    // Draw grid
+    context.strokeStyle = '#f0f0f0';
+    context.lineWidth = 1;
+    for (let i = 0; i < context.canvas.width; i += 50 * scaleX) {
+        context.beginPath();
+        context.moveTo(i, 0);
+        context.lineTo(i, context.canvas.height);
+        context.stroke();
+    }
+    for (let i = 0; i < context.canvas.height; i += 50 * scaleY) {
+        context.beginPath();
+        context.moveTo(0, i);
+        context.lineTo(context.canvas.width, i);
+        context.stroke();
+    }
+
+    // Draw points
+    dataPoints.forEach((point, idx) => {
+        const assignment = assignments[idx];
+        context.fillStyle = colors[assignment];
+        context.globalAlpha = 0.8;
+
+        context.beginPath();
+        context.arc(point.x * scaleX, point.y * scaleY, 5, 0, Math.PI * 2);
+        context.fill();
+
+        context.strokeStyle = '#fff';
+        context.lineWidth = 1.5;
+        context.stroke();
+    });
+
+    // Draw centroids if provided
+    if (centroids) {
+        centroids.forEach((centroid, i) => {
+            context.fillStyle = colors[i];
+            context.globalAlpha = 1;
+            context.beginPath();
+            context.arc(centroid.x * scaleX, centroid.y * scaleY, 8, 0, Math.PI * 2);
+            context.fill();
+
+            context.strokeStyle = '#fff';
+            context.lineWidth = 3;
+            context.stroke();
+        });
+    }
+
+    context.globalAlpha = 1;
+}
+
+function calculateSimilarity() {
+    // Calculate similarity using Adjusted Rand Index approximation
+    let agreements = 0;
+    let total = 0;
+
+    for (let i = 0; i < dataPoints.length; i++) {
+        for (let j = i + 1; j < dataPoints.length; j++) {
+            const userSame = userAssignments[i] === userAssignments[j];
+            const kmeansSame = kmeansAssignments[i] === kmeansAssignments[j];
+
+            if (userSame === kmeansSame) {
+                agreements++;
+            }
+            total++;
+        }
+    }
+
+    const similarity = Math.round((agreements / total) * 100);
+    document.getElementById('similarity').textContent = similarity + '%';
+    document.getElementById('scoreValue').textContent = similarity + '%';
+
+    let message = '';
+    if (similarity >= 90) {
+        message = 'Excellent! You matched K-means almost perfectly!';
+    } else if (similarity >= 80) {
+        message = 'Great job! Your clustering is very similar to K-means!';
+    } else if (similarity >= 70) {
+        message = 'Good work! Your clustering shows strong pattern recognition!';
+    } else if (similarity >= 60) {
+        message = 'Not bad! There are some differences in how you grouped the data.';
+    } else {
+        message = 'Your clustering differs significantly from K-means. Try to group nearby points!';
+    }
+
+    document.getElementById('scoreMessage').textContent = message;
+}
+
+// Initialize
+updateColorSelector();
+generateData();
+</script>
+</body>
+</html>
