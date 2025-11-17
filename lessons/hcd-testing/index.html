@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Human Centered Design: Testing & Iteration</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 0; }
+.nav-header { background: #2d3748; padding: 15px 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; }
+.nav-header a { color: #90cdf4; text-decoration: none; font-weight: 600; font-size: 1.1em; }
+.nav-title { color: #fff; font-size: 1.2em; font-weight: 700; }
+.container { max-width: 1400px; margin: 20px auto; background: #fff; border-radius: 15px; padding: 30px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+h1 { text-align: center; color: #2d3748; font-size: 2.5em; margin-bottom: 10px; }
+.series-tag { text-align: center; color: #667eea; font-weight: 600; font-size: 1.1em; margin-bottom: 20px; }
+.intro { background: #e3f2fd; padding: 20px; border-radius: 10px; margin-bottom: 30px; line-height: 1.6; }
+.intro h2 { color: #1976d2; margin-bottom: 10px; }
+.content-section { margin: 30px 0; }
+.content-section h2 { color: #2d3748; margin-bottom: 15px; font-size: 1.8em; }
+.content-section h3 { color: #667eea; margin: 20px 0 10px 0; font-size: 1.4em; }
+.content-section p { line-height: 1.8; color: #4a5568; margin-bottom: 15px; }
+.content-section ul { margin-left: 30px; line-height: 1.8; color: #4a5568; }
+.content-section li { margin-bottom: 10px; }
+.concept-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin: 20px 0; }
+.concept-card { background: #f8f9fa; padding: 25px; border-radius: 10px; border-left: 4px solid #667eea; }
+.concept-card h4 { color: #667eea; margin-bottom: 12px; font-size: 1.3em; }
+.concept-card p { color: #4a5568; line-height: 1.7; }
+.example-box { background: #fff9c4; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #fbc02d; }
+.example-box h4 { color: #f57c00; margin-bottom: 10px; }
+.example-box p { color: #4a5568; line-height: 1.7; }
+.key-concepts { background: #e8f5e9; padding: 20px; border-radius: 8px; margin: 20px 0; }
+.key-concepts h3 { color: #2e7d32; margin-bottom: 15px; }
+.key-concepts ul { margin-left: 20px; line-height: 1.8; }
+.interactive-demo { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; padding: 25px; border-radius: 10px; margin: 30px 0; text-align: center; }
+.quote-box { background: #f3e5f5; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #9c27b0; font-style: italic; }
+.quote-box p { color: #4a148c; line-height: 1.7; }
+.warning-box { background: #ffebee; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #f44336; }
+.warning-box h4 { color: #c62828; margin-bottom: 12px; }
+.do-dont-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 20px 0; }
+.do-card { background: #e8f5e9; padding: 20px; border-radius: 10px; border-left: 4px solid #4CAF50; }
+.do-card h4 { color: #2e7d32; margin-bottom: 15px; }
+.dont-card { background: #ffebee; padding: 20px; border-radius: 10px; border-left: 4px solid #f44336; }
+.dont-card h4 { color: #c62828; margin-bottom: 15px; }
+.metrics-card { background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%); padding: 20px; border-radius: 10px; margin: 15px 0; }
+.iteration-cycle { display: flex; align-items: center; justify-content: center; margin: 30px 0; flex-wrap: wrap; gap: 15px; }
+.cycle-step { background: #667eea; color: #fff; padding: 15px 25px; border-radius: 50px; font-weight: 600; }
+.cycle-arrow { font-size: 1.5em; color: #667eea; }
+</style>
+</head>
+<body>
+<nav class="nav-header">
+    <div class="nav-title">🔄 HCD Part 3: Testing & Iteration</div>
+    <a href="../../index.html">← Back to Home</a>
+</nav>
+<div class="container">
+    <h1>🔄 Human Centered Design</h1>
+    <div class="series-tag">Part 3 of 3: Testing & Iteration</div>
+
+    <div class="intro">
+        <h2>The Truth Lies in Testing</h2>
+        <p>
+            You've built empathy with users (Part 1) and created prototypes (Part 2). Now comes the crucial step:
+            testing your assumptions with real users. No matter how smart your team is, you can't predict how users
+            will actually interact with your design until you watch them try it.
+        </p>
+        <p>
+            User testing reveals the gap between what you <em>think</em> users will do and what they <em>actually</em> do.
+            This is where humility meets insight, and great products are born.
+        </p>
+    </div>
+
+    <div class="content-section">
+        <h2>Why User Testing Matters</h2>
+
+        <div class="concept-grid">
+            <div class="concept-card">
+                <h4>🎯 Validate Assumptions</h4>
+                <p>
+                    Every design is built on assumptions. Testing reveals which ones are true and which are wrong.
+                    It's better to be proven wrong early with a prototype than late with a launched product!
+                </p>
+            </div>
+
+            <div class="concept-card">
+                <h4>👁️ Uncover Blind Spots</h4>
+                <p>
+                    As a designer, you're too close to your work. You know how it's "supposed" to work. Users don't.
+                    They'll find confusion you never imagined.
+                </p>
+            </div>
+
+            <div class="concept-card">
+                <h4>📊 Reduce Risk</h4>
+                <p>
+                    Testing with 5-8 users catches 80% of usability issues. Finding problems in testing is much cheaper
+                    than finding them in production with thousands of frustrated users.
+                </p>
+            </div>
+
+            <div class="concept-card">
+                <h4>🚀 Build Confidence</h4>
+                <p>
+                    When users successfully complete tasks and give positive feedback, you know you're on the right track.
+                    This validates your work and guides your next steps.
+                </p>
+            </div>
+        </div>
+
+        <div class="quote-box">
+            <p>
+                "You are not your user. Testing is the only way to see through their eyes."
+                <br>- Jakob Nielsen, Usability Expert
+            </p>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Types of User Testing</h2>
+
+        <h3>🔍 Usability Testing</h3>
+        <p>
+            Watch users try to complete specific tasks with your prototype. The goal is to identify friction points
+            and areas of confusion.
+        </p>
+        <ul>
+            <li><strong>Best for:</strong> Testing if users can actually use your product</li>
+            <li><strong>Participants:</strong> 5-8 users from your target audience</li>
+            <li><strong>Duration:</strong> 30-60 minutes per session</li>
+            <li><strong>Output:</strong> List of issues prioritized by severity</li>
+        </ul>
+
+        <h3>💬 Think-Aloud Protocol</h3>
+        <p>
+            Ask users to verbalize their thoughts as they interact with your prototype. "What are you thinking now?
+            What are you trying to do?"
+        </p>
+        <ul>
+            <li><strong>Best for:</strong> Understanding mental models and expectations</li>
+            <li><strong>Reveals:</strong> Confusion, surprise, delight, and reasoning</li>
+            <li><strong>Tip:</strong> Remind users to keep talking - silence is missed insight!</li>
+        </ul>
+
+        <h3>⚖️ A/B Testing</h3>
+        <p>
+            Show different versions to different users and measure which performs better. Great for optimizing
+            specific elements.
+        </p>
+        <ul>
+            <li><strong>Best for:</strong> Comparing two specific solutions (button color, layout, copy, etc.)</li>
+            <li><strong>Requires:</strong> Quantitative data and enough users for statistical significance</li>
+            <li><strong>Example:</strong> Does a green "Sign Up" button get more clicks than a blue one?</li>
+        </ul>
+
+        <h3>🏠 Contextual Testing</h3>
+        <p>
+            Test in the actual environment where the product will be used (home, office, car, etc.).
+            Context matters - behavior in a lab may differ from real-world use.
+        </p>
+        <ul>
+            <li><strong>Best for:</strong> Mobile apps, physical products, location-specific services</li>
+            <li><strong>Reveals:</strong> Environmental factors (lighting, distractions, multitasking)</li>
+        </ul>
+    </div>
+
+    <div class="content-section">
+        <h2>How to Conduct Usability Testing</h2>
+
+        <div class="metrics-card">
+            <h3>📋 Step 1: Define Test Goals</h3>
+            <p>
+                What questions do you need answered? Be specific. Don't just "test the app" - test specific hypotheses.
+            </p>
+            <p style="margin-top: 10px;">
+                <strong>Examples:</strong><br>
+                • Can users find the search feature within 10 seconds?<br>
+                • Do users understand what this app does from the home screen?<br>
+                • Can users complete a purchase in under 2 minutes?
+            </p>
+        </div>
+
+        <div class="metrics-card">
+            <h3>👥 Step 2: Recruit Participants</h3>
+            <p>
+                Test with people who match your target user personas. 5-8 participants catch most issues.
+            </p>
+            <ul style="margin-left: 20px; margin-top: 10px;">
+                <li>Don't test with friends/family - they're biased and not representative</li>
+                <li>Screen participants to ensure they match your user profile</li>
+                <li>Offer compensation (gift cards, cash) to respect their time</li>
+            </ul>
+        </div>
+
+        <div class="metrics-card">
+            <h3>✏️ Step 3: Prepare Tasks</h3>
+            <p>
+                Create realistic scenarios and tasks for users to complete. Tasks should be specific but not prescriptive.
+            </p>
+            <p style="margin-top: 10px;">
+                <strong>Good task:</strong> "You want to find a pizza restaurant near you that's open now. Show me how you'd do that."<br>
+                <strong>Bad task:</strong> "Click the search button in the top right, then click 'restaurants'..." (too prescriptive)
+            </p>
+        </div>
+
+        <div class="metrics-card">
+            <h3>🎬 Step 4: Conduct Sessions</h3>
+            <p>
+                Create a comfortable environment. Remember: you're testing the design, not the user!
+            </p>
+            <ul style="margin-left: 20px; margin-top: 10px;">
+                <li>Start with warm-up questions to make users comfortable</li>
+                <li>Give tasks one at a time</li>
+                <li>Observe silently - don't help unless they're completely stuck</li>
+                <li>Ask follow-up questions: "Why did you click there? What were you expecting?"</li>
+                <li>Record sessions (with permission) or take detailed notes</li>
+            </ul>
+        </div>
+
+        <div class="metrics-card">
+            <h3>📊 Step 5: Analyze Findings</h3>
+            <p>
+                Look for patterns across users. One person's struggle might be random; three people's struggle is a problem.
+            </p>
+            <ul style="margin-left: 20px; margin-top: 10px;">
+                <li>Create a spreadsheet of issues and how many users experienced each</li>
+                <li>Categorize by severity: Critical, High, Medium, Low</li>
+                <li>Note positive findings too - what worked well?</li>
+                <li>Look for the "why" behind behaviors, not just the "what"</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Testing Do's and Don'ts</h2>
+
+        <div class="do-dont-grid">
+            <div class="do-card">
+                <h4>✅ DO</h4>
+                <ul style="margin-left: 20px; line-height: 1.8;">
+                    <li>Stay neutral - don't lead users to "correct" answers</li>
+                    <li>Ask "What are you thinking?" if they're silent</li>
+                    <li>Let users struggle a bit - that reveals problems</li>
+                    <li>Test early and often with rough prototypes</li>
+                    <li>Focus on behaviors, not opinions</li>
+                    <li>Thank users for finding problems</li>
+                </ul>
+            </div>
+
+            <div class="dont-card">
+                <h4>❌ DON'T</h4>
+                <ul style="margin-left: 20px; line-height: 1.8;">
+                    <li>Defend your design or explain how it works</li>
+                    <li>Ask leading questions: "Isn't this intuitive?"</li>
+                    <li>Jump in to help immediately when users struggle</li>
+                    <li>Take negative feedback personally</li>
+                    <li>Ask "Would you use this?" (unreliable)</li>
+                    <li>Test only with people who are tech-savvy if your users aren't</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="warning-box">
+            <h4>⚠️ Common Mistake: Explaining the Design</h4>
+            <p>
+                When users struggle, it's tempting to jump in: "Oh, that button does X!" RESIST THIS URGE.
+                If users need an explanation, your design isn't clear enough. Let them struggle - that's the data you need!
+            </p>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Observing, Not Leading</h2>
+        <p>
+            The hardest part of user testing is staying quiet and observing. Here's how to guide without leading:
+        </p>
+
+        <div class="example-box">
+            <h4>Sample Testing Script</h4>
+            <p>
+                <strong>Opening:</strong> "Thanks for helping us test this prototype. Remember, we're testing the design,
+                not you - there are no wrong answers. If anything is confusing, that's valuable feedback for us. Please
+                think out loud as you work, telling me what you're thinking."
+            </p>
+            <p style="margin-top: 15px;">
+                <strong>Giving a task:</strong> "Imagine you're planning a trip to Paris next month and need to book a hotel.
+                Show me how you'd use this app to find and book a hotel."
+            </p>
+            <p style="margin-top: 15px;">
+                <strong>When they're stuck:</strong> "What are you looking for?" or "What would you expect to happen next?"
+                (NOT "Did you see the button in the corner?")
+            </p>
+            <p style="margin-top: 15px;">
+                <strong>Follow-up:</strong> "You clicked on X. What were you hoping would happen?" or "I noticed you hesitated
+                there - what were you thinking?"
+            </p>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Measuring Success</h2>
+        <p>
+            How do you know if your design is working? Use both qualitative and quantitative metrics:
+        </p>
+
+        <div class="concept-grid">
+            <div class="concept-card">
+                <h4>📊 Quantitative Metrics</h4>
+                <p><strong>Task Success Rate:</strong> % of users who complete the task</p>
+                <p><strong>Time on Task:</strong> How long it takes to complete</p>
+                <p><strong>Error Rate:</strong> Number of mistakes made</p>
+                <p><strong>Clicks to Complete:</strong> Efficiency measure</p>
+            </div>
+
+            <div class="concept-card">
+                <h4>💬 Qualitative Insights</h4>
+                <p><strong>Confusion Points:</strong> Where users hesitate or express uncertainty</p>
+                <p><strong>Satisfaction:</strong> How users feel about the experience</p>
+                <p><strong>Mental Models:</strong> Whether the design matches user expectations</p>
+                <p><strong>Delight Moments:</strong> What users love</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>The Iteration Cycle</h2>
+        <p>
+            Testing isn't the end - it's the beginning of the next cycle. Here's how to iterate based on findings:
+        </p>
+
+        <div class="iteration-cycle">
+            <div class="cycle-step">Test</div>
+            <div class="cycle-arrow">→</div>
+            <div class="cycle-step">Analyze</div>
+            <div class="cycle-arrow">→</div>
+            <div class="cycle-step">Prioritize</div>
+            <div class="cycle-arrow">→</div>
+            <div class="cycle-step">Redesign</div>
+            <div class="cycle-arrow">→</div>
+            <div class="cycle-step">Test Again</div>
+        </div>
+
+        <div class="concept-card" style="margin: 20px 0;">
+            <h4>🎯 Prioritizing Issues</h4>
+            <p>You'll find more problems than you can fix immediately. Prioritize based on:</p>
+            <ul style="margin-left: 20px; margin-top: 10px;">
+                <li><strong>Severity:</strong> Does it block users from completing critical tasks?</li>
+                <li><strong>Frequency:</strong> How many users experienced this issue?</li>
+                <li><strong>Impact:</strong> Does it affect core functionality or edge cases?</li>
+                <li><strong>Effort:</strong> How much work to fix? (Quick wins vs. major redesigns)</li>
+            </ul>
+            <p style="margin-top: 15px;">
+                Fix high-severity, high-frequency issues first. Don't get distracted by interesting but minor problems.
+            </p>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>When to Pivot vs. Persevere</h2>
+        <p>
+            Sometimes testing reveals that your whole approach is wrong. How do you know when to iterate vs. start over?
+        </p>
+
+        <div class="concept-grid">
+            <div class="concept-card">
+                <h4>🔄 Iterate (Persevere)</h4>
+                <p><strong>When:</strong></p>
+                <ul style="margin-left: 20px; margin-top: 10px;">
+                    <li>Users understand the core concept</li>
+                    <li>Issues are specific and fixable</li>
+                    <li>Users see value but struggle with execution</li>
+                    <li>Problems are in the "how," not the "what"</li>
+                </ul>
+            </div>
+
+            <div class="concept-card">
+                <h4>↩️ Pivot (Start Over)</h4>
+                <p><strong>When:</strong></p>
+                <ul style="margin-left: 20px; margin-top: 10px;">
+                    <li>Users don't understand what it's for</li>
+                    <li>No one sees value in solving this problem</li>
+                    <li>You're solving the wrong problem</li>
+                    <li>Fundamental assumptions are wrong</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="example-box">
+            <h4>🎬 Real Example: YouTube's Pivot</h4>
+            <p>
+                YouTube started as a video dating site where users would post videos describing their ideal partner.
+                Founders tested this and got basically zero interest. But they noticed users were uploading all kinds
+                of other videos and sharing them.
+            </p>
+            <p style="margin-top: 15px;">
+                <strong>The Pivot:</strong> They changed to a general video-sharing platform. Testing showed this resonated
+                with users, so they iterated on that concept instead. The result: the world's largest video platform.
+            </p>
+            <p style="margin-top: 15px; font-weight: 600;">
+                Lesson: Don't be afraid to pivot when testing reveals a better opportunity. Being right matters more than
+                being consistent.
+            </p>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Remote Testing</h2>
+        <p>
+            You don't always need in-person testing. Remote testing tools let you test with users anywhere:
+        </p>
+
+        <div class="concept-card" style="margin: 20px 0;">
+            <h4>🌐 Remote Testing Options</h4>
+            <p><strong>Moderated Remote:</strong> Video call with user sharing screen (Zoom, Teams)</p>
+            <ul style="margin-left: 20px; margin-top: 10px;">
+                <li>Pro: Still get rich qualitative insights</li>
+                <li>Con: Requires scheduling and facilitator time</li>
+            </ul>
+            <p style="margin-top: 15px;"><strong>Unmoderated Remote:</strong> Users complete tasks on their own, recorded (UserTesting, Maze)</p>
+            <ul style="margin-left: 20px; margin-top: 10px;">
+                <li>Pro: Fast, cheap, can test many users</li>
+                <li>Con: Can't ask follow-up questions in real-time</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="key-concepts">
+        <h3>🎯 Key Takeaways</h3>
+        <ul>
+            <li>User testing reveals the gap between what you think and what users actually do</li>
+            <li>Test early and often - 5-8 users catch 80% of usability issues</li>
+            <li>Stay neutral during testing - observe, don't lead or explain</li>
+            <li>Use think-aloud protocol to understand user mental models</li>
+            <li>Measure both quantitative metrics (success rate, time) and qualitative insights (confusion, satisfaction)</li>
+            <li>Prioritize issues by severity, frequency, and impact</li>
+            <li>Iterate based on findings, but be willing to pivot if fundamental assumptions are wrong</li>
+            <li>Testing isn't one-and-done - it's a continuous cycle throughout design</li>
+        </ul>
+    </div>
+
+    <div class="interactive-demo">
+        <h3>🎮 Ready to Practice?</h3>
+        <p style="margin: 20px 0;">
+            Test your usability detective skills by identifying issues in prototypes!
+        </p>
+        <a href="../../games/usability-detective/index.html" style="display: inline-block; background: #fff; color: #667eea; padding: 15px 40px; border-radius: 8px; text-decoration: none; font-weight: 700; margin-top: 10px;">
+            Play Usability Detective Game →
+        </a>
+    </div>
+
+    <div class="content-section" style="text-align: center; margin-top: 40px; background: #f8f9fa; padding: 30px; border-radius: 10px;">
+        <h3>🎉 You've Completed the HCD Series!</h3>
+        <p style="margin: 15px 0; color: #4a5568;">
+            You now have the fundamentals of Human Centered Design:<br>
+            Empathy → Ideation → Testing
+        </p>
+        <p style="margin: 15px 0; color: #667eea; font-weight: 600;">
+            The journey doesn't end here - HCD is a continuous practice. Keep iterating, keep learning from users,
+            and keep putting people at the center of your designs!
+        </p>
+        <div style="margin-top: 30px;">
+            <a href="../hcd-empathy/index.html" style="display: inline-block; background: #999; color: #fff; padding: 10px 30px; border-radius: 8px; text-decoration: none; font-weight: 600; margin: 10px;">
+                ← Part 1: Empathy
+            </a>
+            <a href="../hcd-ideation/index.html" style="display: inline-block; background: #999; color: #fff; padding: 10px 30px; border-radius: 8px; text-decoration: none; font-weight: 600; margin: 10px;">
+                ← Part 2: Ideation
+            </a>
+        </div>
+    </div>
+</div>
+</body>
+</html>

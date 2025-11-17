@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Human Centered Design: Empathy & Understanding Users</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 0; }
+.nav-header { background: #2d3748; padding: 15px 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; }
+.nav-header a { color: #90cdf4; text-decoration: none; font-weight: 600; font-size: 1.1em; }
+.nav-title { color: #fff; font-size: 1.2em; font-weight: 700; }
+.container { max-width: 1400px; margin: 20px auto; background: #fff; border-radius: 15px; padding: 30px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+h1 { text-align: center; color: #2d3748; font-size: 2.5em; margin-bottom: 10px; }
+.series-tag { text-align: center; color: #667eea; font-weight: 600; font-size: 1.1em; margin-bottom: 20px; }
+.intro { background: #e3f2fd; padding: 20px; border-radius: 10px; margin-bottom: 30px; line-height: 1.6; }
+.intro h2 { color: #1976d2; margin-bottom: 10px; }
+.content-section { margin: 30px 0; }
+.content-section h2 { color: #2d3748; margin-bottom: 15px; font-size: 1.8em; }
+.content-section h3 { color: #667eea; margin: 20px 0 10px 0; font-size: 1.4em; }
+.content-section p { line-height: 1.8; color: #4a5568; margin-bottom: 15px; }
+.content-section ul { margin-left: 30px; line-height: 1.8; color: #4a5568; }
+.content-section li { margin-bottom: 10px; }
+.concept-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin: 20px 0; }
+.concept-card { background: #f8f9fa; padding: 25px; border-radius: 10px; border-left: 4px solid #667eea; }
+.concept-card h4 { color: #667eea; margin-bottom: 12px; font-size: 1.3em; }
+.concept-card p { color: #4a5568; line-height: 1.7; }
+.example-box { background: #fff9c4; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #fbc02d; }
+.example-box h4 { color: #f57c00; margin-bottom: 10px; }
+.example-box p { color: #4a5568; line-height: 1.7; }
+.key-concepts { background: #e8f5e9; padding: 20px; border-radius: 8px; margin: 20px 0; }
+.key-concepts h3 { color: #2e7d32; margin-bottom: 15px; }
+.key-concepts ul { margin-left: 20px; line-height: 1.8; }
+.interactive-demo { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; padding: 25px; border-radius: 10px; margin: 30px 0; text-align: center; }
+.quote-box { background: #f3e5f5; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #9c27b0; font-style: italic; }
+.quote-box p { color: #4a148c; line-height: 1.7; }
+.case-study { background: #e1f5fe; padding: 25px; border-radius: 10px; margin: 30px 0; }
+.case-study h3 { color: #01579b; margin-bottom: 15px; }
+.empathy-map { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: auto auto auto; gap: 15px; margin: 20px 0; }
+.empathy-section { background: #fff; padding: 20px; border-radius: 8px; border: 2px solid #667eea; }
+.empathy-section h4 { color: #667eea; margin-bottom: 10px; }
+.empathy-center { grid-column: 1 / -1; background: #667eea; color: #fff; text-align: center; padding: 15px; border-radius: 8px; }
+</style>
+</head>
+<body>
+<nav class="nav-header">
+    <div class="nav-title">👥 HCD Part 1: Empathy & Understanding Users</div>
+    <a href="../../index.html">← Back to Home</a>
+</nav>
+<div class="container">
+    <h1>👥 Human Centered Design</h1>
+    <div class="series-tag">Part 1 of 3: Empathy & Understanding Users</div>
+
+    <div class="intro">
+        <h2>What is Human Centered Design?</h2>
+        <p>
+            Human Centered Design (HCD) is an approach to problem-solving that puts people at the heart of the design process.
+            Instead of designing products based on what we think users want, HCD requires us to deeply understand users' needs,
+            behaviors, and pain points before creating solutions.
+        </p>
+        <p>
+            Think about the last time you used an app or website that was confusing or frustrating. That's often the result
+            of design without empathy. HCD helps us create products that truly work for real people.
+        </p>
+    </div>
+
+    <div class="content-section">
+        <h2>Why Empathy Matters in Design</h2>
+        <p>
+            Empathy is the foundation of Human Centered Design. It's the ability to understand and share the feelings
+            of another person. In design, empathy means stepping into your users' shoes to see the world from their perspective.
+        </p>
+
+        <div class="concept-grid">
+            <div class="concept-card">
+                <h4>🎯 Better Solutions</h4>
+                <p>
+                    When you understand users deeply, you solve the right problems. Many products fail because they
+                    solve problems users don't actually have.
+                </p>
+            </div>
+
+            <div class="concept-card">
+                <h4>💡 Innovation</h4>
+                <p>
+                    Empathy reveals unmet needs and hidden opportunities. The best innovations come from observing
+                    what users struggle with but can't articulate.
+                </p>
+            </div>
+
+            <div class="concept-card">
+                <h4>✅ User Satisfaction</h4>
+                <p>
+                    Products designed with empathy are intuitive and delightful to use. Users feel understood
+                    and valued, leading to higher satisfaction and loyalty.
+                </p>
+            </div>
+
+            <div class="concept-card">
+                <h4>🚀 Reduced Waste</h4>
+                <p>
+                    Understanding users early prevents costly mistakes. It's much cheaper to validate ideas
+                    with users before building than to rebuild after launch.
+                </p>
+            </div>
+        </div>
+
+        <div class="example-box">
+            <h4>Real-World Example: The OXO Good Grips Story</h4>
+            <p>
+                In 1990, Sam Farber watched his wife struggle to use a traditional vegetable peeler due to arthritis.
+                Instead of just making it easier for people with arthritis, he used empathy to realize that EVERYONE
+                would benefit from more comfortable kitchen tools. OXO Good Grips was born, revolutionizing kitchen
+                products by designing for the extremes and benefiting all users. This is empathy-driven design at its best.
+            </p>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>User Research Methods</h2>
+        <p>
+            To build empathy, we need to conduct user research. Here are the main methods designers use to understand their users:
+        </p>
+
+        <h3>1. User Interviews 🗣️</h3>
+        <p>
+            One-on-one conversations with users to understand their experiences, needs, and pain points.
+            The key is to ask open-ended questions and listen actively.
+        </p>
+        <ul>
+            <li><strong>Good questions:</strong> "Tell me about the last time you tried to..." or "How do you currently handle...?"</li>
+            <li><strong>Bad questions:</strong> "Would you use a feature that does X?" (leading question that doesn't reveal real behavior)</li>
+            <li><strong>Pro tip:</strong> Ask "why" at least five times to dig deeper into motivations</li>
+        </ul>
+
+        <h3>2. Observations & Shadowing 👀</h3>
+        <p>
+            Watching users in their natural environment as they complete tasks. People often do things differently
+            than they describe in interviews.
+        </p>
+        <ul>
+            <li>Observe without interrupting - let users work naturally</li>
+            <li>Take notes on workarounds, frustrations, and unexpected behaviors</li>
+            <li>Look for what users do, not just what they say</li>
+        </ul>
+
+        <h3>3. Surveys & Questionnaires 📊</h3>
+        <p>
+            Gathering data from a larger group of users. Useful for validating patterns seen in interviews
+            and understanding scale.
+        </p>
+        <ul>
+            <li>Use a mix of quantitative (ratings, scales) and qualitative (open-ended) questions</li>
+            <li>Keep surveys short - long surveys have low completion rates</li>
+            <li>Be careful with self-reported data - what people say and do often differ</li>
+        </ul>
+
+        <h3>4. Contextual Inquiry 🏠</h3>
+        <p>
+            A combination of interviews and observation where you watch users in their environment
+            while asking questions about what they're doing and why.
+        </p>
+    </div>
+
+    <div class="content-section">
+        <h2>Creating User Personas</h2>
+        <p>
+            A persona is a fictional character that represents a key user type. Personas help teams keep
+            real users in mind throughout the design process.
+        </p>
+
+        <div class="concept-card" style="margin: 20px 0;">
+            <h4>📋 What Goes in a Persona?</h4>
+            <ul style="margin-left: 20px;">
+                <li><strong>Name & Photo:</strong> Make them feel like a real person</li>
+                <li><strong>Demographics:</strong> Age, occupation, location (when relevant)</li>
+                <li><strong>Goals:</strong> What they're trying to achieve</li>
+                <li><strong>Frustrations:</strong> Current pain points and challenges</li>
+                <li><strong>Behaviors:</strong> How they currently solve problems</li>
+                <li><strong>Motivations:</strong> What drives their decisions</li>
+                <li><strong>Quote:</strong> Something they might say that captures their mindset</li>
+            </ul>
+        </div>
+
+        <div class="example-box">
+            <h4>Example Persona: Sarah, the Busy College Student</h4>
+            <p>
+                <strong>Age:</strong> 20 | <strong>Major:</strong> Biology | <strong>Tech Level:</strong> High<br><br>
+                <strong>Goals:</strong> Balance coursework, part-time job, and social life. Stay organized without spending hours planning.<br><br>
+                <strong>Frustrations:</strong> Existing calendar apps are too complex. Constantly forgets assignments. Overwhelmed by notifications.<br><br>
+                <strong>Behaviors:</strong> Uses phone for everything. Checks social media between classes. Prefers quick, visual information.<br><br>
+                <strong>Quote:</strong> "I need something that just works. I don't have time to set up complicated systems."
+            </p>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Empathy Mapping</h2>
+        <p>
+            An empathy map is a visual tool that helps you understand what a user says, thinks, feels, and does.
+            It's a quick way to synthesize research findings and build team alignment.
+        </p>
+
+        <div class="empathy-map">
+            <div class="empathy-section">
+                <h4>🗣️ Says</h4>
+                <p style="color: #4a5568;">What the user says out loud in interviews or observations</p>
+                <p style="color: #666; font-size: 0.9em; margin-top: 10px;"><em>Example: "I don't have time for this"</em></p>
+            </div>
+            <div class="empathy-section">
+                <h4>💭 Thinks</h4>
+                <p style="color: #4a5568;">What the user might be thinking but not saying</p>
+                <p style="color: #666; font-size: 0.9em; margin-top: 10px;"><em>Example: "I'm worried I'll look dumb if I ask"</em></p>
+            </div>
+            <div class="empathy-section">
+                <h4>⚡ Does</h4>
+                <p style="color: #4a5568;">Actions and behaviors you observe</p>
+                <p style="color: #666; font-size: 0.9em; margin-top: 10px;"><em>Example: Clicks back button multiple times</em></p>
+            </div>
+            <div class="empathy-section">
+                <h4>😟 Feels</h4>
+                <p style="color: #4a5568;">Emotional state during the experience</p>
+                <p style="color: #666; font-size: 0.9em; margin-top: 10px;"><em>Example: Frustrated, anxious, confused</em></p>
+            </div>
+            <div class="empathy-center">
+                <h4>🎯 USER GOAL</h4>
+                <p>What they're trying to accomplish</p>
+            </div>
+        </div>
+
+        <p style="margin-top: 20px;">
+            <strong>How to use it:</strong> After conducting research, gather your team and fill out an empathy map together.
+            Look for patterns and contradictions between what users say and do.
+        </p>
+    </div>
+
+    <div class="content-section">
+        <h2>Needs vs. Wants</h2>
+        <p>
+            A crucial skill in HCD is distinguishing between what users <em>say they want</em> and what they <em>actually need</em>.
+        </p>
+
+        <div class="concept-grid">
+            <div class="concept-card">
+                <h4>🎤 Wants (Stated)</h4>
+                <p>
+                    What users explicitly ask for. Often framed as feature requests or solutions.
+                    <br><br>
+                    <em>Example: "I want a faster horse" - Henry Ford's customers</em>
+                </p>
+            </div>
+
+            <div class="concept-card">
+                <h4>💎 Needs (Underlying)</h4>
+                <p>
+                    The real problem or goal beneath the surface. Discovered through research and observation.
+                    <br><br>
+                    <em>Reality: They needed faster transportation → The car was born</em>
+                </p>
+            </div>
+        </div>
+
+        <div class="quote-box">
+            <p>
+                "If I had asked people what they wanted, they would have said faster horses."
+                <br>- Often attributed to Henry Ford (though possibly apocryphal)
+            </p>
+        </div>
+
+        <p>
+            Your job as a designer is to dig beneath surface-level wants to uncover true needs. Listen to the problem,
+            not the proposed solution.
+        </p>
+    </div>
+
+    <div class="case-study">
+        <h3>🏥 Case Study: Redesigning the MRI Experience</h3>
+        <p>
+            GE Healthcare wanted to make MRI machines more efficient. Through empathy research, designer Doug Dietz
+            discovered that children were terrified of the machines - some needed sedation just to get scanned.
+        </p>
+        <p style="margin-top: 15px;">
+            <strong>The Insight:</strong> Kids weren't scared of medical procedures - they were scared of the big,
+            loud, intimidating machine and sterile hospital environment.
+        </p>
+        <p style="margin-top: 15px;">
+            <strong>The Solution:</strong> Transform MRI rooms into adventure themes. The "pirate ship" scanner, the
+            "jungle adventure," etc. Kids were coached to "stay very still so you don't wake the baby elephant."
+        </p>
+        <p style="margin-top: 15px;">
+            <strong>The Result:</strong> Sedation rates dropped dramatically. Children asked to go back. Same machine,
+            completely different experience - all because of empathy.
+        </p>
+    </div>
+
+    <div class="key-concepts">
+        <h3>🎯 Key Takeaways</h3>
+        <ul>
+            <li>Human Centered Design starts with empathy - deeply understanding users before designing solutions</li>
+            <li>Use multiple research methods: interviews, observations, surveys, and contextual inquiry</li>
+            <li>Create personas to keep real users in mind throughout the design process</li>
+            <li>Empathy maps help synthesize research and build team alignment</li>
+            <li>Focus on uncovering needs, not just wants - dig beneath surface-level feature requests</li>
+            <li>Small changes based on empathy can have huge impacts on user experience</li>
+        </ul>
+    </div>
+
+    <div class="interactive-demo">
+        <h3>🎮 Ready to Practice?</h3>
+        <p style="margin: 20px 0;">
+            Test your empathy and persona-building skills with the Persona Builder game!
+        </p>
+        <a href="../../games/persona-builder/index.html" style="display: inline-block; background: #fff; color: #667eea; padding: 15px 40px; border-radius: 8px; text-decoration: none; font-weight: 700; margin-top: 10px;">
+            Play Persona Builder Game →
+        </a>
+    </div>
+
+    <div class="content-section" style="text-align: center; margin-top: 40px;">
+        <h3>📚 Continue the Series</h3>
+        <p style="margin: 15px 0;">Next up: Learn about ideation and prototyping!</p>
+        <a href="../hcd-ideation/index.html" style="display: inline-block; background: #667eea; color: #fff; padding: 15px 40px; border-radius: 8px; text-decoration: none; font-weight: 700; margin-top: 10px;">
+            Part 2: Ideation & Prototyping →
+        </a>
+    </div>
+</div>
+</body>
+</html>
