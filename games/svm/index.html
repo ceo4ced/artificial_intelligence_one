@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Margin Maximizer - SVM Game</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 0; }
+.nav-header { background: #2d3748; padding: 15px 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; }
+.nav-header a { color: #90cdf4; text-decoration: none; font-weight: 600; font-size: 1.1em; }
+.nav-title { color: #fff; font-size: 1.2em; font-weight: 700; }
+.container { max-width: 1200px; margin: 20px auto; background: #fff; border-radius: 15px; padding: 30px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+h1 { text-align: center; color: #2d3748; font-size: 2.5em; margin-bottom: 10px; }
+.subtitle { text-align: center; color: #666; margin-bottom: 30px; font-size: 1.1em; }
+.game-area { display: grid; grid-template-columns: 300px 1fr; gap: 30px; }
+.sidebar { background: #f8f9fa; padding: 20px; border-radius: 10px; height: fit-content; }
+.score-display { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; padding: 20px; border-radius: 10px; text-align: center; margin-bottom: 20px; }
+.score-value { font-size: 3em; font-weight: bold; margin: 10px 0; }
+.stats { margin: 15px 0; }
+.stat-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e0e0e0; }
+.canvas-container { text-align: center; }
+canvas { border: 2px solid #ddd; border-radius: 8px; background: #fafafa; cursor: crosshair; }
+button { padding: 15px 30px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 1.05em; transition: all 0.3s; }
+.btn-primary { background: #4CAF50; color: #fff; width: 100%; margin-top: 10px; }
+.btn-primary:hover { background: #45a049; transform: scale(1.02); }
+.btn-secondary { background: #2196F3; color: #fff; width: 100%; }
+.btn-secondary:hover { background: #1976d2; }
+.btn-danger { background: #f44336; color: #fff; width: 100%; }
+.btn-danger:hover { background: #da190b; }
+.instructions { background: #e3f2fd; padding: 15px; border-radius: 8px; margin: 15px 0; }
+.instructions h4 { color: #1976d2; margin-bottom: 10px; }
+.instructions p { font-size: 0.9em; line-height: 1.6; color: #01579b; }
+.feedback { background: #fff9c4; padding: 20px; border-radius: 10px; margin-top: 20px; border-left: 4px solid #fbc02d; display: none; }
+.feedback.show { display: block; animation: slideIn 0.3s; }
+.feedback h4 { color: #f57c00; margin-bottom: 10px; }
+@keyframes slideIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+.progress-bar { background: #e0e0e0; height: 8px; border-radius: 4px; margin: 20px 0; overflow: hidden; }
+.progress-fill { background: linear-gradient(90deg, #667eea, #764ba2); height: 100%; transition: width 0.3s; }
+.mode-selector { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 15px 0; }
+.mode-btn { padding: 10px; background: #fff; border: 2px solid #667eea; color: #667eea; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.3s; }
+.mode-btn.active { background: #667eea; color: #fff; }
+</style>
+</head>
+<body>
+<nav class="nav-header">
+    <div class="nav-title">⚡ Margin Maximizer</div>
+    <a href="../../index.html">← Back to Home</a>
+</nav>
+<div class="container">
+    <h1>⚡ Margin Maximizer</h1>
+    <p class="subtitle">Draw decision boundaries to maximize the margin!</p>
+
+    <div class="game-area">
+        <div class="sidebar">
+            <div class="score-display">
+                <div>Total Score</div>
+                <div class="score-value" id="totalScore">0</div>
+                <div>Level: <span id="level">1</span></div>
+            </div>
+
+            <div class="stats">
+                <div class="stat-row"><span>Challenges:</span><span id="challenges">0/8</span></div>
+                <div class="stat-row"><span>Avg Margin:</span><span id="avgMargin">0%</span></div>
+                <div class="stat-row"><span>Best Score:</span><span id="bestScore">0</span></div>
+            </div>
+
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar" style="width: 0%"></div>
+            </div>
+
+            <div class="mode-selector">
+                <button class="mode-btn active" onclick="setMode('draw')">✏️ Draw</button>
+                <button class="mode-btn" onclick="setMode('erase')">🗑️ Erase</button>
+            </div>
+
+            <button class="btn-primary" onclick="submitBoundary()">Submit Boundary</button>
+            <button class="btn-secondary" onclick="showSolution()">Show Solution</button>
+            <button class="btn-secondary" onclick="nextChallenge()">Next Challenge →</button>
+            <button class="btn-danger" onclick="clearBoundary()">Clear</button>
+
+            <div class="instructions">
+                <h4>How to Play:</h4>
+                <p>
+                    1. Draw a decision boundary to separate the two classes<br>
+                    2. Try to maximize the margin (distance to nearest points)<br>
+                    3. Submit to see your score!<br><br>
+                    <strong>Tip:</strong> The best boundary is equidistant from both classes.
+                </p>
+            </div>
+        </div>
+
+        <div>
+            <div class="canvas-container">
+                <canvas id="gameCanvas" width="700" height="600"></canvas>
+                <div id="challenge-title" style="margin-top: 15px; font-size: 1.2em; font-weight: 600; color: #2d3748;">
+                    Challenge 1: Simple Linear Separation
+                </div>
+            </div>
+
+            <div class="feedback" id="feedback">
+                <h4 id="feedbackTitle">Results</h4>
+                <p id="feedbackText"></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+
+let currentMode = 'draw';
+let isDrawing = false;
+let boundaryPoints = [];
+let dataPoints = [];
+let currentLevel = 0;
+let totalScore = 0;
+let completedChallenges = 0;
+let marginScores = [];
+let bestScore = 0;
+let solution = null;
+
+const challenges = [
+    {
+        title: "Challenge 1: Simple Linear Separation",
+        description: "Draw a straight line to separate these linearly separable classes.",
+        type: "linear",
+        difficulty: "easy"
+    },
+    {
+        title: "Challenge 2: Diagonal Separation",
+        description: "Find the optimal diagonal boundary with maximum margin.",
+        type: "diagonal",
+        difficulty: "easy"
+    },
+    {
+        title: "Challenge 3: Narrow Margin",
+        description: "Careful! The classes are close together. Maximize that margin!",
+        type: "narrow",
+        difficulty: "medium"
+    },
+    {
+        title: "Challenge 4: Unbalanced Classes",
+        description: "Handle unbalanced data - one class has more points than the other.",
+        type: "unbalanced",
+        difficulty: "medium"
+    },
+    {
+        title: "Challenge 5: Curved Boundary",
+        description: "This needs a curved decision boundary. Draw carefully!",
+        type: "curved",
+        difficulty: "hard"
+    },
+    {
+        title: "Challenge 6: Multiple Clusters",
+        description: "Each class has multiple clusters. Find the best overall boundary.",
+        type: "clusters",
+        difficulty: "hard"
+    },
+    {
+        title: "Challenge 7: Circular Pattern",
+        description: "One class surrounds the other. Draw a circular boundary!",
+        type: "circular",
+        difficulty: "hard"
+    },
+    {
+        title: "Challenge 8: Complex Pattern",
+        description: "The ultimate challenge - find the optimal boundary for this complex data!",
+        type: "complex",
+        difficulty: "expert"
+    }
+];
+
+function generateChallenge(type) {
+    dataPoints = [];
+    solution = null;
+
+    switch(type) {
+        case 'linear':
+            // Class 1 (blue)
+            for (let i = 0; i < 20; i++) {
+                dataPoints.push({
+                    x: 100 + Math.random() * 250,
+                    y: 100 + Math.random() * 400,
+                    label: 1
+                });
+            }
+            // Class 2 (red)
+            for (let i = 0; i < 20; i++) {
+                dataPoints.push({
+                    x: 400 + Math.random() * 250,
+                    y: 100 + Math.random() * 400,
+                    label: -1
+                });
+            }
+            solution = {type: 'vertical', x: 350};
+            break;
+
+        case 'diagonal':
+            // Class 1 (blue) - top left
+            for (let i = 0; i < 20; i++) {
+                dataPoints.push({
+                    x: 100 + Math.random() * 250,
+                    y: 50 + Math.random() * 200,
+                    label: 1
+                });
+            }
+            // Class 2 (red) - bottom right
+            for (let i = 0; i < 20; i++) {
+                dataPoints.push({
+                    x: 400 + Math.random() * 250,
+                    y: 350 + Math.random() * 200,
+                    label: -1
+                });
+            }
+            solution = {type: 'diagonal', x1: 250, y1: 150, x2: 550, y2: 450};
+            break;
+
+        case 'narrow':
+            // Class 1 (blue)
+            for (let i = 0; i < 25; i++) {
+                dataPoints.push({
+                    x: 150 + Math.random() * 180,
+                    y: 100 + Math.random() * 400,
+                    label: 1
+                });
+            }
+            // Class 2 (red) - close to class 1
+            for (let i = 0; i < 25; i++) {
+                dataPoints.push({
+                    x: 370 + Math.random() * 180,
+                    y: 100 + Math.random() * 400,
+                    label: -1
+                });
+            }
+            solution = {type: 'vertical', x: 330};
+            break;
+
+        case 'unbalanced':
+            // Class 1 (blue) - many points
+            for (let i = 0; i < 35; i++) {
+                dataPoints.push({
+                    x: 100 + Math.random() * 300,
+                    y: 100 + Math.random() * 400,
+                    label: 1
+                });
+            }
+            // Class 2 (red) - fewer points
+            for (let i = 0; i < 15; i++) {
+                dataPoints.push({
+                    x: 450 + Math.random() * 200,
+                    y: 150 + Math.random() * 300,
+                    label: -1
+                });
+            }
+            solution = {type: 'vertical', x: 425};
+            break;
+
+        case 'curved':
+            // Class 1 (blue) - curved top
+            for (let i = 0; i < 25; i++) {
+                const x = 100 + Math.random() * 500;
+                const y = 100 + Math.sin(x / 100) * 60 + Math.random() * 80;
+                dataPoints.push({x, y, label: 1});
+            }
+            // Class 2 (red) - curved bottom
+            for (let i = 0; i < 25; i++) {
+                const x = 100 + Math.random() * 500;
+                const y = 400 + Math.sin(x / 100) * 60 + Math.random() * 80;
+                dataPoints.push({x, y, label: -1});
+            }
+            solution = {type: 'sine', amplitude: 60, frequency: 100, offset: 300};
+            break;
+
+        case 'clusters':
+            // Class 1 (blue) - two clusters
+            for (let i = 0; i < 15; i++) {
+                dataPoints.push({
+                    x: 100 + Math.random() * 120,
+                    y: 100 + Math.random() * 150,
+                    label: 1
+                });
+            }
+            for (let i = 0; i < 15; i++) {
+                dataPoints.push({
+                    x: 100 + Math.random() * 120,
+                    y: 350 + Math.random() * 150,
+                    label: 1
+                });
+            }
+            // Class 2 (red) - two clusters
+            for (let i = 0; i < 15; i++) {
+                dataPoints.push({
+                    x: 480 + Math.random() * 120,
+                    y: 100 + Math.random() * 150,
+                    label: -1
+                });
+            }
+            for (let i = 0; i < 15; i++) {
+                dataPoints.push({
+                    x: 480 + Math.random() * 120,
+                    y: 350 + Math.random() * 150,
+                    label: -1
+                });
+            }
+            solution = {type: 'vertical', x: 350};
+            break;
+
+        case 'circular':
+            const centerX = 350;
+            const centerY = 300;
+            // Class 1 (blue) - inner circle
+            for (let i = 0; i < 25; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const radius = 40 + Math.random() * 50;
+                dataPoints.push({
+                    x: centerX + Math.cos(angle) * radius,
+                    y: centerY + Math.sin(angle) * radius,
+                    label: 1
+                });
+            }
+            // Class 2 (red) - outer ring
+            for (let i = 0; i < 35; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const radius = 140 + Math.random() * 80;
+                dataPoints.push({
+                    x: centerX + Math.cos(angle) * radius,
+                    y: centerY + Math.sin(angle) * radius,
+                    label: -1
+                });
+            }
+            solution = {type: 'circle', centerX, centerY, radius: 110};
+            break;
+
+        case 'complex':
+            // Mix of patterns
+            for (let i = 0; i < 20; i++) {
+                const x = 100 + Math.random() * 200;
+                const y = 100 + Math.random() * 150 + x * 0.3;
+                dataPoints.push({x, y, label: 1});
+            }
+            for (let i = 0; i < 20; i++) {
+                const x = 400 + Math.random() * 250;
+                const y = 300 + Math.random() * 200 + (x - 400) * 0.2;
+                dataPoints.push({x, y, label: -1});
+            }
+            solution = {type: 'diagonal', x1: 200, y1: 200, x2: 600, y2: 450};
+            break;
+    }
+
+    drawCanvas();
+}
+
+function drawCanvas() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Draw grid
+    ctx.strokeStyle = '#f0f0f0';
+    ctx.lineWidth = 1;
+    for (let i = 0; i < canvas.width; i += 50) {
+        ctx.beginPath();
+        ctx.moveTo(i, 0);
+        ctx.lineTo(i, canvas.height);
+        ctx.stroke();
+    }
+    for (let i = 0; i < canvas.height; i += 50) {
+        ctx.beginPath();
+        ctx.moveTo(0, i);
+        ctx.lineTo(canvas.width, i);
+        ctx.stroke();
+    }
+
+    // Draw user's boundary
+    if (boundaryPoints.length > 1) {
+        ctx.strokeStyle = '#4CAF50';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(boundaryPoints[0].x, boundaryPoints[0].y);
+        for (let i = 1; i < boundaryPoints.length; i++) {
+            ctx.lineTo(boundaryPoints[i].x, boundaryPoints[i].y);
+        }
+        ctx.stroke();
+    }
+
+    // Draw data points
+    dataPoints.forEach(point => {
+        ctx.fillStyle = point.label === 1 ? 'rgba(33, 150, 243, 0.9)' : 'rgba(244, 67, 54, 0.9)';
+        ctx.beginPath();
+        ctx.arc(point.x, point.y, 7, 0, Math.PI * 2);
+        ctx.fill();
+    });
+}
+
+function setMode(mode) {
+    currentMode = mode;
+    document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+}
+
+canvas.addEventListener('mousedown', (e) => {
+    if (currentMode === 'draw') {
+        isDrawing = true;
+        const rect = canvas.getBoundingClientRect();
+        boundaryPoints = [{
+            x: e.clientX - rect.left,
+            y: e.clientY - rect.top
+        }];
+    }
+});
+
+canvas.addEventListener('mousemove', (e) => {
+    if (isDrawing && currentMode === 'draw') {
+        const rect = canvas.getBoundingClientRect();
+        boundaryPoints.push({
+            x: e.clientX - rect.left,
+            y: e.clientY - rect.top
+        });
+        drawCanvas();
+    }
+});
+
+canvas.addEventListener('mouseup', () => {
+    isDrawing = false;
+});
+
+function clearBoundary() {
+    boundaryPoints = [];
+    drawCanvas();
+    document.getElementById('feedback').classList.remove('show');
+}
+
+function calculateMarginScore() {
+    if (boundaryPoints.length < 2) return 0;
+
+    let minDistClass1 = Infinity;
+    let minDistClass2 = Infinity;
+
+    dataPoints.forEach(point => {
+        let minDist = Infinity;
+
+        // Calculate minimum distance from point to boundary
+        for (let i = 0; i < boundaryPoints.length - 1; i++) {
+            const dist = pointToLineDistance(
+                point,
+                boundaryPoints[i],
+                boundaryPoints[i + 1]
+            );
+            minDist = Math.min(minDist, dist);
+        }
+
+        if (point.label === 1) {
+            minDistClass1 = Math.min(minDistClass1, minDist);
+        } else {
+            minDistClass2 = Math.min(minDistClass2, minDist);
+        }
+    });
+
+    // Margin is the minimum of the two distances
+    const margin = Math.min(minDistClass1, minDistClass2);
+
+    // Check for misclassifications
+    let misclassified = 0;
+    dataPoints.forEach(point => {
+        if (classifyPoint(point) !== point.label) {
+            misclassified++;
+        }
+    });
+
+    // Score based on margin and accuracy
+    const maxPossibleMargin = 100;
+    const marginScore = (margin / maxPossibleMargin) * 100;
+    const accuracyPenalty = misclassified * 10;
+
+    return Math.max(0, Math.min(100, marginScore - accuracyPenalty));
+}
+
+function pointToLineDistance(point, lineStart, lineEnd) {
+    const A = point.x - lineStart.x;
+    const B = point.y - lineStart.y;
+    const C = lineEnd.x - lineStart.x;
+    const D = lineEnd.y - lineStart.y;
+
+    const dot = A * C + B * D;
+    const lenSq = C * C + D * D;
+    let param = -1;
+
+    if (lenSq !== 0) param = dot / lenSq;
+
+    let xx, yy;
+
+    if (param < 0) {
+        xx = lineStart.x;
+        yy = lineStart.y;
+    } else if (param > 1) {
+        xx = lineEnd.x;
+        yy = lineEnd.y;
+    } else {
+        xx = lineStart.x + param * C;
+        yy = lineStart.y + param * D;
+    }
+
+    const dx = point.x - xx;
+    const dy = point.y - yy;
+
+    return Math.sqrt(dx * dx + dy * dy);
+}
+
+function classifyPoint(point) {
+    // Simple classification: check which side of the boundary the point is on
+    if (boundaryPoints.length < 2) return 0;
+
+    // Use the first and last points of the boundary
+    const p1 = boundaryPoints[0];
+    const p2 = boundaryPoints[boundaryPoints.length - 1];
+
+    const crossProduct = (p2.x - p1.x) * (point.y - p1.y) - (p2.y - p1.y) * (point.x - p1.x);
+
+    return crossProduct > 0 ? 1 : -1;
+}
+
+function submitBoundary() {
+    if (boundaryPoints.length < 2) {
+        alert('Please draw a decision boundary first!');
+        return;
+    }
+
+    const score = calculateMarginScore();
+    const roundScore = Math.round(score * 10);
+
+    totalScore += roundScore;
+    completedChallenges++;
+    marginScores.push(score);
+    bestScore = Math.max(bestScore, roundScore);
+
+    const feedback = document.getElementById('feedback');
+    const feedbackTitle = document.getElementById('feedbackTitle');
+    const feedbackText = document.getElementById('feedbackText');
+
+    if (score >= 85) {
+        feedback.style.background = '#e8f5e9';
+        feedback.style.borderLeftColor = '#4CAF50';
+        feedbackTitle.style.color = '#2e7d32';
+        feedbackTitle.textContent = '🎯 Excellent! Near-Optimal Margin!';
+    } else if (score >= 70) {
+        feedback.style.background = '#fff9c4';
+        feedback.style.borderLeftColor = '#FFC107';
+        feedbackTitle.style.color = '#f57c00';
+        feedbackTitle.textContent = '👍 Good Boundary!';
+    } else if (score >= 50) {
+        feedback.style.background = '#ffe0b2';
+        feedback.style.borderLeftColor = '#FF9800';
+        feedbackTitle.style.color = '#e65100';
+        feedbackTitle.textContent = '📊 Decent Try';
+    } else {
+        feedback.style.background = '#ffebee';
+        feedback.style.borderLeftColor = '#f44336';
+        feedbackTitle.style.color = '#c62828';
+        feedbackTitle.textContent = '🤔 Keep Practicing';
+    }
+
+    feedbackText.textContent = `Margin Score: ${score.toFixed(1)}% | Points Earned: ${roundScore} | Try to maximize the distance between the boundary and the nearest points from both classes!`;
+
+    feedback.classList.add('show');
+    updateStats();
+}
+
+function showSolution() {
+    if (!solution) return;
+
+    ctx.strokeStyle = '#FF9800';
+    ctx.lineWidth = 3;
+    ctx.setLineDash([10, 5]);
+
+    if (solution.type === 'vertical') {
+        ctx.beginPath();
+        ctx.moveTo(solution.x, 0);
+        ctx.lineTo(solution.x, canvas.height);
+        ctx.stroke();
+    } else if (solution.type === 'diagonal') {
+        ctx.beginPath();
+        ctx.moveTo(solution.x1, solution.y1);
+        ctx.lineTo(solution.x2, solution.y2);
+        ctx.stroke();
+    } else if (solution.type === 'circle') {
+        ctx.beginPath();
+        ctx.arc(solution.centerX, solution.centerY, solution.radius, 0, Math.PI * 2);
+        ctx.stroke();
+    } else if (solution.type === 'sine') {
+        ctx.beginPath();
+        for (let x = 0; x <= canvas.width; x += 5) {
+            const y = solution.offset + Math.sin(x / solution.frequency) * solution.amplitude;
+            if (x === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+    }
+
+    ctx.setLineDash([]);
+
+    // Label it
+    ctx.fillStyle = '#FF9800';
+    ctx.font = 'bold 16px Arial';
+    ctx.fillText('Optimal Boundary', 20, 30);
+}
+
+function nextChallenge() {
+    currentLevel++;
+    if (currentLevel >= challenges.length) {
+        showFinalScore();
+        return;
+    }
+
+    clearBoundary();
+    const challenge = challenges[currentLevel];
+    document.getElementById('challenge-title').textContent = challenge.title;
+    document.getElementById('level').textContent = currentLevel + 1;
+
+    generateChallenge(challenge.type);
+}
+
+function updateStats() {
+    document.getElementById('totalScore').textContent = totalScore;
+    document.getElementById('challenges').textContent = `${completedChallenges}/${challenges.length}`;
+    document.getElementById('bestScore').textContent = bestScore;
+
+    if (marginScores.length > 0) {
+        const avg = marginScores.reduce((a, b) => a + b, 0) / marginScores.length;
+        document.getElementById('avgMargin').textContent = `${avg.toFixed(1)}%`;
+    }
+
+    const progress = (completedChallenges / challenges.length) * 100;
+    document.getElementById('progressBar').style.width = `${progress}%`;
+}
+
+function showFinalScore() {
+    const avg = marginScores.reduce((a, b) => a + b, 0) / marginScores.length;
+    let grade = '';
+
+    if (avg >= 85) grade = 'S - SVM Master!';
+    else if (avg >= 75) grade = 'A - Excellent!';
+    else if (avg >= 65) grade = 'B - Great Work!';
+    else if (avg >= 55) grade = 'C - Good Effort!';
+    else grade = 'Keep Practicing!';
+
+    alert(`Game Complete!\n\nTotal Score: ${totalScore}\nAverage Margin: ${avg.toFixed(1)}%\nGrade: ${grade}\n\nYou've mastered the art of margin maximization!`);
+}
+
+// Initialize first challenge
+generateChallenge(challenges[0].type);
+updateStats();
+</script>
+</body>
+</html>
