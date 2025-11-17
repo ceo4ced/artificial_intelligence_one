@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chart Switcher - Data Visualization Game</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 0; }
+.nav-header { background: #2d3748; padding: 15px 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; }
+.nav-header a { color: #90cdf4; text-decoration: none; font-weight: 600; font-size: 1.1em; }
+.nav-title { color: #fff; font-size: 1.2em; font-weight: 700; }
+.container { max-width: 1400px; margin: 20px auto; background: #fff; border-radius: 15px; padding: 30px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+h1 { text-align: center; color: #2d3748; font-size: 2.5em; margin-bottom: 10px; }
+.subtitle { text-align: center; color: #666; margin-bottom: 30px; font-size: 1.1em; }
+.game-area { display: grid; grid-template-columns: 350px 1fr; gap: 30px; }
+.sidebar { background: #f8f9fa; padding: 20px; border-radius: 10px; height: fit-content; }
+button { width: 100%; padding: 12px; margin: 5px 0; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.2s; }
+.btn-primary { background: #4CAF50; color: #fff; }
+.btn-primary:hover { background: #45a049; }
+.btn-secondary { background: #2196F3; color: #fff; }
+.btn-secondary:hover { background: #1976d2; }
+.btn-danger { background: #f44336; color: #fff; }
+.btn-danger:hover { background: #d32f2f; }
+canvas { border: 2px solid #ddd; border-radius: 8px; display: block; background: #fff; margin: 20px auto; }
+.chart-selector { margin: 20px 0; }
+.chart-btn { width: 48%; display: inline-block; padding: 15px; margin: 2px; border: 2px solid #ddd; background: #fff; color: #333; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 1em; transition: all 0.2s; }
+.chart-btn:hover { border-color: #667eea; transform: translateY(-2px); }
+.chart-btn.selected { background: #667eea; color: #fff; border-color: #667eea; }
+.chart-btn.correct { background: #4CAF50; color: #fff; border-color: #4CAF50; }
+.chart-btn.incorrect { background: #f44336; color: #fff; border-color: #f44336; }
+.chart-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+.stats { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; padding: 15px; border-radius: 10px; margin-top: 15px; }
+.stat-row { display: flex; justify-content: space-between; margin: 8px 0; font-size: 1em; }
+.score-board { background: #fff9c4; padding: 20px; border-radius: 10px; text-align: center; margin: 20px 0; border: 2px solid #fbc02d; }
+.score-board h2 { color: #f57c00; margin-bottom: 10px; }
+.score-value { font-size: 3em; font-weight: bold; color: #667eea; }
+.scenario-info { background: #e3f2fd; padding: 15px; border-radius: 8px; margin: 15px 0; }
+.scenario-info h4 { color: #1976d2; margin-bottom: 10px; }
+.scenario-info p { line-height: 1.6; font-size: 0.95em; }
+.feedback-box { background: #f0f0f0; padding: 20px; border-radius: 10px; margin: 20px 0; display: none; }
+.feedback-box.show { display: block; animation: slideIn 0.3s; }
+.feedback-box.correct { background: #e8f5e9; border-left: 4px solid #4CAF50; }
+.feedback-box.incorrect { background: #ffebee; border-left: 4px solid #f44336; }
+.feedback-box h3 { margin-bottom: 10px; }
+.feedback-box.correct h3 { color: #2e7d32; }
+.feedback-box.incorrect h3 { color: #c62828; }
+@keyframes slideIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+.progress-bar { background: #e0e0e0; height: 8px; border-radius: 4px; margin: 15px 0; overflow: hidden; }
+.progress-fill { background: linear-gradient(90deg, #4CAF50, #45a049); height: 100%; transition: width 0.3s; }
+.info-box { background: #fff3e0; padding: 15px; border-radius: 8px; margin: 15px 0; border-left: 4px solid #ff9800; }
+.info-box h4 { color: #e65100; margin-bottom: 8px; }
+.info-box p { font-size: 0.9em; line-height: 1.6; }
+</style>
+</head>
+<body>
+<nav class="nav-header">
+    <div class="nav-title">📊 Chart Switcher</div>
+    <a href="../../index.html">← Back to Home</a>
+</nav>
+<div class="container">
+    <h1>📊 Chart Switcher</h1>
+    <p class="subtitle">Choose the best chart type for each dataset!</p>
+
+    <div class="game-area">
+        <div class="sidebar">
+            <h3>🎮 Game Progress</h3>
+
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar" style="width: 0%"></div>
+            </div>
+
+            <div class="stats">
+                <div class="stat-row"><span>Scenario:</span><span id="currentScenario">1 / 10</span></div>
+                <div class="stat-row"><span>Score:</span><span id="score">0</span></div>
+                <div class="stat-row"><span>Correct:</span><span id="correct">0</span></div>
+                <div class="stat-row"><span>Accuracy:</span><span id="accuracy">0%</span></div>
+            </div>
+
+            <div class="scenario-info" id="scenarioInfo">
+                <h4>📋 Current Dataset:</h4>
+                <p id="scenarioDescription">Loading...</p>
+            </div>
+
+            <h3 style="margin-top: 20px;">Select Chart Type:</h3>
+            <div class="chart-selector">
+                <button class="chart-btn" onclick="selectChart('bar')">📊 Bar Chart</button>
+                <button class="chart-btn" onclick="selectChart('line')">📈 Line Chart</button>
+                <button class="chart-btn" onclick="selectChart('pie')">🥧 Pie Chart</button>
+                <button class="chart-btn" onclick="selectChart('scatter')">⚫ Scatter Plot</button>
+            </div>
+
+            <button class="btn-primary" onclick="submitAnswer()" id="submitBtn" disabled>✅ Submit Answer</button>
+            <button class="btn-secondary" onclick="nextScenario()" id="nextBtn" style="display: none;">➡️ Next Scenario</button>
+            <button class="btn-danger" onclick="resetGame()">🔄 Restart Game</button>
+
+            <div class="info-box">
+                <h4>💡 How to Play:</h4>
+                <p>
+                    1. Read the dataset description<br>
+                    2. View the data in different chart formats<br>
+                    3. Choose the BEST chart type<br>
+                    4. Submit and see how you did!<br><br>
+                    <strong>Score: 100 points per correct answer!</strong>
+                </p>
+            </div>
+        </div>
+
+        <div>
+            <div class="score-board">
+                <h2>Current View</h2>
+                <div style="font-size: 1.3em; color: #667eea; font-weight: 600;" id="currentView">Click a chart type to preview</div>
+            </div>
+
+            <canvas id="canvas" width="900" height="500"></canvas>
+
+            <div class="feedback-box" id="feedbackBox">
+                <h3 id="feedbackTitle">Feedback</h3>
+                <p id="feedbackText"></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+
+let currentScenarioIndex = 0;
+let selectedChart = null;
+let score = 0;
+let correctCount = 0;
+let answeredScenarios = 0;
+
+const scenarios = [
+    {
+        title: 'Monthly Website Traffic',
+        description: 'Data showing the number of visitors to a website each month from January to December.',
+        correct: 'line',
+        explanation: 'Line charts are perfect for time series data! They show trends over time and make it easy to spot patterns like seasonal changes or growth.',
+        wrongExplanation: 'This is time series data showing change over months. A line chart would better show the trend and continuous nature of the data.',
+        data: {
+            type: 'time',
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+            values: [2400, 2800, 3200, 3500, 4100, 4500, 4800, 4600, 4200, 3800, 3400, 5200]
+        }
+    },
+    {
+        title: 'Company Budget Breakdown',
+        description: 'How a company allocates its $1M annual budget: Salaries (50%), Marketing (20%), R&D (15%), Operations (10%), Other (5%).',
+        correct: 'pie',
+        explanation: 'Pie charts excel at showing parts of a whole! When you need to see proportions and percentages that add up to 100%, pie charts are the way to go.',
+        wrongExplanation: 'This data shows how parts make up a whole (100% of budget). A pie chart would instantly show these proportions visually.',
+        data: {
+            type: 'proportion',
+            labels: ['Salaries', 'Marketing', 'R&D', 'Operations', 'Other'],
+            values: [50, 20, 15, 10, 5]
+        }
+    },
+    {
+        title: 'Sales by Product Category',
+        description: 'Comparing total sales across 5 different product categories: Electronics, Clothing, Food, Toys, and Books.',
+        correct: 'bar',
+        explanation: 'Bar charts are ideal for comparing discrete categories! They make it easy to see which category has the highest or lowest values at a glance.',
+        wrongExplanation: 'This data compares different categories. A bar chart would make the comparison clearer and easier to read than other chart types.',
+        data: {
+            type: 'category',
+            labels: ['Electronics', 'Clothing', 'Food', 'Toys', 'Books'],
+            values: [85000, 62000, 43000, 51000, 38000]
+        }
+    },
+    {
+        title: 'Height vs Weight Correlation',
+        description: 'Data from 40 people showing their height (inches) and weight (pounds) to see if there\'s a relationship.',
+        correct: 'scatter',
+        explanation: 'Scatter plots are perfect for finding relationships between two variables! Each point represents one person, and you can see if taller people tend to weigh more.',
+        wrongExplanation: 'This data explores the relationship between two continuous variables. A scatter plot would reveal any correlation or pattern between height and weight.',
+        data: {
+            type: 'correlation',
+            points: generateCorrelatedPoints(40, 0.7)
+        }
+    },
+    {
+        title: 'Quarterly Revenue Growth',
+        description: 'Company revenue tracked over 12 quarters (3 years) showing business performance over time.',
+        correct: 'line',
+        explanation: 'Line charts show trends over time beautifully! They help you see growth patterns, seasonal variations, and overall trajectory.',
+        wrongExplanation: 'Sequential time data like quarterly revenue is best shown with a line chart to visualize the growth trend clearly.',
+        data: {
+            type: 'time',
+            labels: ['Q1 22', 'Q2 22', 'Q3 22', 'Q4 22', 'Q1 23', 'Q2 23', 'Q3 23', 'Q4 23', 'Q1 24', 'Q2 24', 'Q3 24', 'Q4 24'],
+            values: [120, 135, 148, 165, 158, 172, 185, 195, 188, 205, 220, 240]
+        }
+    },
+    {
+        title: 'Market Share by Company',
+        description: 'The smartphone market is divided among Apple (35%), Samsung (28%), Xiaomi (15%), Others (22%).',
+        correct: 'pie',
+        explanation: 'Pie charts are perfect for market share! They instantly show who has the biggest slice of the market and how it\'s divided.',
+        wrongExplanation: 'Market share shows parts of a whole market. A pie chart is the standard way to visualize market distribution.',
+        data: {
+            type: 'proportion',
+            labels: ['Apple', 'Samsung', 'Xiaomi', 'Others'],
+            values: [35, 28, 15, 22]
+        }
+    },
+    {
+        title: 'Employee Count by Department',
+        description: 'A comparison of how many employees work in each department: Sales, Engineering, Marketing, HR, and Finance.',
+        correct: 'bar',
+        explanation: 'Bar charts make category comparisons crystal clear! You can instantly see which departments are largest and smallest.',
+        wrongExplanation: 'Comparing quantities across different departments is a classic use case for bar charts, not other types.',
+        data: {
+            type: 'category',
+            labels: ['Sales', 'Engineering', 'Marketing', 'HR', 'Finance'],
+            values: [45, 72, 28, 15, 22]
+        }
+    },
+    {
+        title: 'Study Time vs Test Scores',
+        description: 'Data from 35 students showing hours studied and their test score to find if studying more helps.',
+        correct: 'scatter',
+        explanation: 'Scatter plots reveal relationships! You can see if there\'s a positive correlation (more studying = higher scores) or not.',
+        wrongExplanation: 'To explore if two variables are related, scatter plots are the right tool. They show patterns and correlations clearly.',
+        data: {
+            type: 'correlation',
+            points: generateCorrelatedPoints(35, 0.8)
+        }
+    },
+    {
+        title: 'Daily Temperature Over 2 Weeks',
+        description: 'Temperature readings (in °F) recorded each day for 14 consecutive days.',
+        correct: 'line',
+        explanation: 'Line charts are excellent for continuous time-based measurements! They show the flow and variation of temperature over time.',
+        wrongExplanation: 'Daily temperature is continuous time series data. Line charts connect the points to show the temperature trend.',
+        data: {
+            type: 'time',
+            labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+            values: [72, 75, 78, 76, 74, 71, 69, 70, 73, 76, 79, 82, 80, 77]
+        }
+    },
+    {
+        title: 'Survey: Favorite Ice Cream Flavor',
+        description: 'Survey results showing what percentage of people chose each flavor: Chocolate (30%), Vanilla (25%), Strawberry (20%), Mint (15%), Other (10%).',
+        correct: 'pie',
+        explanation: 'Pie charts are ideal for survey results showing preferences! Each slice represents what portion of respondents chose each option.',
+        wrongExplanation: 'Survey percentages that sum to 100% are perfectly suited for pie charts, which show parts of the whole survey.',
+        data: {
+            type: 'proportion',
+            labels: ['Chocolate', 'Vanilla', 'Strawberry', 'Mint', 'Other'],
+            values: [30, 25, 20, 15, 10]
+        }
+    }
+];
+
+function generateCorrelatedPoints(count, correlation) {
+    const points = [];
+    for (let i = 0; i < count; i++) {
+        const x = Math.random() * 80 + 10;
+        const y = x * correlation + (Math.random() * 40) + 10;
+        points.push({ x, y });
+    }
+    return points;
+}
+
+function selectChart(type) {
+    if (answeredScenarios > currentScenarioIndex) return; // Already answered
+
+    selectedChart = type;
+    document.querySelectorAll('.chart-btn').forEach(btn => {
+        btn.classList.remove('selected');
+    });
+    event.target.classList.add('selected');
+
+    document.getElementById('submitBtn').disabled = false;
+    document.getElementById('currentView').textContent = getChartName(type);
+
+    drawChart(type);
+}
+
+function getChartName(type) {
+    const names = {
+        bar: '📊 Bar Chart View',
+        line: '📈 Line Chart View',
+        pie: '🥧 Pie Chart View',
+        scatter: '⚫ Scatter Plot View'
+    };
+    return names[type] || 'Unknown';
+}
+
+function submitAnswer() {
+    if (!selectedChart) return;
+
+    const scenario = scenarios[currentScenarioIndex];
+    const isCorrect = selectedChart === scenario.correct;
+
+    // Disable chart selection buttons
+    document.querySelectorAll('.chart-btn').forEach(btn => {
+        btn.disabled = true;
+        if (btn.textContent.toLowerCase().includes(scenario.correct)) {
+            btn.classList.add('correct');
+        }
+        if (btn.classList.contains('selected') && !isCorrect) {
+            btn.classList.add('incorrect');
+        }
+    });
+
+    // Update stats
+    if (isCorrect) {
+        score += 100;
+        correctCount++;
+    }
+    answeredScenarios++;
+
+    document.getElementById('score').textContent = score;
+    document.getElementById('correct').textContent = correctCount;
+    document.getElementById('accuracy').textContent = Math.round((correctCount / answeredScenarios) * 100) + '%';
+
+    // Show feedback
+    const feedbackBox = document.getElementById('feedbackBox');
+    const feedbackTitle = document.getElementById('feedbackTitle');
+    const feedbackText = document.getElementById('feedbackText');
+
+    feedbackBox.className = 'feedback-box show ' + (isCorrect ? 'correct' : 'incorrect');
+    feedbackTitle.textContent = isCorrect ? '✅ Correct!' : '❌ Incorrect';
+    feedbackText.textContent = isCorrect ? scenario.explanation : scenario.wrongExplanation + '\n\nCorrect answer: ' + getChartName(scenario.correct);
+
+    // Update buttons
+    document.getElementById('submitBtn').style.display = 'none';
+    document.getElementById('nextBtn').style.display = currentScenarioIndex < scenarios.length - 1 ? 'block' : 'none';
+
+    // Draw the correct chart
+    drawChart(scenario.correct);
+}
+
+function nextScenario() {
+    currentScenarioIndex++;
+
+    if (currentScenarioIndex >= scenarios.length) {
+        showFinalScore();
+        return;
+    }
+
+    // Reset UI
+    selectedChart = null;
+    document.querySelectorAll('.chart-btn').forEach(btn => {
+        btn.classList.remove('selected', 'correct', 'incorrect');
+        btn.disabled = false;
+    });
+
+    document.getElementById('submitBtn').style.display = 'block';
+    document.getElementById('submitBtn').disabled = true;
+    document.getElementById('nextBtn').style.display = 'none';
+    document.getElementById('feedbackBox').classList.remove('show');
+    document.getElementById('currentView').textContent = 'Click a chart type to preview';
+
+    // Update progress
+    updateScenarioDisplay();
+
+    // Clear canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#f0f0f0';
+    ctx.font = '24px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('Select a chart type to preview', canvas.width / 2, canvas.height / 2);
+}
+
+function updateScenarioDisplay() {
+    const scenario = scenarios[currentScenarioIndex];
+
+    document.getElementById('currentScenario').textContent = `${currentScenarioIndex + 1} / ${scenarios.length}`;
+    document.getElementById('scenarioDescription').textContent = scenario.description;
+
+    const progress = ((currentScenarioIndex) / scenarios.length) * 100;
+    document.getElementById('progressBar').style.width = progress + '%';
+}
+
+function showFinalScore() {
+    const percentage = Math.round((correctCount / scenarios.length) * 100);
+    let grade = '';
+
+    if (percentage === 100) grade = 'Perfect! 🏆';
+    else if (percentage >= 90) grade = 'Excellent! ⭐';
+    else if (percentage >= 80) grade = 'Great Job! 👍';
+    else if (percentage >= 70) grade = 'Good! 😊';
+    else if (percentage >= 60) grade = 'Not Bad! 👌';
+    else grade = 'Keep Practicing! 💪';
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    ctx.fillStyle = '#667eea';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 48px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('Game Complete!', canvas.width / 2, 120);
+
+    ctx.font = '36px Arial';
+    ctx.fillText(grade, canvas.width / 2, 180);
+
+    ctx.font = 'bold 72px Arial';
+    ctx.fillText(score + ' points', canvas.width / 2, 280);
+
+    ctx.font = '28px Arial';
+    ctx.fillText(`${correctCount} / ${scenarios.length} correct (${percentage}%)`, canvas.width / 2, 340);
+
+    ctx.font = '20px Arial';
+    ctx.fillText('Click "Restart Game" to play again!', canvas.width / 2, 420);
+
+    document.getElementById('nextBtn').style.display = 'none';
+    document.getElementById('progressBar').style.width = '100%';
+}
+
+function resetGame() {
+    currentScenarioIndex = 0;
+    selectedChart = null;
+    score = 0;
+    correctCount = 0;
+    answeredScenarios = 0;
+
+    document.getElementById('score').textContent = '0';
+    document.getElementById('correct').textContent = '0';
+    document.getElementById('accuracy').textContent = '0%';
+
+    document.querySelectorAll('.chart-btn').forEach(btn => {
+        btn.classList.remove('selected', 'correct', 'incorrect');
+        btn.disabled = false;
+    });
+
+    document.getElementById('submitBtn').style.display = 'block';
+    document.getElementById('submitBtn').disabled = true;
+    document.getElementById('nextBtn').style.display = 'none';
+    document.getElementById('feedbackBox').classList.remove('show');
+
+    updateScenarioDisplay();
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#f0f0f0';
+    ctx.font = '24px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('Select a chart type to preview', canvas.width / 2, canvas.height / 2);
+}
+
+function drawChart(type) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const scenario = scenarios[currentScenarioIndex];
+    const data = scenario.data;
+
+    switch(type) {
+        case 'bar':
+            drawBarChart(scenario.title, data);
+            break;
+        case 'line':
+            drawLineChart(scenario.title, data);
+            break;
+        case 'pie':
+            drawPieChart(scenario.title, data);
+            break;
+        case 'scatter':
+            drawScatterPlot(scenario.title, data);
+            break;
+    }
+}
+
+function drawBarChart(title, data) {
+    const chartArea = { x: 100, y: 80, width: 700, height: 340 };
+    const barWidth = (chartArea.width / data.labels.length) - 20;
+    const maxValue = Math.max(...data.values);
+
+    // Title
+    ctx.fillStyle = '#2d3748';
+    ctx.font = 'bold 20px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText(title, canvas.width / 2, 40);
+
+    // Axes
+    ctx.strokeStyle = '#333';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(chartArea.x, chartArea.y);
+    ctx.lineTo(chartArea.x, chartArea.y + chartArea.height);
+    ctx.lineTo(chartArea.x + chartArea.width, chartArea.y + chartArea.height);
+    ctx.stroke();
+
+    // Y-axis grid and labels
+    ctx.fillStyle = '#666';
+    ctx.font = '12px Arial';
+    ctx.textAlign = 'right';
+    for (let i = 0; i <= 5; i++) {
+        const value = Math.round(maxValue * i / 5);
+        const y = chartArea.y + chartArea.height - (chartArea.height * i / 5);
+        ctx.fillText(formatValue(value), chartArea.x - 10, y + 5);
+
+        ctx.strokeStyle = '#e0e0e0';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(chartArea.x, y);
+        ctx.lineTo(chartArea.x + chartArea.width, y);
+        ctx.stroke();
+    }
+
+    // Bars
+    const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E2'];
+    data.labels.forEach((label, i) => {
+        const x = chartArea.x + (i * (chartArea.width / data.labels.length)) + 30;
+        const barHeight = (data.values[i] / maxValue) * chartArea.height;
+        const y = chartArea.y + chartArea.height - barHeight;
+
+        ctx.fillStyle = colors[i % colors.length];
+        ctx.fillRect(x, y, barWidth, barHeight);
+
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(x, y, barWidth, barHeight);
+
+        // X-axis labels
+        ctx.fillStyle = '#666';
+        ctx.font = '11px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText(label, x + barWidth / 2, chartArea.y + chartArea.height + 20);
+    });
+}
+
+function drawLineChart(title, data) {
+    const chartArea = { x: 100, y: 80, width: 700, height: 340 };
+    const maxValue = Math.max(...data.values);
+
+    // Title
+    ctx.fillStyle = '#2d3748';
+    ctx.font = 'bold 20px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText(title, canvas.width / 2, 40);
+
+    // Axes
+    ctx.strokeStyle = '#333';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(chartArea.x, chartArea.y);
+    ctx.lineTo(chartArea.x, chartArea.y + chartArea.height);
+    ctx.lineTo(chartArea.x + chartArea.width, chartArea.y + chartArea.height);
+    ctx.stroke();
+
+    // Grid and Y-axis labels
+    ctx.fillStyle = '#666';
+    ctx.font = '12px Arial';
+    ctx.textAlign = 'right';
+    for (let i = 0; i <= 5; i++) {
+        const value = Math.round(maxValue * i / 5);
+        const y = chartArea.y + chartArea.height - (chartArea.height * i / 5);
+        ctx.fillText(formatValue(value), chartArea.x - 10, y + 5);
+
+        ctx.strokeStyle = '#e0e0e0';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(chartArea.x, y);
+        ctx.lineTo(chartArea.x + chartArea.width, y);
+        ctx.stroke();
+    }
+
+    // Line
+    const pointSpacing = chartArea.width / (data.labels.length - 1);
+
+    ctx.strokeStyle = '#4CAF50';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+
+    data.values.forEach((value, i) => {
+        const x = chartArea.x + (i * pointSpacing);
+        const y = chartArea.y + chartArea.height - (value / maxValue * chartArea.height);
+
+        if (i === 0) {
+            ctx.moveTo(x, y);
+        } else {
+            ctx.lineTo(x, y);
+        }
+    });
+    ctx.stroke();
+
+    // Points and labels
+    data.values.forEach((value, i) => {
+        const x = chartArea.x + (i * pointSpacing);
+        const y = chartArea.y + chartArea.height - (value / maxValue * chartArea.height);
+
+        ctx.fillStyle = '#2196F3';
+        ctx.beginPath();
+        ctx.arc(x, y, 5, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // X-axis labels
+        ctx.fillStyle = '#666';
+        ctx.font = '11px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText(data.labels[i], x, chartArea.y + chartArea.height + 20);
+    });
+}
+
+function drawPieChart(title, data) {
+    const centerX = canvas.width / 2;
+    const centerY = 280;
+    const radius = 150;
+
+    // Title
+    ctx.fillStyle = '#2d3748';
+    ctx.font = 'bold 20px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText(title, canvas.width / 2, 40);
+
+    const total = data.values.reduce((sum, val) => sum + val, 0);
+    const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8', '#F7DC6F', '#BB8FCE'];
+
+    let currentAngle = -Math.PI / 2;
+
+    data.values.forEach((value, i) => {
+        const sliceAngle = (value / total) * 2 * Math.PI;
+
+        // Draw slice
+        ctx.fillStyle = colors[i % colors.length];
+        ctx.beginPath();
+        ctx.moveTo(centerX, centerY);
+        ctx.arc(centerX, centerY, radius, currentAngle, currentAngle + sliceAngle);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 3;
+        ctx.stroke();
+
+        // Percentage labels
+        const percentage = ((value / total) * 100).toFixed(1);
+        const labelAngle = currentAngle + sliceAngle / 2;
+        const labelX = centerX + Math.cos(labelAngle) * (radius * 0.7);
+        const labelY = centerY + Math.sin(labelAngle) * (radius * 0.7);
+
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold 16px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText(percentage + '%', labelX, labelY);
+
+        currentAngle += sliceAngle;
+    });
+
+    // Legend
+    const legendX = 80;
+    const legendY = 100;
+
+    data.labels.forEach((label, i) => {
+        const y = legendY + i * 35;
+
+        // Color box
+        ctx.fillStyle = colors[i % colors.length];
+        ctx.fillRect(legendX, y, 25, 25);
+        ctx.strokeStyle = '#333';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(legendX, y, 25, 25);
+
+        // Label
+        ctx.fillStyle = '#333';
+        ctx.font = '14px Arial';
+        ctx.textAlign = 'left';
+        const percentage = ((data.values[i] / total) * 100).toFixed(1);
+        ctx.fillText(`${label} (${percentage}%)`, legendX + 35, y + 18);
+    });
+}
+
+function drawScatterPlot(title, data) {
+    const chartArea = { x: 100, y: 80, width: 700, height: 340 };
+
+    // Title
+    ctx.fillStyle = '#2d3748';
+    ctx.font = 'bold 20px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText(title, canvas.width / 2, 40);
+
+    // Axes
+    ctx.strokeStyle = '#333';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(chartArea.x, chartArea.y);
+    ctx.lineTo(chartArea.x, chartArea.y + chartArea.height);
+    ctx.lineTo(chartArea.x + chartArea.width, chartArea.y + chartArea.height);
+    ctx.stroke();
+
+    // Grid
+    ctx.strokeStyle = '#e0e0e0';
+    ctx.lineWidth = 1;
+
+    for (let i = 0; i <= 5; i++) {
+        const y = chartArea.y + (chartArea.height * i / 5);
+        ctx.beginPath();
+        ctx.moveTo(chartArea.x, y);
+        ctx.lineTo(chartArea.x + chartArea.width, y);
+        ctx.stroke();
+
+        const x = chartArea.x + (chartArea.width * i / 5);
+        ctx.beginPath();
+        ctx.moveTo(x, chartArea.y);
+        ctx.lineTo(x, chartArea.y + chartArea.height);
+        ctx.stroke();
+
+        // Axis labels
+        ctx.fillStyle = '#666';
+        ctx.font = '12px Arial';
+        ctx.textAlign = 'right';
+        const yValue = (5 - i) * 20;
+        ctx.fillText(yValue, chartArea.x - 10, y + 5);
+
+        ctx.textAlign = 'center';
+        const xValue = i * 20;
+        ctx.fillText(xValue, x, chartArea.y + chartArea.height + 20);
+    }
+
+    // Plot points
+    if (data.points) {
+        data.points.forEach(point => {
+            const x = chartArea.x + (point.x / 100) * chartArea.width;
+            const y = chartArea.y + chartArea.height - (point.y / 100) * chartArea.height;
+
+            ctx.fillStyle = '#2196F3';
+            ctx.beginPath();
+            ctx.arc(x, y, 5, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        });
+    }
+}
+
+function formatValue(value) {
+    if (value >= 1000000) {
+        return (value / 1000000).toFixed(1) + 'M';
+    } else if (value >= 1000) {
+        return (value / 1000).toFixed(0) + 'K';
+    }
+    return value.toString();
+}
+
+// Initialize
+updateScenarioDisplay();
+ctx.fillStyle = '#f0f0f0';
+ctx.font = '24px Arial';
+ctx.textAlign = 'center';
+ctx.fillText('Select a chart type to preview', canvas.width / 2, canvas.height / 2);
+</script>
+</body>
+</html>

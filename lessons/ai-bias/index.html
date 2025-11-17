@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Bias - Interactive Lesson</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 0; }
+.nav-header { background: #2d3748; padding: 15px 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; }
+.nav-header a { color: #90cdf4; text-decoration: none; font-weight: 600; font-size: 1.1em; }
+.nav-title { color: #fff; font-size: 1.2em; font-weight: 700; }
+.container { max-width: 1400px; margin: 20px auto; background: #fff; border-radius: 15px; padding: 30px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+h1 { text-align: center; color: #2d3748; font-size: 2.5em; margin-bottom: 20px; }
+.intro { background: #e3f2fd; padding: 20px; border-radius: 10px; margin-bottom: 30px; line-height: 1.6; }
+.intro h2 { color: #1976d2; margin-bottom: 10px; }
+.content-section { margin: 30px 0; }
+.content-section h2 { color: #2d3748; margin-bottom: 15px; font-size: 1.8em; }
+.content-section h3 { color: #667eea; margin: 20px 0 10px 0; font-size: 1.4em; }
+.content-section p { line-height: 1.8; color: #4a5568; margin-bottom: 15px; }
+.example-box { background: #fff9c4; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #fbc02d; }
+.example-box h4 { color: #f57c00; margin-bottom: 10px; }
+.key-concepts { background: #e8f5e9; padding: 20px; border-radius: 8px; margin: 20px 0; }
+.key-concepts h3 { color: #2e7d32; margin-bottom: 15px; }
+.key-concepts ul { margin-left: 20px; line-height: 1.8; }
+.bias-types { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin: 20px 0; }
+.bias-card { background: #f8f9fa; padding: 20px; border-radius: 10px; border: 2px solid #e9ecef; }
+.bias-card h4 { color: #667eea; margin-bottom: 10px; }
+.bias-card p { color: #4a5568; line-height: 1.6; font-size: 0.95em; }
+.interactive-demo { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; padding: 25px; border-radius: 10px; margin: 30px 0; text-align: center; }
+.demo-button { background: #fff; color: #667eea; padding: 15px 30px; border: none; border-radius: 8px; font-weight: 600; font-size: 1.1em; cursor: pointer; margin: 10px; transition: all 0.3s; }
+.demo-button:hover { transform: scale(1.05); box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+.canvas-container { text-align: center; margin: 20px 0; }
+canvas { border: 2px solid #ddd; border-radius: 8px; background: #fafafa; max-width: 100%; }
+.real-world { background: #ffebee; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #c62828; }
+.real-world h3 { color: #c62828; margin-bottom: 15px; }
+</style>
+</head>
+<body>
+<nav class="nav-header">
+    <div class="nav-title">⚖️ AI Bias</div>
+    <a href="../../index.html">← Back to Home</a>
+</nav>
+<div class="container">
+    <h1>⚖️ AI Bias - Understanding How Systems Become Unfair</h1>
+
+    <div class="intro">
+        <h2>What is AI Bias?</h2>
+        <p>
+            AI bias occurs when an AI system produces unfair or skewed results because of flawed data,
+            biased assumptions, or problematic design choices. Just like humans can have unconscious biases,
+            AI systems can inherit and even amplify biases from their training data and creators.
+        </p>
+        <p>
+            Understanding AI bias is crucial because AI systems are increasingly making decisions that affect
+            people's lives - from job applications to loan approvals to criminal justice.
+        </p>
+    </div>
+
+    <div class="content-section">
+        <h2>Why Does AI Bias Matter?</h2>
+        <p>
+            When AI systems are biased, they can:
+        </p>
+        <ul style="margin-left: 40px; line-height: 1.8; color: #4a5568;">
+            <li>Discriminate against certain groups of people</li>
+            <li>Reinforce existing social inequalities</li>
+            <li>Make unfair decisions about jobs, loans, healthcare, and justice</li>
+            <li>Amplify stereotypes and misinformation</li>
+            <li>Erode public trust in technology</li>
+        </ul>
+    </div>
+
+    <div class="content-section">
+        <h2>Types of AI Bias</h2>
+
+        <div class="bias-types">
+            <div class="bias-card">
+                <h4>📊 Data Bias</h4>
+                <p>
+                    When training data doesn't represent all groups equally. For example, if a facial
+                    recognition system is trained mostly on light-skinned faces, it will perform poorly
+                    on darker skin tones.
+                </p>
+            </div>
+
+            <div class="bias-card">
+                <h4>🎯 Selection Bias</h4>
+                <p>
+                    When the data used to train the AI doesn't reflect the real world. If you train a
+                    hiring AI only on resumes of people who were hired in the past, it may discriminate
+                    against qualified candidates who don't fit historical patterns.
+                </p>
+            </div>
+
+            <div class="bias-card">
+                <h4>📜 Historical Bias</h4>
+                <p>
+                    When AI learns from historical data that reflects past discrimination. For example,
+                    if men were historically hired more often for tech jobs, an AI might incorrectly
+                    learn that men are better suited for these roles.
+                </p>
+            </div>
+
+            <div class="bias-card">
+                <h4>🔄 Confirmation Bias</h4>
+                <p>
+                    When developers design AI to confirm their existing beliefs rather than discovering
+                    objective truths. This can happen when choosing which features to include or how to
+                    interpret results.
+                </p>
+            </div>
+
+            <div class="bias-card">
+                <h4>⚙️ Algorithmic Bias</h4>
+                <p>
+                    When the way an algorithm processes data creates unfair outcomes. Even with good data,
+                    poorly designed algorithms can produce biased results.
+                </p>
+            </div>
+
+            <div class="bias-card">
+                <h4>🎭 Label Bias</h4>
+                <p>
+                    When human labelers unknowingly add their own biases while tagging training data.
+                    For example, labeling certain behaviors as "suspicious" based on stereotypes.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="real-world">
+        <h3>🚨 Real-World Examples of AI Bias</h3>
+
+        <div class="example-box" style="background: #fff; border-left: 4px solid #667eea; margin: 15px 0;">
+            <h4>Criminal Justice Risk Assessment</h4>
+            <p>
+                AI systems used to predict recidivism (re-offending) have been found to incorrectly flag
+                Black defendants as higher risk twice as often as white defendants, even when controlling
+                for prior criminal history.
+            </p>
+        </div>
+
+        <div class="example-box" style="background: #fff; border-left: 4px solid #667eea; margin: 15px 0;">
+            <h4>Hiring Algorithms</h4>
+            <p>
+                Amazon had to scrap an AI recruiting tool because it discriminated against women. The system
+                was trained on resumes submitted over 10 years, which were predominantly from men, so it
+                learned to penalize resumes containing the word "women's."
+            </p>
+        </div>
+
+        <div class="example-box" style="background: #fff; border-left: 4px solid #667eea; margin: 15px 0;">
+            <h4>Facial Recognition</h4>
+            <p>
+                Studies have shown that commercial facial recognition systems have higher error rates for
+                people with darker skin tones and for women, with the highest error rates for dark-skinned
+                women (up to 35% error rate vs. less than 1% for light-skinned men).
+            </p>
+        </div>
+
+        <div class="example-box" style="background: #fff; border-left: 4px solid #667eea; margin: 15px 0;">
+            <h4>Healthcare AI</h4>
+            <p>
+                An algorithm used to determine which patients need extra medical care was found to favor
+                white patients over Black patients. The bias occurred because the system used healthcare
+                spending as a proxy for health needs, but Black patients historically have less access to
+                healthcare.
+            </p>
+        </div>
+    </div>
+
+    <div class="canvas-container">
+        <h2 style="margin-bottom: 20px;">Interactive Demonstration: Biased Training Data</h2>
+        <canvas id="biasCanvas" width="800" height="400"></canvas>
+        <div style="margin-top: 20px;">
+            <button class="demo-button" onclick="showBalancedData()">Show Balanced Data</button>
+            <button class="demo-button" onclick="showBiasedData()">Show Biased Data</button>
+            <button class="demo-button" onclick="showImpact()">Show Impact on Predictions</button>
+        </div>
+        <div id="demoExplanation" style="margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 8px; text-align: left;">
+            <strong>What you're seeing:</strong> This demo shows how biased training data affects AI predictions.
+            Click the buttons above to see different scenarios.
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>How to Detect and Prevent AI Bias</h2>
+
+        <div class="key-concepts">
+            <h3>Detection Strategies</h3>
+            <ul>
+                <li><strong>Audit your data:</strong> Check if your training data represents all groups fairly</li>
+                <li><strong>Test across demographics:</strong> Measure performance for different groups separately</li>
+                <li><strong>Look for disparate impact:</strong> Check if outcomes differ significantly by protected characteristics</li>
+                <li><strong>Use fairness metrics:</strong> Apply statistical tests to measure bias</li>
+                <li><strong>Get diverse perspectives:</strong> Have people from different backgrounds review the system</li>
+            </ul>
+        </div>
+
+        <div class="key-concepts" style="background: #e1f5fe;">
+            <h3 style="color: #01579b;">Prevention Strategies</h3>
+            <ul>
+                <li><strong>Diverse training data:</strong> Ensure data includes all relevant groups proportionally</li>
+                <li><strong>Careful feature selection:</strong> Avoid using features that correlate with protected attributes</li>
+                <li><strong>Bias correction techniques:</strong> Use debiasing algorithms and fairness constraints</li>
+                <li><strong>Regular monitoring:</strong> Continuously check for bias as the system is used</li>
+                <li><strong>Transparency:</strong> Document how the AI makes decisions so bias can be identified</li>
+                <li><strong>Diverse development teams:</strong> Include people from varied backgrounds in AI development</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="interactive-demo">
+        <h2 style="margin-bottom: 15px;">🎮 Ready to Test Your Understanding?</h2>
+        <p style="margin-bottom: 20px;">Try the Bias Detective game to identify different types of bias in real scenarios!</p>
+        <a href="../../games/ai-bias/index.html" style="text-decoration: none;">
+            <button class="demo-button">Play Bias Detective Game →</button>
+        </a>
+    </div>
+
+    <div class="key-concepts">
+        <h3>Key Takeaways</h3>
+        <ul>
+            <li>AI bias happens when systems produce unfair results due to flawed data or design</li>
+            <li>There are many types of bias: data bias, selection bias, historical bias, and more</li>
+            <li>Real-world AI bias has serious consequences in criminal justice, hiring, healthcare, and other areas</li>
+            <li>Detecting bias requires careful testing across different demographic groups</li>
+            <li>Preventing bias requires diverse data, thoughtful design, and ongoing monitoring</li>
+            <li>Everyone building or using AI has a responsibility to watch for and address bias</li>
+        </ul>
+    </div>
+</div>
+
+<script>
+const canvas = document.getElementById('biasCanvas');
+const ctx = canvas.getContext('2d');
+
+function drawDataPoints(balanced = true) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Draw axes
+    ctx.strokeStyle = '#333';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(50, 350);
+    ctx.lineTo(750, 350);
+    ctx.moveTo(50, 50);
+    ctx.lineTo(50, 350);
+    ctx.stroke();
+
+    // Labels
+    ctx.fillStyle = '#333';
+    ctx.font = '14px Arial';
+    ctx.fillText('Qualification Score', 350, 385);
+    ctx.save();
+    ctx.translate(15, 200);
+    ctx.rotate(-Math.PI/2);
+    ctx.fillText('Selection Rate', 0, 0);
+    ctx.restore();
+
+    // Title
+    ctx.font = 'bold 16px Arial';
+    ctx.fillText(balanced ? 'Balanced Training Data' : 'Biased Training Data', 280, 30);
+
+    // Draw data points
+    if (balanced) {
+        // Group A (blue) - balanced representation
+        ctx.fillStyle = 'rgba(33, 150, 243, 0.7)';
+        for (let i = 0; i < 50; i++) {
+            const x = 100 + Math.random() * 600;
+            const y = 100 + Math.random() * 200;
+            ctx.beginPath();
+            ctx.arc(x, y, 5, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        // Group B (red) - balanced representation
+        ctx.fillStyle = 'rgba(244, 67, 54, 0.7)';
+        for (let i = 0; i < 50; i++) {
+            const x = 100 + Math.random() * 600;
+            const y = 100 + Math.random() * 200;
+            ctx.beginPath();
+            ctx.arc(x, y, 5, 0, Math.PI * 2);
+            ctx.fill();
+        }
+    } else {
+        // Group A (blue) - over-represented
+        ctx.fillStyle = 'rgba(33, 150, 243, 0.7)';
+        for (let i = 0; i < 80; i++) {
+            const x = 100 + Math.random() * 600;
+            const y = 100 + Math.random() * 200;
+            ctx.beginPath();
+            ctx.arc(x, y, 5, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        // Group B (red) - under-represented
+        ctx.fillStyle = 'rgba(244, 67, 54, 0.7)';
+        for (let i = 0; i < 20; i++) {
+            const x = 100 + Math.random() * 600;
+            const y = 100 + Math.random() * 200;
+            ctx.beginPath();
+            ctx.arc(x, y, 5, 0, Math.PI * 2);
+            ctx.fill();
+        }
+    }
+
+    // Legend
+    ctx.fillStyle = 'rgba(33, 150, 243, 0.7)';
+    ctx.fillRect(560, 60, 15, 15);
+    ctx.fillStyle = '#333';
+    ctx.font = '12px Arial';
+    ctx.fillText('Group A', 580, 72);
+
+    ctx.fillStyle = 'rgba(244, 67, 54, 0.7)';
+    ctx.fillRect(560, 85, 15, 15);
+    ctx.fillStyle = '#333';
+    ctx.fillText('Group B', 580, 97);
+}
+
+function showBalancedData() {
+    drawDataPoints(true);
+    document.getElementById('demoExplanation').innerHTML =
+        '<strong>Balanced Data:</strong> Both Group A (blue) and Group B (red) are equally represented ' +
+        'in the training data. This gives the AI a fair chance to learn patterns for both groups.';
+}
+
+function showBiasedData() {
+    drawDataPoints(false);
+    document.getElementById('demoExplanation').innerHTML =
+        '<strong>Biased Data:</strong> Group A (blue) has 80 examples while Group B (red) only has 20. ' +
+        'The AI will learn much more about Group A and may perform poorly on Group B, or even ignore them entirely.';
+}
+
+function showImpact() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Draw comparison
+    ctx.font = 'bold 16px Arial';
+    ctx.fillStyle = '#333';
+    ctx.fillText('Impact on Model Performance', 280, 30);
+
+    // Balanced performance
+    ctx.fillStyle = '#4CAF50';
+    ctx.fillRect(100, 100, 250, 40);
+    ctx.fillStyle = '#fff';
+    ctx.font = '14px Arial';
+    ctx.fillText('Group A: 92% Accuracy', 140, 125);
+
+    ctx.fillStyle = '#4CAF50';
+    ctx.fillRect(100, 160, 245, 40);
+    ctx.fillStyle = '#fff';
+    ctx.fillText('Group B: 90% Accuracy', 140, 185);
+
+    ctx.fillStyle = '#333';
+    ctx.font = 'bold 14px Arial';
+    ctx.fillText('With Balanced Data', 160, 230);
+
+    // Biased performance
+    ctx.fillStyle = '#4CAF50';
+    ctx.fillRect(450, 100, 250, 40);
+    ctx.fillStyle = '#fff';
+    ctx.font = '14px Arial';
+    ctx.fillText('Group A: 93% Accuracy', 490, 125);
+
+    ctx.fillStyle = '#f44336';
+    ctx.fillRect(450, 160, 160, 40);
+    ctx.fillStyle = '#fff';
+    ctx.fillText('Group B: 64% Accuracy', 470, 185);
+
+    ctx.fillStyle = '#333';
+    ctx.font = 'bold 14px Arial';
+    ctx.fillText('With Biased Data', 510, 230);
+
+    // Warning icon
+    ctx.fillStyle = '#f44336';
+    ctx.font = '40px Arial';
+    ctx.fillText('⚠', 620, 192);
+
+    document.getElementById('demoExplanation').innerHTML =
+        '<strong>The Impact:</strong> When training data is biased, the AI performs much worse on ' +
+        'under-represented groups. This can lead to unfair outcomes, like qualified candidates being ' +
+        'rejected or important health conditions being missed. Fair AI requires balanced, representative data.';
+}
+
+// Show balanced data by default
+showBalancedData();
+</script>
+</body>
+</html>

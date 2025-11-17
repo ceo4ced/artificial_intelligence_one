@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Misleading Graphs - How Visuals Can Trick You</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 0; }
+.nav-header { background: #2d3748; padding: 15px 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; }
+.nav-header a { color: #90cdf4; text-decoration: none; font-weight: 600; font-size: 1.1em; }
+.nav-title { color: #fff; font-size: 1.2em; font-weight: 700; }
+.container { max-width: 1400px; margin: 20px auto; background: #fff; border-radius: 15px; padding: 30px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+h1 { text-align: center; color: #2d3748; font-size: 2.5em; margin-bottom: 20px; }
+.intro { background: #ffebee; padding: 20px; border-radius: 10px; margin-bottom: 30px; line-height: 1.6; border-left: 4px solid #d32f2f; }
+.intro h2 { color: #c62828; margin-bottom: 10px; }
+.main-content { display: grid; grid-template-columns: 350px 1fr; gap: 30px; }
+.sidebar { background: #f8f9fa; padding: 20px; border-radius: 10px; height: fit-content; }
+button { width: 100%; padding: 12px; margin: 5px 0; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }
+.btn-primary { background: #4CAF50; color: #fff; }
+.btn-secondary { background: #2196F3; color: #fff; }
+canvas { border: 2px solid #ddd; border-radius: 8px; display: block; background: #fafafa; margin: 0 auto; }
+.explanation { background: #fff9c4; padding: 15px; border-radius: 8px; margin: 15px 0; border-left: 4px solid #fbc02d; }
+.explanation h4 { color: #f57c00; margin-bottom: 8px; }
+.tricks-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin: 20px 0; }
+.trick-card { background: #ffebee; padding: 15px; border-radius: 8px; border-left: 4px solid #d32f2f; }
+.trick-card h4 { color: #c62828; margin-bottom: 8px; }
+.trick-card ul { margin-left: 20px; font-size: 0.9em; line-height: 1.6; }
+.comparison-container { margin: 30px 0; }
+.comparison-title { text-align: center; font-size: 1.3em; color: #2d3748; margin-bottom: 20px; font-weight: 600; }
+.before-after { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 30px; }
+.viz-example { background: #fafafa; padding: 20px; border-radius: 10px; border: 2px solid #ddd; }
+.viz-example h3 { text-align: center; margin-bottom: 15px; padding: 10px; border-radius: 5px; }
+.viz-example.misleading h3 { background: #ffebee; color: #c62828; }
+.viz-example.honest h3 { background: #e8f5e9; color: #2e7d32; }
+.viz-example canvas { display: block; margin: 0 auto; }
+.viz-example .caption { text-align: center; margin-top: 10px; font-size: 0.9em; color: #666; font-style: italic; }
+.chart-selector { margin: 15px 0; }
+.chart-btn { width: 100%; padding: 10px; margin: 5px 0; border: 2px solid #667eea; background: #fff; color: #667eea; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.2s; }
+.chart-btn:hover { background: #667eea; color: #fff; }
+.chart-btn.active { background: #667eea; color: #fff; }
+.key-points { background: #e8f5e9; padding: 15px; border-radius: 8px; margin: 15px 0; }
+.key-points ul { margin-left: 20px; line-height: 1.8; font-size: 0.9em; }
+.game-cta { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; padding: 30px; border-radius: 15px; text-align: center; margin-top: 30px; }
+.game-cta h3 { font-size: 1.8em; margin-bottom: 15px; }
+.game-cta p { font-size: 1.1em; margin-bottom: 20px; opacity: 0.9; }
+.game-cta a { display: inline-block; background: #fff; color: #667eea; padding: 15px 40px; border-radius: 10px; text-decoration: none; font-weight: 700; font-size: 1.2em; transition: all 0.3s; }
+.game-cta a:hover { transform: translateY(-3px); box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
+</style>
+</head>
+<body>
+<nav class="nav-header">
+    <div class="nav-title">Misleading Graphs</div>
+    <a href="../../index.html">← Back to Home</a>
+</nav>
+<div class="container">
+    <h1>Misleading Graphs - How Visuals Can Trick You</h1>
+
+    <div class="intro">
+        <h2>Why Are Misleading Graphs a Problem?</h2>
+        <p>
+            Graphs are powerful tools for communicating data, but they can also be weapons of deception. Whether
+            through ignorance or malicious intent, misleading graphs manipulate viewers into drawing false conclusions.
+            The same data can tell completely different stories depending on how it's visualized. Understanding these
+            tricks is essential for being a critical consumer of information in our data-driven world. From news media
+            to social media to business presentations, misleading graphs are everywhere.
+        </p>
+    </div>
+
+    <div class="main-content">
+        <div class="sidebar">
+            <h3>Manipulation Examples</h3>
+            <div class="chart-selector">
+                <button class="chart-btn active" onclick="showExample(1)">Example 1: Truncated Y-Axis</button>
+                <button class="chart-btn" onclick="showExample(2)">Example 2: Cherry-Picked Data</button>
+                <button class="chart-btn" onclick="showExample(3)">Example 3: Misleading Scale</button>
+                <button class="chart-btn" onclick="showExample(4)">Example 4: Wrong Chart Type</button>
+            </div>
+
+            <div class="key-points">
+                <h4>How to Spot Deception:</h4>
+                <ul>
+                    <li><strong>Check axes:</strong> Does the y-axis start at zero?</li>
+                    <li><strong>Question context:</strong> Is the full story shown?</li>
+                    <li><strong>Verify scale:</strong> Are axes proportional?</li>
+                    <li><strong>Look for labels:</strong> Are units and sources clear?</li>
+                    <li><strong>Think critically:</strong> Who benefits from this message?</li>
+                </ul>
+            </div>
+
+            <div class="explanation">
+                <h4>Stay Vigilant:</h4>
+                <p style="font-size: 0.9em; line-height: 1.6;">
+                    Even well-intentioned people can create misleading graphs by accident. Always approach data
+                    visualizations with a critical eye. Ask questions, check sources, and look for the tricks
+                    outlined in these examples.
+                </p>
+            </div>
+        </div>
+
+        <div>
+            <div class="comparison-container">
+                <div class="comparison-title" id="exampleTitle">Truncated Y-Axis: Misleading vs. Honest</div>
+
+                <div class="before-after" id="exampleContainer">
+                    <!-- Populated by JavaScript -->
+                </div>
+            </div>
+
+            <div class="tricks-grid">
+                <div class="trick-card">
+                    <h4>Truncated Y-Axis</h4>
+                    <ul>
+                        <li>Starting y-axis above zero exaggerates differences</li>
+                        <li>Makes small changes look dramatic</li>
+                        <li>Common in news media and politics</li>
+                        <li>Solution: Always check if axis starts at zero</li>
+                        <li>Context matters - sometimes truncation is valid</li>
+                    </ul>
+                </div>
+                <div class="trick-card">
+                    <h4>Cherry-Picked Data</h4>
+                    <ul>
+                        <li>Showing only data that supports a narrative</li>
+                        <li>Hiding unfavorable time periods or data points</li>
+                        <li>Zooming in on specific ranges to manipulate trends</li>
+                        <li>Solution: Ask for complete dataset</li>
+                        <li>Check if outliers or ranges are excluded</li>
+                    </ul>
+                </div>
+                <div class="trick-card">
+                    <h4>Misleading Scales</h4>
+                    <ul>
+                        <li>Using different scales on dual-axis charts</li>
+                        <li>Non-linear or logarithmic scales without labels</li>
+                        <li>Inconsistent intervals between tick marks</li>
+                        <li>Solution: Verify both axes use consistent scaling</li>
+                        <li>Question why dual axes are necessary</li>
+                    </ul>
+                </div>
+                <div class="trick-card">
+                    <h4>Wrong Chart Types</h4>
+                    <ul>
+                        <li>3D effects distort proportions and areas</li>
+                        <li>Pie charts with too many categories</li>
+                        <li>Area charts that exaggerate volume differences</li>
+                        <li>Solution: Match chart type to data type</li>
+                        <li>Avoid unnecessary 3D and decorative effects</li>
+                    </ul>
+                </div>
+                <div class="trick-card">
+                    <h4>No Context or Labels</h4>
+                    <ul>
+                        <li>Missing units, dates, or sample sizes</li>
+                        <li>No data sources cited</li>
+                        <li>Vague or misleading titles</li>
+                        <li>Solution: Demand complete information</li>
+                        <li>Without context, data is meaningless</li>
+                    </ul>
+                </div>
+                <div class="trick-card">
+                    <h4>Visual Manipulation</h4>
+                    <ul>
+                        <li>Using icons/images that distort size perception</li>
+                        <li>Colors that create false emotional associations</li>
+                        <li>Manipulating aspect ratios to change slope appearance</li>
+                        <li>Solution: Focus on the actual numbers</li>
+                        <li>Don't be swayed by flashy visuals</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="explanation">
+                <h4>Why This Matters in AI and Data Science:</h4>
+                <p style="line-height: 1.8;">
+                    As AI and machine learning become more prevalent, the ability to visualize and interpret data honestly
+                    becomes crucial. <strong>Misleading graphs can hide biased algorithms, poor model performance, or
+                    cherry-picked results.</strong> Data scientists have an ethical responsibility to present results
+                    accurately and transparently. In business, healthcare, criminal justice, and public policy, misleading
+                    visualizations can lead to harmful decisions that affect real people's lives.
+                </p>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 20px;">
+                <div style="background: #ffebee; padding: 15px; border-radius: 8px; border-left: 4px solid #d32f2f;">
+                    <strong>Political Campaigns</strong>
+                    <p style="margin-top: 8px; font-size: 0.9em;">Cherry-picked economic data, truncated job growth charts</p>
+                </div>
+                <div style="background: #ffebee; padding: 15px; border-radius: 8px; border-left: 4px solid #d32f2f;">
+                    <strong>Corporate Marketing</strong>
+                    <p style="margin-top: 8px; font-size: 0.9em;">Exaggerated product effectiveness, misleading comparison charts</p>
+                </div>
+                <div style="background: #ffebee; padding: 15px; border-radius: 8px; border-left: 4px solid #d32f2f;">
+                    <strong>Media Headlines</strong>
+                    <p style="margin-top: 8px; font-size: 0.9em;">Dramatic trends that aren't supported by full data context</p>
+                </div>
+            </div>
+
+            <div style="background: #e3f2fd; padding: 20px; border-radius: 10px; margin-top: 20px; border-left: 4px solid #1976d2;">
+                <h4 style="color: #0d47a1; margin-bottom: 10px;">Real-World Example: Fox News Climate Graph</h4>
+                <p style="line-height: 1.6;">
+                    In 2012, Fox News showed a graph of global temperature changes with a y-axis that started at -0.2°C
+                    instead of zero, making a 0.6°C rise look like temperatures had nearly quadrupled. This is a classic
+                    example of truncated axis manipulation. When you compress the visible range, even tiny changes appear
+                    massive. Always check the axis range to understand the true scale of change!
+                </p>
+            </div>
+
+            <div style="background: #fff3e0; padding: 20px; border-radius: 10px; margin-top: 20px; border-left: 4px solid #ff9800;">
+                <h4 style="color: #e65100; margin-bottom: 10px;">Edward Tufte's Principle: The Lie Factor</h4>
+                <p style="line-height: 1.6;">
+                    Data visualization expert Edward Tufte introduced the concept of the "lie factor" - the ratio of the
+                    size of an effect shown in a graphic to the size of the effect in the actual data. <strong>A lie factor
+                    of 1 is ideal (truthful representation).</strong> Values far from 1 indicate distortion. For example,
+                    if data increases by 10% but the visual makes it look like 50%, the lie factor is 5. Good visualizations
+                    minimize the lie factor.
+                </p>
+            </div>
+
+            <div class="game-cta">
+                <h3>Ready to Test Your Skills?</h3>
+                <p>Put your critical thinking to the test! Identify misleading techniques in deceptive graphs and see the honest versions.</p>
+                <a href="../../games/misleading-graphs/index.html">Play Spot the Sketchy Graph</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const examples = {
+    1: {
+        title: "Truncated Y-Axis: Misleading vs. Honest",
+        misleading: {
+            title: "Misleading: Truncated Y-Axis",
+            caption: "Starting at 95 makes a 3% increase look dramatic - 'Sales skyrocketing!'",
+            draw: (canvas) => drawTruncatedAxis(canvas, true)
+        },
+        honest: {
+            title: "Honest: Full Y-Axis Scale",
+            caption: "Starting at 0 shows the actual modest 3% increase in proper context",
+            draw: (canvas) => drawTruncatedAxis(canvas, false)
+        }
+    },
+    2: {
+        title: "Cherry-Picked Data: Misleading vs. Honest",
+        misleading: {
+            title: "Misleading: Cherry-Picked Time Range",
+            caption: "Showing only Jan-Mar hides the full year decline - 'Stock is rising!'",
+            draw: (canvas) => drawCherryPicked(canvas, true)
+        },
+        honest: {
+            title: "Honest: Complete Time Period",
+            caption: "Full year shows stock actually declined 15% overall",
+            draw: (canvas) => drawCherryPicked(canvas, false)
+        }
+    },
+    3: {
+        title: "Misleading Scale: Misleading vs. Honest",
+        misleading: {
+            title: "Misleading: Dual Axes with Different Scales",
+            caption: "Manipulated scales create false correlation between unrelated variables",
+            draw: (canvas) => drawDualAxis(canvas, true)
+        },
+        honest: {
+            title: "Honest: Single Scale or Proportional Axes",
+            caption: "Proper scaling reveals no real correlation between the variables",
+            draw: (canvas) => drawDualAxis(canvas, false)
+        }
+    },
+    4: {
+        title: "Wrong Chart Type: Misleading vs. Honest",
+        misleading: {
+            title: "Misleading: 3D Pie Chart",
+            caption: "3D perspective and angles distort actual proportions and values",
+            draw: (canvas) => draw3DPie(canvas, true)
+        },
+        honest: {
+            title: "Honest: Simple Bar Chart",
+            caption: "Clear comparison shows actual values without visual distortion",
+            draw: (canvas) => draw3DPie(canvas, false)
+        }
+    }
+};
+
+let currentExample = 1;
+
+function showExample(num) {
+    currentExample = num;
+    document.querySelectorAll('.chart-btn').forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+    renderExample();
+}
+
+function renderExample() {
+    const example = examples[currentExample];
+    document.getElementById('exampleTitle').textContent = example.title;
+
+    const container = document.getElementById('exampleContainer');
+    container.innerHTML = `
+        <div class="viz-example misleading">
+            <h3>${example.misleading.title}</h3>
+            <canvas id="misleadingCanvas" width="500" height="300"></canvas>
+            <div class="caption">${example.misleading.caption}</div>
+        </div>
+        <div class="viz-example honest">
+            <h3>${example.honest.title}</h3>
+            <canvas id="honestCanvas" width="500" height="300"></canvas>
+            <div class="caption">${example.honest.caption}</div>
+        </div>
+    `;
+
+    const misleadingCanvas = document.getElementById('misleadingCanvas');
+    const honestCanvas = document.getElementById('honestCanvas');
+    example.misleading.draw(misleadingCanvas);
+    example.honest.draw(honestCanvas);
+}
+
+function drawTruncatedAxis(canvas, misleading) {
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const data = [98, 98.5, 99, 99.5, 100, 100.5, 101];
+    const labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'];
+
+    const offsetX = 80;
+    const offsetY = 40;
+    const chartWidth = 380;
+    const chartHeight = 200;
+
+    const minValue = misleading ? 95 : 0;
+    const maxValue = misleading ? 102 : 110;
+    const range = maxValue - minValue;
+
+    // Draw axes
+    ctx.strokeStyle = '#333';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(offsetX, offsetY);
+    ctx.lineTo(offsetX, offsetY + chartHeight);
+    ctx.lineTo(offsetX + chartWidth, offsetY + chartHeight);
+    ctx.stroke();
+
+    // Y-axis label
+    ctx.fillStyle = '#333';
+    ctx.font = 'bold 12px Arial';
+    ctx.save();
+    ctx.translate(25, 140);
+    ctx.rotate(-Math.PI / 2);
+    ctx.fillText('Sales ($1000s)', 0, 0);
+    ctx.restore();
+
+    // Y-axis ticks
+    ctx.font = '11px Arial';
+    ctx.textAlign = 'right';
+    for (let i = 0; i <= 5; i++) {
+        const value = minValue + (range * i / 5);
+        const y = offsetY + chartHeight - (i * chartHeight / 5);
+        ctx.fillText(value.toFixed(0), offsetX - 10, y + 4);
+    }
+
+    // Draw line
+    ctx.strokeStyle = '#d32f2f';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+
+    data.forEach((value, i) => {
+        const x = offsetX + (i * chartWidth / (data.length - 1));
+        const y = offsetY + chartHeight - ((value - minValue) / range * chartHeight);
+
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+    });
+
+    ctx.stroke();
+
+    // Draw points and labels
+    ctx.textAlign = 'center';
+    data.forEach((value, i) => {
+        const x = offsetX + (i * chartWidth / (data.length - 1));
+        const y = offsetY + chartHeight - ((value - minValue) / range * chartHeight);
+
+        ctx.fillStyle = '#d32f2f';
+        ctx.beginPath();
+        ctx.arc(x, y, 5, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = '#333';
+        ctx.fillText(labels[i], x, offsetY + chartHeight + 20);
+    });
+
+    // Title
+    ctx.font = 'bold 14px Arial';
+    ctx.fillText(misleading ? 'Sales Skyrocketing!' : 'Monthly Sales (Modest Growth)', 250, 25);
+}
+
+function drawCherryPicked(canvas, misleading) {
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const fullData = [100, 105, 110, 108, 102, 95, 88, 82, 78, 80, 83, 85];
+    const labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+    const displayData = misleading ? fullData.slice(0, 3) : fullData;
+    const displayLabels = misleading ? labels.slice(0, 3) : labels;
+
+    const offsetX = 80;
+    const offsetY = 40;
+    const chartWidth = 380;
+    const chartHeight = 200;
+
+    // Draw axes
+    ctx.strokeStyle = '#333';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(offsetX, offsetY);
+    ctx.lineTo(offsetX, offsetY + chartHeight);
+    ctx.lineTo(offsetX + chartWidth, offsetY + chartHeight);
+    ctx.stroke();
+
+    // Y-axis label
+    ctx.fillStyle = '#333';
+    ctx.font = 'bold 12px Arial';
+    ctx.save();
+    ctx.translate(25, 140);
+    ctx.rotate(-Math.PI / 2);
+    ctx.fillText('Stock Price ($)', 0, 0);
+    ctx.restore();
+
+    // Y-axis ticks
+    ctx.font = '11px Arial';
+    ctx.textAlign = 'right';
+    for (let i = 0; i <= 5; i++) {
+        const value = i * 25;
+        const y = offsetY + chartHeight - (i * chartHeight / 5);
+        ctx.fillText(value, offsetX - 10, y + 4);
+    }
+
+    // Draw line
+    ctx.strokeStyle = misleading ? '#4CAF50' : '#d32f2f';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+
+    displayData.forEach((value, i) => {
+        const x = offsetX + (i * chartWidth / (displayData.length - 1));
+        const y = offsetY + chartHeight - (value / 125 * chartHeight);
+
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+    });
+
+    ctx.stroke();
+
+    // Draw points
+    ctx.textAlign = 'center';
+    displayData.forEach((value, i) => {
+        const x = offsetX + (i * chartWidth / (displayData.length - 1));
+        const y = offsetY + chartHeight - (value / 125 * chartHeight);
+
+        ctx.fillStyle = misleading ? '#4CAF50' : '#d32f2f';
+        ctx.beginPath();
+        ctx.arc(x, y, 5, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = '#333';
+        ctx.font = '10px Arial';
+        ctx.fillText(displayLabels[i], x, offsetY + chartHeight + 20);
+    });
+
+    // Title
+    ctx.font = 'bold 14px Arial';
+    ctx.fillText(misleading ? 'Stock Rising Fast!' : 'Full Year Stock Performance', 250, 25);
+}
+
+function drawDualAxis(canvas, misleading) {
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const iceCream = [100, 120, 180, 250, 300, 280, 200, 150];
+    const drownings = [2, 3, 4, 6, 7, 6, 5, 3];
+    const labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'];
+
+    const offsetX = 80;
+    const offsetY = 40;
+    const chartWidth = 350;
+    const chartHeight = 200;
+
+    // Draw axes
+    ctx.strokeStyle = '#333';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(offsetX, offsetY);
+    ctx.lineTo(offsetX, offsetY + chartHeight);
+    ctx.lineTo(offsetX + chartWidth, offsetY + chartHeight);
+    if (misleading) {
+        ctx.moveTo(offsetX + chartWidth, offsetY);
+        ctx.lineTo(offsetX + chartWidth, offsetY + chartHeight);
+    }
+    ctx.stroke();
+
+    // Left Y-axis (Ice Cream)
+    ctx.fillStyle = '#ff9800';
+    ctx.font = 'bold 11px Arial';
+    ctx.save();
+    ctx.translate(20, 140);
+    ctx.rotate(-Math.PI / 2);
+    ctx.fillText('Ice Cream Sales', 0, 0);
+    ctx.restore();
+
+    // Right Y-axis (Drownings) - only if misleading
+    if (misleading) {
+        ctx.fillStyle = '#2196F3';
+        ctx.save();
+        ctx.translate(480, 140);
+        ctx.rotate(-Math.PI / 2);
+        ctx.fillText('Drownings', 0, 0);
+        ctx.restore();
+    }
+
+    // Draw Ice Cream line
+    ctx.strokeStyle = '#ff9800';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    iceCream.forEach((value, i) => {
+        const x = offsetX + (i * chartWidth / (iceCream.length - 1));
+        const y = offsetY + chartHeight - (value / 300 * chartHeight);
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+    });
+    ctx.stroke();
+
+    // Draw Drownings line
+    ctx.strokeStyle = '#2196F3';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    drownings.forEach((value, i) => {
+        const x = offsetX + (i * chartWidth / (drownings.length - 1));
+        const y = misleading ?
+            offsetY + chartHeight - (value / 7 * chartHeight) :
+            offsetY + chartHeight - (value / 300 * chartHeight);
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+    });
+    ctx.stroke();
+
+    // Labels
+    ctx.fillStyle = '#333';
+    ctx.font = '10px Arial';
+    ctx.textAlign = 'center';
+    labels.forEach((label, i) => {
+        const x = offsetX + (i * chartWidth / (labels.length - 1));
+        ctx.fillText(label, x, offsetY + chartHeight + 20);
+    });
+
+    // Title
+    ctx.font = 'bold 14px Arial';
+    ctx.fillText(
+        misleading ? 'Ice Cream Causes Drowning!' : 'No Real Correlation (Same Scale)',
+        250, 25
+    );
+
+    // Legend
+    ctx.fillStyle = '#ff9800';
+    ctx.fillRect(offsetX, offsetY - 25, 15, 10);
+    ctx.fillStyle = '#333';
+    ctx.font = '11px Arial';
+    ctx.textAlign = 'left';
+    ctx.fillText('Ice Cream', offsetX + 20, offsetY - 17);
+
+    ctx.fillStyle = '#2196F3';
+    ctx.fillRect(offsetX + 120, offsetY - 25, 15, 10);
+    ctx.fillStyle = '#333';
+    ctx.fillText('Drownings', offsetX + 140, offsetY - 17);
+}
+
+function draw3DPie(canvas, misleading) {
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const data = [35, 30, 20, 15];
+    const labels = ['Product A', 'Product B', 'Product C', 'Product D'];
+    const colors = ['#2196F3', '#4CAF50', '#ff9800', '#f44336'];
+
+    if (misleading) {
+        // Draw 3D pie chart with distortion
+        const centerX = 250;
+        const centerY = 150;
+        const radius = 100;
+        const depth = 30;
+
+        // Draw 3D effect (bottom ellipse)
+        let startAngle = -0.5;
+        data.forEach((value, i) => {
+            const angle = (value / 100) * Math.PI * 2;
+
+            ctx.fillStyle = shadeColor(colors[i], -30);
+            ctx.beginPath();
+            ctx.ellipse(centerX, centerY + depth, radius, radius * 0.5, 0, startAngle, startAngle + angle);
+            ctx.lineTo(centerX, centerY + depth);
+            ctx.fill();
+
+            startAngle += angle;
+        });
+
+        // Draw top pie with perspective
+        startAngle = -0.5;
+        data.forEach((value, i) => {
+            const angle = (value / 100) * Math.PI * 2;
+
+            // Add artificial perspective distortion
+            const distortion = i === 0 ? 1.3 : 1.0;
+
+            ctx.fillStyle = colors[i];
+            ctx.beginPath();
+            ctx.ellipse(centerX, centerY, radius * distortion, radius * 0.5, 0, startAngle, startAngle + angle);
+            ctx.lineTo(centerX, centerY);
+            ctx.fill();
+
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            startAngle += angle;
+        });
+
+        // Labels
+        ctx.fillStyle = '#333';
+        ctx.font = 'bold 12px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('Market Share (3D Pie - Distorted!)', 250, 30);
+
+    } else {
+        // Draw honest bar chart
+        const barWidth = 80;
+        const maxHeight = 180;
+        const offsetX = 50;
+        const offsetY = 220;
+
+        data.forEach((value, i) => {
+            const x = offsetX + i * 110;
+            const height = (value / 35) * maxHeight;
+            const y = offsetY - height;
+
+            ctx.fillStyle = colors[i];
+            ctx.fillRect(x, y, barWidth, height);
+
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(x, y, barWidth, height);
+
+            // Value label
+            ctx.fillStyle = '#333';
+            ctx.font = 'bold 14px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(value + '%', x + barWidth / 2, y - 10);
+
+            // Category label
+            ctx.font = '11px Arial';
+            ctx.fillText(labels[i], x + barWidth / 2, offsetY + 20);
+        });
+
+        // Y-axis
+        ctx.strokeStyle = '#333';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(offsetX - 10, offsetY - maxHeight - 10);
+        ctx.lineTo(offsetX - 10, offsetY);
+        ctx.lineTo(offsetX + 440, offsetY);
+        ctx.stroke();
+
+        ctx.fillStyle = '#333';
+        ctx.font = 'bold 12px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('Market Share (Clear Bar Chart)', 250, 30);
+    }
+}
+
+function shadeColor(color, percent) {
+    const num = parseInt(color.replace('#', ''), 16);
+    const amt = Math.round(2.55 * percent);
+    const R = (num >> 16) + amt;
+    const G = (num >> 8 & 0x00FF) + amt;
+    const B = (num & 0x0000FF) + amt;
+    return '#' + (0x1000000 + (R < 255 ? R < 1 ? 0 : R : 255) * 0x10000 +
+        (G < 255 ? G < 1 ? 0 : G : 255) * 0x100 +
+        (B < 255 ? B < 1 ? 0 : B : 255))
+        .toString(16).slice(1);
+}
+
+// Initialize
+renderExample();
+</script>
+</body>
+</html>

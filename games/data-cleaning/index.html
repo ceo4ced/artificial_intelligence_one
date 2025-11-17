@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fix the Dataset - Data Cleaning Game</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 0; }
+.nav-header { background: #2d3748; padding: 15px 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; }
+.nav-header a { color: #90cdf4; text-decoration: none; font-weight: 600; font-size: 1.1em; }
+.nav-title { color: #fff; font-size: 1.2em; font-weight: 700; }
+.container { max-width: 1600px; margin: 20px auto; background: #fff; border-radius: 15px; padding: 30px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+h1 { text-align: center; color: #2d3748; font-size: 2.5em; margin-bottom: 10px; }
+.subtitle { text-align: center; color: #666; margin-bottom: 30px; font-size: 1.1em; }
+.game-area { display: grid; grid-template-columns: 300px 1fr; gap: 30px; }
+.sidebar { background: #f8f9fa; padding: 20px; border-radius: 10px; height: fit-content; position: sticky; top: 20px; }
+button { width: 100%; padding: 12px; margin: 5px 0; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.2s; }
+.btn-primary { background: #4CAF50; color: #fff; }
+.btn-primary:hover { background: #45a049; }
+.btn-secondary { background: #2196F3; color: #fff; }
+.btn-secondary:hover { background: #0b7dda; }
+.btn-danger { background: #f44336; color: #fff; }
+.btn-danger:hover { background: #da190b; }
+.btn-warning { background: #ff9800; color: #fff; }
+.btn-warning:hover { background: #e68900; }
+.dataset-selector { margin: 15px 0; max-height: 400px; overflow-y: auto; }
+.dataset-btn { width: 100%; padding: 12px; margin: 5px 0; border: 2px solid #667eea; background: #fff; color: #667eea; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.2s; text-align: left; font-size: 0.9em; }
+.dataset-btn:hover { background: #f0f0f0; }
+.dataset-btn.active { background: #667eea; color: #fff; }
+.dataset-btn.completed { background: #4CAF50; color: #fff; border-color: #4CAF50; }
+.stats { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; padding: 15px; border-radius: 10px; margin-top: 15px; }
+.stat-row { display: flex; justify-content: space-between; margin: 8px 0; }
+.score-board { background: #fff9c4; padding: 20px; border-radius: 10px; text-align: center; margin: 20px 0; border: 2px solid #fbc02d; }
+.score-board h2 { color: #f57c00; margin-bottom: 10px; font-size: 1.5em; }
+.score-value { font-size: 2.5em; font-weight: bold; color: #667eea; }
+.info-box { background: #e3f2fd; padding: 15px; border-radius: 8px; margin: 15px 0; font-size: 0.9em; line-height: 1.6; }
+.table-container { overflow-x: auto; background: #fff; border-radius: 10px; padding: 20px; }
+.data-table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+.data-table th { background: #667eea; color: #fff; padding: 12px; text-align: left; position: sticky; top: 0; }
+.data-table td { border: 1px solid #ddd; padding: 10px; }
+.data-table tr:nth-child(even) { background: #f9f9f9; }
+.data-table tr:hover { background: #e3f2fd; }
+.editable-cell { cursor: text; position: relative; }
+.editable-cell:hover { background: #fff9c4; }
+.editable-cell input { width: 100%; padding: 8px; border: 2px solid #667eea; border-radius: 4px; font-size: 0.9em; }
+.row-actions { display: flex; gap: 5px; justify-content: center; }
+.row-actions button { padding: 5px 10px; font-size: 0.8em; width: auto; }
+.error-indicator { background: #ffebee !important; }
+.fixed-indicator { background: #e8f5e9 !important; }
+.problem-types { background: #fff3e0; padding: 15px; border-radius: 8px; margin: 15px 0; border-left: 4px solid #ff9800; }
+.problem-types h4 { color: #e65100; margin-bottom: 10px; }
+.problem-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.problem-badge { background: #ff9800; color: #fff; padding: 5px 12px; border-radius: 15px; font-size: 0.85em; font-weight: 600; }
+.action-buttons { display: flex; gap: 10px; margin: 15px 0; }
+.action-buttons button { width: auto; padding: 10px 20px; }
+.result-modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #fff; padding: 40px; border-radius: 15px; box-shadow: 0 10px 40px rgba(0,0,0,0.3); z-index: 1000; max-width: 500px; text-align: center; }
+.result-modal.show { display: block; animation: slideIn 0.3s; }
+.modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999; }
+.modal-overlay.show { display: block; }
+@keyframes slideIn { from { opacity: 0; transform: translate(-50%, -60%); } to { opacity: 1; transform: translate(-50%, -50%); } }
+.progress-bar { width: 100%; height: 10px; background: #e0e0e0; border-radius: 5px; overflow: hidden; margin: 10px 0; }
+.progress-fill { height: 100%; background: linear-gradient(90deg, #4CAF50, #8BC34A); transition: width 0.3s; }
+.hint-box { background: #e8f5e9; padding: 15px; border-radius: 8px; margin: 15px 0; border-left: 4px solid #4CAF50; display: none; }
+.hint-box.show { display: block; }
+</style>
+</head>
+<body>
+<nav class="nav-header">
+    <div class="nav-title">🧹 Fix the Dataset</div>
+    <a href="../../index.html">← Back to Home</a>
+</nav>
+
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal()"></div>
+<div class="result-modal" id="resultModal">
+    <h2 style="color: #667eea; margin-bottom: 20px;">Dataset Results</h2>
+    <div class="score-value" id="modalScore">0</div>
+    <p style="margin: 20px 0; font-size: 1.1em;" id="modalMessage"></p>
+    <div style="background: #f5f5f5; padding: 15px; border-radius: 8px; margin: 20px 0;">
+        <div class="stat-row"><span>Errors Found:</span><span id="modalFound">0</span></div>
+        <div class="stat-row"><span>Total Errors:</span><span id="modalTotal">0</span></div>
+        <div class="stat-row"><span>Accuracy:</span><span id="modalAccuracy">0%</span></div>
+    </div>
+    <button class="btn-primary" onclick="closeModal()" style="width: auto; padding: 12px 30px;">Continue</button>
+</div>
+
+<div class="container">
+    <h1>🧹 Fix the Dataset</h1>
+    <p class="subtitle">Find and fix data quality issues in messy datasets!</p>
+
+    <div class="game-area">
+        <div class="sidebar">
+            <h3>📊 Datasets</h3>
+            <div class="dataset-selector" id="datasetSelector"></div>
+
+            <div class="stats">
+                <h4 style="margin-bottom: 10px;">Progress</h4>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                </div>
+                <div class="stat-row"><span>Completed:</span><span id="completedCount">0/8</span></div>
+                <div class="stat-row"><span>Total Score:</span><span id="totalScore">0</span></div>
+                <div class="stat-row"><span>Avg Accuracy:</span><span id="avgAccuracy">0%</span></div>
+            </div>
+
+            <div class="info-box">
+                <h4 style="color: #1976d2; margin-bottom: 8px;">💡 How to Play:</h4>
+                <p>
+                    1. Click on cells to edit values<br>
+                    2. Use "Delete Row" for duplicates<br>
+                    3. Fix formatting issues<br>
+                    4. Correct outliers and typos<br>
+                    5. Submit when done!
+                </p>
+            </div>
+
+            <button class="btn-warning" onclick="showHint()">💡 Show Hint</button>
+            <button class="btn-secondary" onclick="resetDataset()">🔄 Reset Current</button>
+        </div>
+
+        <div>
+            <div class="score-board">
+                <h2>Current Dataset</h2>
+                <div style="font-size: 1.5em; color: #667eea; font-weight: 600; margin: 10px 0;" id="datasetTitle">Select a dataset to begin</div>
+                <div class="score-value" id="currentScore">0</div>
+                <div style="margin-top: 10px; font-size: 0.9em; color: #666;" id="errorCount">Errors to find: -</div>
+            </div>
+
+            <div class="problem-types" id="problemTypes" style="display: none;">
+                <h4>🔍 Problems in this dataset:</h4>
+                <div class="problem-list" id="problemList"></div>
+            </div>
+
+            <div class="hint-box" id="hintBox">
+                <h4 style="color: #2e7d32; margin-bottom: 8px;">💡 Hint:</h4>
+                <p id="hintText"></p>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn-primary" onclick="submitDataset()">✅ Submit & Check</button>
+                <button class="btn-danger" onclick="showSolution()">👁️ Show Solution</button>
+            </div>
+
+            <div class="table-container">
+                <div id="tableContainer"></div>
+            </div>
+
+            <div style="background: #fff3e0; padding: 20px; border-radius: 10px; margin-top: 20px; border-left: 4px solid #ff9800;">
+                <h4 style="color: #e65100; margin-bottom: 10px;">📚 Data Cleaning Skills</h4>
+                <p style="line-height: 1.6;">
+                    Real data scientists spend 60-80% of their time cleaning data! This game teaches you to spot
+                    and fix common data quality issues: missing values, duplicates, outliers, formatting errors,
+                    typos, and inconsistent categories. These skills are essential for building accurate AI models.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const datasets = [
+    {
+        id: 1,
+        name: "Student Grades",
+        description: "School grade records",
+        problems: ["Missing values", "Duplicates", "Outliers"],
+        data: [
+            { id: 1, name: "Alice Johnson", grade: "95", subject: "Math", semester: "Fall 2024" },
+            { id: 2, name: "Bob Smith", grade: "", subject: "Math", semester: "Fall 2024" },
+            { id: 3, name: "Carol Davis", grade: "88", subject: "Math", semester: "fall 2024" },
+            { id: 4, name: "Bob Smith", grade: "92", subject: "Math", semester: "Fall 2024" },
+            { id: 5, name: "Eve Wilson", grade: "999", subject: "Math", semester: "Fall 2024" },
+            { id: 6, name: "Frank Brown", grade: "78", subject: "Math", semester: "Fall 2024" },
+        ],
+        errors: [
+            { row: 1, col: "grade", fix: "92", reason: "Missing value - should be 92" },
+            { row: 3, col: "semester", fix: "Fall 2024", reason: "Inconsistent capitalization" },
+            { row: 3, type: "duplicate", reason: "Duplicate of row 1 (Bob Smith)" },
+            { row: 4, col: "grade", fix: "85", reason: "Outlier - grade should be 85 not 999" },
+        ],
+        hint: "Look for: empty grades, duplicate students, impossible grade values (>100), and inconsistent text formatting"
+    },
+    {
+        id: 2,
+        name: "Customer Records",
+        description: "E-commerce customer data",
+        problems: ["Formatting", "Typos", "Missing values"],
+        data: [
+            { id: 1, name: "John Smith", email: "john@email.com", phone: "555-1234", state: "CA" },
+            { id: 2, name: "jane doe", email: "jane@email.com", phone: "(555) 5678", state: "ca" },
+            { id: 3, name: "Bob Jones", email: "bob@emailcom", phone: "5559012", state: "NY" },
+            { id: 4, name: "Alice Brown", email: "alice@email.com", phone: "", state: "CA" },
+            { id: 5, name: "CHARLIE DAVIS", email: "charlie@email.com", phone: "555-3456", state: "Texas" },
+        ],
+        errors: [
+            { row: 1, col: "name", fix: "Jane Doe", reason: "Name should be capitalized" },
+            { row: 1, col: "state", fix: "CA", reason: "State code should be uppercase" },
+            { row: 2, col: "email", fix: "bob@email.com", reason: "Missing dot in email domain" },
+            { row: 3, col: "phone", fix: "555-9012", reason: "Phone should have consistent format" },
+            { row: 4, col: "name", fix: "Charlie Davis", reason: "Name should use title case, not all caps" },
+            { row: 4, col: "state", fix: "TX", reason: "State should be 2-letter code" },
+        ],
+        hint: "Check for: inconsistent name capitalization, email format errors, phone number formats, and state abbreviations"
+    },
+    {
+        id: 3,
+        name: "Product Inventory",
+        description: "Store inventory system",
+        problems: ["Inconsistent categories", "Outliers", "Typos"],
+        data: [
+            { id: 1, product: "Laptop", category: "Electronics", price: "$999.99", stock: "50" },
+            { id: 2, product: "Mouse", category: "electronics", price: "$19.99", stock: "200" },
+            { id: 3, product: "Keybord", category: "Electronics", price: "$49.99", stock: "150" },
+            { id: 4, product: "Monitor", category: "Electronic", price: "$299.99", stock: "-5" },
+            { id: 5, product: "Headphones", category: "Electronics", price: "$79.99", stock: "1000000" },
+        ],
+        errors: [
+            { row: 1, col: "category", fix: "Electronics", reason: "Category should be capitalized consistently" },
+            { row: 2, col: "product", fix: "Keyboard", reason: "Typo in product name" },
+            { row: 3, col: "category", fix: "Electronics", reason: "Inconsistent category name" },
+            { row: 3, col: "stock", fix: "5", reason: "Negative stock impossible" },
+            { row: 4, col: "stock", fix: "100", reason: "Outlier - unrealistic stock quantity" },
+        ],
+        hint: "Look for: spelling errors, inconsistent category names, negative stock values, and unrealistic inventory numbers"
+    },
+    {
+        id: 4,
+        name: "Survey Responses",
+        description: "Customer satisfaction survey",
+        problems: ["Missing values", "Inconsistent entries", "Outliers"],
+        data: [
+            { id: 1, age: "25", satisfaction: "Very Satisfied", rating: "5", date: "2024-01-15" },
+            { id: 2, age: "", satisfaction: "Satisfied", rating: "4", date: "2024-01-16" },
+            { id: 3, age: "35", satisfaction: "very satisfied", rating: "5", date: "01/17/2024" },
+            { id: 4, age: "200", satisfaction: "Neutral", rating: "3", date: "2024-01-18" },
+            { id: 5, age: "45", satisfaction: "Dissatisfied", rating: "15", date: "2024-01-19" },
+        ],
+        errors: [
+            { row: 1, col: "age", fix: "30", reason: "Missing age value" },
+            { row: 2, col: "satisfaction", fix: "Very Satisfied", reason: "Inconsistent capitalization" },
+            { row: 2, col: "date", fix: "2024-01-17", reason: "Date format should be YYYY-MM-DD" },
+            { row: 3, col: "age", fix: "28", reason: "Age outlier - 200 is impossible" },
+            { row: 4, col: "rating", fix: "2", reason: "Rating should be 1-5 scale, not 15" },
+        ],
+        hint: "Check for: missing ages, inconsistent text capitalization, different date formats, impossible ages, and invalid rating values"
+    },
+    {
+        id: 5,
+        name: "Sales Data",
+        description: "Monthly sales records",
+        problems: ["Duplicates", "Formatting", "Outliers"],
+        data: [
+            { id: 1, date: "2024-01-15", product: "Widget A", quantity: "100", revenue: "$5,000" },
+            { id: 2, date: "2024-01-15", product: "Widget A", quantity: "100", revenue: "$5,000" },
+            { id: 3, date: "2024-01-16", product: "Widget B", quantity: "50", revenue: "2500" },
+            { id: 4, date: "01/17/2024", product: "Widget C", quantity: "-10", revenue: "$1,200" },
+            { id: 5, date: "2024-01-18", product: "Widget D", quantity: "75", revenue: "$99999" },
+        ],
+        errors: [
+            { row: 1, type: "duplicate", reason: "Duplicate transaction" },
+            { row: 2, col: "revenue", fix: "$2,500", reason: "Revenue should have $ and comma" },
+            { row: 3, col: "date", fix: "2024-01-17", reason: "Date format should be YYYY-MM-DD" },
+            { row: 3, col: "quantity", fix: "10", reason: "Negative quantity impossible" },
+            { row: 4, col: "revenue", fix: "$3,750", reason: "Revenue outlier - seems like data entry error" },
+        ],
+        hint: "Look for: duplicate sales records, inconsistent currency formatting, date format variations, and impossible negative quantities"
+    },
+    {
+        id: 6,
+        name: "Employee Records",
+        description: "HR employee database",
+        problems: ["Missing values", "Formatting", "Typos"],
+        data: [
+            { id: 1, name: "Sarah Johnson", department: "Engineering", salary: "$85,000", hireDate: "2020-06-15" },
+            { id: 2, name: "mike wilson", department: "engineering", salary: "75000", hireDate: "06/20/2021" },
+            { id: 3, name: "Emily Davis", department: "", salary: "$92,000", hireDate: "2019-03-10" },
+            { id: 4, name: "ROBERT BROWN", department: "Sales", salary: "$68,000", hireDate: "2022-01-05" },
+            { id: 5, name: "Lisa Miler", department: "Marketing", salary: "$71,000", hireDate: "2021-09-12" },
+        ],
+        errors: [
+            { row: 1, col: "name", fix: "Mike Wilson", reason: "Name should be capitalized" },
+            { row: 1, col: "department", fix: "Engineering", reason: "Department should be capitalized" },
+            { row: 1, col: "salary", fix: "$75,000", reason: "Salary formatting should be consistent" },
+            { row: 1, col: "hireDate", fix: "2021-06-20", reason: "Date format should be YYYY-MM-DD" },
+            { row: 2, col: "department", fix: "Engineering", reason: "Missing department value" },
+            { row: 3, col: "name", fix: "Robert Brown", reason: "Name should use title case" },
+            { row: 4, col: "name", fix: "Lisa Miller", reason: "Typo in last name (Miler -> Miller)" },
+        ],
+        hint: "Check for: name capitalization, missing departments, salary formatting, date formats, and spelling errors"
+    },
+    {
+        id: 7,
+        name: "Restaurant Orders",
+        description: "Food delivery orders",
+        problems: ["Duplicates", "Outliers", "Inconsistent entries"],
+        data: [
+            { id: 1, customer: "John Doe", item: "Pizza", quantity: "2", price: "$24.99", status: "Delivered" },
+            { id: 2, customer: "Jane Smith", item: "Burger", quantity: "1", price: "$12.50", status: "delivered" },
+            { id: 3, customer: "John Doe", item: "Pizza", quantity: "2", price: "$24.99", status: "Delivered" },
+            { id: 4, customer: "Bob Jones", item: "Salad", quantity: "100", price: "$8.99", status: "Pending" },
+            { id: 5, customer: "Alice Brown", item: "Pasta", quantity: "3", price: "$999.99", status: "DELIVERED" },
+        ],
+        errors: [
+            { row: 1, col: "status", fix: "Delivered", reason: "Status should be capitalized consistently" },
+            { row: 2, type: "duplicate", reason: "Duplicate order" },
+            { row: 3, col: "quantity", fix: "3", reason: "Quantity outlier - 100 salads unlikely" },
+            { row: 4, col: "price", fix: "$38.97", reason: "Price outlier - should be quantity × unit price" },
+            { row: 4, col: "status", fix: "Delivered", reason: "Status should use title case" },
+        ],
+        hint: "Look for: duplicate orders, unrealistic quantities, price errors, and inconsistent status capitalization"
+    },
+    {
+        id: 8,
+        name: "Medical Records",
+        description: "Patient vital signs",
+        problems: ["Missing values", "Outliers", "Formatting"],
+        data: [
+            { id: 1, patient: "P001", age: "45", heartRate: "72", bloodPressure: "120/80", temp: "98.6" },
+            { id: 2, patient: "P002", age: "", heartRate: "68", bloodPressure: "115/75", temp: "98.4" },
+            { id: 3, patient: "P003", age: "35", heartRate: "250", bloodPressure: "130/85", temp: "97.8" },
+            { id: 4, patient: "P004", age: "52", heartRate: "75", bloodPressure: "0/0", temp: "104.5" },
+            { id: 5, patient: "p005", age: "28", heartRate: "70", bloodPressure: "118/76", temp: "98.6 F" },
+        ],
+        errors: [
+            { row: 1, col: "age", fix: "38", reason: "Missing age value" },
+            { row: 2, col: "heartRate", fix: "85", reason: "Heart rate outlier - 250 is dangerous/error" },
+            { row: 3, col: "bloodPressure", fix: "125/82", reason: "Blood pressure can't be 0/0" },
+            { row: 3, col: "temp", fix: "100.5", reason: "Temperature outlier - 104.5°F is critical fever" },
+            { row: 4, col: "patient", fix: "P005", reason: "Patient ID should be uppercase for consistency" },
+            { row: 4, col: "temp", fix: "98.6", reason: "Temperature format should be consistent (no F)" },
+        ],
+        hint: "Check for: missing ages, impossible vital signs (heart rate >200, BP of 0/0, very high temps), and ID formatting"
+    }
+];
+
+let currentDatasetId = null;
+let currentData = [];
+let originalData = [];
+let deletedRows = new Set();
+let editedCells = new Map();
+let scores = [];
+let completedDatasets = new Set();
+
+function initGame() {
+    renderDatasetSelector();
+    updateStats();
+}
+
+function renderDatasetSelector() {
+    const container = document.getElementById('datasetSelector');
+    container.innerHTML = '';
+
+    datasets.forEach(dataset => {
+        const btn = document.createElement('button');
+        btn.className = 'dataset-btn';
+        if (completedDatasets.has(dataset.id)) {
+            btn.classList.add('completed');
+        }
+        if (currentDatasetId === dataset.id) {
+            btn.classList.add('active');
+        }
+        btn.innerHTML = `
+            <div style="font-weight: 700;">${dataset.name}</div>
+            <div style="font-size: 0.85em; margin-top: 4px; opacity: 0.8;">${dataset.description}</div>
+        `;
+        btn.onclick = () => loadDataset(dataset.id);
+        container.appendChild(btn);
+    });
+}
+
+function loadDataset(id) {
+    const dataset = datasets.find(d => d.id === id);
+    if (!dataset) return;
+
+    currentDatasetId = id;
+    currentData = JSON.parse(JSON.stringify(dataset.data));
+    originalData = JSON.parse(JSON.stringify(dataset.data));
+    deletedRows = new Set();
+    editedCells = new Map();
+
+    document.getElementById('datasetTitle').textContent = dataset.name;
+    document.getElementById('currentScore').textContent = '0';
+    document.getElementById('errorCount').textContent = `Errors to find: ${dataset.errors.length}`;
+
+    const problemTypes = document.getElementById('problemTypes');
+    const problemList = document.getElementById('problemList');
+    problemTypes.style.display = 'block';
+    problemList.innerHTML = dataset.problems.map(p =>
+        `<span class="problem-badge">${p}</span>`
+    ).join('');
+
+    document.getElementById('hintBox').classList.remove('show');
+
+    renderDatasetSelector();
+    renderTable();
+}
+
+function renderTable() {
+    const dataset = datasets.find(d => d.id === currentDatasetId);
+    if (!dataset || currentData.length === 0) {
+        document.getElementById('tableContainer').innerHTML = '<p style="text-align: center; padding: 40px; color: #999;">Select a dataset to begin</p>';
+        return;
+    }
+
+    const columns = Object.keys(currentData[0]);
+
+    let html = '<table class="data-table"><thead><tr>';
+    columns.forEach(col => {
+        html += `<th>${col}</th>`;
+    });
+    html += '<th>Actions</th></tr></thead><tbody>';
+
+    currentData.forEach((row, rowIndex) => {
+        if (deletedRows.has(rowIndex)) return;
+
+        html += '<tr>';
+        columns.forEach(col => {
+            const cellKey = `${rowIndex}-${col}`;
+            const value = editedCells.has(cellKey) ? editedCells.get(cellKey) : row[col];
+            html += `<td class="editable-cell" onclick="editCell(${rowIndex}, '${col}')">${value || '<em style="color: #999;">empty</em>'}</td>`;
+        });
+        html += `<td class="row-actions">
+            <button class="btn-danger" onclick="deleteRow(${rowIndex})">Delete</button>
+        </td></tr>`;
+    });
+
+    html += '</tbody></table>';
+    document.getElementById('tableContainer').innerHTML = html;
+}
+
+function editCell(rowIndex, column) {
+    const cellKey = `${rowIndex}-${column}`;
+    const currentValue = editedCells.has(cellKey) ? editedCells.get(cellKey) : currentData[rowIndex][column];
+
+    const newValue = prompt(`Edit ${column}:`, currentValue);
+    if (newValue !== null && newValue !== currentValue) {
+        editedCells.set(cellKey, newValue);
+        renderTable();
+    }
+}
+
+function deleteRow(rowIndex) {
+    if (confirm('Delete this row?')) {
+        deletedRows.add(rowIndex);
+        renderTable();
+    }
+}
+
+function resetDataset() {
+    if (currentDatasetId && confirm('Reset all changes to this dataset?')) {
+        loadDataset(currentDatasetId);
+    }
+}
+
+function showHint() {
+    const dataset = datasets.find(d => d.id === currentDatasetId);
+    if (!dataset) return;
+
+    document.getElementById('hintText').textContent = dataset.hint;
+    document.getElementById('hintBox').classList.add('show');
+}
+
+function submitDataset() {
+    const dataset = datasets.find(d => d.id === currentDatasetId);
+    if (!dataset) {
+        alert('Please select a dataset first!');
+        return;
+    }
+
+    let correctFixes = 0;
+    const totalErrors = dataset.errors.length;
+
+    // Check each error
+    dataset.errors.forEach(error => {
+        if (error.type === 'duplicate') {
+            // Check if the row was deleted
+            if (deletedRows.has(error.row)) {
+                correctFixes++;
+            }
+        } else {
+            // Check if the cell was edited correctly
+            const cellKey = `${error.row}-${error.col}`;
+            if (editedCells.has(cellKey)) {
+                const userValue = editedCells.get(cellKey).toString().toLowerCase().trim();
+                const correctValue = error.fix.toString().toLowerCase().trim();
+                if (userValue === correctValue) {
+                    correctFixes++;
+                }
+            }
+        }
+    });
+
+    const accuracy = (correctFixes / totalErrors * 100).toFixed(1);
+    const score = Math.round((correctFixes / totalErrors) * 1000);
+
+    scores.push(parseFloat(accuracy));
+    completedDatasets.add(currentDatasetId);
+
+    // Show modal
+    document.getElementById('modalScore').textContent = score;
+    document.getElementById('modalFound').textContent = correctFixes;
+    document.getElementById('modalTotal').textContent = totalErrors;
+    document.getElementById('modalAccuracy').textContent = accuracy + '%';
+
+    let message = '';
+    if (accuracy >= 90) {
+        message = '🏆 Excellent! You found almost all the errors!';
+    } else if (accuracy >= 75) {
+        message = '⭐ Great job! Keep practicing to catch more errors.';
+    } else if (accuracy >= 50) {
+        message = '👍 Good start! Review the solution to learn more.';
+    } else {
+        message = '💪 Keep trying! Data cleaning takes practice.';
+    }
+
+    document.getElementById('modalMessage').textContent = message;
+    document.getElementById('modalOverlay').classList.add('show');
+    document.getElementById('resultModal').classList.add('show');
+
+    updateStats();
+    renderDatasetSelector();
+}
+
+function showSolution() {
+    const dataset = datasets.find(d => d.id === currentDatasetId);
+    if (!dataset) return;
+
+    let solution = `Solutions for ${dataset.name}:\n\n`;
+    dataset.errors.forEach((error, idx) => {
+        if (error.type === 'duplicate') {
+            solution += `${idx + 1}. Row ${error.row + 1}: DELETE - ${error.reason}\n`;
+        } else {
+            solution += `${idx + 1}. Row ${error.row + 1}, ${error.col}: "${error.fix}" - ${error.reason}\n`;
+        }
+    });
+
+    alert(solution);
+}
+
+function closeModal() {
+    document.getElementById('modalOverlay').classList.remove('show');
+    document.getElementById('resultModal').classList.remove('show');
+}
+
+function updateStats() {
+    const completed = completedDatasets.size;
+    const total = datasets.length;
+    const progress = (completed / total * 100).toFixed(0);
+
+    document.getElementById('progressFill').style.width = progress + '%';
+    document.getElementById('completedCount').textContent = `${completed}/${total}`;
+
+    const totalScore = scores.reduce((sum, score) => sum + score, 0);
+    document.getElementById('totalScore').textContent = Math.round(totalScore);
+
+    const avgAccuracy = scores.length > 0
+        ? (scores.reduce((sum, score) => sum + score, 0) / scores.length).toFixed(1)
+        : '0';
+    document.getElementById('avgAccuracy').textContent = avgAccuracy + '%';
+}
+
+// Initialize
+initGame();
+</script>
+</body>
+</html>

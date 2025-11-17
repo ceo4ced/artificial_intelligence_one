@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Folder Tree Builder - Game</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 0; }
+.nav-header { background: #2d3748; padding: 15px 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; }
+.nav-header a { color: #90cdf4; text-decoration: none; font-weight: 600; font-size: 1.1em; }
+.nav-title { color: #fff; font-size: 1.2em; font-weight: 700; }
+.container { max-width: 1400px; margin: 20px auto; background: #fff; border-radius: 15px; padding: 30px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+h1 { text-align: center; color: #2d3748; font-size: 2.5em; margin-bottom: 10px; }
+.subtitle { text-align: center; color: #666; margin-bottom: 30px; font-size: 1.1em; }
+.game-area { display: grid; grid-template-columns: 300px 1fr; gap: 30px; }
+.sidebar { background: #f8f9fa; padding: 20px; border-radius: 10px; height: fit-content; }
+.score-display { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; padding: 20px; border-radius: 10px; text-align: center; margin-bottom: 20px; }
+.score-value { font-size: 3em; font-weight: bold; margin: 10px 0; }
+.stats { margin: 15px 0; }
+.stat-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e0e0e0; }
+button { width: 100%; padding: 12px; margin: 5px 0; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.3s; }
+.btn-primary { background: #4CAF50; color: #fff; }
+.btn-primary:hover { background: #45a049; }
+.btn-secondary { background: #2196F3; color: #fff; }
+.btn-secondary:hover { background: #1976d2; }
+.btn-danger { background: #f44336; color: #fff; }
+.btn-danger:hover { background: #da190b; }
+.scenario-card { background: #fff; border: 2px solid #e0e0e0; border-radius: 10px; padding: 25px; }
+.scenario-card h3 { color: #667eea; margin-bottom: 15px; font-size: 1.5em; }
+.challenge-description { background: #e8f5e9; padding: 15px; border-radius: 8px; margin-bottom: 20px; line-height: 1.6; color: #2d3748; border-left: 4px solid #4CAF50; }
+.challenge-description h4 { color: #2e7d32; margin-bottom: 10px; }
+.items-pool { background: #fff9c4; padding: 20px; border-radius: 8px; margin-bottom: 25px; min-height: 120px; border: 2px dashed #fbc02d; }
+.items-pool h4 { color: #f57c00; margin-bottom: 15px; }
+.item { background: #2196F3; color: #fff; padding: 8px 12px; border-radius: 6px; margin: 5px; display: inline-block; cursor: pointer; font-weight: 600; transition: all 0.2s; user-select: none; font-size: 0.9em; }
+.item:hover { background: #1976d2; transform: scale(1.05); }
+.item.selected { background: #4CAF50; }
+.item.folder { background: #ff9800; }
+.item.folder:hover { background: #f57c00; }
+.tree-builder { background: #fafafa; padding: 20px; border-radius: 8px; margin-bottom: 20px; min-height: 300px; border: 2px solid #e0e0e0; }
+.tree-builder h4 { color: #2d3748; margin-bottom: 15px; }
+.tree-node { margin-left: 25px; margin-bottom: 5px; }
+.tree-node.root { margin-left: 0; }
+.node-label { background: #fff; padding: 8px 12px; border-radius: 6px; display: inline-block; margin: 3px 0; cursor: pointer; transition: all 0.2s; border: 2px solid #ddd; }
+.node-label.folder { border-color: #ff9800; color: #e65100; font-weight: 600; }
+.node-label.file { border-color: #2196F3; color: #1976d2; }
+.node-label:hover { transform: translateX(5px); box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+.node-label.selected-node { border-color: #4CAF50; background: #e8f5e9; }
+.node-label.target { border-color: #f44336; background: #ffebee; animation: pulse 1s infinite; }
+.expand-toggle { cursor: pointer; display: inline-block; width: 20px; text-align: center; font-weight: bold; color: #666; user-select: none; }
+.search-challenge { background: #e3f2fd; padding: 20px; border-radius: 8px; margin-top: 20px; display: none; }
+.search-challenge.active { display: block; }
+.search-challenge h4 { color: #1976d2; margin-bottom: 10px; }
+.timer { font-size: 2em; font-weight: bold; color: #667eea; text-align: center; margin: 15px 0; }
+.controls { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
+.hint-box { background: #e8f5e9; padding: 15px; border-radius: 8px; margin: 15px 0; }
+.hint-box h4 { color: #2e7d32; margin-bottom: 8px; }
+.hint-box ul { margin-left: 20px; line-height: 1.6; color: #1b5e20; font-size: 0.9em; }
+.feedback { background: #fff3e0; padding: 15px; border-radius: 8px; margin-top: 15px; display: none; border-left: 4px solid #ff9800; }
+.feedback.show { display: block; }
+.feedback h4 { color: #e65100; margin-bottom: 8px; }
+.progress-bar { background: #e0e0e0; height: 8px; border-radius: 4px; margin: 15px 0; overflow: hidden; }
+.progress-fill { background: linear-gradient(90deg, #667eea, #764ba2); height: 100%; transition: width 0.3s; }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+</style>
+</head>
+<body>
+<nav class="nav-header">
+    <div class="nav-title">Folder Tree Builder</div>
+    <a href="../../index.html">← Back to Home</a>
+</nav>
+<div class="container">
+    <h1>Folder Tree Builder</h1>
+    <p class="subtitle">Organize files efficiently and master tree navigation!</p>
+
+    <div class="game-area">
+        <div class="sidebar">
+            <div class="score-display">
+                <div>Score</div>
+                <div class="score-value" id="score">0</div>
+                <div>Efficiency: <span id="efficiency">0%</span></div>
+            </div>
+
+            <div class="stats">
+                <div class="stat-row">
+                    <span>Scenario:</span>
+                    <span id="currentScenario">1/8</span>
+                </div>
+                <div class="stat-row">
+                    <span>Tree Depth:</span>
+                    <span id="treeDepth">0</span>
+                </div>
+                <div class="stat-row">
+                    <span>Balance Score:</span>
+                    <span id="balanceScore">0%</span>
+                </div>
+                <div class="stat-row">
+                    <span>Search Speed:</span>
+                    <span id="searchSpeed">-</span>
+                </div>
+            </div>
+
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar" style="width: 12.5%"></div>
+            </div>
+
+            <button class="btn-primary" onclick="testSearch()">Test Search Speed</button>
+            <button class="btn-secondary" onclick="checkOrganization()">Check Organization</button>
+            <button class="btn-danger" onclick="resetTree()">Reset Tree</button>
+
+            <div class="hint-box">
+                <h4>Tips:</h4>
+                <ul>
+                    <li>Group related items together</li>
+                    <li>Keep depth balanced (3-4 levels ideal)</li>
+                    <li>Use descriptive folder names</li>
+                    <li>Avoid too many items in one folder</li>
+                </ul>
+            </div>
+        </div>
+
+        <div>
+            <div class="scenario-card">
+                <h3 id="scenarioTitle">Scenario 1</h3>
+                <div class="challenge-description">
+                    <h4 id="challengeTitle">Challenge</h4>
+                    <p id="challengeDescription">Loading...</p>
+                </div>
+
+                <div class="items-pool" id="itemsPool">
+                    <h4>Items to Organize (Click to select, then click a folder to place):</h4>
+                    <div id="poolItems"></div>
+                </div>
+
+                <div class="tree-builder" id="treeBuilder">
+                    <h4>Your Folder Structure:</h4>
+                    <div id="treeDisplay"></div>
+                </div>
+
+                <div class="controls">
+                    <button class="btn-secondary" onclick="addFolder()">Add Folder</button>
+                    <button class="btn-secondary" onclick="nextScenario()">Next Scenario →</button>
+                </div>
+
+                <div class="search-challenge" id="searchChallenge">
+                    <h4>Find: <span id="searchTarget"></span></h4>
+                    <div class="timer" id="timer">0.0s</div>
+                    <p style="text-align: center; color: #666;">Click on the file in your tree to find it!</p>
+                </div>
+
+                <div class="feedback" id="feedback">
+                    <h4 id="feedbackTitle">Feedback</h4>
+                    <p id="feedbackText"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const scenarios = [
+    {
+        title: "Personal Desktop Cleanup",
+        description: "You have a messy desktop with 15 random files. Organize them into a logical folder structure.",
+        items: [
+            { name: "vacation.jpg", type: "file", category: "photos" },
+            { name: "birthday.jpg", type: "file", category: "photos" },
+            { name: "resume.pdf", type: "file", category: "documents" },
+            { name: "taxes2024.pdf", type: "file", category: "documents" },
+            { name: "game.exe", type: "file", category: "programs" },
+            { name: "music_player.exe", type: "file", category: "programs" },
+            { name: "shopping_list.txt", type: "file", category: "documents" },
+            { name: "song1.mp3", type: "file", category: "music" },
+            { name: "song2.mp3", type: "file", category: "music" },
+            { name: "recipe.txt", type: "file", category: "documents" },
+            { name: "project.zip", type: "file", category: "work" },
+            { name: "meeting_notes.txt", type: "file", category: "work" },
+            { name: "family.jpg", type: "file", category: "photos" }
+        ],
+        targetDepth: 3,
+        hint: "Group by type: Photos, Documents, Music, Programs, Work"
+    },
+    {
+        title: "Student Project Folder",
+        description: "Organize your school project files for a science fair presentation.",
+        items: [
+            { name: "hypothesis.docx", type: "file", category: "research" },
+            { name: "results.xlsx", type: "file", category: "research" },
+            { name: "slide1.pptx", type: "file", category: "presentation" },
+            { name: "slide2.pptx", type: "file", category: "presentation" },
+            { name: "experiment1.jpg", type: "file", category: "photos" },
+            { name: "experiment2.jpg", type: "file", category: "photos" },
+            { name: "data.csv", type: "file", category: "research" },
+            { name: "bibliography.txt", type: "file", category: "research" },
+            { name: "draft.docx", type: "file", category: "writing" },
+            { name: "final_paper.docx", type: "file", category: "writing" },
+            { name: "notes.txt", type: "file", category: "research" }
+        ],
+        targetDepth: 3,
+        hint: "Organize by: Research, Presentation, Photos, Writing"
+    },
+    {
+        title: "Developer Source Code",
+        description: "Structure a web development project with proper organization.",
+        items: [
+            { name: "index.html", type: "file", category: "frontend" },
+            { name: "styles.css", type: "file", category: "frontend" },
+            { name: "app.js", type: "file", category: "frontend" },
+            { name: "server.py", type: "file", category: "backend" },
+            { name: "database.py", type: "file", category: "backend" },
+            { name: "api.py", type: "file", category: "backend" },
+            { name: "logo.png", type: "file", category: "assets" },
+            { name: "icon.svg", type: "file", category: "assets" },
+            { name: "README.md", type: "file", category: "docs" },
+            { name: "API_GUIDE.md", type: "file", category: "docs" },
+            { name: "test_app.py", type: "file", category: "tests" },
+            { name: "test_api.py", type: "file", category: "tests" }
+        ],
+        targetDepth: 3,
+        hint: "Standard structure: src/(frontend, backend), assets, docs, tests"
+    },
+    {
+        title: "Photography Portfolio",
+        description: "Organize a photographer's portfolio by categories and dates.",
+        items: [
+            { name: "portrait1.jpg", type: "file", category: "portraits" },
+            { name: "portrait2.jpg", type: "file", category: "portraits" },
+            { name: "landscape1.jpg", type: "file", category: "landscapes" },
+            { name: "landscape2.jpg", type: "file", category: "landscapes" },
+            { name: "wedding_jan.jpg", type: "file", category: "events" },
+            { name: "wedding_feb.jpg", type: "file", category: "events" },
+            { name: "street1.jpg", type: "file", category: "street" },
+            { name: "street2.jpg", type: "file", category: "street" },
+            { name: "macro1.jpg", type: "file", category: "nature" },
+            { name: "macro2.jpg", type: "file", category: "nature" },
+            { name: "client_contract.pdf", type: "file", category: "business" },
+            { name: "pricing.xlsx", type: "file", category: "business" }
+        ],
+        targetDepth: 3,
+        hint: "Categories: Portraits, Landscapes, Events, Street, Nature, Business"
+    },
+    {
+        title: "Company HR System",
+        description: "Organize employee records and HR documents efficiently.",
+        items: [
+            { name: "alice_resume.pdf", type: "file", category: "hiring" },
+            { name: "bob_resume.pdf", type: "file", category: "hiring" },
+            { name: "payroll_jan.xlsx", type: "file", category: "payroll" },
+            { name: "payroll_feb.xlsx", type: "file", category: "payroll" },
+            { name: "benefits_guide.pdf", type: "file", category: "benefits" },
+            { name: "insurance_plan.pdf", type: "file", category: "benefits" },
+            { name: "employee_handbook.pdf", type: "file", category: "policies" },
+            { name: "conduct_policy.pdf", type: "file", category: "policies" },
+            { name: "training_video.mp4", type: "file", category: "training" },
+            { name: "safety_cert.pdf", type: "file", category: "training" },
+            { name: "team_photo.jpg", type: "file", category: "misc" }
+        ],
+        targetDepth: 3,
+        hint: "Organize by: Hiring, Payroll, Benefits, Policies, Training"
+    },
+    {
+        title: "Music Library",
+        description: "Organize a digital music collection by artist, album, and genre.",
+        items: [
+            { name: "track1_rock.mp3", type: "file", category: "rock" },
+            { name: "track2_rock.mp3", type: "file", category: "rock" },
+            { name: "track1_pop.mp3", type: "file", category: "pop" },
+            { name: "track2_pop.mp3", type: "file", category: "pop" },
+            { name: "track1_jazz.mp3", type: "file", category: "jazz" },
+            { name: "track2_jazz.mp3", type: "file", category: "jazz" },
+            { name: "playlist_workout.m3u", type: "file", category: "playlists" },
+            { name: "playlist_relax.m3u", type: "file", category: "playlists" },
+            { name: "album_art1.jpg", type: "file", category: "artwork" },
+            { name: "album_art2.jpg", type: "file", category: "artwork" },
+            { name: "concert_ticket.pdf", type: "file", category: "memories" }
+        ],
+        targetDepth: 3,
+        hint: "Structure: Music/(Rock, Pop, Jazz), Playlists, Artwork, Memories"
+    },
+    {
+        title: "E-commerce Product Catalog",
+        description: "Organize products into a hierarchical category structure.",
+        items: [
+            { name: "laptop_dell.txt", type: "file", category: "electronics_computers" },
+            { name: "laptop_hp.txt", type: "file", category: "electronics_computers" },
+            { name: "iphone.txt", type: "file", category: "electronics_phones" },
+            { name: "samsung.txt", type: "file", category: "electronics_phones" },
+            { name: "shirt_blue.txt", type: "file", category: "clothing_shirts" },
+            { name: "shirt_red.txt", type: "file", category: "clothing_shirts" },
+            { name: "jeans.txt", type: "file", category: "clothing_pants" },
+            { name: "shorts.txt", type: "file", category: "clothing_pants" },
+            { name: "chair.txt", type: "file", category: "furniture" },
+            { name: "desk.txt", type: "file", category: "furniture" },
+            { name: "lamp.txt", type: "file", category: "furniture" }
+        ],
+        targetDepth: 4,
+        hint: "Deep hierarchy: Electronics/(Computers, Phones), Clothing/(Shirts, Pants), Furniture"
+    },
+    {
+        title: "Research Lab Data",
+        description: "Organize scientific research data with experiments and analysis.",
+        items: [
+            { name: "exp1_data.csv", type: "file", category: "experiment1" },
+            { name: "exp1_analysis.py", type: "file", category: "experiment1" },
+            { name: "exp1_results.txt", type: "file", category: "experiment1" },
+            { name: "exp2_data.csv", type: "file", category: "experiment2" },
+            { name: "exp2_analysis.py", type: "file", category: "experiment2" },
+            { name: "exp2_results.txt", type: "file", category: "experiment2" },
+            { name: "paper_draft.docx", type: "file", category: "publications" },
+            { name: "paper_final.pdf", type: "file", category: "publications" },
+            { name: "raw_sensor.dat", type: "file", category: "raw_data" },
+            { name: "calibration.dat", type: "file", category: "raw_data" },
+            { name: "grant_proposal.pdf", type: "file", category: "admin" }
+        ],
+        targetDepth: 3,
+        hint: "Group by: Experiments/(Exp1, Exp2), Publications, Raw_Data, Admin"
+    }
+];
+
+let currentScenario = 0;
+let score = 0;
+let selectedItem = null;
+let tree = { name: "Desktop", type: "folder", children: [], expanded: true };
+let searchStartTime = 0;
+let searchActive = false;
+let searchTarget = null;
+
+function loadScenario() {
+    const scenario = scenarios[currentScenario];
+
+    document.getElementById('scenarioTitle').textContent = `Scenario ${currentScenario + 1}: ${scenario.title}`;
+    document.getElementById('challengeTitle').textContent = "Challenge:";
+    document.getElementById('challengeDescription').textContent = scenario.description;
+    document.getElementById('currentScenario').textContent = `${currentScenario + 1}/${scenarios.length}`;
+
+    // Reset tree
+    tree = { name: currentScenario === 0 ? "Desktop" : scenario.title.replace(/ /g, '_'), type: "folder", children: [], expanded: true };
+
+    // Load items pool
+    const poolContainer = document.getElementById('poolItems');
+    poolContainer.innerHTML = '';
+    scenario.items.forEach((item, index) => {
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'item';
+        itemDiv.textContent = item.name;
+        itemDiv.onclick = () => selectItem(index);
+        poolContainer.appendChild(itemDiv);
+    });
+
+    selectedItem = null;
+    searchActive = false;
+    document.getElementById('searchChallenge').classList.remove('active');
+    document.getElementById('feedback').classList.remove('show');
+
+    renderTree();
+    updateStats();
+    updateProgress();
+}
+
+function selectItem(index) {
+    selectedItem = index;
+
+    const items = document.querySelectorAll('#poolItems .item');
+    items.forEach((item, i) => {
+        if (i === index) {
+            item.classList.add('selected');
+        } else {
+            item.classList.remove('selected');
+        }
+    });
+}
+
+function addFolder() {
+    const folderName = prompt("Enter folder name:");
+    if (!folderName) return;
+
+    tree.children.push({
+        name: folderName,
+        type: "folder",
+        children: [],
+        expanded: true
+    });
+
+    renderTree();
+    updateStats();
+}
+
+function addItemToFolder(folderPath) {
+    if (selectedItem === null) {
+        alert("Please select an item from the pool first!");
+        return;
+    }
+
+    const scenario = scenarios[currentScenario];
+    const item = scenario.items[selectedItem];
+
+    // Find folder in tree
+    let folder = tree;
+    for (const pathPart of folderPath) {
+        folder = folder.children[pathPart];
+    }
+
+    // Add item
+    folder.children.push({
+        name: item.name,
+        type: "file",
+        category: item.category
+    });
+
+    // Remove from pool
+    scenario.items.splice(selectedItem, 1);
+    selectedItem = null;
+
+    loadScenario();
+}
+
+function renderTree() {
+    const container = document.getElementById('treeDisplay');
+    container.innerHTML = '';
+
+    renderNode(tree, container, []);
+}
+
+function renderNode(node, container, path) {
+    const nodeDiv = document.createElement('div');
+    nodeDiv.className = 'tree-node' + (path.length === 0 ? ' root' : '');
+
+    const labelDiv = document.createElement('div');
+
+    // Expand/collapse toggle for folders
+    if (node.type === 'folder' && node.children.length > 0) {
+        const toggle = document.createElement('span');
+        toggle.className = 'expand-toggle';
+        toggle.textContent = node.expanded ? '▼' : '▶';
+        toggle.onclick = () => toggleExpand(path);
+        labelDiv.appendChild(toggle);
+    } else if (node.type === 'folder') {
+        const toggle = document.createElement('span');
+        toggle.className = 'expand-toggle';
+        toggle.textContent = '○';
+        labelDiv.appendChild(toggle);
+    } else {
+        const spacer = document.createElement('span');
+        spacer.className = 'expand-toggle';
+        spacer.textContent = '•';
+        labelDiv.appendChild(spacer);
+    }
+
+    const label = document.createElement('span');
+    label.className = 'node-label ' + node.type;
+    label.textContent = node.type === 'folder' ? '📁 ' + node.name : '📄 ' + node.name;
+
+    if (node.type === 'folder') {
+        label.onclick = () => {
+            if (selectedItem !== null) {
+                addItemToFolder(path);
+            }
+        };
+    } else if (searchActive && searchTarget === node.name) {
+        label.classList.add('target');
+        label.onclick = () => foundTarget();
+    }
+
+    labelDiv.appendChild(label);
+    nodeDiv.appendChild(labelDiv);
+    container.appendChild(nodeDiv);
+
+    // Render children if expanded
+    if (node.type === 'folder' && node.expanded && node.children.length > 0) {
+        const childContainer = document.createElement('div');
+        node.children.forEach((child, index) => {
+            renderNode(child, childContainer, [...path, index]);
+        });
+        nodeDiv.appendChild(childContainer);
+    }
+}
+
+function toggleExpand(path) {
+    let node = tree;
+    for (const pathPart of path) {
+        node = node.children[pathPart];
+    }
+    node.expanded = !node.expanded;
+    renderTree();
+}
+
+function testSearch() {
+    const scenario = scenarios[currentScenario];
+
+    // Check if tree has files
+    const allFiles = getAllFiles(tree);
+    if (allFiles.length === 0) {
+        alert("Add some files to your tree first!");
+        return;
+    }
+
+    // Pick random file
+    searchTarget = allFiles[Math.floor(Math.random() * allFiles.length)];
+
+    document.getElementById('searchTarget').textContent = searchTarget;
+    document.getElementById('searchChallenge').classList.add('active');
+
+    searchActive = true;
+    searchStartTime = Date.now();
+
+    // Collapse all folders for challenge
+    collapseAll(tree);
+    renderTree();
+
+    updateTimer();
+}
+
+function updateTimer() {
+    if (!searchActive) return;
+
+    const elapsed = ((Date.now() - searchStartTime) / 1000).toFixed(1);
+    document.getElementById('timer').textContent = elapsed + 's';
+
+    requestAnimationFrame(updateTimer);
+}
+
+function foundTarget() {
+    if (!searchActive) return;
+
+    const elapsed = (Date.now() - searchStartTime) / 1000;
+    searchActive = false;
+
+    const depth = calculateDepth(tree, searchTarget);
+    let speedRating = '';
+    let points = 0;
+
+    if (elapsed < 3) {
+        speedRating = 'Excellent!';
+        points = 100;
+    } else if (elapsed < 5) {
+        speedRating = 'Good!';
+        points = 75;
+    } else if (elapsed < 8) {
+        speedRating = 'Fair';
+        points = 50;
+    } else {
+        speedRating = 'Slow';
+        points = 25;
+    }
+
+    // Bonus for shallow depth
+    if (depth <= 3) points += 25;
+
+    score += points;
+
+    document.getElementById('searchSpeed').textContent = elapsed.toFixed(1) + 's';
+
+    const feedback = document.getElementById('feedback');
+    feedback.classList.add('show');
+    document.getElementById('feedbackTitle').textContent = `Found in ${elapsed.toFixed(1)}s - ${speedRating}`;
+    document.getElementById('feedbackText').innerHTML = `
+        You earned <strong>${points} points</strong>!<br>
+        File depth: ${depth} levels<br>
+        ${depth <= 3 ? '✓ Good depth!' : '⚠ Consider reducing tree depth for faster access'}
+    `;
+
+    document.getElementById('searchChallenge').classList.remove('active');
+    updateStats();
+}
+
+function getAllFiles(node, files = []) {
+    if (node.type === 'file') {
+        files.push(node.name);
+    } else if (node.children) {
+        node.children.forEach(child => getAllFiles(child, files));
+    }
+    return files;
+}
+
+function calculateDepth(node, targetName, currentDepth = 0) {
+    if (node.name === targetName) return currentDepth;
+
+    if (node.children) {
+        for (const child of node.children) {
+            const depth = calculateDepth(child, targetName, currentDepth + 1);
+            if (depth !== -1) return depth;
+        }
+    }
+
+    return -1;
+}
+
+function collapseAll(node) {
+    if (node.type === 'folder') {
+        node.expanded = false;
+        if (node.children) {
+            node.children.forEach(child => collapseAll(child));
+        }
+    }
+}
+
+function checkOrganization() {
+    const scenario = scenarios[currentScenario];
+
+    if (scenario.items.length > 0) {
+        alert("You still have items to organize!");
+        return;
+    }
+
+    const depth = getMaxDepth(tree);
+    const balance = calculateBalance(tree);
+
+    let feedback = '';
+    let points = 0;
+
+    // Check depth
+    if (depth >= 2 && depth <= 4) {
+        feedback += '✓ Good depth (2-4 levels)\n';
+        points += 50;
+    } else if (depth === 1) {
+        feedback += '⚠ Too shallow - use folders to categorize\n';
+        points += 20;
+    } else {
+        feedback += '⚠ Too deep - simplify structure\n';
+        points += 30;
+    }
+
+    // Check balance
+    if (balance > 70) {
+        feedback += '✓ Well balanced tree\n';
+        points += 50;
+    } else if (balance > 50) {
+        feedback += '○ Moderate balance\n';
+        points += 30;
+    } else {
+        feedback += '⚠ Unbalanced - distribute items evenly\n';
+        points += 20;
+    }
+
+    score += points;
+
+    const feedbackDiv = document.getElementById('feedback');
+    feedbackDiv.classList.add('show');
+    document.getElementById('feedbackTitle').textContent = `Organization Score: ${points}/100`;
+    document.getElementById('feedbackText').innerHTML = feedback.replace(/\n/g, '<br>');
+
+    updateStats();
+}
+
+function getMaxDepth(node, currentDepth = 0) {
+    if (!node.children || node.children.length === 0) {
+        return currentDepth;
+    }
+
+    return Math.max(...node.children.map(child => getMaxDepth(child, currentDepth + 1)));
+}
+
+function calculateBalance(node) {
+    if (!node.children || node.children.length === 0) return 100;
+
+    const depths = node.children.map(child => getMaxDepth(child));
+    const minDepth = Math.min(...depths);
+    const maxDepth = Math.max(...depths);
+
+    if (maxDepth === 0) return 100;
+
+    return Math.round((minDepth / maxDepth) * 100);
+}
+
+function updateStats() {
+    document.getElementById('score').textContent = score;
+    document.getElementById('treeDepth').textContent = getMaxDepth(tree);
+    document.getElementById('balanceScore').textContent = calculateBalance(tree) + '%';
+
+    const fileCount = getAllFiles(tree).length;
+    const totalFiles = scenarios[currentScenario].items.length + fileCount;
+    const efficiency = totalFiles > 0 ? Math.round((fileCount / totalFiles) * 100) : 0;
+    document.getElementById('efficiency').textContent = efficiency + '%';
+}
+
+function updateProgress() {
+    const progress = ((currentScenario + 1) / scenarios.length) * 100;
+    document.getElementById('progressBar').style.width = progress + '%';
+}
+
+function resetTree() {
+    if (confirm("Reset the tree and start over?")) {
+        loadScenario();
+    }
+}
+
+function nextScenario() {
+    const scenario = scenarios[currentScenario];
+
+    if (scenario.items.length > 0) {
+        if (!confirm("You have unorganized items. Continue anyway?")) {
+            return;
+        }
+    }
+
+    currentScenario++;
+    if (currentScenario >= scenarios.length) {
+        showFinalScore();
+        return;
+    }
+
+    loadScenario();
+}
+
+function showFinalScore() {
+    const avgScore = Math.round(score / scenarios.length);
+    let message = '';
+
+    if (avgScore >= 150) {
+        message = '🏆 Master Organizer! Perfect tree structures!';
+    } else if (avgScore >= 120) {
+        message = '⭐ Excellent! You understand tree organization well!';
+    } else if (avgScore >= 90) {
+        message = '👍 Good job! Keep practicing for better balance.';
+    } else if (avgScore >= 60) {
+        message = '📚 Not bad! Review the lesson on tree efficiency.';
+    } else {
+        message = '💡 Keep learning! Focus on depth and balance.';
+    }
+
+    alert(`Game Complete!\n\nFinal Score: ${score}\nAverage per Scenario: ${avgScore}\n\n${message}\n\nTip: Efficient trees have 3-4 levels and balanced branches!`);
+}
+
+// Initialize
+loadScenario();
+</script>
+</body>
+</html>

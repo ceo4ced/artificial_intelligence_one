@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bias Detective - AI Bias Game</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 0; }
+.nav-header { background: #2d3748; padding: 15px 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; }
+.nav-header a { color: #90cdf4; text-decoration: none; font-weight: 600; font-size: 1.1em; }
+.nav-title { color: #fff; font-size: 1.2em; font-weight: 700; }
+.container { max-width: 1200px; margin: 20px auto; background: #fff; border-radius: 15px; padding: 30px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+h1 { text-align: center; color: #2d3748; font-size: 2.5em; margin-bottom: 10px; }
+.subtitle { text-align: center; color: #666; margin-bottom: 30px; font-size: 1.1em; }
+.game-area { display: grid; grid-template-columns: 300px 1fr; gap: 30px; }
+.sidebar { background: #f8f9fa; padding: 20px; border-radius: 10px; height: fit-content; }
+.score-display { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; padding: 20px; border-radius: 10px; text-align: center; margin-bottom: 20px; }
+.score-value { font-size: 3em; font-weight: bold; margin: 10px 0; }
+.stats { margin: 15px 0; }
+.stat-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e0e0e0; }
+.scenario-card { background: #fff; border: 2px solid #e0e0e0; border-radius: 10px; padding: 30px; margin-bottom: 20px; }
+.scenario-card h3 { color: #667eea; margin-bottom: 15px; font-size: 1.6em; }
+.scenario-text { background: #f8f9fa; padding: 20px; border-radius: 8px; line-height: 1.8; color: #2d3748; margin-bottom: 25px; font-size: 1.05em; }
+.bias-options { display: grid; gap: 15px; }
+.bias-option { background: #fff; border: 2px solid #667eea; padding: 20px; border-radius: 10px; cursor: pointer; transition: all 0.3s; }
+.bias-option:hover { background: #f0f4ff; transform: translateX(5px); }
+.bias-option h4 { color: #667eea; margin-bottom: 8px; }
+.bias-option p { color: #4a5568; font-size: 0.95em; line-height: 1.6; }
+.bias-option.correct { background: #4CAF50; border-color: #4CAF50; color: #fff; }
+.bias-option.correct h4,
+.bias-option.correct p { color: #fff; }
+.bias-option.incorrect { background: #f44336; border-color: #f44336; color: #fff; }
+.bias-option.incorrect h4,
+.bias-option.incorrect p { color: #fff; }
+.bias-option.disabled { cursor: not-allowed; opacity: 0.6; }
+.feedback { background: #e3f2fd; padding: 20px; border-radius: 10px; margin-top: 20px; border-left: 4px solid #2196F3; display: none; }
+.feedback.show { display: block; animation: slideIn 0.3s; }
+.feedback h4 { color: #1976d2; margin-bottom: 10px; }
+button { padding: 15px 30px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 1.05em; transition: all 0.3s; }
+.btn-primary { background: #4CAF50; color: #fff; width: 100%; margin-top: 10px; }
+.btn-primary:hover { background: #45a049; transform: scale(1.02); }
+.btn-secondary { background: #2196F3; color: #fff; width: 100%; }
+.btn-secondary:hover { background: #1976d2; }
+.progress-bar { background: #e0e0e0; height: 8px; border-radius: 4px; margin: 20px 0; overflow: hidden; }
+.progress-fill { background: linear-gradient(90deg, #667eea, #764ba2); height: 100%; transition: width 0.3s; }
+.achievement { background: #fff9c4; padding: 15px; border-radius: 8px; margin: 10px 0; text-align: center; border: 2px solid #fbc02d; display: none; }
+.achievement.show { display: block; animation: bounce 0.5s; }
+@keyframes slideIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes bounce { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+.how-to-play { background: #e8f5e9; padding: 15px; border-radius: 8px; margin: 15px 0; }
+.how-to-play h4 { color: #2e7d32; margin-bottom: 10px; }
+.how-to-play ul { margin-left: 20px; line-height: 1.8; color: #1b5e20; }
+</style>
+</head>
+<body>
+<nav class="nav-header">
+    <div class="nav-title">🔍 Bias Detective</div>
+    <a href="../../index.html">← Back to Home</a>
+</nav>
+<div class="container">
+    <h1>🔍 Bias Detective</h1>
+    <p class="subtitle">Identify the type of bias in each AI scenario!</p>
+
+    <div class="game-area">
+        <div class="sidebar">
+            <div class="score-display">
+                <div>Score</div>
+                <div class="score-value" id="score">0</div>
+                <div>Streak: <span id="streak">0</span></div>
+            </div>
+
+            <div class="stats">
+                <div class="stat-row">
+                    <span>Scenarios Solved:</span>
+                    <span id="solved">0/12</span>
+                </div>
+                <div class="stat-row">
+                    <span>Accuracy:</span>
+                    <span id="accuracy">0%</span>
+                </div>
+                <div class="stat-row">
+                    <span>Best Streak:</span>
+                    <span id="bestStreak">0</span>
+                </div>
+            </div>
+
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar" style="width: 0%"></div>
+            </div>
+
+            <button class="btn-secondary" onclick="nextScenario()">Next Scenario →</button>
+            <button class="btn-primary" onclick="resetGame()">Start Over</button>
+
+            <div class="how-to-play">
+                <h4>How to Play:</h4>
+                <ul>
+                    <li>Read each scenario carefully</li>
+                    <li>Identify the type of bias</li>
+                    <li>Click your answer</li>
+                    <li>Learn from the explanation!</li>
+                </ul>
+            </div>
+
+            <div id="achievement" class="achievement">
+                <strong>Achievement Unlocked!</strong>
+                <div id="achievementText"></div>
+            </div>
+        </div>
+
+        <div>
+            <div class="scenario-card">
+                <h3 id="scenarioTitle">Scenario 1</h3>
+                <div class="scenario-text" id="scenarioText">
+                    Loading scenario...
+                </div>
+
+                <div class="bias-options" id="biasOptions">
+                    <!-- Options will be populated by JavaScript -->
+                </div>
+
+                <div class="feedback" id="feedback">
+                    <h4 id="feedbackTitle">Feedback</h4>
+                    <p id="feedbackText"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const scenarios = [
+    {
+        title: "The Hiring Algorithm",
+        text: "A tech company builds an AI hiring tool trained on resumes from the past 10 years. During that time, 85% of hires were men. The AI now automatically ranks resumes with women's colleges or women's sports teams lower than others.",
+        correctAnswer: "Historical Bias",
+        explanation: "This is Historical Bias. The AI learned from past hiring patterns that reflected gender discrimination. Even though the historical data was accurate, it contained societal biases from the past that the AI replicated.",
+        options: [
+            { type: "Historical Bias", description: "Learning from past data that reflects discrimination" },
+            { type: "Data Bias", description: "Training data doesn't represent all groups equally" },
+            { type: "Selection Bias", description: "Training data doesn't reflect the real world" },
+            { type: "Label Bias", description: "Human labelers add their own biases" }
+        ]
+    },
+    {
+        title: "The Facial Recognition System",
+        text: "A facial recognition system was trained on a dataset containing 100,000 images. Of these, 70,000 were light-skinned faces and 30,000 were dark-skinned faces. The system now has a 2% error rate for light skin but a 28% error rate for dark skin.",
+        correctAnswer: "Data Bias",
+        explanation: "This is Data Bias. The training dataset didn't represent all skin tones equally. With more than twice as many light-skinned examples, the AI had much more opportunity to learn features for that group, leading to unequal performance.",
+        options: [
+            { type: "Data Bias", description: "Training data doesn't represent all groups equally" },
+            { type: "Algorithmic Bias", description: "The algorithm itself creates unfair outcomes" },
+            { type: "Selection Bias", description: "Training data doesn't reflect the real world" },
+            { type: "Historical Bias", description: "Learning from past data that reflects discrimination" }
+        ]
+    },
+    {
+        title: "The Medical Risk Predictor",
+        text: "A healthcare AI was trained only on data from patients who regularly visited doctors and had health insurance. When deployed across the whole population, it performs poorly for people without regular healthcare access.",
+        correctAnswer: "Selection Bias",
+        explanation: "This is Selection Bias. The training data came only from patients with healthcare access, which doesn't represent the full population. People without insurance or regular doctor visits have different health patterns that the AI never learned.",
+        options: [
+            { type: "Selection Bias", description: "Training data doesn't reflect the real world" },
+            { type: "Data Bias", description: "Training data doesn't represent all groups equally" },
+            { type: "Historical Bias", description: "Learning from past data that reflects discrimination" },
+            { type: "Algorithmic Bias", description: "The algorithm itself creates unfair outcomes" }
+        ]
+    },
+    {
+        title: "The Content Moderation Bot",
+        text: "Human moderators trained an AI to flag 'threatening' content by labeling thousands of posts. The moderators unconsciously labeled posts in African American Vernacular English (AAVE) as more threatening than similar posts in Standard American English.",
+        correctAnswer: "Label Bias",
+        explanation: "This is Label Bias. The human labelers unknowingly added their own cultural biases when tagging the training data. Their subjective judgments about what seems 'threatening' were influenced by stereotypes about different language styles.",
+        options: [
+            { type: "Label Bias", description: "Human labelers add their own biases" },
+            { type: "Confirmation Bias", description: "Designers confirm their existing beliefs" },
+            { type: "Historical Bias", description: "Learning from past data that reflects discrimination" },
+            { type: "Data Bias", description: "Training data doesn't represent all groups equally" }
+        ]
+    },
+    {
+        title: "The Credit Score Model",
+        text: "A bank's AI credit model uses zip code as a feature to predict loan defaults. Even though race isn't directly used, zip codes correlate strongly with race due to historical housing segregation. The AI effectively discriminates by race through this proxy.",
+        correctAnswer: "Algorithmic Bias",
+        explanation: "This is Algorithmic Bias. Even with complete data, the way the algorithm uses zip code creates unfair outcomes. Using features that correlate with protected characteristics (like race) creates indirect discrimination, even when those characteristics aren't directly included.",
+        options: [
+            { type: "Algorithmic Bias", description: "The algorithm itself creates unfair outcomes" },
+            { type: "Historical Bias", description: "Learning from past data that reflects discrimination" },
+            { type: "Data Bias", description: "Training data doesn't represent all groups equally" },
+            { type: "Selection Bias", description: "Training data doesn't reflect the real world" }
+        ]
+    },
+    {
+        title: "The Voice Assistant",
+        text: "Developers building a voice assistant believed that users would prefer a female voice for helpful tasks and a male voice for authoritative tasks. They designed the system to use a female voice by default, reinforcing gender stereotypes.",
+        correctAnswer: "Confirmation Bias",
+        explanation: "This is Confirmation Bias. The developers designed the system based on their existing beliefs about gender roles rather than objective evidence. They built their assumptions into the product, which then reinforces those stereotypes for users.",
+        options: [
+            { type: "Confirmation Bias", description: "Designers confirm their existing beliefs" },
+            { type: "Label Bias", description: "Human labelers add their own biases" },
+            { type: "Algorithmic Bias", description: "The algorithm itself creates unfair outcomes" },
+            { type: "Historical Bias", description: "Learning from past data that reflects discrimination" }
+        ]
+    },
+    {
+        title: "The Job Ad Targeting System",
+        text: "An AI advertising system was trained on past ad performance data. It learned that historically, men clicked more often on engineering job ads and women clicked more on nursing job ads. Now it mainly shows engineering ads to men and nursing ads to women.",
+        correctAnswer: "Historical Bias",
+        explanation: "This is Historical Bias. The AI learned from historical patterns that reflected existing gender stereotypes in career choices. By optimizing based on past behavior, it perpetuates those stereotypes instead of giving everyone equal access to all opportunities.",
+        options: [
+            { type: "Historical Bias", description: "Learning from past data that reflects discrimination" },
+            { type: "Confirmation Bias", description: "Designers confirm their existing beliefs" },
+            { type: "Selection Bias", description: "Training data doesn't reflect the real world" },
+            { type: "Algorithmic Bias", description: "The algorithm itself creates unfair outcomes" }
+        ]
+    },
+    {
+        title: "The Sentiment Analysis Tool",
+        text: "A sentiment analysis AI was trained on social media posts, where younger users are more active. When analyzing customer feedback, it performs well on casual language and emojis but struggles with formal language used by older customers.",
+        correctAnswer: "Data Bias",
+        explanation: "This is Data Bias. The training data over-represented younger users' communication styles and under-represented older users' styles. The AI had more examples to learn from for one demographic, leading to unequal performance across age groups.",
+        options: [
+            { type: "Data Bias", description: "Training data doesn't represent all groups equally" },
+            { type: "Selection Bias", description: "Training data doesn't reflect the real world" },
+            { type: "Label Bias", description: "Human labelers add their own biases" },
+            { type: "Algorithmic Bias", description: "The algorithm itself creates unfair outcomes" }
+        ]
+    },
+    {
+        title: "The Recidivism Predictor",
+        text: "A criminal justice AI was trained on arrest and conviction records. In areas with heavier policing of certain neighborhoods, arrest rates were higher regardless of actual crime rates. The AI learned to associate living in these areas with higher risk.",
+        correctAnswer: "Selection Bias",
+        explanation: "This is Selection Bias. The training data (arrest records) doesn't reflect actual crime rates—it reflects policing patterns. Areas with more police presence have more arrests, but that doesn't mean more crime occurs there. The data collection method biased the training set.",
+        options: [
+            { type: "Selection Bias", description: "Training data doesn't reflect the real world" },
+            { type: "Data Bias", description: "Training data doesn't represent all groups equally" },
+            { type: "Historical Bias", description: "Learning from past data that reflects discrimination" },
+            { type: "Algorithmic Bias", description: "The algorithm itself creates unfair outcomes" }
+        ]
+    },
+    {
+        title: "The Image Search Engine",
+        text: "Developers trained an image recognition system to detect 'professional' vs. 'unprofessional' photos. The labeling team consistently rated business suits as professional and casual wear as unprofessional, even for jobs where casual dress is standard.",
+        correctAnswer: "Label Bias",
+        explanation: "This is Label Bias. The human labelers brought their own cultural assumptions about professionalism when tagging the images. Their subjective judgments about dress codes were influenced by their personal backgrounds and experiences, creating biased labels.",
+        options: [
+            { type: "Label Bias", description: "Human labelers add their own biases" },
+            { type: "Confirmation Bias", description: "Designers confirm their existing beliefs" },
+            { type: "Data Bias", description: "Training data doesn't represent all groups equally" },
+            { type: "Historical Bias", description: "Learning from past data that reflects discrimination" }
+        ]
+    },
+    {
+        title: "The Scholarship Predictor",
+        text: "A university built an AI to predict scholarship success using GPA, test scores, and extracurricular activities. The algorithm weighted expensive activities (like travel abroad and private music lessons) heavily, disadvantaging students from low-income families.",
+        correctAnswer: "Algorithmic Bias",
+        explanation: "This is Algorithmic Bias. Even if the data was complete, the way the algorithm weighs features creates unfair outcomes. By heavily weighting activities that require financial resources, the system discriminates against qualified students who couldn't afford those experiences.",
+        options: [
+            { type: "Algorithmic Bias", description: "The algorithm itself creates unfair outcomes" },
+            { type: "Selection Bias", description: "Training data doesn't reflect the real world" },
+            { type: "Data Bias", description: "Training data doesn't represent all groups equally" },
+            { type: "Confirmation Bias", description: "Designers confirm their existing beliefs" }
+        ]
+    },
+    {
+        title: "The Translation System",
+        text: "An AI translation system was trained on historical texts and literature. When translating gender-neutral languages to English, it consistently translated doctor as 'he' and nurse as 'she' because those patterns appeared frequently in older texts.",
+        correctAnswer: "Historical Bias",
+        explanation: "This is Historical Bias. The training data (historical texts) reflected outdated gender stereotypes about professions. The AI learned these patterns from accurate historical data, but applying them today perpetuates discrimination that society has been working to overcome.",
+        options: [
+            { type: "Historical Bias", description: "Learning from past data that reflects discrimination" },
+            { type: "Data Bias", description: "Training data doesn't represent all groups equally" },
+            { type: "Confirmation Bias", description: "Designers confirm their existing beliefs" },
+            { type: "Label Bias", description: "Human labelers add their own biases" }
+        ]
+    }
+];
+
+let currentScenario = 0;
+let score = 0;
+let streak = 0;
+let bestStreak = 0;
+let correct = 0;
+let answered = false;
+
+function loadScenario() {
+    const scenario = scenarios[currentScenario];
+    answered = false;
+
+    document.getElementById('scenarioTitle').textContent = `Scenario ${currentScenario + 1}: ${scenario.title}`;
+    document.getElementById('scenarioText').textContent = scenario.text;
+    document.getElementById('feedback').classList.remove('show');
+
+    const optionsContainer = document.getElementById('biasOptions');
+    optionsContainer.innerHTML = '';
+
+    scenario.options.forEach(option => {
+        const optionDiv = document.createElement('div');
+        optionDiv.className = 'bias-option';
+        optionDiv.innerHTML = `
+            <h4>${option.type}</h4>
+            <p>${option.description}</p>
+        `;
+        optionDiv.onclick = () => selectAnswer(option.type);
+        optionsContainer.appendChild(optionDiv);
+    });
+
+    updateProgress();
+}
+
+function selectAnswer(selectedType) {
+    if (answered) return;
+    answered = true;
+
+    const scenario = scenarios[currentScenario];
+    const isCorrect = selectedType === scenario.correctAnswer;
+    const options = document.querySelectorAll('.bias-option');
+
+    options.forEach(option => {
+        const optionType = option.querySelector('h4').textContent;
+        option.classList.add('disabled');
+
+        if (optionType === scenario.correctAnswer) {
+            option.classList.add('correct');
+        } else if (optionType === selectedType && !isCorrect) {
+            option.classList.add('incorrect');
+        }
+    });
+
+    const feedback = document.getElementById('feedback');
+    const feedbackTitle = document.getElementById('feedbackTitle');
+    const feedbackText = document.getElementById('feedbackText');
+
+    if (isCorrect) {
+        correct++;
+        streak++;
+        bestStreak = Math.max(bestStreak, streak);
+        score += 100 + (streak * 10);
+
+        feedbackTitle.textContent = '✅ Correct!';
+        feedbackTitle.style.color = '#4CAF50';
+        feedbackText.textContent = scenario.explanation;
+
+        checkAchievements();
+    } else {
+        streak = 0;
+        feedbackTitle.textContent = '❌ Not Quite';
+        feedbackTitle.style.color = '#f44336';
+        feedbackText.textContent = scenario.explanation;
+    }
+
+    feedback.classList.add('show');
+    updateStats();
+}
+
+function nextScenario() {
+    if (!answered) {
+        alert('Please select an answer first!');
+        return;
+    }
+
+    currentScenario++;
+    if (currentScenario >= scenarios.length) {
+        showFinalScore();
+        return;
+    }
+
+    loadScenario();
+}
+
+function updateStats() {
+    document.getElementById('score').textContent = score;
+    document.getElementById('streak').textContent = streak;
+    document.getElementById('bestStreak').textContent = bestStreak;
+    document.getElementById('solved').textContent = `${currentScenario + (answered ? 1 : 0)}/${scenarios.length}`;
+    document.getElementById('accuracy').textContent = `${Math.round((correct / Math.max(currentScenario + (answered ? 1 : 0), 1)) * 100)}%`;
+}
+
+function updateProgress() {
+    const progress = ((currentScenario + (answered ? 1 : 0)) / scenarios.length) * 100;
+    document.getElementById('progressBar').style.width = `${progress}%`;
+}
+
+function checkAchievements() {
+    const achievementDiv = document.getElementById('achievement');
+    const achievementText = document.getElementById('achievementText');
+
+    if (streak === 3) {
+        achievementText.textContent = '🔥 3 in a row! You\'re on fire!';
+        achievementDiv.classList.add('show');
+        setTimeout(() => achievementDiv.classList.remove('show'), 3000);
+    } else if (streak === 5) {
+        achievementText.textContent = '⭐ 5 streak! Bias Detective Master!';
+        achievementDiv.classList.add('show');
+        setTimeout(() => achievementDiv.classList.remove('show'), 3000);
+    } else if (correct === scenarios.length && currentScenario === scenarios.length - 1) {
+        achievementText.textContent = '👑 Perfect Score! Ultimate Detective!';
+        achievementDiv.classList.add('show');
+        setTimeout(() => achievementDiv.classList.remove('show'), 3000);
+    }
+}
+
+function showFinalScore() {
+    const accuracy = Math.round((correct / scenarios.length) * 100);
+    let message = '';
+
+    if (accuracy === 100) {
+        message = '👑 Perfect! You\'re a Bias Detection Expert!';
+    } else if (accuracy >= 80) {
+        message = '⭐ Excellent work! You have a strong understanding of AI bias.';
+    } else if (accuracy >= 60) {
+        message = '👍 Good job! Keep learning about AI bias.';
+    } else {
+        message = '📚 Review the lesson and try again!';
+    }
+
+    alert(`Game Complete!\n\nFinal Score: ${score}\nAccuracy: ${accuracy}%\nBest Streak: ${bestStreak}\n\n${message}`);
+}
+
+function resetGame() {
+    currentScenario = 0;
+    score = 0;
+    streak = 0;
+    bestStreak = 0;
+    correct = 0;
+    answered = false;
+    loadScenario();
+    updateStats();
+}
+
+// Load first scenario on page load
+loadScenario();
+updateStats();
+</script>
+</body>
+</html>

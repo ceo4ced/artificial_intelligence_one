@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Intro to Data Science - Reading and Interpreting Graphs</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 0; }
+.nav-header { background: #2d3748; padding: 15px 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; }
+.nav-header a { color: #90cdf4; text-decoration: none; font-weight: 600; font-size: 1.1em; }
+.nav-title { color: #fff; font-size: 1.2em; font-weight: 700; }
+.container { max-width: 1400px; margin: 20px auto; background: #fff; border-radius: 15px; padding: 30px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+h1 { text-align: center; color: #2d3748; font-size: 2.5em; margin-bottom: 20px; }
+.intro { background: #e3f2fd; padding: 20px; border-radius: 10px; margin-bottom: 30px; line-height: 1.6; }
+.intro h2 { color: #1976d2; margin-bottom: 10px; }
+.main-content { display: grid; grid-template-columns: 350px 1fr; gap: 30px; }
+.sidebar { background: #f8f9fa; padding: 20px; border-radius: 10px; height: fit-content; position: sticky; top: 20px; }
+button { width: 100%; padding: 12px; margin: 5px 0; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }
+.btn-primary { background: #4CAF50; color: #fff; }
+.btn-secondary { background: #2196F3; color: #fff; }
+canvas { border: 2px solid #ddd; border-radius: 8px; display: block; background: #fff; margin: 20px auto; }
+.chart-selector { margin: 15px 0; }
+.chart-btn { width: 48%; display: inline-block; padding: 10px; margin: 2px; border: 2px solid #ddd; background: #fff; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.9em; transition: all 0.2s; }
+.chart-btn:hover { border-color: #667eea; }
+.chart-btn.active { background: #667eea; color: #fff; border-color: #667eea; }
+.explanation { background: #fff9c4; padding: 15px; border-radius: 8px; margin: 15px 0; border-left: 4px solid #fbc02d; }
+.explanation h4 { color: #f57c00; margin-bottom: 8px; }
+.chart-info { background: #e8f5e9; padding: 15px; border-radius: 8px; margin: 15px 0; }
+.chart-info h4 { color: #2e7d32; margin-bottom: 8px; }
+.chart-info ul { margin-left: 20px; font-size: 0.9em; line-height: 1.6; }
+.comparison-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 20px 0; }
+.comparison-card { background: #f0f0f0; padding: 15px; border-radius: 8px; border-left: 4px solid #2196F3; }
+.comparison-card h4 { color: #1976d2; margin-bottom: 10px; }
+.comparison-card.bad { border-left-color: #f44336; }
+.comparison-card.bad h4 { color: #c62828; }
+.example-section { background: #fafafa; padding: 20px; border-radius: 10px; margin: 20px 0; }
+.example-section h3 { color: #2d3748; margin-bottom: 15px; }
+.key-points { background: #e3f2fd; padding: 15px; border-radius: 8px; margin: 15px 0; }
+.key-points h4 { color: #1976d2; margin-bottom: 10px; }
+.key-points ul { margin-left: 20px; line-height: 1.8; }
+.game-link { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; padding: 25px; border-radius: 10px; text-align: center; margin-top: 30px; }
+.game-link h3 { margin-bottom: 10px; font-size: 1.8em; }
+.game-link a { color: #fff; text-decoration: none; background: #4CAF50; padding: 15px 30px; border-radius: 8px; display: inline-block; font-weight: 600; font-size: 1.2em; margin-top: 15px; transition: all 0.2s; }
+.game-link a:hover { background: #45a049; transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+</style>
+</head>
+<body>
+<nav class="nav-header">
+    <div class="nav-title">📊 Data Science - Graphs & Charts</div>
+    <a href="../../index.html">← Back to Home</a>
+</nav>
+<div class="container">
+    <h1>📊 Intro to Data Science: Reading and Interpreting Graphs</h1>
+
+    <div class="intro">
+        <h2>Why Are Graphs Important in Data Science?</h2>
+        <p>
+            Data visualization is the art and science of presenting data visually so that patterns, trends, and insights
+            become clear at a glance. Choosing the <strong>right chart type</strong> is crucial - the same data can tell
+            completely different stories depending on how it's visualized! In this lesson, you'll learn about the main
+            chart types, when to use each one, and how to read them effectively.
+        </p>
+    </div>
+
+    <div class="main-content">
+        <div class="sidebar">
+            <h3>Chart Type</h3>
+            <div class="chart-selector">
+                <button class="chart-btn active" onclick="switchChart('bar')">📊 Bar</button>
+                <button class="chart-btn" onclick="switchChart('line')">📈 Line</button>
+                <button class="chart-btn" onclick="switchChart('pie')">🥧 Pie</button>
+                <button class="chart-btn" onclick="switchChart('scatter')">⚫ Scatter</button>
+            </div>
+
+            <button class="btn-primary" onclick="updateData()">🎲 New Data</button>
+            <button class="btn-secondary" onclick="toggleLabels()">🏷️ Toggle Labels</button>
+
+            <div class="chart-info" id="chartInfo">
+                <!-- Populated by JavaScript -->
+            </div>
+
+            <div class="explanation">
+                <h4>Reading the Chart:</h4>
+                <p id="readingInstructions">
+                    Bar charts show comparisons between categories. Look at the height of each bar to compare values.
+                    The tallest bar represents the highest value.
+                </p>
+            </div>
+
+            <div class="key-points">
+                <h4>Key Chart Elements:</h4>
+                <ul>
+                    <li><strong>Title:</strong> What the chart shows</li>
+                    <li><strong>X-axis:</strong> Horizontal axis (categories/time)</li>
+                    <li><strong>Y-axis:</strong> Vertical axis (values/measurements)</li>
+                    <li><strong>Legend:</strong> Explains colors/symbols</li>
+                    <li><strong>Data points:</strong> The actual values</li>
+                </ul>
+            </div>
+        </div>
+
+        <div>
+            <canvas id="canvas" width="900" height="450"></canvas>
+
+            <div class="example-section">
+                <h3>Chart Type Guide</h3>
+                <div class="comparison-grid">
+                    <div class="comparison-card">
+                        <h4>📊 Bar Charts - BEST FOR:</h4>
+                        <ul style="margin-left: 20px; line-height: 1.6;">
+                            <li>Comparing categories</li>
+                            <li>Discrete/distinct groups</li>
+                            <li>Non-time-based data</li>
+                            <li>Example: Sales by product</li>
+                        </ul>
+                    </div>
+                    <div class="comparison-card">
+                        <h4>📈 Line Charts - BEST FOR:</h4>
+                        <ul style="margin-left: 20px; line-height: 1.6;">
+                            <li>Trends over time</li>
+                            <li>Continuous data</li>
+                            <li>Showing change/growth</li>
+                            <li>Example: Stock prices</li>
+                        </ul>
+                    </div>
+                    <div class="comparison-card">
+                        <h4>🥧 Pie Charts - BEST FOR:</h4>
+                        <ul style="margin-left: 20px; line-height: 1.6;">
+                            <li>Parts of a whole</li>
+                            <li>Percentages/proportions</li>
+                            <li>Limited categories (3-6)</li>
+                            <li>Example: Budget breakdown</li>
+                        </ul>
+                    </div>
+                    <div class="comparison-card">
+                        <h4>⚫ Scatter Plots - BEST FOR:</h4>
+                        <ul style="margin-left: 20px; line-height: 1.6;">
+                            <li>Relationships between variables</li>
+                            <li>Correlations/patterns</li>
+                            <li>Outlier detection</li>
+                            <li>Example: Height vs Weight</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="example-section">
+                <h3>Good vs Bad Chart Choices</h3>
+                <div class="comparison-grid">
+                    <div class="comparison-card">
+                        <h4>✅ GOOD: Time Series Data → Line Chart</h4>
+                        <p style="margin-top: 10px; line-height: 1.6;">
+                            When showing temperature over 12 months, a <strong>line chart</strong> clearly shows the
+                            seasonal pattern and trends. You can see rising and falling temperatures at a glance.
+                        </p>
+                    </div>
+                    <div class="comparison-card bad">
+                        <h4>❌ BAD: Time Series Data → Pie Chart</h4>
+                        <p style="margin-top: 10px; line-height: 1.6;">
+                            Using a <strong>pie chart</strong> for monthly temperatures makes no sense! Pie charts show
+                            parts of a whole, but each month's temperature is independent. The trend is lost.
+                        </p>
+                    </div>
+                    <div class="comparison-card">
+                        <h4>✅ GOOD: Budget Breakdown → Pie Chart</h4>
+                        <p style="margin-top: 10px; line-height: 1.6;">
+                            For showing what percentage of your budget goes to rent, food, and entertainment, a
+                            <strong>pie chart</strong> instantly shows the proportions. You see the whole budget at once.
+                        </p>
+                    </div>
+                    <div class="comparison-card bad">
+                        <h4>❌ BAD: Budget Breakdown → Scatter Plot</h4>
+                        <p style="margin-top: 10px; line-height: 1.6;">
+                            A <strong>scatter plot</strong> for budget categories makes no sense! Scatter plots show
+                            relationships between two variables, not parts of a whole. Wrong tool for the job!
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div style="background: #fff3e0; padding: 20px; border-radius: 10px; margin-top: 20px; border-left: 4px solid #ff9800;">
+                <h4 style="color: #e65100; margin-bottom: 10px;">💡 Pro Tips for Reading Graphs</h4>
+                <ol style="margin-left: 20px; line-height: 1.8;">
+                    <li><strong>Always check the axes:</strong> Make sure you understand what's being measured and the scale</li>
+                    <li><strong>Look for trends:</strong> Is the data going up, down, or staying flat?</li>
+                    <li><strong>Check for outliers:</strong> Are there any unusual data points?</li>
+                    <li><strong>Read the title and labels:</strong> Context is everything!</li>
+                    <li><strong>Be skeptical:</strong> Can the chart be misleading? (truncated axes, cherry-picked data, etc.)</li>
+                </ol>
+            </div>
+
+            <div class="game-link">
+                <h3>🎮 Ready to Practice?</h3>
+                <p style="font-size: 1.1em; margin: 10px 0;">
+                    Test your skills with the Chart Switcher game! You'll see different datasets and need to choose
+                    the best chart type for each one. Can you get a perfect score?
+                </p>
+                <a href="../../games/data-science-intro/index.html">Play Chart Switcher Game →</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+
+let currentChart = 'bar';
+let showLabels = true;
+let data = {
+    labels: ['Product A', 'Product B', 'Product C', 'Product D', 'Product E'],
+    values: [45, 62, 38, 71, 54]
+};
+
+const chartInfo = {
+    bar: {
+        title: 'Bar Chart',
+        bestFor: 'Comparing categories',
+        whenToUse: 'Use when you want to compare discrete groups or categories. Great for showing "which is bigger/smaller".',
+        example: 'Sales by product, survey responses, category comparisons'
+    },
+    line: {
+        title: 'Line Chart',
+        bestFor: 'Showing trends over time',
+        whenToUse: 'Use for continuous data, especially time series. Perfect for spotting trends, patterns, and changes.',
+        example: 'Stock prices, temperature over time, website traffic'
+    },
+    pie: {
+        title: 'Pie Chart',
+        bestFor: 'Parts of a whole',
+        whenToUse: 'Use when showing how a total is divided into parts. Best with 3-6 categories. All parts must add to 100%.',
+        example: 'Budget breakdown, market share, demographic percentages'
+    },
+    scatter: {
+        title: 'Scatter Plot',
+        bestFor: 'Relationships between variables',
+        whenToUse: 'Use to find correlations, patterns, or clusters between two variables. Each point represents one observation.',
+        example: 'Height vs weight, study time vs test score, age vs income'
+    }
+};
+
+function switchChart(type) {
+    currentChart = type;
+    document.querySelectorAll('.chart-btn').forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+
+    updateChartInfo();
+    draw();
+}
+
+function updateChartInfo() {
+    const info = chartInfo[currentChart];
+    const infoDiv = document.getElementById('chartInfo');
+
+    infoDiv.innerHTML = `
+        <h4>${info.title}</h4>
+        <p style="margin: 8px 0; font-size: 0.9em;"><strong>Best for:</strong> ${info.bestFor}</p>
+        <p style="margin: 8px 0; font-size: 0.9em; line-height: 1.5;"><strong>When to use:</strong> ${info.whenToUse}</p>
+        <p style="margin: 8px 0; font-size: 0.9em; color: #666;"><em>Example: ${info.example}</em></p>
+    `;
+
+    const instructions = {
+        bar: 'Bar charts show comparisons between categories. Look at the height of each bar to compare values. The tallest bar represents the highest value.',
+        line: 'Line charts show trends over time. Follow the line from left to right to see if values are increasing, decreasing, or fluctuating. The slope shows the rate of change.',
+        pie: 'Pie charts show parts of a whole. Each slice represents a percentage of the total. Larger slices = bigger portions. All slices add up to 100%.',
+        scatter: 'Scatter plots show relationships between two variables. Each dot is one data point. Look for patterns: do points cluster, spread out, or follow a trend?'
+    };
+
+    document.getElementById('readingInstructions').textContent = instructions[currentChart];
+}
+
+function updateData() {
+    if (currentChart === 'scatter') {
+        // Generate scatter plot data
+        data.points = [];
+        for (let i = 0; i < 30; i++) {
+            data.points.push({
+                x: Math.random() * 100,
+                y: Math.random() * 100
+            });
+        }
+    } else {
+        // Generate random values
+        data.values = data.labels.map(() => Math.floor(Math.random() * 60) + 20);
+    }
+    draw();
+}
+
+function toggleLabels() {
+    showLabels = !showLabels;
+    draw();
+}
+
+function drawBarChart() {
+    const chartArea = { x: 80, y: 50, width: 740, height: 320 };
+    const barWidth = chartArea.width / data.labels.length - 20;
+    const maxValue = Math.max(...data.values);
+
+    // Title
+    ctx.fillStyle = '#2d3748';
+    ctx.font = 'bold 18px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('Product Sales Comparison', canvas.width / 2, 30);
+
+    // Axes
+    ctx.strokeStyle = '#333';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(chartArea.x, chartArea.y);
+    ctx.lineTo(chartArea.x, chartArea.y + chartArea.height);
+    ctx.lineTo(chartArea.x + chartArea.width, chartArea.y + chartArea.height);
+    ctx.stroke();
+
+    // Y-axis labels
+    if (showLabels) {
+        ctx.fillStyle = '#666';
+        ctx.font = '12px Arial';
+        ctx.textAlign = 'right';
+        for (let i = 0; i <= 5; i++) {
+            const value = Math.round(maxValue * i / 5);
+            const y = chartArea.y + chartArea.height - (chartArea.height * i / 5);
+            ctx.fillText(value, chartArea.x - 10, y + 5);
+
+            // Grid lines
+            ctx.strokeStyle = '#e0e0e0';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(chartArea.x, y);
+            ctx.lineTo(chartArea.x + chartArea.width, y);
+            ctx.stroke();
+        }
+    }
+
+    // Bars
+    const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8'];
+    data.labels.forEach((label, i) => {
+        const x = chartArea.x + (i * (chartArea.width / data.labels.length)) + 30;
+        const barHeight = (data.values[i] / maxValue) * chartArea.height;
+        const y = chartArea.y + chartArea.height - barHeight;
+
+        ctx.fillStyle = colors[i % colors.length];
+        ctx.fillRect(x, y, barWidth, barHeight);
+
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(x, y, barWidth, barHeight);
+
+        // Value labels
+        if (showLabels) {
+            ctx.fillStyle = '#333';
+            ctx.font = 'bold 14px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(data.values[i], x + barWidth / 2, y - 10);
+        }
+
+        // X-axis labels
+        ctx.fillStyle = '#666';
+        ctx.font = '12px Arial';
+        ctx.fillText(label, x + barWidth / 2, chartArea.y + chartArea.height + 20);
+    });
+
+    // Axis labels
+    if (showLabels) {
+        ctx.fillStyle = '#333';
+        ctx.font = 'bold 14px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('Products', canvas.width / 2, canvas.height - 10);
+
+        ctx.save();
+        ctx.translate(20, canvas.height / 2);
+        ctx.rotate(-Math.PI / 2);
+        ctx.fillText('Sales (units)', 0, 0);
+        ctx.restore();
+    }
+}
+
+function drawLineChart() {
+    const chartArea = { x: 80, y: 50, width: 740, height: 320 };
+    const maxValue = Math.max(...data.values);
+
+    // Title
+    ctx.fillStyle = '#2d3748';
+    ctx.font = 'bold 18px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('Monthly Revenue Trend', canvas.width / 2, 30);
+
+    // Axes
+    ctx.strokeStyle = '#333';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(chartArea.x, chartArea.y);
+    ctx.lineTo(chartArea.x, chartArea.y + chartArea.height);
+    ctx.lineTo(chartArea.x + chartArea.width, chartArea.y + chartArea.height);
+    ctx.stroke();
+
+    // Grid and Y-axis labels
+    if (showLabels) {
+        ctx.fillStyle = '#666';
+        ctx.font = '12px Arial';
+        ctx.textAlign = 'right';
+        for (let i = 0; i <= 5; i++) {
+            const value = Math.round(maxValue * i / 5);
+            const y = chartArea.y + chartArea.height - (chartArea.height * i / 5);
+            ctx.fillText(value, chartArea.x - 10, y + 5);
+
+            ctx.strokeStyle = '#e0e0e0';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(chartArea.x, y);
+            ctx.lineTo(chartArea.x + chartArea.width, y);
+            ctx.stroke();
+        }
+    }
+
+    // Line
+    const pointSpacing = chartArea.width / (data.labels.length - 1);
+
+    ctx.strokeStyle = '#4CAF50';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+
+    data.values.forEach((value, i) => {
+        const x = chartArea.x + (i * pointSpacing);
+        const y = chartArea.y + chartArea.height - (value / maxValue * chartArea.height);
+
+        if (i === 0) {
+            ctx.moveTo(x, y);
+        } else {
+            ctx.lineTo(x, y);
+        }
+    });
+    ctx.stroke();
+
+    // Points
+    data.values.forEach((value, i) => {
+        const x = chartArea.x + (i * pointSpacing);
+        const y = chartArea.y + chartArea.height - (value / maxValue * chartArea.height);
+
+        ctx.fillStyle = '#2196F3';
+        ctx.beginPath();
+        ctx.arc(x, y, 6, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Value labels
+        if (showLabels) {
+            ctx.fillStyle = '#333';
+            ctx.font = 'bold 12px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(value, x, y - 15);
+        }
+
+        // X-axis labels
+        ctx.fillStyle = '#666';
+        ctx.font = '12px Arial';
+        ctx.fillText(data.labels[i], x, chartArea.y + chartArea.height + 20);
+    });
+
+    // Axis labels
+    if (showLabels) {
+        ctx.fillStyle = '#333';
+        ctx.font = 'bold 14px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('Time Period', canvas.width / 2, canvas.height - 10);
+
+        ctx.save();
+        ctx.translate(20, canvas.height / 2);
+        ctx.rotate(-Math.PI / 2);
+        ctx.fillText('Revenue ($K)', 0, 0);
+        ctx.restore();
+    }
+}
+
+function drawPieChart() {
+    const centerX = canvas.width / 2;
+    const centerY = 230;
+    const radius = 140;
+
+    // Title
+    ctx.fillStyle = '#2d3748';
+    ctx.font = 'bold 18px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('Market Share Distribution', canvas.width / 2, 30);
+
+    const total = data.values.reduce((sum, val) => sum + val, 0);
+    const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8'];
+
+    let currentAngle = -Math.PI / 2;
+
+    data.values.forEach((value, i) => {
+        const sliceAngle = (value / total) * 2 * Math.PI;
+
+        // Draw slice
+        ctx.fillStyle = colors[i % colors.length];
+        ctx.beginPath();
+        ctx.moveTo(centerX, centerY);
+        ctx.arc(centerX, centerY, radius, currentAngle, currentAngle + sliceAngle);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 3;
+        ctx.stroke();
+
+        // Labels
+        if (showLabels) {
+            const percentage = ((value / total) * 100).toFixed(1);
+            const labelAngle = currentAngle + sliceAngle / 2;
+            const labelX = centerX + Math.cos(labelAngle) * (radius * 0.7);
+            const labelY = centerY + Math.sin(labelAngle) * (radius * 0.7);
+
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 14px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(percentage + '%', labelX, labelY);
+        }
+
+        currentAngle += sliceAngle;
+    });
+
+    // Legend
+    const legendX = 50;
+    const legendY = 80;
+
+    data.labels.forEach((label, i) => {
+        const y = legendY + i * 30;
+
+        // Color box
+        ctx.fillStyle = colors[i % colors.length];
+        ctx.fillRect(legendX, y, 20, 20);
+        ctx.strokeStyle = '#333';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(legendX, y, 20, 20);
+
+        // Label
+        ctx.fillStyle = '#333';
+        ctx.font = '14px Arial';
+        ctx.textAlign = 'left';
+        const percentage = ((data.values[i] / total) * 100).toFixed(1);
+        ctx.fillText(`${label} (${percentage}%)`, legendX + 30, y + 15);
+    });
+}
+
+function drawScatterPlot() {
+    const chartArea = { x: 80, y: 50, width: 740, height: 320 };
+
+    // Title
+    ctx.fillStyle = '#2d3748';
+    ctx.font = 'bold 18px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('Study Time vs Test Score', canvas.width / 2, 30);
+
+    // Axes
+    ctx.strokeStyle = '#333';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(chartArea.x, chartArea.y);
+    ctx.lineTo(chartArea.x, chartArea.y + chartArea.height);
+    ctx.lineTo(chartArea.x + chartArea.width, chartArea.y + chartArea.height);
+    ctx.stroke();
+
+    // Grid
+    if (showLabels) {
+        ctx.strokeStyle = '#e0e0e0';
+        ctx.lineWidth = 1;
+
+        for (let i = 0; i <= 5; i++) {
+            const y = chartArea.y + (chartArea.height * i / 5);
+            ctx.beginPath();
+            ctx.moveTo(chartArea.x, y);
+            ctx.lineTo(chartArea.x + chartArea.width, y);
+            ctx.stroke();
+
+            const x = chartArea.x + (chartArea.width * i / 5);
+            ctx.beginPath();
+            ctx.moveTo(x, chartArea.y);
+            ctx.lineTo(x, chartArea.y + chartArea.height);
+            ctx.stroke();
+        }
+
+        // Axis labels
+        ctx.fillStyle = '#666';
+        ctx.font = '12px Arial';
+        ctx.textAlign = 'right';
+        for (let i = 0; i <= 5; i++) {
+            const value = i * 20;
+            const y = chartArea.y + chartArea.height - (chartArea.height * i / 5);
+            ctx.fillText(value, chartArea.x - 10, y + 5);
+        }
+
+        ctx.textAlign = 'center';
+        for (let i = 0; i <= 5; i++) {
+            const value = i * 20;
+            const x = chartArea.x + (chartArea.width * i / 5);
+            ctx.fillText(value, x, chartArea.y + chartArea.height + 20);
+        }
+    }
+
+    // Plot points
+    if (!data.points) {
+        data.points = [];
+        for (let i = 0; i < 30; i++) {
+            data.points.push({
+                x: Math.random() * 100,
+                y: Math.random() * 100
+            });
+        }
+    }
+
+    data.points.forEach(point => {
+        const x = chartArea.x + (point.x / 100) * chartArea.width;
+        const y = chartArea.y + chartArea.height - (point.y / 100) * chartArea.height;
+
+        ctx.fillStyle = '#2196F3';
+        ctx.beginPath();
+        ctx.arc(x, y, 6, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+    });
+
+    // Axis labels
+    if (showLabels) {
+        ctx.fillStyle = '#333';
+        ctx.font = 'bold 14px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('Study Time (hours)', canvas.width / 2, canvas.height - 10);
+
+        ctx.save();
+        ctx.translate(20, canvas.height / 2);
+        ctx.rotate(-Math.PI / 2);
+        ctx.fillText('Test Score (%)', 0, 0);
+        ctx.restore();
+    }
+}
+
+function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    switch(currentChart) {
+        case 'bar':
+            drawBarChart();
+            break;
+        case 'line':
+            drawLineChart();
+            break;
+        case 'pie':
+            drawPieChart();
+            break;
+        case 'scatter':
+            drawScatterPlot();
+            break;
+    }
+}
+
+// Initialize
+updateChartInfo();
+draw();
+</script>
+</body>
+</html>

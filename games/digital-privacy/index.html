@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Digital Footprint Meter - Privacy Game</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 0; }
+.nav-header { background: #2d3748; padding: 15px 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; }
+.nav-header a { color: #90cdf4; text-decoration: none; font-weight: 600; font-size: 1.1em; }
+.nav-title { color: #fff; font-size: 1.2em; font-weight: 700; }
+.container { max-width: 1400px; margin: 20px auto; background: #fff; border-radius: 15px; padding: 30px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+h1 { text-align: center; color: #2d3748; font-size: 2.5em; margin-bottom: 10px; }
+.subtitle { text-align: center; color: #666; margin-bottom: 30px; font-size: 1.1em; }
+.game-area { display: grid; grid-template-columns: 350px 1fr; gap: 30px; }
+.sidebar { background: #f8f9fa; padding: 20px; border-radius: 10px; height: fit-content; }
+.risk-meter { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; padding: 20px; border-radius: 10px; text-align: center; margin-bottom: 20px; }
+.meter-value { font-size: 3.5em; font-weight: bold; margin: 15px 0; }
+.meter-label { font-size: 1.3em; margin-top: 10px; }
+.meter-bar { background: #e0e0e0; height: 30px; border-radius: 15px; margin: 15px 0; overflow: hidden; }
+.meter-fill { height: 100%; transition: width 0.5s, background 0.5s; border-radius: 15px; }
+.stats { margin: 15px 0; }
+.stat-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e0e0e0; }
+.prompt-card { background: #fff; border: 2px solid #e0e0e0; border-radius: 10px; padding: 30px; margin-bottom: 20px; }
+.prompt-card h3 { color: #667eea; margin-bottom: 15px; font-size: 1.6em; }
+.prompt-display { background: #f8f9fa; padding: 25px; border-radius: 8px; line-height: 1.9; color: #2d3748; margin-bottom: 25px; font-size: 1.1em; border: 2px solid #e9ecef; }
+.highlight-sensitive { background: #ffcdd2; padding: 2px 5px; border-radius: 3px; border-bottom: 2px solid #f44336; font-weight: 600; cursor: pointer; position: relative; }
+.highlight-sensitive:hover { background: #ef9a9a; }
+.tooltip { display: none; position: absolute; background: #2d3748; color: #fff; padding: 8px 12px; border-radius: 6px; font-size: 0.85em; white-space: nowrap; z-index: 1000; bottom: 100%; left: 50%; transform: translateX(-50%); margin-bottom: 5px; }
+.highlight-sensitive:hover .tooltip { display: block; }
+.inference-box { background: #fff9c4; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #fbc02d; }
+.inference-box h4 { color: #f57c00; margin-bottom: 15px; }
+.inference-item { padding: 10px 0; border-bottom: 1px solid #f0f0f0; }
+.inference-item:last-child { border-bottom: none; }
+.safer-alternative { background: #e8f5e9; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #4CAF50; }
+.safer-alternative h4 { color: #2e7d32; margin-bottom: 15px; }
+.safer-text { background: #fff; padding: 15px; border-radius: 6px; font-style: italic; color: #2d3748; line-height: 1.8; margin-top: 10px; }
+button { padding: 15px 30px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 1.05em; transition: all 0.3s; }
+.btn-primary { background: #4CAF50; color: #fff; width: 100%; margin-top: 10px; }
+.btn-primary:hover { background: #45a049; transform: scale(1.02); }
+.btn-secondary { background: #2196F3; color: #fff; width: 100%; }
+.btn-secondary:hover { background: #1976d2; }
+.btn-custom { background: #667eea; color: #fff; width: 100%; margin-top: 10px; }
+.btn-custom:hover { background: #5568d3; }
+.progress-bar { background: #e0e0e0; height: 8px; border-radius: 4px; margin: 20px 0; overflow: hidden; }
+.progress-fill { background: linear-gradient(90deg, #667eea, #764ba2); height: 100%; transition: width 0.3s; }
+.how-to-play { background: #e8f5e9; padding: 15px; border-radius: 8px; margin: 15px 0; }
+.how-to-play h4 { color: #2e7d32; margin-bottom: 10px; }
+.how-to-play ul { margin-left: 20px; line-height: 1.8; color: #1b5e20; font-size: 0.9em; }
+.custom-input-area { margin: 20px 0; }
+.custom-input-area textarea { width: 100%; padding: 15px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 1em; font-family: inherit; resize: vertical; min-height: 100px; }
+.risk-legend { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 15px 0; }
+.legend-item { text-align: center; padding: 8px; border-radius: 6px; font-size: 0.85em; }
+</style>
+</head>
+<body>
+<nav class="nav-header">
+    <div class="nav-title">🔍 Digital Footprint Meter</div>
+    <a href="../../index.html">← Back to Home</a>
+</nav>
+<div class="container">
+    <h1>🔍 Digital Footprint Meter</h1>
+    <p class="subtitle">Analyze how much private data your AI prompts reveal!</p>
+
+    <div class="game-area">
+        <div class="sidebar">
+            <div class="risk-meter">
+                <div>Privacy Risk</div>
+                <div class="meter-value" id="riskValue">0</div>
+                <div class="meter-label" id="riskLabel">SAFE</div>
+                <div class="meter-bar">
+                    <div class="meter-fill" id="meterFill" style="width: 0%; background: #4CAF50;"></div>
+                </div>
+            </div>
+
+            <div class="stats">
+                <div class="stat-row">
+                    <span>Prompts Analyzed:</span>
+                    <span id="analyzed">0/12</span>
+                </div>
+                <div class="stat-row">
+                    <span>Sensitive Items:</span>
+                    <span id="sensitiveCount">0</span>
+                </div>
+                <div class="stat-row">
+                    <span>Avg Risk:</span>
+                    <span id="avgRisk">0%</span>
+                </div>
+            </div>
+
+            <div class="risk-legend">
+                <div class="legend-item" style="background: #c8e6c9; color: #2e7d32;">
+                    0-30<br>Low Risk
+                </div>
+                <div class="legend-item" style="background: #fff9c4; color: #f57c00;">
+                    31-70<br>Medium
+                </div>
+                <div class="legend-item" style="background: #ffcdd2; color: #c62828;">
+                    71-100<br>High Risk
+                </div>
+            </div>
+
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar" style="width: 0%"></div>
+            </div>
+
+            <button class="btn-secondary" onclick="nextPrompt()">Next Example →</button>
+            <button class="btn-custom" onclick="showCustomInput()">Analyze Your Own</button>
+            <button class="btn-primary" onclick="resetGame()">Start Over</button>
+
+            <div class="how-to-play">
+                <h4>How It Works:</h4>
+                <ul>
+                    <li>Review example AI prompts</li>
+                    <li>Hover over highlighted text to see risks</li>
+                    <li>Learn what AI can infer</li>
+                    <li>See safer alternatives</li>
+                    <li>Analyze your own prompts!</li>
+                </ul>
+            </div>
+        </div>
+
+        <div>
+            <div class="prompt-card">
+                <h3 id="promptTitle">Example 1</h3>
+
+                <div id="customInputSection" style="display: none;">
+                    <div class="custom-input-area">
+                        <h4 style="margin-bottom: 10px; color: #667eea;">Enter your AI prompt:</h4>
+                        <textarea id="customPrompt" placeholder="Type or paste an AI prompt you want to analyze..."></textarea>
+                        <button class="btn-primary" style="margin-top: 10px;" onclick="analyzeCustomPrompt()">Analyze This Prompt</button>
+                        <button class="btn-secondary" style="margin-top: 10px;" onclick="hideCustomInput()">Back to Examples</button>
+                    </div>
+                </div>
+
+                <div id="exampleSection">
+                    <div class="prompt-display" id="promptDisplay">
+                        Loading example prompt...
+                    </div>
+
+                    <div class="inference-box">
+                        <h4>🧠 What AI Can Infer From This:</h4>
+                        <div id="inferences">
+                            <!-- Will be populated by JavaScript -->
+                        </div>
+                    </div>
+
+                    <div class="safer-alternative">
+                        <h4>✅ Safer Alternative:</h4>
+                        <div class="safer-text" id="saferVersion">
+                            <!-- Will be populated by JavaScript -->
+                        </div>
+                        <div style="margin-top: 15px; padding: 15px; background: #fff; border-radius: 6px;">
+                            <strong style="color: #2e7d32;">Why it's safer:</strong>
+                            <p id="whySafer" style="margin-top: 8px; color: #4a5568; line-height: 1.6;">
+                                <!-- Will be populated by JavaScript -->
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const examplePrompts = [
+    {
+        title: "Medical Information Leak",
+        text: "I'm Sarah Johnson from Portland. My 7-year-old son has type 1 diabetes. What are the best glucose monitors under $200?",
+        sensitiveData: [
+            { text: "Sarah Johnson", type: "Full Name", reason: "Real identity" },
+            { text: "Portland", type: "Location", reason: "City of residence" },
+            { text: "7-year-old son", type: "Family Info", reason: "Child's age and gender" },
+            { text: "type 1 diabetes", type: "Health Condition", reason: "Serious medical diagnosis" },
+            { text: "under $200", type: "Financial Info", reason: "Budget constraints" }
+        ],
+        inferences: [
+            "Your full identity and location",
+            "You have a young child with a chronic condition",
+            "Your family's health history and medical needs",
+            "Your approximate income level based on budget",
+            "Your daily routines (diabetes management)",
+            "Insurance coverage status (buying monitor yourself)"
+        ],
+        riskScore: 92,
+        saferVersion: "What are effective glucose monitors for children with type 1 diabetes in the under-$200 price range?",
+        whySafer: "Removes all identifying information (name, location, specific family details) while still getting the medical advice needed. The AI can't build a personal profile or connect this to other queries."
+    },
+    {
+        title: "Location & Routine Exposure",
+        text: "I take the #42 bus from Oak Street to downtown every weekday at 7:45 AM. Is there a faster route?",
+        sensitiveData: [
+            { text: "#42 bus", type: "Transit Route", reason: "Specific route number" },
+            { text: "Oak Street", type: "Location", reason: "Home neighborhood" },
+            { text: "downtown", type: "Location", reason: "Work area" },
+            { text: "every weekday at 7:45 AM", type: "Routine", reason: "Predictable schedule" }
+        ],
+        inferences: [
+            "Your home neighborhood (Oak Street area)",
+            "Your work location (downtown)",
+            "Your daily commute pattern and timing",
+            "When your home is likely empty (weekdays 8AM-5PM)",
+            "That you don't own a car (use public transit)",
+            "Your approximate income level"
+        ],
+        riskScore: 78,
+        saferVersion: "What are the fastest public transit routes from residential areas to downtown during morning rush hour?",
+        whySafer: "Gets the same transportation advice without revealing your specific location, route, or schedule. No one can track your movements or know when you're not home."
+    },
+    {
+        title: "Financial Privacy Breach",
+        text: "I make $67,000 per year and have $45,000 in student loans. Can I afford to buy a $350,000 condo in Seattle?",
+        sensitiveData: [
+            { text: "$67,000 per year", type: "Income", reason: "Exact salary" },
+            { text: "$45,000 in student loans", type: "Debt", reason: "Financial obligations" },
+            { text: "$350,000 condo", type: "Financial Info", reason: "Purchase budget" },
+            { text: "Seattle", type: "Location", reason: "City of residence" }
+        ],
+        inferences: [
+            "Your exact income and debt levels",
+            "Your location and where you're house hunting",
+            "Your education level (student loans)",
+            "Approximate age (career stage, income level)",
+            "Credit worthiness and financial stability",
+            "No significant savings (if asking about affordability)"
+        ],
+        riskScore: 85,
+        saferVersion: "What salary and debt-to-income ratio is typically needed to afford a $350,000 home in a major West Coast city?",
+        whySafer: "Removes your specific financial details and location while still getting the advice you need. Use the general guidance to assess your personal situation privately."
+    },
+    {
+        title: "Work & Career Exposure",
+        text: "I'm interviewing at Google's Seattle office next Tuesday for a Senior Software Engineer role. What should I prepare?",
+        sensitiveData: [
+            { text: "Google", type: "Employer", reason: "Specific company" },
+            { text: "Seattle office", type: "Location", reason: "Office location" },
+            { text: "next Tuesday", type: "Schedule", reason: "Specific date" },
+            { text: "Senior Software Engineer", type: "Career Info", reason: "Position and level" }
+        ],
+        inferences: [
+            "Your current job search status",
+            "Your career level and skills",
+            "Your location (Seattle area)",
+            "Your schedule (free next Tuesday)",
+            "Approximate salary expectations ($150k-250k range)",
+            "Your employer may be notified if data is shared"
+        ],
+        riskScore: 74,
+        saferVersion: "What should I prepare for a senior software engineering interview at a major tech company?",
+        whySafer: "Gets you the same interview prep advice without revealing which company, when, or where. Protects your job search privacy and prevents conflicts with your current employer."
+    },
+    {
+        title: "Family & Relationship Data",
+        text: "My wife Emma and I are trying to get pregnant. She's 34 and has PCOS. What fertility treatments should we consider?",
+        sensitiveData: [
+            { text: "My wife Emma", type: "Family & Name", reason: "Spouse's name" },
+            { text: "trying to get pregnant", type: "Private Plans", reason: "Reproductive plans" },
+            { text: "34", type: "Age", reason: "Spouse's age" },
+            { text: "PCOS", type: "Health Condition", reason: "Medical diagnosis" }
+        ],
+        inferences: [
+            "Your marital status and spouse's name",
+            "Your reproductive plans and timeline",
+            "Your spouse's age and health condition",
+            "Potential fertility struggles and emotional stress",
+            "Your approximate age range (likely 30s)",
+            "Future family plans and financial commitments"
+        ],
+        riskScore: 88,
+        saferVersion: "What fertility treatment options are available for a 34-year-old woman with PCOS who is trying to conceive?",
+        whySafer: "Removes identifying information and personal relationship details while getting the same medical information. The advice remains relevant without exposing private family matters."
+    },
+    {
+        title: "Children's Privacy Violation",
+        text: "My daughter Sophia (age 9) attends Lincoln Elementary. She's being bullied by classmates. How should I talk to the school?",
+        sensitiveData: [
+            { text: "daughter Sophia", type: "Child's Name", reason: "Minor's identity" },
+            { text: "age 9", type: "Child's Age", reason: "Specific age" },
+            { text: "Lincoln Elementary", type: "School Name", reason: "Specific institution" },
+            { text: "being bullied", type: "Sensitive Info", reason: "Child's personal issues" }
+        ],
+        inferences: [
+            "Your child's name, age, and school",
+            "Your location (Lincoln Elementary's area)",
+            "Your child's social difficulties",
+            "Your family structure (have a daughter)",
+            "Your parenting concerns and style",
+            "School's potential liability issues"
+        ],
+        riskScore: 95,
+        saferVersion: "What's the best way to address bullying concerns with a child's elementary school administration?",
+        whySafer: "Protects your child's identity, school, and personal issues. Gets the same advice on handling bullying without creating a permanent digital record about your child."
+    },
+    {
+        title: "Legal & Sensitive Matters",
+        text: "I was arrested for DUI last month in King County. I have a court date on June 15th. What should I expect?",
+        sensitiveData: [
+            { text: "arrested for DUI", type: "Legal Issue", reason: "Criminal matter" },
+            { text: "last month", type: "Timeline", reason: "Recent event" },
+            { text: "King County", type: "Location", reason: "Specific jurisdiction" },
+            { text: "June 15th", type: "Court Date", reason: "Legal schedule" }
+        ],
+        inferences: [
+            "Your criminal record and legal troubles",
+            "Your location (King County area)",
+            "Your schedule and court obligations",
+            "Potential employment consequences",
+            "Insurance rate impacts",
+            "Pattern if combined with other queries"
+        ],
+        riskScore: 91,
+        saferVersion: "What typically happens during a first court appearance for a DUI charge? What should someone expect in the process?",
+        whySafer: "Gets general legal information without creating a record of your specific case, location, or timeline. Note: AI conversations are not privileged - consult a real lawyer."
+    },
+    {
+        title: "Political & Religious Views",
+        text: "I'm a conservative Christian homeschooling my 3 kids in Texas. What curriculum works best for teaching evolution from a creationist perspective?",
+        sensitiveData: [
+            { text: "conservative Christian", type: "Religion/Politics", reason: "Beliefs" },
+            { text: "homeschooling my 3 kids", type: "Family & Education", reason: "Children and choices" },
+            { text: "Texas", type: "Location", reason: "State residence" },
+            { text: "creationist perspective", type: "Religious Views", reason: "Specific beliefs" }
+        ],
+        inferences: [
+            "Your religious and political beliefs",
+            "Your parenting choices and education philosophy",
+            "Number and ages of your children",
+            "Your location and community",
+            "Your stance on science education",
+            "Potential social and political network"
+        ],
+        riskScore: 72,
+        saferVersion: "What homeschool science curricula are available that teach both evolutionary biology and alternative perspectives?",
+        whySafer: "Removes your personal beliefs, location, and family details while still finding appropriate curriculum options. Avoids creating a political/religious profile."
+    },
+    {
+        title: "Relationship & Mental Health",
+        text: "I think my husband is cheating on me. He's been secretive with his phone and working late 4 nights a week. Should I confront him or hire a private investigator?",
+        sensitiveData: [
+            { text: "husband is cheating", type: "Relationship Issue", reason: "Private matter" },
+            { text: "secretive with his phone", type: "Behavior Pattern", reason: "Specific evidence" },
+            { text: "working late 4 nights a week", type: "Schedule", reason: "Routine details" },
+            { text: "hire a private investigator", type: "Intent", reason: "Planned action" }
+        ],
+        inferences: [
+            "Marital problems and trust issues",
+            "Your emotional state and stress level",
+            "Your spouse's schedule and habits",
+            "Your financial ability (PI budget)",
+            "Potential divorce proceedings coming",
+            "Your social support network status"
+        ],
+        riskScore: 87,
+        saferVersion: "What are effective ways to address trust issues and communication problems in a marriage?",
+        whySafer: "Addresses the core relationship concern without sharing private details about your spouse's behavior or your investigation plans. Keeps sensitive marital issues private."
+    },
+    {
+        title: "Immigration Status",
+        text: "I'm on an H1B visa working at Microsoft. My visa expires in 3 months and my green card application is delayed. Can I switch employers without losing status?",
+        sensitiveData: [
+            { text: "H1B visa", type: "Immigration Status", reason: "Visa type" },
+            { text: "Microsoft", type: "Employer", reason: "Current company" },
+            { text: "expires in 3 months", type: "Timeline", reason: "Visa deadline" },
+            { text: "green card application", type: "Immigration", reason: "Status plans" }
+        ],
+        inferences: [
+            "Your immigration status and vulnerability",
+            "Your current employer",
+            "Your job security concerns",
+            "Your career and location constraints",
+            "Your country of origin (likely)",
+            "Your long-term residency plans"
+        ],
+        riskScore: 82,
+        saferVersion: "What are the rules for changing employers while on an H1B visa near expiration with a pending green card application?",
+        whySafer: "Gets the same immigration law information without revealing your employer, specific timeline, or creating a record that could affect your application."
+    },
+    {
+        title: "Substance Use & Health",
+        text: "I'm 28 weeks pregnant and occasionally smoke marijuana to help with nausea. Is this safe for my baby?",
+        sensitiveData: [
+            { text: "28 weeks pregnant", type: "Health Status", reason: "Pregnancy details" },
+            { text: "smoke marijuana", type: "Substance Use", reason: "Drug use admission" },
+            { text: "help with nausea", type: "Medical Reason", reason: "Health symptoms" }
+        ],
+        inferences: [
+            "Your pregnancy status and timeline",
+            "Your substance use during pregnancy",
+            "Your health concerns and symptoms",
+            "Potential legal implications (state-dependent)",
+            "Your due date (approximately 12 weeks)",
+            "Medical compliance and risk awareness"
+        ],
+        riskScore: 93,
+        saferVersion: "What does medical research say about marijuana use during pregnancy and potential effects on fetal development?",
+        whySafer: "Gets factual medical information without admitting to substance use or revealing pregnancy status. Note: This kind of health question should be discussed with a real doctor, not AI."
+    },
+    {
+        title: "Smart Home & Security",
+        text: "I installed Ring cameras at 742 Evergreen Terrace. They keep detecting motion at my back door between 2-3 AM when I'm asleep. Should I be worried?",
+        sensitiveData: [
+            { text: "742 Evergreen Terrace", type: "Address", reason: "Exact home address" },
+            { text: "Ring cameras", type: "Security System", reason: "Specific devices" },
+            { text: "back door", type: "Property Layout", reason: "Home layout" },
+            { text: "2-3 AM when I'm asleep", type: "Routine", reason: "Vulnerable hours" }
+        ],
+        inferences: [
+            "Your exact home address",
+            "Your security system details",
+            "When you're asleep and vulnerable",
+            "Your home's layout and entry points",
+            "That you live alone or with others",
+            "Potential security vulnerabilities"
+        ],
+        riskScore: 96,
+        saferVersion: "My security cameras keep detecting motion at night. What could cause false alerts, and when should I be concerned?",
+        whySafer: "Addresses the security concern without revealing your address, specific system, or exact vulnerable times. Never share addresses or security details online."
+    }
+];
+
+let currentPrompt = 0;
+let totalAnalyzed = 0;
+let totalRiskSum = 0;
+let totalSensitiveItems = 0;
+let customMode = false;
+
+function highlightSensitiveData(text, sensitiveData) {
+    let highlightedText = text;
+
+    // Sort by length (longest first) to avoid partial replacements
+    const sortedData = [...sensitiveData].sort((a, b) => b.text.length - a.text.length);
+
+    sortedData.forEach((item, index) => {
+        const regex = new RegExp(escapeRegExp(item.text), 'g');
+        const replacement = `<span class="highlight-sensitive">${item.text}<span class="tooltip">${item.type}: ${item.reason}</span></span>`;
+        highlightedText = highlightedText.replace(regex, replacement);
+    });
+
+    return highlightedText;
+}
+
+function escapeRegExp(string) {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function loadPrompt() {
+    if (customMode) return;
+
+    const prompt = examplePrompts[currentPrompt];
+
+    document.getElementById('promptTitle').textContent = `Example ${currentPrompt + 1}: ${prompt.title}`;
+
+    const highlightedText = highlightSensitiveData(prompt.text, prompt.sensitiveData);
+    document.getElementById('promptDisplay').innerHTML = highlightedText;
+
+    // Update inferences
+    const inferencesDiv = document.getElementById('inferences');
+    inferencesDiv.innerHTML = '';
+    prompt.inferences.forEach(inference => {
+        const inferenceItem = document.createElement('div');
+        inferenceItem.className = 'inference-item';
+        inferenceItem.innerHTML = `<span style="color: #f57c00;">▸</span> ${inference}`;
+        inferencesDiv.appendChild(inferenceItem);
+    });
+
+    // Update safer version
+    document.getElementById('saferVersion').textContent = prompt.saferVersion;
+    document.getElementById('whySafer').textContent = prompt.whySafer;
+
+    // Update risk meter
+    updateRiskMeter(prompt.riskScore);
+
+    // Update stats
+    totalAnalyzed = currentPrompt + 1;
+    totalRiskSum += prompt.riskScore;
+    totalSensitiveItems += prompt.sensitiveData.length;
+    updateStats();
+}
+
+function updateRiskMeter(riskScore) {
+    const meterFill = document.getElementById('meterFill');
+    const riskValue = document.getElementById('riskValue');
+    const riskLabel = document.getElementById('riskLabel');
+
+    riskValue.textContent = riskScore;
+    meterFill.style.width = riskScore + '%';
+
+    if (riskScore <= 30) {
+        meterFill.style.background = '#4CAF50';
+        riskLabel.textContent = 'LOW RISK';
+        riskLabel.style.color = '#fff';
+    } else if (riskScore <= 70) {
+        meterFill.style.background = '#FFC107';
+        riskLabel.textContent = 'MEDIUM RISK';
+        riskLabel.style.color = '#fff';
+    } else {
+        meterFill.style.background = '#f44336';
+        riskLabel.textContent = 'HIGH RISK';
+        riskLabel.style.color = '#fff';
+    }
+}
+
+function updateStats() {
+    document.getElementById('analyzed').textContent = `${totalAnalyzed}/${examplePrompts.length}`;
+    document.getElementById('sensitiveCount').textContent = totalSensitiveItems;
+    const avgRisk = totalAnalyzed > 0 ? Math.round(totalRiskSum / totalAnalyzed) : 0;
+    document.getElementById('avgRisk').textContent = avgRisk + '%';
+
+    const progress = (totalAnalyzed / examplePrompts.length) * 100;
+    document.getElementById('progressBar').style.width = progress + '%';
+}
+
+function nextPrompt() {
+    if (customMode) {
+        customMode = false;
+        document.getElementById('customInputSection').style.display = 'none';
+        document.getElementById('exampleSection').style.display = 'block';
+        loadPrompt();
+        return;
+    }
+
+    currentPrompt++;
+    if (currentPrompt >= examplePrompts.length) {
+        showFinalSummary();
+        return;
+    }
+
+    loadPrompt();
+}
+
+function showCustomInput() {
+    customMode = true;
+    document.getElementById('customInputSection').style.display = 'block';
+    document.getElementById('exampleSection').style.display = 'none';
+    document.getElementById('promptTitle').textContent = 'Analyze Your Own Prompt';
+    document.getElementById('customPrompt').value = '';
+}
+
+function hideCustomInput() {
+    customMode = false;
+    document.getElementById('customInputSection').style.display = 'none';
+    document.getElementById('exampleSection').style.display = 'block';
+    loadPrompt();
+}
+
+function analyzeCustomPrompt() {
+    const customText = document.getElementById('customPrompt').value.trim();
+
+    if (!customText) {
+        alert('Please enter a prompt to analyze!');
+        return;
+    }
+
+    // Simple analysis based on keywords
+    const analysis = analyzeText(customText);
+
+    // Switch to analysis view
+    document.getElementById('customInputSection').style.display = 'none';
+    document.getElementById('exampleSection').style.display = 'block';
+    document.getElementById('promptTitle').textContent = 'Your Custom Prompt Analysis';
+
+    // Display analyzed prompt
+    const highlightedText = highlightSensitiveData(customText, analysis.sensitiveData);
+    document.getElementById('promptDisplay').innerHTML = highlightedText;
+
+    // Update inferences
+    const inferencesDiv = document.getElementById('inferences');
+    inferencesDiv.innerHTML = '';
+    analysis.inferences.forEach(inference => {
+        const inferenceItem = document.createElement('div');
+        inferenceItem.className = 'inference-item';
+        inferenceItem.innerHTML = `<span style="color: #f57c00;">▸</span> ${inference}`;
+        inferencesDiv.appendChild(inferenceItem);
+    });
+
+    // Update safer version
+    document.getElementById('saferVersion').textContent = analysis.saferVersion;
+    document.getElementById('whySafer').textContent = analysis.whySafer;
+
+    // Update risk meter
+    updateRiskMeter(analysis.riskScore);
+
+    // Update stats
+    totalAnalyzed++;
+    totalRiskSum += analysis.riskScore;
+    totalSensitiveItems += analysis.sensitiveData.length;
+    updateStats();
+}
+
+function analyzeText(text) {
+    const sensitiveData = [];
+    const inferences = [];
+    let riskScore = 10; // Base risk
+
+    // Check for names (simple heuristic)
+    const namePatterns = /\b(I'm|I am|my name is|called)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)\b/gi;
+    const nameMatches = text.match(namePatterns);
+    if (nameMatches) {
+        nameMatches.forEach(match => {
+            sensitiveData.push({ text: match, type: 'Name', reason: 'Personal identity' });
+        });
+        inferences.push('Your personal identity');
+        riskScore += 20;
+    }
+
+    // Check for locations
+    const locationWords = ['street', 'avenue', 'road', 'city', 'town', 'county', 'state'];
+    locationWords.forEach(word => {
+        const regex = new RegExp(`\\b\\w+\\s+${word}\\b`, 'gi');
+        const matches = text.match(regex);
+        if (matches) {
+            matches.forEach(match => {
+                sensitiveData.push({ text: match, type: 'Location', reason: 'Geographic data' });
+            });
+        }
+    });
+    if (text.match(/\b\d+\s+\w+\s+(street|avenue|road|lane|drive)\b/gi)) {
+        inferences.push('Your physical address or location');
+        riskScore += 25;
+    }
+
+    // Check for ages
+    if (text.match(/\b\d+[\s-]?year[\s-]?old\b/gi) || text.match(/\bage\s+\d+\b/gi)) {
+        sensitiveData.push({ text: 'age information', type: 'Age', reason: 'Demographic data' });
+        inferences.push('Age of you or family members');
+        riskScore += 15;
+    }
+
+    // Check for medical terms
+    const medicalTerms = ['disease', 'diagnosis', 'diabetes', 'cancer', 'illness', 'condition', 'treatment', 'medication', 'doctor', 'hospital', 'pregnant', 'surgery'];
+    medicalTerms.forEach(term => {
+        const regex = new RegExp(`\\b${term}\\b`, 'gi');
+        if (text.match(regex)) {
+            sensitiveData.push({ text: term, type: 'Health Info', reason: 'Medical condition' });
+        }
+    });
+    if (sensitiveData.some(item => item.type === 'Health Info')) {
+        inferences.push('Your or family members\' health conditions');
+        riskScore += 20;
+    }
+
+    // Check for financial info
+    if (text.match(/\$[\d,]+/g)) {
+        const amounts = text.match(/\$[\d,]+/g);
+        amounts.forEach(amount => {
+            sensitiveData.push({ text: amount, type: 'Financial', reason: 'Money amounts' });
+        });
+        inferences.push('Your financial situation and budget');
+        riskScore += 18;
+    }
+
+    // Check for family references
+    const familyTerms = ['son', 'daughter', 'wife', 'husband', 'child', 'kids', 'mother', 'father', 'parent'];
+    familyTerms.forEach(term => {
+        const regex = new RegExp(`\\b${term}\\b`, 'gi');
+        if (text.match(regex)) {
+            sensitiveData.push({ text: term, type: 'Family', reason: 'Family structure' });
+        }
+    });
+    if (sensitiveData.some(item => item.type === 'Family')) {
+        inferences.push('Your family structure and relationships');
+        riskScore += 12;
+    }
+
+    // Check for work/career
+    const workTerms = ['job', 'work', 'employer', 'company', 'interview', 'salary', 'career'];
+    if (workTerms.some(term => text.toLowerCase().includes(term))) {
+        inferences.push('Your employment status and career level');
+        riskScore += 10;
+    }
+
+    // Cap risk score at 100
+    riskScore = Math.min(riskScore, 100);
+
+    // Generate safer version (simplified)
+    let saferVersion = text;
+    if (sensitiveData.length > 0) {
+        saferVersion = "A safer version would remove specific personal details like names, locations, exact ages, and financial amounts while keeping the core question.";
+    }
+
+    const whySafer = sensitiveData.length > 0
+        ? `This prompt contained ${sensitiveData.length} sensitive data point(s). Removing identifying information protects your privacy while still allowing you to get helpful responses.`
+        : "This prompt appears relatively safe with minimal personal information shared.";
+
+    if (inferences.length === 0) {
+        inferences.push('Minimal personal information detected');
+    }
+
+    return {
+        sensitiveData,
+        inferences,
+        riskScore,
+        saferVersion,
+        whySafer
+    };
+}
+
+function showFinalSummary() {
+    const avgRisk = Math.round(totalRiskSum / totalAnalyzed);
+    let message = `Analysis Complete!\n\n`;
+    message += `Prompts Analyzed: ${totalAnalyzed}\n`;
+    message += `Sensitive Items Found: ${totalSensitiveItems}\n`;
+    message += `Average Risk Level: ${avgRisk}%\n\n`;
+
+    if (avgRisk >= 80) {
+        message += '🚨 HIGH RISK: Most examples revealed significant private information. Always minimize personal details when using AI!';
+    } else if (avgRisk >= 50) {
+        message += '⚠️ MEDIUM RISK: Be more cautious about what you share with AI systems.';
+    } else {
+        message += '✅ You\'re learning good privacy practices! Keep protecting your data.';
+    }
+
+    alert(message);
+}
+
+function resetGame() {
+    currentPrompt = 0;
+    totalAnalyzed = 0;
+    totalRiskSum = 0;
+    totalSensitiveItems = 0;
+    customMode = false;
+    document.getElementById('customInputSection').style.display = 'none';
+    document.getElementById('exampleSection').style.display = 'block';
+    loadPrompt();
+    updateStats();
+}
+
+// Load first prompt on page load
+loadPrompt();
+updateStats();
+</script>
+</body>
+</html>

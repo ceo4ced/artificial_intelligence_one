@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pattern Finding - Interactive Lesson</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 0; }
+.nav-header { background: #2d3748; padding: 15px 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; }
+.nav-header a { color: #90cdf4; text-decoration: none; font-weight: 600; font-size: 1.1em; }
+.nav-title { color: #fff; font-size: 1.2em; font-weight: 700; }
+.container { max-width: 1400px; margin: 20px auto; background: #fff; border-radius: 15px; padding: 30px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+h1 { text-align: center; color: #2d3748; font-size: 2.5em; margin-bottom: 20px; }
+.intro { background: #e3f2fd; padding: 20px; border-radius: 10px; margin-bottom: 30px; line-height: 1.6; }
+.intro h2 { color: #1976d2; margin-bottom: 10px; }
+.main-content { display: grid; grid-template-columns: 350px 1fr; gap: 30px; }
+.sidebar { background: #f8f9fa; padding: 20px; border-radius: 10px; height: fit-content; }
+button { width: 100%; padding: 12px; margin: 5px 0; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }
+.btn-primary { background: #4CAF50; color: #fff; }
+.btn-secondary { background: #2196F3; color: #fff; }
+canvas { border: 2px solid #ddd; border-radius: 8px; display: block; background: #fafafa; margin: 0 auto; }
+.pattern-tabs { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }
+.tab { flex: 1; min-width: 80px; padding: 10px; background: #e0e0e0; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.2s; font-size: 0.9em; }
+.tab.active { background: #667eea; color: #fff; }
+.explanation { background: #fff9c4; padding: 15px; border-radius: 8px; margin: 15px 0; border-left: 4px solid #fbc02d; }
+.explanation h4 { color: #f57c00; margin-bottom: 8px; }
+.stats { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; padding: 15px; border-radius: 10px; margin-top: 15px; }
+.stat-row { display: flex; justify-content: space-between; margin: 8px 0; }
+.info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 20px; }
+.info-card { background: #f0f0f0; padding: 15px; border-radius: 8px; }
+.info-card h4 { color: #1976d2; margin-bottom: 8px; }
+.info-card ul { margin-left: 20px; font-size: 0.9em; line-height: 1.6; }
+.pattern-types { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 20px; }
+.pattern-type { background: #e8f5e9; padding: 15px; border-radius: 8px; border-left: 4px solid #4CAF50; }
+.pattern-type h4 { color: #2e7d32; margin-bottom: 8px; }
+.comparison { background: #f3e5f5; padding: 20px; border-radius: 10px; margin: 20px 0; }
+.comparison h3 { color: #6a1b9a; margin-bottom: 15px; }
+.comparison-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 15px; }
+.comparison-item { background: #fff; padding: 15px; border-radius: 8px; }
+.comparison-item h4 { color: #667eea; margin-bottom: 10px; }
+.cta-box { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; padding: 25px; border-radius: 10px; margin-top: 30px; text-align: center; }
+.cta-box h3 { margin-bottom: 15px; font-size: 1.5em; }
+.cta-box a { display: inline-block; background: #fff; color: #667eea; padding: 12px 30px; border-radius: 8px; text-decoration: none; font-weight: 600; margin-top: 10px; transition: all 0.3s; }
+.cta-box a:hover { background: #f0f0f0; transform: scale(1.05); }
+</style>
+</head>
+<body>
+<nav class="nav-header">
+    <div class="nav-title">Pattern Finding</div>
+    <a href="../../index.html">← Back to Home</a>
+</nav>
+<div class="container">
+    <h1>Pattern Finding Without AI - Human Data Insight Skills</h1>
+
+    <div class="intro">
+        <h2>What is Pattern Finding?</h2>
+        <p>
+            Pattern finding is the ability to identify regularities, relationships, and structures in data.
+            Humans are naturally excellent pattern finders - our brains are wired to detect patterns in everything
+            from visual data to complex datasets. While AI algorithms can process more data faster, human pattern
+            recognition brings context, creativity, and intuition that machines still struggle to replicate.
+        </p>
+    </div>
+
+    <div class="main-content">
+        <div class="sidebar">
+            <h3>Pattern Type</h3>
+            <div class="pattern-tabs">
+                <button class="tab active" onclick="switchPattern('clusters')">Clusters</button>
+                <button class="tab" onclick="switchPattern('trends')">Trends</button>
+                <button class="tab" onclick="switchPattern('outliers')">Outliers</button>
+                <button class="tab" onclick="switchPattern('cycles')">Cycles</button>
+                <button class="tab" onclick="switchPattern('correlation')">Correlation</button>
+            </div>
+
+            <button class="btn-primary" style="margin-top: 15px;" onclick="generatePattern()">Generate New Pattern</button>
+            <button class="btn-secondary" onclick="revealPattern()">Reveal Pattern</button>
+            <button class="btn-secondary" onclick="reset()">Reset</button>
+
+            <div class="stats">
+                <div class="stat-row"><span>Pattern Type:</span><span id="patternType">Clusters</span></div>
+                <div class="stat-row"><span>Data Points:</span><span id="dataPoints">0</span></div>
+                <div class="stat-row"><span>Complexity:</span><span id="complexity">Medium</span></div>
+                <div class="stat-row"><span>Pattern Revealed:</span><span id="revealed">No</span></div>
+            </div>
+
+            <div class="explanation">
+                <h4>Why Humans Matter:</h4>
+                <p style="line-height: 1.6;">
+                    While AI can process vast amounts of data, humans excel at:
+                </p>
+                <ul style="margin-left: 20px; margin-top: 8px; line-height: 1.6;">
+                    <li>Understanding context and meaning</li>
+                    <li>Recognizing unusual patterns</li>
+                    <li>Asking "why" questions</li>
+                    <li>Identifying false patterns</li>
+                    <li>Creative interpretation</li>
+                </ul>
+            </div>
+
+            <div style="background: #e8f5e9; padding: 15px; border-radius: 8px; margin-top: 15px;">
+                <h4 style="margin-bottom: 10px;">Pattern Finding Skills:</h4>
+                <ul style="margin-left: 20px; line-height: 1.8; font-size: 0.9em;">
+                    <li><strong>Observation:</strong> Notice details in data</li>
+                    <li><strong>Comparison:</strong> Find similarities and differences</li>
+                    <li><strong>Grouping:</strong> Organize related items</li>
+                    <li><strong>Prediction:</strong> Extend patterns forward</li>
+                </ul>
+            </div>
+        </div>
+
+        <div>
+            <canvas id="canvas" width="800" height="500"></canvas>
+
+            <div class="pattern-types">
+                <div class="pattern-type">
+                    <h4>Clusters</h4>
+                    <p style="font-size: 0.9em; line-height: 1.5;">
+                        Groups of similar data points that are close together.
+                        <br><strong>Example:</strong> Customer segments
+                    </p>
+                </div>
+                <div class="pattern-type">
+                    <h4>Trends</h4>
+                    <p style="font-size: 0.9em; line-height: 1.5;">
+                        General direction of data over time (up, down, or stable).
+                        <br><strong>Example:</strong> Sales growth
+                    </p>
+                </div>
+                <div class="pattern-type">
+                    <h4>Outliers</h4>
+                    <p style="font-size: 0.9em; line-height: 1.5;">
+                        Data points that are significantly different from others.
+                        <br><strong>Example:</strong> Fraud detection
+                    </p>
+                </div>
+                <div class="pattern-type">
+                    <h4>Cycles</h4>
+                    <p style="font-size: 0.9em; line-height: 1.5;">
+                        Repeating patterns at regular intervals.
+                        <br><strong>Example:</strong> Seasonal sales
+                    </p>
+                </div>
+                <div class="pattern-type">
+                    <h4>Correlations</h4>
+                    <p style="font-size: 0.9em; line-height: 1.5;">
+                        Relationships where variables change together.
+                        <br><strong>Example:</strong> Height vs weight
+                    </p>
+                </div>
+                <div class="pattern-type" style="background: #fff3e0; border-left: 4px solid #ff9800;">
+                    <h4 style="color: #e65100;">Randomness</h4>
+                    <p style="font-size: 0.9em; line-height: 1.5;">
+                        No discernible pattern - important to recognize!
+                        <br><strong>Example:</strong> Coin flips
+                    </p>
+                </div>
+            </div>
+
+            <div class="comparison">
+                <h3>Human vs AI Pattern Finding</h3>
+                <div class="comparison-grid">
+                    <div class="comparison-item">
+                        <h4>Human Strengths</h4>
+                        <ul style="margin-left: 20px; line-height: 1.8;">
+                            <li>Contextual understanding</li>
+                            <li>Domain expertise application</li>
+                            <li>Novel pattern recognition</li>
+                            <li>Ethical considerations</li>
+                            <li>Creative insights</li>
+                            <li>Small sample intuition</li>
+                        </ul>
+                    </div>
+                    <div class="comparison-item">
+                        <h4>AI Strengths</h4>
+                        <ul style="margin-left: 20px; line-height: 1.8;">
+                            <li>Process massive datasets</li>
+                            <li>Find subtle mathematical patterns</li>
+                            <li>Consistent, unbiased analysis</li>
+                            <li>High-dimensional patterns</li>
+                            <li>Speed and scale</li>
+                            <li>Complex calculations</li>
+                        </ul>
+                    </div>
+                </div>
+                <p style="margin-top: 15px; padding: 15px; background: #fff; border-radius: 8px; font-weight: 600; text-align: center; color: #667eea;">
+                    Best Results: Combine human insight with AI computational power!
+                </p>
+            </div>
+
+            <div class="explanation" style="margin-top: 20px;">
+                <h4>Real-World Pattern Finding Examples:</h4>
+                <ul style="margin-left: 20px; line-height: 1.8;">
+                    <li><strong>Healthcare:</strong> Doctors identify disease patterns in patient symptoms</li>
+                    <li><strong>Finance:</strong> Analysts spot market trends and anomalies</li>
+                    <li><strong>Science:</strong> Researchers discover patterns in experimental data</li>
+                    <li><strong>Marketing:</strong> Teams identify customer behavior patterns</li>
+                    <li><strong>Education:</strong> Teachers recognize learning patterns in students</li>
+                    <li><strong>Weather:</strong> Meteorologists predict weather from atmospheric patterns</li>
+                </ul>
+            </div>
+
+            <div class="cta-box">
+                <h3>Ready to Test Your Skills?</h3>
+                <p>Try the Manual Clustering Board game!</p>
+                <p>Challenge yourself to find patterns in data and compare your clustering skills to AI algorithms.</p>
+                <a href="../../games/pattern-finding/index.html">Play the Game →</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+
+let currentPattern = 'clusters';
+let dataPoints = [];
+let patternRevealed = false;
+let clusters = [];
+let trendLine = null;
+let outliers = [];
+
+const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8', '#DDA15E'];
+
+function switchPattern(pattern) {
+    currentPattern = pattern;
+    document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+    event.target.classList.add('active');
+    document.getElementById('patternType').textContent = pattern.charAt(0).toUpperCase() + pattern.slice(1);
+    reset();
+    generatePattern();
+}
+
+function generatePattern() {
+    dataPoints = [];
+    patternRevealed = false;
+    clusters = [];
+    trendLine = null;
+    outliers = [];
+    document.getElementById('revealed').textContent = 'No';
+
+    switch(currentPattern) {
+        case 'clusters':
+            generateClusters();
+            break;
+        case 'trends':
+            generateTrend();
+            break;
+        case 'outliers':
+            generateOutliers();
+            break;
+        case 'cycles':
+            generateCycles();
+            break;
+        case 'correlation':
+            generateCorrelation();
+            break;
+    }
+
+    document.getElementById('dataPoints').textContent = dataPoints.length;
+    draw();
+}
+
+function generateClusters() {
+    const numClusters = 3 + Math.floor(Math.random() * 2);
+    clusters = [];
+
+    for (let i = 0; i < numClusters; i++) {
+        const centerX = 100 + Math.random() * 600;
+        const centerY = 100 + Math.random() * 300;
+        const size = 30 + Math.random() * 40;
+        const pointsPerCluster = 15 + Math.floor(Math.random() * 15);
+
+        clusters.push({ x: centerX, y: centerY, color: colors[i] });
+
+        for (let j = 0; j < pointsPerCluster; j++) {
+            dataPoints.push({
+                x: centerX + (Math.random() - 0.5) * size * 2,
+                y: centerY + (Math.random() - 0.5) * size * 2,
+                cluster: i
+            });
+        }
+    }
+    document.getElementById('complexity').textContent = numClusters + ' clusters';
+}
+
+function generateTrend() {
+    const slope = (Math.random() - 0.5) * 2;
+    const intercept = 250;
+    const noise = 50;
+
+    trendLine = { slope, intercept };
+
+    for (let i = 0; i < 50; i++) {
+        const x = 50 + i * 15;
+        const y = intercept + slope * i * 15 + (Math.random() - 0.5) * noise;
+        dataPoints.push({ x, y });
+    }
+
+    const direction = slope > 0.3 ? 'Upward' : slope < -0.3 ? 'Downward' : 'Flat';
+    document.getElementById('complexity').textContent = direction + ' trend';
+}
+
+function generateOutliers() {
+    // Generate normal cluster
+    const centerX = 400;
+    const centerY = 250;
+
+    for (let i = 0; i < 60; i++) {
+        dataPoints.push({
+            x: centerX + (Math.random() - 0.5) * 200,
+            y: centerY + (Math.random() - 0.5) * 150,
+            isOutlier: false
+        });
+    }
+
+    // Add outliers
+    const numOutliers = 3 + Math.floor(Math.random() * 3);
+    for (let i = 0; i < numOutliers; i++) {
+        const x = 100 + Math.random() * 600;
+        const y = 50 + Math.random() * 400;
+
+        // Ensure they're far from center
+        if (Math.abs(x - centerX) > 150 || Math.abs(y - centerY) > 100) {
+            dataPoints.push({ x, y, isOutlier: true });
+            outliers.push(dataPoints.length - 1);
+        }
+    }
+
+    document.getElementById('complexity').textContent = numOutliers + ' outliers';
+}
+
+function generateCycles() {
+    const amplitude = 100;
+    const frequency = 0.03;
+    const noise = 15;
+
+    for (let i = 0; i < 80; i++) {
+        const x = i * 10;
+        const y = 250 + Math.sin(x * frequency) * amplitude + (Math.random() - 0.5) * noise;
+        dataPoints.push({ x, y });
+    }
+
+    document.getElementById('complexity').textContent = 'Sinusoidal';
+}
+
+function generateCorrelation() {
+    const correlation = (Math.random() - 0.5) * 2; // -1 to 1
+    const noise = 30;
+
+    for (let i = 0; i < 60; i++) {
+        const x = 100 + Math.random() * 600;
+        const baseY = 250 + correlation * (x - 400) * 0.5;
+        const y = baseY + (Math.random() - 0.5) * noise;
+        dataPoints.push({ x, y });
+    }
+
+    const corrType = correlation > 0.3 ? 'Positive' : correlation < -0.3 ? 'Negative' : 'Weak';
+    document.getElementById('complexity').textContent = corrType + ' correlation';
+}
+
+function revealPattern() {
+    patternRevealed = true;
+    document.getElementById('revealed').textContent = 'Yes';
+    draw();
+}
+
+function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Draw pattern-specific visualizations
+    if (patternRevealed) {
+        ctx.globalAlpha = 0.3;
+
+        if (currentPattern === 'clusters' && clusters.length > 0) {
+            // Draw cluster boundaries
+            clusters.forEach((cluster, i) => {
+                ctx.fillStyle = cluster.color;
+                ctx.beginPath();
+                ctx.arc(cluster.x, cluster.y, 50, 0, Math.PI * 2);
+                ctx.fill();
+            });
+        }
+
+        if (currentPattern === 'trends' && trendLine) {
+            // Draw trend line
+            ctx.strokeStyle = '#FF6B6B';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(0, trendLine.intercept);
+            ctx.lineTo(canvas.width, trendLine.intercept + trendLine.slope * canvas.width);
+            ctx.stroke();
+        }
+
+        if (currentPattern === 'cycles') {
+            // Draw cycle curve
+            ctx.strokeStyle = '#4ECDC4';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            for (let x = 0; x < canvas.width; x += 5) {
+                const y = 250 + Math.sin(x * 0.03) * 100;
+                if (x === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+        }
+
+        if (currentPattern === 'correlation') {
+            // Draw correlation line
+            ctx.strokeStyle = '#45B7D1';
+            ctx.lineWidth = 2;
+            // Calculate best fit line
+            const n = dataPoints.length;
+            let sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0;
+            dataPoints.forEach(p => {
+                sumX += p.x;
+                sumY += p.y;
+                sumXY += p.x * p.y;
+                sumX2 += p.x * p.x;
+            });
+            const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+            const intercept = (sumY - slope * sumX) / n;
+
+            ctx.beginPath();
+            ctx.moveTo(0, intercept);
+            ctx.lineTo(canvas.width, slope * canvas.width + intercept);
+            ctx.stroke();
+        }
+
+        ctx.globalAlpha = 1;
+    }
+
+    // Draw data points
+    dataPoints.forEach((point, i) => {
+        if (patternRevealed) {
+            if (currentPattern === 'clusters') {
+                ctx.fillStyle = colors[point.cluster];
+            } else if (currentPattern === 'outliers') {
+                ctx.fillStyle = point.isOutlier ? '#FF6B6B' : '#4ECDC4';
+            } else {
+                ctx.fillStyle = '#667eea';
+            }
+        } else {
+            ctx.fillStyle = '#999';
+        }
+
+        const radius = (patternRevealed && currentPattern === 'outliers' && point.isOutlier) ? 8 : 5;
+
+        ctx.globalAlpha = 0.7;
+        ctx.beginPath();
+        ctx.arc(point.x, point.y, radius, 0, Math.PI * 2);
+        ctx.fill();
+
+        if (patternRevealed && currentPattern === 'outliers' && point.isOutlier) {
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        }
+    });
+
+    ctx.globalAlpha = 1;
+
+    // Draw instructions if pattern not revealed
+    if (!patternRevealed) {
+        ctx.fillStyle = '#666';
+        ctx.font = '16px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('Can you identify the pattern? Click "Reveal Pattern" to check!', canvas.width / 2, 30);
+    }
+}
+
+function reset() {
+    dataPoints = [];
+    patternRevealed = false;
+    clusters = [];
+    trendLine = null;
+    outliers = [];
+    document.getElementById('dataPoints').textContent = '0';
+    document.getElementById('revealed').textContent = 'No';
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+}
+
+// Initialize
+generatePattern();
+</script>
+</body>
+</html>
