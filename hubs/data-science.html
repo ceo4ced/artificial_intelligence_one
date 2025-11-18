@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Science & Visualization - Mr. Williams' AI 1</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .nav-header {
+            background: #f8f9fa;
+            padding: 20px 40px;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .nav-header a {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 1.1em;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            transition: color 0.3s;
+        }
+
+        .nav-header a:hover {
+            color: #764ba2;
+        }
+
+        .topic-banner {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 60px 40px;
+            text-align: center;
+        }
+
+        .topic-icon {
+            font-size: 5em;
+            margin-bottom: 20px;
+        }
+
+        .topic-banner h1 {
+            font-size: 3em;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .topic-banner p {
+            font-size: 1.3em;
+            opacity: 0.95;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .stats-summary {
+            background: #f8f9fa;
+            padding: 30px 40px;
+            text-align: center;
+            border-bottom: 3px solid #e9ecef;
+        }
+
+        .stats-summary h2 {
+            font-size: 1.5em;
+            color: #2d3748;
+        }
+
+        .content-section {
+            padding: 50px 40px;
+        }
+
+        .content-section h2 {
+            text-align: center;
+            font-size: 2em;
+            color: #2d3748;
+            margin-bottom: 40px;
+        }
+
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .tool-card {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 30px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+        }
+
+        .tool-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+            border-color: #667eea;
+        }
+
+        .tool-icon {
+            font-size: 4em;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .tool-card h3 {
+            color: #2d3748;
+            font-size: 1.8em;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .tool-card p {
+            color: #4a5568;
+            margin-bottom: 20px;
+            font-size: 1.05em;
+            text-align: center;
+        }
+
+        .tool-link {
+            display: block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-align: center;
+            padding: 15px 30px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+        }
+
+        .tool-link:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        footer {
+            background: #2d3748;
+            color: white;
+            text-align: center;
+            padding: 30px;
+            font-size: 0.95em;
+        }
+
+        footer a {
+            color: #90cdf4;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .topic-banner h1 {
+                font-size: 2em;
+            }
+
+            .topic-banner p {
+                font-size: 1.1em;
+            }
+
+            .tools-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .tool-card {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav-header">
+            <a href="../index.html">← Back to Home</a>
+        </div>
+
+        <div class="topic-banner">
+            <div class="topic-icon">📊</div>
+            <h1>Data Science & Visualization</h1>
+            <p>Learn to work with data structures, visualize data, and find patterns</p>
+        </div>
+
+        <div class="stats-summary">
+            <h2>8 Lessons • 8 Games</h2>
+        </div>
+
+        <div class="content-section">
+            <div class="tools-grid">
+                <div class="tool-card">
+                    <div class="tool-icon">📦</div>
+                    <h3>Data Structures Lesson</h3>
+                    <p>What they are and why they matter for AI and computer science</p>
+                    <a href="../lessons/data-structures/index.html" class="tool-link">Start Lesson →</a>
+                </div>
+
+                <div class="tool-card">
+                    <div class="tool-icon">🎮</div>
+                    <h3>Data Structure Playground</h3>
+                    <p>Organize messy data into lists, tables, trees, and graphs</p>
+                    <a href="../games/data-structures/index.html" class="tool-link">Play Game →</a>
+                </div>
+
+                <div class="tool-card">
+                    <div class="tool-icon">🌳</div>
+                    <h3>Trees Lesson</h3>
+                    <p>Learn about hierarchies and decision paths in tree structures</p>
+                    <a href="../lessons/trees/index.html" class="tool-link">Start Lesson →</a>
+                </div>
+
+                <div class="tool-card">
+                    <div class="tool-icon">📁</div>
+                    <h3>Folder Tree Builder Game</h3>
+                    <p>Build folder hierarchies and test search efficiency</p>
+                    <a href="../games/trees/index.html" class="tool-link">Play Game →</a>
+                </div>
+
+                <div class="tool-card">
+                    <div class="tool-icon">🕸️</div>
+                    <h3>Graphs Lesson</h3>
+                    <p>Networks, connections, and relationships in graph structures</p>
+                    <a href="../lessons/graphs/index.html" class="tool-link">Start Lesson →</a>
+                </div>
+
+                <div class="tool-card">
+                    <div class="tool-icon">🌐</div>
+                    <h3>Graph Your World Game</h3>
+                    <p>Create graphs to model social networks, maps, and more</p>
+                    <a href="../games/graphs/index.html" class="tool-link">Play Game →</a>
+                </div>
+
+                <div class="tool-card">
+                    <div class="tool-icon">📊</div>
+                    <h3>Intro to Data Science Lesson</h3>
+                    <p>Reading and interpreting different types of graphs</p>
+                    <a href="../lessons/data-science-intro/index.html" class="tool-link">Start Lesson →</a>
+                </div>
+
+                <div class="tool-card">
+                    <div class="tool-icon">📈</div>
+                    <h3>Chart Switcher Game</h3>
+                    <p>Toggle datasets through different chart types to find the best fit</p>
+                    <a href="../games/data-science-intro/index.html" class="tool-link">Play Game →</a>
+                </div>
+
+                <div class="tool-card">
+                    <div class="tool-icon">🎨</div>
+                    <h3>Data Visualization Lesson</h3>
+                    <p>Tell compelling stories with data through effective visuals</p>
+                    <a href="../lessons/data-visualization/index.html" class="tool-link">Start Lesson →</a>
+                </div>
+
+                <div class="tool-card">
+                    <div class="tool-icon">📉</div>
+                    <h3>Story from a Scatterplot Game</h3>
+                    <p>Interpret patterns and write data stories from scatterplots</p>
+                    <a href="../games/data-visualization/index.html" class="tool-link">Play Game →</a>
+                </div>
+
+                <div class="tool-card">
+                    <div class="tool-icon">🚫</div>
+                    <h3>Misleading Graphs Lesson</h3>
+                    <p>How visuals can trick you and how to spot deception</p>
+                    <a href="../lessons/misleading-graphs/index.html" class="tool-link">Start Lesson →</a>
+                </div>
+
+                <div class="tool-card">
+                    <div class="tool-icon">🔎</div>
+                    <h3>Spot the Sketchy Graph Game</h3>
+                    <p>Identify deceptive charts and explain what's wrong</p>
+                    <a href="../games/misleading-graphs/index.html" class="tool-link">Play Game →</a>
+                </div>
+
+                <div class="tool-card">
+                    <div class="tool-icon">🧹</div>
+                    <h3>Data Cleaning Lesson</h3>
+                    <p>Why messy data creates wrong conclusions in AI</p>
+                    <a href="../lessons/data-cleaning/index.html" class="tool-link">Start Lesson →</a>
+                </div>
+
+                <div class="tool-card">
+                    <div class="tool-icon">🛠️</div>
+                    <h3>Fix the Dataset Game</h3>
+                    <p>Correct errors, duplicates, and outliers in messy data</p>
+                    <a href="../games/data-cleaning/index.html" class="tool-link">Play Game →</a>
+                </div>
+
+                <div class="tool-card">
+                    <div class="tool-icon">🔍</div>
+                    <h3>Pattern Finding Lesson</h3>
+                    <p>Human data insight skills - finding patterns without AI</p>
+                    <a href="../lessons/pattern-finding/index.html" class="tool-link">Start Lesson →</a>
+                </div>
+
+                <div class="tool-card">
+                    <div class="tool-icon">🎯</div>
+                    <h3>Manual Clustering Board Game</h3>
+                    <p>Cluster data manually and compare to K-means algorithm</p>
+                    <a href="../games/pattern-finding/index.html" class="tool-link">Play Game →</a>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p><strong>Data Science & Visualization</strong></p>
+            <p>Part of Mr. Williams' AI 1 - Interactive Learning Tools</p>
+            <p><a href="../index.html">Return to Home</a></p>
+        </footer>
+    </div>
+</body>
+</html>

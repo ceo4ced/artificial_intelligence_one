@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Algorithms - Mr. Williams' AI 1</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .nav-header {
+            background: #f8f9fa;
+            padding: 20px 40px;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .nav-header a {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 1.1em;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            transition: color 0.3s;
+        }
+
+        .nav-header a:hover {
+            color: #764ba2;
+        }
+
+        .topic-banner {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 60px 40px;
+            text-align: center;
+        }
+
+        .topic-icon {
+            font-size: 5em;
+            margin-bottom: 20px;
+        }
+
+        .topic-banner h1 {
+            font-size: 3em;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .topic-banner p {
+            font-size: 1.3em;
+            opacity: 0.95;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .stats-summary {
+            background: #f8f9fa;
+            padding: 30px 40px;
+            text-align: center;
+            border-bottom: 3px solid #e9ecef;
+        }
+
+        .stats-summary h2 {
+            font-size: 1.5em;
+            color: #2d3748;
+        }
+
+        .content-section {
+            padding: 50px 40px;
+        }
+
+        .section-header {
+            text-align: center;
+            font-size: 2em;
+            color: #2d3748;
+            margin-bottom: 40px;
+            margin-top: 40px;
+        }
+
+        .section-header:first-of-type {
+            margin-top: 0;
+        }
+
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .tool-card {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 30px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+        }
+
+        .tool-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+            border-color: #667eea;
+        }
+
+        .tool-icon {
+            font-size: 4em;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .tool-card h3 {
+            color: #2d3748;
+            font-size: 1.8em;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .tool-card p {
+            color: #4a5568;
+            margin-bottom: 20px;
+            font-size: 1.05em;
+            text-align: center;
+        }
+
+        .features {
+            list-style: none;
+            margin-bottom: 25px;
+        }
+
+        .features li {
+            padding: 8px 0;
+            padding-left: 30px;
+            position: relative;
+            color: #4a5568;
+        }
+
+        .features li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #48bb78;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .tool-link {
+            display: block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-align: center;
+            padding: 15px 30px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+        }
+
+        .tool-link:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .algorithms-section {
+            background: #f7fafc;
+            padding: 40px;
+            margin-top: 40px;
+            border-radius: 12px;
+        }
+
+        .algorithms-section h3 {
+            color: #2d3748;
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .algorithm-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .algorithm-box {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .algorithm-box h4 {
+            color: #667eea;
+            margin-bottom: 8px;
+            font-size: 1.2em;
+        }
+
+        .algorithm-box p {
+            color: #4a5568;
+            font-size: 0.95em;
+        }
+
+        footer {
+            background: #2d3748;
+            color: white;
+            text-align: center;
+            padding: 30px;
+            font-size: 0.95em;
+        }
+
+        footer a {
+            color: #90cdf4;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .topic-banner h1 {
+                font-size: 2em;
+            }
+
+            .topic-banner p {
+                font-size: 1.1em;
+            }
+
+            .tools-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .tool-card {
+                padding: 20px;
+            }
+
+            .algorithm-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav-header">
+            <a href="../index.html">← Back to Home</a>
+        </div>
+
+        <div class="topic-banner">
+            <div class="topic-icon">🛠</div>
+            <h1>Search Algorithms</h1>
+            <p>Visualize how AI finds paths through trees and mazes</p>
+        </div>
+
+        <div class="stats-summary">
+            <h2>2 Interactive Visualizers • 6 Search Algorithms</h2>
+        </div>
+
+        <div class="content-section">
+            <h2 class="section-header">Interactive Visualizers</h2>
+            <div class="tools-grid">
+                <div class="tool-card">
+                    <div class="tool-icon">🌳</div>
+                    <h3>Tree Search Visualizer</h3>
+                    <p>Build custom trees and watch algorithms explore them step-by-step</p>
+                    <ul class="features">
+                        <li>Create your own tree structures</li>
+                        <li>Add costs and heuristics to edges</li>
+                        <li>Visualize BFS, DFS, UCS, A*, and more</li>
+                        <li>Handle cycles with curved edges</li>
+                        <li>Compare algorithm performance</li>
+                    </ul>
+                    <a href="../pathing/index.html" class="tool-link">Launch Tree Visualizer →</a>
+                </div>
+
+                <div class="tool-card">
+                    <div class="tool-icon">🎯</div>
+                    <h3>Maze Pathfinder</h3>
+                    <p>Draw mazes and discover how algorithms find the shortest path</p>
+                    <ul class="features">
+                        <li>Interactive grid-based maze creation</li>
+                        <li>Draw walls by clicking and dragging</li>
+                        <li>Watch algorithms explore in real-time</li>
+                        <li>Random maze generator included</li>
+                        <li>Adjustable animation speed</li>
+                    </ul>
+                    <a href="../pathing/maze/index.html" class="tool-link">Launch Maze Pathfinder →</a>
+                </div>
+            </div>
+
+            <div class="algorithms-section">
+                <h3>Search Algorithms Overview</h3>
+                <div class="algorithm-grid">
+                    <div class="algorithm-box">
+                        <h4>Breadth-First Search (BFS)</h4>
+                        <p>Explores all neighbors at the current depth before going deeper. Guarantees shortest path in unweighted graphs.</p>
+                    </div>
+
+                    <div class="algorithm-box">
+                        <h4>Depth-First Search (DFS)</h4>
+                        <p>Goes as deep as possible down one path before backtracking. Fast but doesn't guarantee shortest path.</p>
+                    </div>
+
+                    <div class="algorithm-box">
+                        <h4>Uniform Cost Search (UCS)</h4>
+                        <p>Always expands the lowest-cost path first. Finds optimal path in weighted graphs.</p>
+                    </div>
+
+                    <div class="algorithm-box">
+                        <h4>A* Search</h4>
+                        <p>Uses both actual cost and estimated distance to goal. Most efficient informed search algorithm.</p>
+                    </div>
+
+                    <div class="algorithm-box">
+                        <h4>Greedy Best-First</h4>
+                        <p>Only considers estimated distance to goal. Fast but not always optimal.</p>
+                    </div>
+
+                    <div class="algorithm-box">
+                        <h4>Iterative Deepening DFS</h4>
+                        <p>Combines benefits of BFS and DFS. Memory efficient with guaranteed shortest path.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p><strong>Search Algorithms</strong></p>
+            <p>Part of Mr. Williams' AI 1 - Interactive Learning Tools</p>
+            <p><a href="../index.html">Return to Home</a></p>
+        </footer>
+    </div>
+</body>
+</html>

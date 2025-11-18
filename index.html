@@ -84,6 +84,120 @@
             margin-bottom: 40px;
         }
 
+        .hub-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            gap: 35px;
+            margin: 40px 0;
+        }
+
+        .hub-card {
+            background: white;
+            border-radius: 20px;
+            padding: 0;
+            overflow: hidden;
+            transition: all 0.4s ease;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+            border: 3px solid transparent;
+            position: relative;
+        }
+
+        .hub-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .hub-card-header {
+            padding: 40px 35px 30px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hub-card-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            transform: rotate(45deg);
+        }
+
+        .hub-icon {
+            font-size: 4.5em;
+            margin-bottom: 15px;
+            display: block;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            position: relative;
+            z-index: 1;
+        }
+
+        .hub-card h3 {
+            font-size: 2em;
+            margin-bottom: 12px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hub-card-desc {
+            font-size: 1.05em;
+            line-height: 1.6;
+            opacity: 0.95;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hub-card-body {
+            padding: 30px 35px 35px;
+        }
+
+        .hub-stats {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .hub-stat-badge {
+            background: linear-gradient(135deg, #f0f4f8 0%, #e2e8f0 100%);
+            padding: 10px 18px;
+            border-radius: 25px;
+            font-weight: 600;
+            color: #2d3748;
+            font-size: 0.95em;
+            border: 2px solid #cbd5e0;
+        }
+
+        .hub-link {
+            display: block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-align: center;
+            padding: 16px 30px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1.15em;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .hub-link:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+        }
+
+        .gradient-ethics { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .gradient-hcd { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+        .gradient-data { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+        .gradient-ml { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+        .gradient-dl { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
+        .gradient-search { background: linear-gradient(135deg, #30cfd0 0%, #330867 100%); }
+        .gradient-game { background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); }
+
         .tool-card {
             background: white;
             border: 2px solid #e2e8f0;
@@ -97,6 +211,31 @@
             transform: translateY(-5px);
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
             border-color: #667eea;
+        }
+
+        @media (max-width: 1200px) {
+            .hub-grid {
+                grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hub-grid {
+                grid-template-columns: 1fr;
+                gap: 25px;
+            }
+
+            .hub-card-header {
+                padding: 35px 25px 25px;
+            }
+
+            .hub-icon {
+                font-size: 3.5em;
+            }
+
+            .hub-card h3 {
+                font-size: 1.7em;
+            }
         }
 
         .tool-icon {
@@ -266,632 +405,122 @@
         </div>
 
         <div class="tools-section">
-            <h2>⚖️ AI Ethics & Responsible Use</h2>
-            <p style="text-align: center; color: #4a5568; margin-bottom: 30px; font-size: 1.05em;">
-                Learn about bias, fairness, privacy, and how to use AI tools responsibly
+            <h2>🚀 Explore AI Topics</h2>
+            <p style="text-align: center; color: #4a5568; margin-bottom: 20px; font-size: 1.1em;">
+                Choose a topic to dive into interactive lessons, games, and visualizations
             </p>
 
-            <div class="tools-grid">
-                <div class="tool-card">
-                    <div class="tool-icon">⚖️</div>
-                    <h3>AI Bias Lesson</h3>
-                    <p>Understanding how AI systems become unfair and what we can do about it</p>
-                    <a href="lessons/ai-bias/index.html" class="tool-link">Start Lesson →</a>
-                </div>
-
-                <div class="tool-card">
-                    <div class="tool-icon">🔍</div>
-                    <h3>Bias Detective Game</h3>
-                    <p>Identify different types of bias in real AI scenarios</p>
-                    <a href="games/ai-bias/index.html" class="tool-link">Play Game →</a>
-                </div>
-
-                <div class="tool-card">
-                    <div class="tool-icon">🧭</div>
-                    <h3>Ethical AI Lesson</h3>
-                    <p>What makes an AI decision fair? Explore core ethical principles</p>
-                    <a href="lessons/ethical-ai/index.html" class="tool-link">Start Lesson →</a>
-                </div>
-
-                <div class="tool-card">
-                    <div class="tool-icon">🎯</div>
-                    <h3>Ethics Compass Game</h3>
-                    <p>Rate AI scenarios on an ethical risk slider</p>
-                    <a href="games/ethical-ai/index.html" class="tool-link">Play Game →</a>
-                </div>
-
-                <div class="tool-card">
-                    <div class="tool-icon">🎓</div>
-                    <h3>Responsible AI Usage Lesson</h3>
-                    <p>How students should interact with AI tools for learning</p>
-                    <a href="lessons/responsible-ai/index.html" class="tool-link">Start Lesson →</a>
-                </div>
-
-                <div class="tool-card">
-                    <div class="tool-icon">⚡</div>
-                    <h3>AI Use Judge Game</h3>
-                    <p>Label AI usage scenarios as responsible, gray area, or unsafe</p>
-                    <a href="games/responsible-ai/index.html" class="tool-link">Play Game →</a>
-                </div>
-
-                <div class="tool-card">
-                    <div class="tool-icon">🔒</div>
-                    <h3>Digital Privacy & AI Lesson</h3>
-                    <p>How AI tools store and infer information from your data</p>
-                    <a href="lessons/digital-privacy/index.html" class="tool-link">Start Lesson →</a>
-                </div>
-
-                <div class="tool-card">
-                    <div class="tool-icon">👁️</div>
-                    <h3>Digital Footprint Meter Game</h3>
-                    <p>Discover how much private data you reveal in AI prompts</p>
-                    <a href="games/digital-privacy/index.html" class="tool-link">Play Game →</a>
-                </div>
-            </div>
-
-            <h2 style="margin-top: 60px;">🎨 Human Centered Design</h2>
-            <p style="text-align: center; color: #4a5568; margin-bottom: 30px; font-size: 1.05em;">
-                Design products with users at the center - empathy, ideation, and testing
-            </p>
-
-            <div class="tools-grid">
-                <div class="tool-card">
-                    <div class="tool-icon">👥</div>
-                    <h3>HCD Part 1: Empathy & Understanding</h3>
-                    <p>Learn to understand users through research and build empathy</p>
-                    <a href="lessons/hcd-empathy/index.html" class="tool-link">Start Lesson →</a>
-                </div>
-
-                <div class="tool-card">
-                    <div class="tool-icon">🎭</div>
-                    <h3>Persona Builder Game</h3>
-                    <p>Build personas from user interviews and match quotes</p>
-                    <a href="games/persona-builder/index.html" class="tool-link">Play Game →</a>
-                </div>
-
-                <div class="tool-card">
-                    <div class="tool-icon">💡</div>
-                    <h3>HCD Part 2: Ideation & Prototyping</h3>
-                    <p>Generate creative solutions and build prototypes to test</p>
-                    <a href="lessons/hcd-ideation/index.html" class="tool-link">Start Lesson →</a>
-                </div>
-
-                <div class="tool-card">
-                    <div class="tool-icon">🚀</div>
-                    <h3>Solution Sprint Game</h3>
-                    <p>Design user-centered solutions under time pressure</p>
-                    <a href="games/solution-sprint/index.html" class="tool-link">Play Game →</a>
-                </div>
-
-                <div class="tool-card">
-                    <div class="tool-icon">🔄</div>
-                    <h3>HCD Part 3: Testing & Iteration</h3>
-                    <p>Test designs with users and iterate based on feedback</p>
-                    <a href="lessons/hcd-testing/index.html" class="tool-link">Start Lesson →</a>
-                </div>
-
-                <div class="tool-card">
-                    <div class="tool-icon">🔍</div>
-                    <h3>Usability Detective Game</h3>
-                    <p>Find and fix usability issues in interface mockups</p>
-                    <a href="games/usability-detective/index.html" class="tool-link">Play Game →</a>
-                </div>
-            </div>
-
-            <h2 style="margin-top: 60px;">📊 Data Science & Visualization</h2>
-            <p style="text-align: center; color: #4a5568; margin-bottom: 30px; font-size: 1.05em;">
-                Learn to work with data structures, visualize data, and find patterns
-            </p>
-
-            <div class="tools-grid">
-                <div class="tool-card">
-                    <div class="tool-icon">📦</div>
-                    <h3>Data Structures Lesson</h3>
-                    <p>What they are and why they matter for AI and computer science</p>
-                    <a href="lessons/data-structures/index.html" class="tool-link">Start Lesson →</a>
-                </div>
-
-                <div class="tool-card">
-                    <div class="tool-icon">🎮</div>
-                    <h3>Data Structure Playground</h3>
-                    <p>Organize messy data into lists, tables, trees, and graphs</p>
-                    <a href="games/data-structures/index.html" class="tool-link">Play Game →</a>
-                </div>
-
-                <div class="tool-card">
-                    <div class="tool-icon">🌳</div>
-                    <h3>Trees Lesson</h3>
-                    <p>Learn about hierarchies and decision paths in tree structures</p>
-                    <a href="lessons/trees/index.html" class="tool-link">Start Lesson →</a>
-                </div>
-
-                <div class="tool-card">
-                    <div class="tool-icon">📁</div>
-                    <h3>Folder Tree Builder Game</h3>
-                    <p>Build folder hierarchies and test search efficiency</p>
-                    <a href="games/trees/index.html" class="tool-link">Play Game →</a>
-                </div>
-
-                <div class="tool-card">
-                    <div class="tool-icon">🕸️</div>
-                    <h3>Graphs Lesson</h3>
-                    <p>Networks, connections, and relationships in graph structures</p>
-                    <a href="lessons/graphs/index.html" class="tool-link">Start Lesson →</a>
-                </div>
-
-                <div class="tool-card">
-                    <div class="tool-icon">🌐</div>
-                    <h3>Graph Your World Game</h3>
-                    <p>Create graphs to model social networks, maps, and more</p>
-                    <a href="games/graphs/index.html" class="tool-link">Play Game →</a>
-                </div>
-
-                <div class="tool-card">
-                    <div class="tool-icon">📊</div>
-                    <h3>Intro to Data Science Lesson</h3>
-                    <p>Reading and interpreting different types of graphs</p>
-                    <a href="lessons/data-science-intro/index.html" class="tool-link">Start Lesson →</a>
-                </div>
-
-                <div class="tool-card">
-                    <div class="tool-icon">📈</div>
-                    <h3>Chart Switcher Game</h3>
-                    <p>Toggle datasets through different chart types to find the best fit</p>
-                    <a href="games/data-science-intro/index.html" class="tool-link">Play Game →</a>
-                </div>
-
-                <div class="tool-card">
-                    <div class="tool-icon">🎨</div>
-                    <h3>Data Visualization Lesson</h3>
-                    <p>Tell compelling stories with data through effective visuals</p>
-                    <a href="lessons/data-visualization/index.html" class="tool-link">Start Lesson →</a>
-                </div>
-
-                <div class="tool-card">
-                    <div class="tool-icon">📉</div>
-                    <h3>Story from a Scatterplot Game</h3>
-                    <p>Interpret patterns and write data stories from scatterplots</p>
-                    <a href="games/data-visualization/index.html" class="tool-link">Play Game →</a>
-                </div>
-
-                <div class="tool-card">
-                    <div class="tool-icon">🚫</div>
-                    <h3>Misleading Graphs Lesson</h3>
-                    <p>How visuals can trick you and how to spot deception</p>
-                    <a href="lessons/misleading-graphs/index.html" class="tool-link">Start Lesson →</a>
-                </div>
-
-                <div class="tool-card">
-                    <div class="tool-icon">🔎</div>
-                    <h3>Spot the Sketchy Graph Game</h3>
-                    <p>Identify deceptive charts and explain what's wrong</p>
-                    <a href="games/misleading-graphs/index.html" class="tool-link">Play Game →</a>
-                </div>
-
-                <div class="tool-card">
-                    <div class="tool-icon">🧹</div>
-                    <h3>Data Cleaning Lesson</h3>
-                    <p>Why messy data creates wrong conclusions in AI</p>
-                    <a href="lessons/data-cleaning/index.html" class="tool-link">Start Lesson →</a>
-                </div>
-
-                <div class="tool-card">
-                    <div class="tool-icon">🛠️</div>
-                    <h3>Fix the Dataset Game</h3>
-                    <p>Correct errors, duplicates, and outliers in messy data</p>
-                    <a href="games/data-cleaning/index.html" class="tool-link">Play Game →</a>
-                </div>
-
-                <div class="tool-card">
-                    <div class="tool-icon">🔍</div>
-                    <h3>Pattern Finding Lesson</h3>
-                    <p>Human data insight skills - finding patterns without AI</p>
-                    <a href="lessons/pattern-finding/index.html" class="tool-link">Start Lesson →</a>
-                </div>
-
-                <div class="tool-card">
-                    <div class="tool-icon">🎯</div>
-                    <h3>Manual Clustering Board Game</h3>
-                    <p>Cluster data manually and compare to K-means algorithm</p>
-                    <a href="games/pattern-finding/index.html" class="tool-link">Play Game →</a>
-                </div>
-            </div>
-
-            <h2 style="margin-top: 60px;">🛠 Search Algorithms</h2>
-            <p style="text-align: center; color: #4a5568; margin-bottom: 30px; font-size: 1.05em;">
-                Visualize how AI finds paths through trees and mazes
-            </p>
-
-            <div class="tools-grid">
-                <div class="tool-card">
-                    <div class="tool-icon">🌳</div>
-                    <h3>Tree Search Visualizer</h3>
-                    <p>Build custom trees and watch algorithms explore them step-by-step</p>
-
-                    <ul class="features">
-                        <li>Create your own tree structures</li>
-                        <li>Add costs and heuristics to edges</li>
-                        <li>Visualize BFS, DFS, UCS, A*, and more</li>
-                        <li>Handle cycles with curved edges</li>
-                        <li>Compare algorithm performance</li>
-                    </ul>
-
-                    <a href="pathing/index.html" class="tool-link">Launch Tree Visualizer →</a>
-                </div>
-
-                <div class="tool-card">
-                    <div class="tool-icon">🎯</div>
-                    <h3>Maze Pathfinder</h3>
-                    <p>Draw mazes and discover how algorithms find the shortest path</p>
-
-                    <ul class="features">
-                        <li>Interactive grid-based maze creation</li>
-                        <li>Draw walls by clicking and dragging</li>
-                        <li>Watch algorithms explore in real-time</li>
-                        <li>Random maze generator included</li>
-                        <li>Adjustable animation speed</li>
-                    </ul>
-
-                    <a href="pathing/maze/index.html" class="tool-link">Launch Maze Pathfinder →</a>
-                </div>
-            </div>
-
-            <h2 style="margin-top: 60px;">🤖 Machine Learning</h2>
-            <p style="text-align: center; color: #4a5568; margin-bottom: 30px; font-size: 1.05em;">
-                Interactive visualizers, lessons, and games for machine learning algorithms
-            </p>
-
-            <div class="tools-grid">
-                <div class="tool-card">
-                    <div class="tool-icon">📚</div>
-                    <h3>Supervised Learning Lesson</h3>
-                    <p>Learn how AI learns from labeled examples</p>
-                    <a href="lessons/supervised-learning/index.html" class="tool-link">Start Lesson →</a>
-                </div>
-
-                <div class="tool-card">
-                    <div class="tool-icon">📈</div>
-                    <h3>Stock Market Prophet Game</h3>
-                    <p>Predict stock prices using linear regression</p>
-                    <a href="games/linear-regression/index.html" class="tool-link">Play Game →</a>
-                </div>
-
-                <div class="tool-card">
-                    <div class="tool-icon">🎯</div>
-                    <h3>Spam Filter Trainer Game</h3>
-                    <p>Train a spam filter with logistic regression</p>
-                    <a href="games/logistic-regression/index.html" class="tool-link">Play Game →</a>
-                </div>
-
-                <div class="tool-card">
-                    <div class="tool-icon">📚</div>
-                    <h3>Unsupervised Learning Lesson</h3>
-                    <p>Discover how AI finds patterns without labels</p>
-                    <a href="lessons/unsupervised-learning/index.html" class="tool-link">Start Lesson →</a>
-                </div>
-
-                <div class="tool-card">
-                    <div class="tool-icon">🎨</div>
-                    <h3>Color Palette Creator Game</h3>
-                    <p>Use K-means clustering to create color palettes</p>
-                    <a href="games/kmeans/index.html" class="tool-link">Play Game →</a>
-                </div>
-
-                <div class="tool-card">
-                    <div class="tool-icon">📚</div>
-                    <h3>Deep Learning Lesson</h3>
-                    <p>Neural networks and how they learn</p>
-                    <a href="lessons/deep-learning/index.html" class="tool-link">Start Lesson →</a>
-                </div>
-
-                <div class="tool-card">
-                    <div class="tool-icon">🖼️</div>
-                    <h3>Image Classifier Challenge</h3>
-                    <p>Build a neural network to classify images</p>
-                    <a href="games/deep-learning/index.html" class="tool-link">Play Game →</a>
-                </div>
-
-                <div class="tool-card">
-                    <div class="tool-icon">📚</div>
-                    <h3>NLP Lesson</h3>
-                    <p>Natural Language Processing and text AI</p>
-                    <a href="lessons/nlp/index.html" class="tool-link">Start Lesson →</a>
-                </div>
-
-                <div class="tool-card">
-                    <div class="tool-icon">💬</div>
-                    <h3>Sentiment Detective Game</h3>
-                    <p>Analyze text sentiment with NLP</p>
-                    <a href="games/nlp/index.html" class="tool-link">Play Game →</a>
-                </div>
-
-                <div class="tool-card">
-                    <div class="tool-icon">📚</div>
-                    <h3>Dimension Reduction Lesson</h3>
-                    <p>Simplifying complex data while keeping information</p>
-                    <a href="lessons/dimension-reduction/index.html" class="tool-link">Start Lesson →</a>
-                </div>
-
-                <div class="tool-card">
-                    <div class="tool-icon">📉</div>
-                    <h3>Dimension Compressor Game</h3>
-                    <p>Reduce dimensions while preserving maximum variance</p>
-                    <a href="games/dimension-reduction/index.html" class="tool-link">Play Game →</a>
-                </div>
-
-                <div class="tool-card">
-                    <div class="tool-icon">📚</div>
-                    <h3>Reinforcement Learning Lesson</h3>
-                    <p>How AI learns through trial and error</p>
-                    <a href="lessons/reinforcement-learning/index.html" class="tool-link">Start Lesson →</a>
-                </div>
-
-                <div class="tool-card">
-                    <div class="tool-icon">🤖</div>
-                    <h3>Q-Learning Grid World Game</h3>
-                    <p>Train an AI agent to navigate through rewards and penalties</p>
-                    <a href="games/reinforcement-learning/index.html" class="tool-link">Play Game →</a>
-                </div>
-
-                <div class="tool-card">
-                    <div class="tool-icon">📈</div>
-                    <h3>Linear Regression Visualizer</h3>
-                    <p>Click to add data points and watch the algorithm find the best-fit line</p>
-
-                    <ul class="features">
-                        <li>Interactive scatter plot creation</li>
-                        <li>Automatic best-fit line calculation</li>
-                        <li>View equation and R² score</li>
-                        <li>Manual adjustment to see error changes</li>
-                        <li>Sample datasets included</li>
-                    </ul>
-
-                    <a href="ml/linear-regression/index.html" class="tool-link">Launch Visualizer →</a>
-                </div>
-
-                <div class="tool-card">
-                    <div class="tool-icon">🎯</div>
-                    <h3>Logistic Regression</h3>
-                    <p>Binary classification with decision boundaries and probability visualization</p>
-
-                    <ul class="features">
-                        <li>Two-class classification demo</li>
-                        <li>Visual decision boundary display</li>
-                        <li>Probability gradient zones</li>
-                        <li>Classification accuracy metrics</li>
-                        <li>Real-world sample datasets</li>
-                    </ul>
-
-                    <a href="ml/logistic-regression/index.html" class="tool-link">Launch Logistic Regression →</a>
-                </div>
-
-                <div class="tool-card">
-                    <div class="tool-icon">🔍</div>
-                    <h3>K-Nearest Neighbors</h3>
-                    <p>Add training points and classify test points by finding nearest neighbors</p>
-
-                    <ul class="features">
-                        <li>Interactive point placement</li>
-                        <li>Adjustable K value slider</li>
-                        <li>Visual nearest neighbor highlighting</li>
-                        <li>Voronoi diagram boundaries</li>
-                        <li>Distance calculation display</li>
-                    </ul>
-
-                    <a href="ml/knn/index.html" class="tool-link">Launch KNN Demo →</a>
-                </div>
-
-                <div class="tool-card">
-                    <div class="tool-icon">🧠</div>
-                    <h3>Neural Network</h3>
-                    <p>Build and train your own neural network - watch it learn in real-time!</p>
-
-                    <ul class="features">
-                        <li>Configurable network architecture</li>
-                        <li>Multiple activation functions</li>
-                        <li>Real-time forward propagation</li>
-                        <li>Backpropagation visualization</li>
-                        <li>Decision boundary evolution</li>
-                    </ul>
-
-                    <a href="ml/neural-network/index.html" class="tool-link">Launch Neural Network →</a>
-                </div>
-
-                <div class="tool-card">
-                    <div class="tool-icon">🌳</div>
-                    <h3>Decision Tree</h3>
-                    <p>Build decision trees and see how they split data into branches</p>
-
-                    <ul class="features">
-                        <li>Gini impurity & entropy criteria</li>
-                        <li>Adjustable tree depth</li>
-                        <li>Visual tree structure display</li>
-                        <li>Decision region visualization</li>
-                        <li>Real-time accuracy metrics</li>
-                    </ul>
-
-                    <a href="ml/decision-tree/index.html" class="tool-link">Launch Decision Tree →</a>
-                </div>
-
-                <div class="tool-card">
-                    <div class="tool-icon">📊</div>
-                    <h3>Naive Bayes</h3>
-                    <p>Probabilistic classification using Bayes' Theorem</p>
-
-                    <ul class="features">
-                        <li>Gaussian Naive Bayes implementation</li>
-                        <li>Probability heatmap visualization</li>
-                        <li>Feature distribution graphs</li>
-                        <li>Prior & posterior probabilities</li>
-                        <li>Hover for class probabilities</li>
-                    </ul>
-
-                    <a href="ml/naive-bayes/index.html" class="tool-link">Launch Naive Bayes →</a>
-                </div>
-
-                <div class="tool-card">
-                    <div class="tool-icon">📚</div>
-                    <h3>SVM Lesson</h3>
-                    <p>Support Vector Machines: Finding optimal boundaries with maximum margin</p>
-                    <a href="lessons/svm/index.html" class="tool-link">Start Lesson →</a>
-                </div>
-
-                <div class="tool-card">
-                    <div class="tool-icon">⚡</div>
-                    <h3>Margin Maximizer Game</h3>
-                    <p>Draw decision boundaries to separate classes and maximize the margin</p>
-                    <a href="games/svm/index.html" class="tool-link">Play Game →</a>
-                </div>
-
-                <div class="tool-card">
-                    <div class="tool-icon">⚡</div>
-                    <h3>SVM Visualizer</h3>
-                    <p>Interactive visualizer for Support Vector Machines</p>
-
-                    <ul class="features">
-                        <li>Decision boundary visualization</li>
-                        <li>Support vector highlighting</li>
-                        <li>Kernel trick demonstration</li>
-                        <li>Margin maximization display</li>
-                        <li>Linear and non-linear separation</li>
-                    </ul>
-
-                    <a href="ml/svm/index.html" class="tool-link">Launch Visualizer →</a>
-                </div>
-            </div>
-
-            <h2 style="margin-top: 60px;">🧠 Deep Learning</h2>
-            <p style="text-align: center; color: #4a5568; margin-bottom: 30px; font-size: 1.05em;">
-                Explore different types of neural networks and their architectures
-            </p>
-
-            <div class="tools-grid">
-                <div class="tool-card">
-                    <div class="tool-icon">🧠</div>
-                    <h3>Feedforward Neural Networks</h3>
-                    <p>The simplest neural network - data flows forward without loops</p>
-                    <a href="lessons/feedforward-nn/index.html" class="tool-link">Start Lesson →</a>
-                </div>
-
-                <div class="tool-card">
-                    <div class="tool-icon">🏗️</div>
-                    <h3>Network Architect Game</h3>
-                    <p>Design your own feedforward network architecture</p>
-                    <a href="games/feedforward-nn/index.html" class="tool-link">Play Game →</a>
-                </div>
-
-                <div class="tool-card">
-                    <div class="tool-icon">🔄</div>
-                    <h3>Recurrent Neural Networks (RNN)</h3>
-                    <p>Networks with memory - perfect for sequences and time series</p>
-                    <a href="lessons/rnn/index.html" class="tool-link">Start Lesson →</a>
-                </div>
-
-                <div class="tool-card">
-                    <div class="tool-icon">📝</div>
-                    <h3>Text Predictor Game</h3>
-                    <p>Predict the next word using sequence memory</p>
-                    <a href="games/rnn/index.html" class="tool-link">Play Game →</a>
-                </div>
-
-                <div class="tool-card">
-                    <div class="tool-icon">🖼️</div>
-                    <h3>Convolutional Neural Networks (CNN)</h3>
-                    <p>Specialized for image processing with filters and pooling</p>
-                    <a href="lessons/cnn/index.html" class="tool-link">Start Lesson →</a>
-                </div>
-
-                <div class="tool-card">
-                    <div class="tool-icon">🔍</div>
-                    <h3>Filter Detective Game</h3>
-                    <p>Match filters to detect edges, blurs, and patterns</p>
-                    <a href="games/cnn/index.html" class="tool-link">Play Game →</a>
-                </div>
-
-                <div class="tool-card">
-                    <div class="tool-icon">⏳</div>
-                    <h3>Long Short-Term Memory (LSTM)</h3>
-                    <p>Advanced RNN that solves the vanishing gradient problem</p>
-                    <a href="lessons/lstm/index.html" class="tool-link">Start Lesson →</a>
-                </div>
-
-                <div class="tool-card">
-                    <div class="tool-icon">🎯</div>
-                    <h3>Sequence Memory Master</h3>
-                    <p>Test your long-term sequence memory skills</p>
-                    <a href="games/lstm/index.html" class="tool-link">Play Game →</a>
-                </div>
-
-                <div class="tool-card">
-                    <div class="tool-icon">🎨</div>
-                    <h3>Generative Adversarial Networks (GAN)</h3>
-                    <p>Two networks compete - generator vs discriminator</p>
-                    <a href="lessons/gan/index.html" class="tool-link">Start Lesson →</a>
-                </div>
-
-                <div class="tool-card">
-                    <div class="tool-icon">🕵️</div>
-                    <h3>Real or Fake Detective</h3>
-                    <p>Identify real vs AI-generated patterns</p>
-                    <a href="games/gan/index.html" class="tool-link">Play Game →</a>
-                </div>
-
-                <div class="tool-card">
-                    <div class="tool-icon">🔐</div>
-                    <h3>Autoencoders</h3>
-                    <p>Compress and reconstruct data through bottleneck layers</p>
-                    <a href="lessons/autoencoders/index.html" class="tool-link">Start Lesson →</a>
-                </div>
-
-                <div class="tool-card">
-                    <div class="tool-icon">🧹</div>
-                    <h3>Image Denoiser Game</h3>
-                    <p>Remove noise while preserving image quality</p>
-                    <a href="games/autoencoders/index.html" class="tool-link">Play Game →</a>
-                </div>
-
-                <div class="tool-card">
-                    <div class="tool-icon">⚡</div>
-                    <h3>Transformer Networks</h3>
-                    <p>Self-attention mechanism powering GPT and modern LLMs</p>
-                    <a href="lessons/transformers/index.html" class="tool-link">Start Lesson →</a>
-                </div>
-
-                <div class="tool-card">
-                    <div class="tool-icon">🎓</div>
-                    <h3>Attention Master Game</h3>
-                    <p>Identify which words should attend to each other</p>
-                    <a href="games/transformers/index.html" class="tool-link">Play Game →</a>
-                </div>
-            </div>
-
-            <h2 style="margin-top: 60px;">🎮 Game AI</h2>
-            <p style="text-align: center; color: #4a5568; margin-bottom: 30px; font-size: 1.05em;">
-                Learn how AI plays games strategically with Minimax algorithm
-            </p>
-
-            <div class="tools-grid">
-                <div class="tool-card">
-                    <div class="tool-icon">📚</div>
-                    <h3>Minimax Algorithm Lesson</h3>
-                    <p>How AI makes strategic decisions in two-player games</p>
-                    <a href="lessons/minimax/index.html" class="tool-link">Start Lesson →</a>
-                </div>
-
-                <div class="tool-card">
-                    <div class="tool-icon">🎮</div>
-                    <h3>Connect Four</h3>
-                    <p>Play against an AI using the Minimax algorithm with alpha-beta pruning!</p>
-
-                    <ul class="features">
-                        <li>Minimax algorithm implementation</li>
-                        <li>Alpha-beta pruning optimization</li>
-                        <li>Adjustable difficulty (1-7 depth)</li>
-                        <li>Game tree evaluation metrics</li>
-                        <li>Watch AI think and decide</li>
-                    </ul>
-
-                    <a href="games/connect-four/index.html" class="tool-link">Play Connect Four →</a>
+            <div class="hub-grid">
+                <!-- AI Ethics Hub Card -->
+                <div class="hub-card">
+                    <div class="hub-card-header gradient-ethics">
+                        <span class="hub-icon">⚖️</span>
+                        <h3>AI Ethics & Responsible Use</h3>
+                        <p class="hub-card-desc">Learn about bias, fairness, privacy, and how to use AI tools responsibly in your academic and personal life.</p>
+                    </div>
+                    <div class="hub-card-body">
+                        <div class="hub-stats">
+                            <span class="hub-stat-badge">📚 4 Lessons</span>
+                            <span class="hub-stat-badge">🎮 4 Games</span>
+                        </div>
+                        <a href="hubs/ai-ethics.html" class="hub-link">Explore AI Ethics →</a>
+                    </div>
+                </div>
+
+                <!-- Human Centered Design Hub Card -->
+                <div class="hub-card">
+                    <div class="hub-card-header gradient-hcd">
+                        <span class="hub-icon">🎨</span>
+                        <h3>Human Centered Design</h3>
+                        <p class="hub-card-desc">Design products with users at the center through empathy, ideation, prototyping, and iterative testing.</p>
+                    </div>
+                    <div class="hub-card-body">
+                        <div class="hub-stats">
+                            <span class="hub-stat-badge">📚 3 Lessons</span>
+                            <span class="hub-stat-badge">🎮 3 Games</span>
+                        </div>
+                        <a href="hubs/human-centered-design.html" class="hub-link">Explore HCD →</a>
+                    </div>
+                </div>
+                <!-- Data Science Hub Card -->
+                <div class="hub-card">
+                    <div class="hub-card-header gradient-data">
+                        <span class="hub-icon">📊</span>
+                        <h3>Data Science & Visualization</h3>
+                        <p class="hub-card-desc">Learn to work with data structures, visualize data effectively, and discover patterns through analysis and cleaning techniques.</p>
+                    </div>
+                    <div class="hub-card-body">
+                        <div class="hub-stats">
+                            <span class="hub-stat-badge">📚 8 Lessons</span>
+                            <span class="hub-stat-badge">🎮 8 Games</span>
+                        </div>
+                        <a href="hubs/data-science.html" class="hub-link">Explore Data Science →</a>
+                    </div>
+                </div>
+
+                <!-- Machine Learning Hub Card -->
+                <div class="hub-card">
+                    <div class="hub-card-header gradient-ml">
+                        <span class="hub-icon">🤖</span>
+                        <h3>Machine Learning</h3>
+                        <p class="hub-card-desc">Interactive lessons and games for ML algorithms including supervised learning, unsupervised learning, NLP, and more with visualizers.</p>
+                    </div>
+                    <div class="hub-card-body">
+                        <div class="hub-stats">
+                            <span class="hub-stat-badge">📚 6 Lessons</span>
+                            <span class="hub-stat-badge">🎮 8 Games</span>
+                            <span class="hub-stat-badge">🔬 7 Visualizers</span>
+                        </div>
+                        <a href="hubs/machine-learning.html" class="hub-link">Explore Machine Learning →</a>
+                    </div>
+                </div>
+
+                <!-- Deep Learning Hub Card -->
+                <div class="hub-card">
+                    <div class="hub-card-header gradient-dl">
+                        <span class="hub-icon">🧠</span>
+                        <h3>Deep Learning</h3>
+                        <p class="hub-card-desc">Explore different types of neural networks and their architectures including CNNs, RNNs, LSTMs, GANs, Autoencoders, and Transformers.</p>
+                    </div>
+                    <div class="hub-card-body">
+                        <div class="hub-stats">
+                            <span class="hub-stat-badge">📚 7 Lessons</span>
+                            <span class="hub-stat-badge">🎮 7 Games</span>
+                        </div>
+                        <a href="hubs/deep-learning.html" class="hub-link">Explore Deep Learning →</a>
+                    </div>
+                </div>
+
+                <!-- Search Algorithms Hub Card -->
+                <div class="hub-card">
+                    <div class="hub-card-header gradient-search">
+                        <span class="hub-icon">🛠</span>
+                        <h3>Search Algorithms</h3>
+                        <p class="hub-card-desc">Visualize how AI finds paths through trees and mazes using BFS, DFS, UCS, A*, and other pathfinding algorithms.</p>
+                    </div>
+                    <div class="hub-card-body">
+                        <div class="hub-stats">
+                            <span class="hub-stat-badge">🔬 2 Visualizers</span>
+                            <span class="hub-stat-badge">📖 6 Algorithms</span>
+                        </div>
+                        <a href="hubs/search-algorithms.html" class="hub-link">Explore Search Algorithms →</a>
+                    </div>
+                </div>
+
+                <!-- Game AI Hub Card -->
+                <div class="hub-card">
+                    <div class="hub-card-header gradient-game">
+                        <span class="hub-icon">🎮</span>
+                        <h3>Game AI</h3>
+                        <p class="hub-card-desc">Learn how AI plays games strategically using the Minimax algorithm with alpha-beta pruning and game tree search.</p>
+                    </div>
+                    <div class="hub-card-body">
+                        <div class="hub-stats">
+                            <span class="hub-stat-badge">📚 1 Lesson</span>
+                            <span class="hub-stat-badge">🎮 1 Game</span>
+                        </div>
+                        <a href="hubs/game-ai.html" class="hub-link">Explore Game AI →</a>
+                    </div>
                 </div>
             </div>
 
