@@ -49,7 +49,7 @@ button { padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer; 
 
     <div class="stats-banner">
         <div class="stat-box">
-            <div class="stat-value" id="totalQuizzes">23</div>
+            <div class="stat-value" id="totalQuizzes">30</div>
             <div class="stat-label">Total Quizzes</div>
         </div>
         <div class="stat-box">
@@ -84,6 +84,11 @@ button { padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer; 
     <div class="quiz-section">
         <h2>🤖 Machine Learning</h2>
         <div class="quiz-grid" id="mlQuizzes"></div>
+    </div>
+
+    <div class="quiz-section">
+        <h2>🧠 Deep Learning</h2>
+        <div class="quiz-grid" id="deepLearningQuizzes"></div>
     </div>
 
     <div class="quiz-section">
@@ -126,6 +131,15 @@ const quizzes = {
         { id: 'reinforcement-learning', title: 'Reinforcement Learning Quiz', description: 'Learn through trial and error', questions: 8 },
         { id: 'svm', title: 'SVM Quiz', description: 'Support Vector Machines and margin maximization', questions: 8 }
     ],
+    deepLearning: [
+        { id: 'feedforward-nn', title: 'Feedforward Neural Networks Quiz', description: 'Test your understanding of basic neural network architecture', questions: 12 },
+        { id: 'rnn', title: 'Recurrent Neural Networks Quiz', description: 'Master networks with memory for sequences', questions: 12 },
+        { id: 'cnn', title: 'Convolutional Neural Networks Quiz', description: 'Learn about image processing with CNNs', questions: 12 },
+        { id: 'lstm', title: 'Long Short-Term Memory Quiz', description: 'Understand advanced sequence learning with LSTMs', questions: 12 },
+        { id: 'gan', title: 'Generative Adversarial Networks Quiz', description: 'Explore generator vs discriminator training', questions: 12 },
+        { id: 'autoencoders', title: 'Autoencoders Quiz', description: 'Master data compression and reconstruction', questions: 12 },
+        { id: 'transformers', title: 'Transformer Networks Quiz', description: 'Learn about self-attention and modern LLMs', questions: 12 }
+    ],
     gameAI: [
         { id: 'minimax', title: 'Minimax Algorithm Quiz', description: 'Strategic decision-making in two-player games', questions: 8 }
     ]
@@ -136,6 +150,7 @@ function loadQuizzes() {
     loadQuizSection('hcdQuizzes', quizzes.hcd);
     loadQuizSection('dataScienceQuizzes', quizzes.dataScience);
     loadQuizSection('mlQuizzes', quizzes.ml);
+    loadQuizSection('deepLearningQuizzes', quizzes.deepLearning);
     loadQuizSection('gameAIQuizzes', quizzes.gameAI);
     updateStats();
 }

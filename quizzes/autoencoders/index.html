@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Autoencoders Quiz</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 0; }
+.nav-header { background: #2d3748; padding: 15px 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; }
+.nav-header a { color: #90cdf4; text-decoration: none; font-weight: 600; font-size: 1.1em; }
+.nav-title { color: #fff; font-size: 1.2em; font-weight: 700; }
+.container { max-width: 900px; margin: 20px auto; background: #fff; border-radius: 15px; padding: 40px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+h1 { text-align: center; color: #2d3748; font-size: 2.5em; margin-bottom: 15px; }
+.subtitle { text-align: center; color: #666; margin-bottom: 30px; font-size: 1.1em; }
+.question-card { background: #f8f9fa; padding: 25px; border-radius: 10px; margin: 20px 0; border-left: 4px solid #667eea; }
+.question-card.answered-correct { border-left-color: #4CAF50; background: #f1f8f4; }
+.question-card.answered-wrong { border-left-color: #f44336; background: #ffebee; }
+.question-number { color: #667eea; font-weight: 600; margin-bottom: 10px; }
+.question-text { font-size: 1.2em; color: #2d3748; margin-bottom: 20px; line-height: 1.6; }
+.options { display: flex; flex-direction: column; gap: 12px; }
+.option { background: #fff; padding: 15px 20px; border-radius: 8px; border: 2px solid #e0e0e0; cursor: pointer; transition: all 0.3s; }
+.option:hover { border-color: #667eea; transform: translateX(5px); }
+.option.selected { border-color: #667eea; background: #e3f2fd; }
+.option.correct { border-color: #4CAF50; background: #c8e6c9; }
+.option.wrong { border-color: #f44336; background: #ffcdd2; }
+.option.disabled { cursor: not-allowed; opacity: 0.7; }
+.explanation { margin-top: 15px; padding: 15px; background: #fff9c4; border-radius: 6px; border-left: 3px solid #fbc02d; display: none; }
+.explanation.show { display: block; }
+.explanation strong { color: #f57c00; }
+.progress-bar { background: #e0e0e0; height: 10px; border-radius: 5px; margin: 20px 0; overflow: hidden; }
+.progress-fill { background: linear-gradient(90deg, #667eea, #764ba2); height: 100%; transition: width 0.3s; }
+.quiz-actions { display: flex; gap: 15px; justify-content: center; margin: 30px 0; }
+button { padding: 15px 30px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 1.05em; transition: all 0.3s; }
+.btn-primary { background: #4CAF50; color: #fff; }
+.btn-primary:hover { background: #45a049; transform: scale(1.05); }
+.btn-primary:disabled { background: #ccc; cursor: not-allowed; transform: none; }
+.btn-secondary { background: #2196F3; color: #fff; }
+.btn-secondary:hover { background: #1976d2; }
+.results-card { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; padding: 40px; border-radius: 15px; text-align: center; margin: 30px 0; }
+.results-card h2 { font-size: 2.5em; margin-bottom: 20px; }
+.score-display { font-size: 4em; font-weight: bold; margin: 20px 0; }
+.results-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px; margin: 30px 0; }
+.result-stat { background: rgba(255,255,255,0.2); padding: 20px; border-radius: 10px; }
+.result-stat-value { font-size: 2em; font-weight: bold; }
+.result-stat-label { margin-top: 8px; opacity: 0.9; }
+</style>
+</head>
+<body>
+<nav class="nav-header">
+    <div class="nav-title">Autoencoders Quiz</div>
+    <div>
+        <a href="../../lessons/autoencoders/index.html" style="margin-right: 20px;">View Lesson</a>
+        <a href="../index.html">Back to Quizzes</a>
+    </div>
+</nav>
+<div class="container">
+    <h1>Autoencoders Quiz</h1>
+    <p class="subtitle">Test your understanding of encoder, decoder, bottleneck, and dimensionality reduction</p>
+
+    <div class="progress-bar">
+        <div class="progress-fill" id="progressBar" style="width: 0%"></div>
+    </div>
+
+    <div id="quizContent"></div>
+
+    <div class="quiz-actions" id="quizActions">
+        <button class="btn-primary" id="submitBtn" onclick="submitQuiz()" disabled>Submit Quiz</button>
+        <button class="btn-secondary" onclick="retakeQuiz()">Retake Quiz</button>
+    </div>
+</div>
+
+<script>
+const quizData = {
+    id: 'autoencoders',
+    questions: [
+        {
+            question: "What is an autoencoder?",
+            options: [
+                "A car that drives itself",
+                "A neural network that learns to compress and reconstruct data",
+                "A text editing tool",
+                "A video game"
+            ],
+            correct: 1,
+            explanation: "An autoencoder is a neural network trained to compress input data into a lower-dimensional representation and then reconstruct the original data from that compressed form."
+        },
+        {
+            question: "What are the two main parts of an autoencoder?",
+            options: [
+                "Input and output",
+                "Encoder (compresses) and decoder (reconstructs)",
+                "Generator and discriminator",
+                "Teacher and student"
+            ],
+            correct: 1,
+            explanation: "An autoencoder consists of an encoder that compresses the input into a compact representation, and a decoder that reconstructs the original data from this compressed representation."
+        },
+        {
+            question: "What is the bottleneck (latent space) in an autoencoder?",
+            options: [
+                "A traffic jam in the network",
+                "The compressed, lower-dimensional representation in the middle of the network",
+                "The final output layer",
+                "An error in the code"
+            ],
+            correct: 1,
+            explanation: "The bottleneck or latent space is the middle layer with fewer neurons than the input, forcing the network to learn a compressed representation that captures the most important features."
+        },
+        {
+            question: "What is the primary training objective of an autoencoder?",
+            options: [
+                "To classify images",
+                "To minimize reconstruction error between input and output",
+                "To generate new data",
+                "To translate languages"
+            ],
+            correct: 1,
+            explanation: "Autoencoders are trained to minimize the reconstruction error - the difference between the original input and the reconstructed output - forcing them to learn meaningful compressed representations."
+        },
+        {
+            question: "What is dimensionality reduction in the context of autoencoders?",
+            options: [
+                "Making images smaller on screen",
+                "Compressing high-dimensional data into fewer dimensions while preserving important information",
+                "Deleting unnecessary files",
+                "Converting 3D to 2D"
+            ],
+            correct: 1,
+            explanation: "Dimensionality reduction is the process of compressing high-dimensional data (like images with thousands of pixels) into a lower-dimensional representation that captures the essential features."
+        },
+        {
+            question: "What does the encoder do?",
+            options: [
+                "Encrypts passwords",
+                "Compresses input data into a lower-dimensional latent representation",
+                "Generates new images",
+                "Classifies data"
+            ],
+            correct: 1,
+            explanation: "The encoder takes high-dimensional input data and progressively compresses it through neural network layers into a compact, lower-dimensional latent representation."
+        },
+        {
+            question: "What does the decoder do?",
+            options: [
+                "Decrypts passwords",
+                "Reconstructs the original data from the compressed latent representation",
+                "Deletes compressed data",
+                "Sorts data"
+            ],
+            correct: 1,
+            explanation: "The decoder takes the compressed latent representation and progressively expands it back through neural network layers to reconstruct the original input data."
+        },
+        {
+            question: "What is a denoising autoencoder?",
+            options: [
+                "An autoencoder for audio only",
+                "An autoencoder trained to remove noise by learning to reconstruct clean data from corrupted input",
+                "An autoencoder that adds noise",
+                "A regular autoencoder"
+            ],
+            correct: 1,
+            explanation: "A denoising autoencoder is trained on corrupted (noisy) inputs but learns to reconstruct the clean, original data, making it useful for removing noise from images or other data."
+        },
+        {
+            question: "How is the latent space useful?",
+            options: [
+                "It takes up more storage",
+                "It captures essential features in compressed form, useful for visualization and data analysis",
+                "It slows down processing",
+                "It has no use"
+            ],
+            correct: 1,
+            explanation: "The latent space provides a compressed representation that captures the most important features, making it valuable for data visualization, feature extraction, anomaly detection, and analysis."
+        },
+        {
+            question: "What is anomaly detection with autoencoders?",
+            options: [
+                "Finding strange weather patterns",
+                "Identifying unusual data by measuring reconstruction error (normal data reconstructs well, anomalies don't)",
+                "Detecting computer viruses",
+                "Finding spelling mistakes"
+            ],
+            correct: 1,
+            explanation: "Autoencoders trained on normal data will reconstruct normal examples well but struggle with anomalies, producing high reconstruction error that can be used to detect unusual or abnormal data."
+        },
+        {
+            question: "What is a common application of autoencoders?",
+            options: [
+                "Playing video games",
+                "Image compression, denoising, feature learning, and anomaly detection",
+                "Writing emails",
+                "Web browsing"
+            ],
+            correct: 1,
+            explanation: "Autoencoders are used for image compression (reducing file size), denoising (removing noise), learning useful features from data, and detecting anomalies in various applications."
+        },
+        {
+            question: "What happens if the bottleneck layer is too large?",
+            options: [
+                "The network explodes",
+                "The autoencoder may simply memorize input without learning useful compression",
+                "Training becomes faster",
+                "Results improve"
+            ],
+            correct: 1,
+            explanation: "If the bottleneck is too large, the autoencoder can trivially copy the input to the output without learning to compress it into a meaningful representation, defeating its purpose."
+        }
+    ]
+};
+
+let userAnswers = [];
+let submitted = false;
+
+function init() {
+    loadQuiz();
+    loadProgress();
+}
+
+function loadQuiz() {
+    const content = document.getElementById('quizContent');
+    content.innerHTML = quizData.questions.map((q, index) => `
+        <div class="question-card" id="question${index}">
+            <div class="question-number">Question ${index + 1} of ${quizData.questions.length}</div>
+            <div class="question-text">${q.question}</div>
+            <div class="options">
+                ${q.options.map((option, optIndex) => `
+                    <div class="option" onclick="selectOption(${index}, ${optIndex})" id="q${index}_opt${optIndex}">
+                        ${option}
+                    </div>
+                `).join('')}
+            </div>
+            <div class="explanation" id="explanation${index}">
+                <strong>Explanation:</strong> ${q.explanation}
+            </div>
+        </div>
+    `).join('');
+}
+
+function selectOption(questionIndex, optionIndex) {
+    if (submitted) return;
+
+    // Clear previous selection
+    for (let i = 0; i < quizData.questions[questionIndex].options.length; i++) {
+        document.getElementById(`q${questionIndex}_opt${i}`).classList.remove('selected');
+    }
+
+    // Mark new selection
+    document.getElementById(`q${questionIndex}_opt${optionIndex}`).classList.add('selected');
+    userAnswers[questionIndex] = optionIndex;
+
+    updateProgress();
+    checkSubmitEnabled();
+}
+
+function checkSubmitEnabled() {
+    const allAnswered = userAnswers.length === quizData.questions.length &&
+                       userAnswers.every(a => a !== undefined);
+    document.getElementById('submitBtn').disabled = !allAnswered;
+}
+
+function updateProgress() {
+    const progress = (userAnswers.filter(a => a !== undefined).length / quizData.questions.length) * 100;
+    document.getElementById('progressBar').style.width = progress + '%';
+}
+
+function submitQuiz() {
+    if (submitted) return;
+    submitted = true;
+
+    let correct = 0;
+
+    quizData.questions.forEach((q, index) => {
+        const questionCard = document.getElementById(`question${index}`);
+        const userAnswer = userAnswers[index];
+        const isCorrect = userAnswer === q.correct;
+
+        if (isCorrect) {
+            correct++;
+            questionCard.classList.add('answered-correct');
+        } else {
+            questionCard.classList.add('answered-wrong');
+        }
+
+        // Show correct/wrong on options
+        q.options.forEach((_, optIndex) => {
+            const optEl = document.getElementById(`q${index}_opt${optIndex}`);
+            optEl.classList.add('disabled');
+
+            if (optIndex === q.correct) {
+                optEl.classList.add('correct');
+            } else if (optIndex === userAnswer && !isCorrect) {
+                optEl.classList.add('wrong');
+            }
+        });
+
+        // Show explanation
+        document.getElementById(`explanation${index}`).classList.add('show');
+    });
+
+    const percentage = Math.round((correct / quizData.questions.length) * 100);
+
+    // Save result
+    const result = {
+        score: correct,
+        total: quizData.questions.length,
+        percentage: percentage,
+        date: new Date().toISOString()
+    };
+    localStorage.setItem(`quiz_${quizData.id}`, JSON.stringify(result));
+
+    // Show results
+    showResults(correct, percentage);
+}
+
+function showResults(correct, percentage) {
+    const content = document.getElementById('quizContent');
+    let message = '';
+    if (percentage >= 90) message = 'Excellent! You have mastered autoencoders!';
+    else if (percentage >= 70) message = 'Great job! You understand the key concepts!';
+    else if (percentage >= 50) message = 'Good effort! Review the lesson to improve!';
+    else message = 'Keep learning! Review the lesson and try again!';
+
+    content.innerHTML = `
+        <div class="results-card">
+            <h2>Quiz Complete!</h2>
+            <div class="score-display">${percentage}%</div>
+            <p style="font-size: 1.3em; margin: 20px 0;">${message}</p>
+            <div class="results-grid">
+                <div class="result-stat">
+                    <div class="result-stat-value">${correct}</div>
+                    <div class="result-stat-label">Correct</div>
+                </div>
+                <div class="result-stat">
+                    <div class="result-stat-value">${quizData.questions.length - correct}</div>
+                    <div class="result-stat-label">Incorrect</div>
+                </div>
+                <div class="result-stat">
+                    <div class="result-stat-value">${correct * 10}</div>
+                    <div class="result-stat-label">Points Earned</div>
+                </div>
+            </div>
+        </div>
+    ` + content.innerHTML;
+
+    document.getElementById('submitBtn').style.display = 'none';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function retakeQuiz() {
+    if (confirm('Retake the quiz? Your previous score will be replaced.')) {
+        userAnswers = [];
+        submitted = false;
+        document.getElementById('submitBtn').style.display = 'inline-block';
+        init();
+        updateProgress();
+    }
+}
+
+function loadProgress() {
+    // Could load previous answers here if needed
+}
+
+// Initialize
+init();
+</script>
+</body>
+</html>
