@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Neural Architecture Builder - Deep Learning Visualizer</title>
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 0;
+}
+
+.nav-header {
+    background: #2d3748;
+    padding: 15px 30px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.nav-header a {
+    color: #90cdf4;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1.1em;
+    transition: color 0.3s;
+    margin-left: 15px;
+}
+
+.nav-header a:hover {
+    color: #63b3ed;
+}
+
+.nav-title {
+    color: #fff;
+    font-size: 1.2em;
+    font-weight: 700;
+}
+
+.nav-links {
+    display: flex;
+    gap: 10px;
+}
+
+.page-wrapper {
+    padding: 20px;
+}
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+
+h1 {
+    text-align: center;
+    color: #2d3748;
+    margin-bottom: 10px;
+    font-size: 2.5em;
+}
+
+.subtitle {
+    text-align: center;
+    color: #4a5568;
+    margin-bottom: 30px;
+    font-size: 1.1em;
+}
+
+.info-section {
+    background: #e8f5e9;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 25px;
+    border-left: 5px solid #4CAF50;
+}
+
+.info-section h3 {
+    color: #2e7d32;
+    margin-bottom: 10px;
+}
+
+.info-section p {
+    color: #1b5e20;
+    line-height: 1.6;
+    margin-bottom: 8px;
+}
+
+.info-section ul {
+    list-style-position: inside;
+    color: #1b5e20;
+    line-height: 1.8;
+}
+
+.main-content {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 30px;
+    margin-bottom: 30px;
+}
+
+.sidebar {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 10px;
+    height: fit-content;
+}
+
+.sidebar h3 {
+    color: #2d3748;
+    margin-bottom: 15px;
+    font-size: 1.3em;
+}
+
+.control-section {
+    margin-bottom: 20px;
+}
+
+.control-section label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #4a5568;
+}
+
+button {
+    width: 100%;
+    padding: 12px;
+    font-size: 14px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    margin-bottom: 10px;
+}
+
+button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+.btn-primary {
+    background: #4CAF50;
+    color: #fff;
+}
+
+.btn-primary:hover {
+    background: #45a049;
+}
+
+.btn-secondary {
+    background: #2196F3;
+    color: #fff;
+}
+
+.btn-secondary:hover {
+    background: #0b7dda;
+}
+
+.btn-danger {
+    background: #f44336;
+    color: #fff;
+}
+
+.btn-danger:hover {
+    background: #da190b;
+}
+
+.btn-warning {
+    background: #ff9800;
+    color: #fff;
+}
+
+.btn-warning:hover {
+    background: #e68900;
+}
+
+.slider-control {
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.slider-value {
+    text-align: center;
+    font-weight: 600;
+    color: #667eea;
+    margin-bottom: 10px;
+    font-size: 1.2em;
+}
+
+.canvas-area {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    padding: 20px;
+}
+
+#canvas {
+    display: block;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    background: #fafafa;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.stat-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #fff;
+    padding: 15px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.stat-label {
+    font-size: 0.9em;
+    opacity: 0.9;
+    margin-bottom: 5px;
+}
+
+.stat-value {
+    font-size: 1.8em;
+    font-weight: bold;
+}
+
+.layer-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 15px;
+}
+
+.layer-buttons button {
+    font-size: 12px;
+    padding: 8px;
+}
+
+.status-indicator {
+    background: #e3f2fd;
+    padding: 10px;
+    border-radius: 6px;
+    margin-bottom: 15px;
+    font-size: 0.9em;
+    color: #1565c0;
+    font-weight: 600;
+    text-align: center;
+}
+
+@media (max-width: 968px) {
+    .main-content {
+        grid-template-columns: 1fr;
+    }
+
+    h1 {
+        font-size: 2em;
+    }
+
+    .layer-buttons {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+</head>
+<body>
+<nav class="nav-header">
+    <div class="nav-title">Neural Architecture Builder</div>
+    <div class="nav-links">
+        <a href="../../deep-learning.html">Deep Learning Hub</a>
+        <a href="../../index.html">Home</a>
+    </div>
+</nav>
+
+<div class="page-wrapper">
+    <div class="container">
+        <h1>Neural Architecture Builder</h1>
+        <p class="subtitle">Design and visualize custom neural network architectures!</p>
+
+        <div class="info-section">
+            <h3>What is Neural Network Architecture?</h3>
+            <p>
+                Neural network architecture refers to how layers and neurons are organized. Different architectures
+                solve different problems - from simple linear patterns to complex image recognition tasks.
+            </p>
+            <p><strong>Key concepts:</strong></p>
+            <ul>
+                <li><strong>Input Layer:</strong> Receives the initial data (e.g., pixel values, features)</li>
+                <li><strong>Hidden Layers:</strong> Process and transform data through weighted connections</li>
+                <li><strong>Output Layer:</strong> Produces the final prediction or classification</li>
+                <li><strong>Neurons:</strong> Individual processing units that apply activation functions</li>
+                <li><strong>Forward Propagation:</strong> Data flows from input to output through the network</li>
+            </ul>
+        </div>
+
+        <div class="main-content">
+            <div class="sidebar">
+                <h3>Controls</h3>
+
+                <div class="status-indicator" id="statusIndicator">
+                    Ready to build
+                </div>
+
+                <div class="control-section">
+                    <label>Quick Architectures:</label>
+                    <div class="layer-buttons">
+                        <button class="btn-secondary" onclick="loadArchitecture('simple')">Simple FNN</button>
+                        <button class="btn-secondary" onclick="loadArchitecture('deep')">Deep Network</button>
+                        <button class="btn-secondary" onclick="loadArchitecture('wide')">Wide Network</button>
+                        <button class="btn-secondary" onclick="loadArchitecture('pyramid')">Pyramid</button>
+                    </div>
+                </div>
+
+                <div class="control-section">
+                    <label>Add Layer:</label>
+                    <button class="btn-primary" onclick="addLayer()">+ Add Hidden Layer</button>
+                </div>
+
+                <div class="control-section">
+                    <label>Layer Size (Neurons):</label>
+                    <div class="slider-value" id="layerSizeValue">8</div>
+                    <input type="range" class="slider-control" id="layerSizeSlider"
+                           min="2" max="16" step="1" value="8"
+                           oninput="updateLayerSize()">
+                </div>
+
+                <div class="control-section">
+                    <label>Selected Layer: <span id="selectedLayer">None</span></label>
+                    <button class="btn-warning" onclick="modifySelectedLayer()">Modify Layer</button>
+                    <button class="btn-danger" onclick="removeSelectedLayer()">Remove Layer</button>
+                </div>
+
+                <button class="btn-primary" onclick="animateForwardPass()">Play Forward Pass</button>
+                <button class="btn-warning" onclick="stopAnimation()">Stop Animation</button>
+                <button class="btn-danger" onclick="resetArchitecture()">Reset</button>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">Total Layers</div>
+                        <div class="stat-value" id="totalLayers">3</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Total Neurons</div>
+                        <div class="stat-value" id="totalNeurons">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Connections</div>
+                        <div class="stat-value" id="totalConnections">0</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="canvas-area">
+                <canvas id="canvas" width="900" height="600"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+
+// Network architecture: array of layer sizes
+let architecture = [3, 8, 8, 2];  // input, hidden1, hidden2, output
+let selectedLayerIndex = -1;
+let animating = false;
+let animationFrame = 0;
+let animationInterval = null;
+
+const NEURON_RADIUS = 12;
+const LAYER_SPACING = 200;
+const MIN_NEURON_SPACING = 40;
+
+function drawNetwork() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const numLayers = architecture.length;
+    const startX = 80;
+
+    // Calculate positions for all neurons
+    const neuronPositions = [];
+
+    for (let l = 0; l < numLayers; l++) {
+        const layerSize = architecture[l];
+        const x = startX + l * LAYER_SPACING;
+        const totalHeight = Math.max(layerSize * MIN_NEURON_SPACING, 400);
+        const spacing = totalHeight / (layerSize + 1);
+        const startY = (canvas.height - totalHeight) / 2;
+
+        neuronPositions[l] = [];
+        for (let n = 0; n < layerSize; n++) {
+            neuronPositions[l][n] = {
+                x: x,
+                y: startY + spacing * (n + 1)
+            };
+        }
+    }
+
+    // Draw connections
+    for (let l = 0; l < numLayers - 1; l++) {
+        for (let i = 0; i < architecture[l]; i++) {
+            for (let j = 0; j < architecture[l + 1]; j++) {
+                const from = neuronPositions[l][i];
+                const to = neuronPositions[l + 1][j];
+
+                // Animation effect
+                let opacity = 0.15;
+                let lineWidth = 1;
+
+                if (animating) {
+                    const progress = animationFrame / 100;
+                    const layerProgress = l / (numLayers - 1);
+
+                    if (progress > layerProgress && progress < layerProgress + 0.2) {
+                        opacity = 0.6;
+                        lineWidth = 2;
+                    }
+                }
+
+                ctx.strokeStyle = `rgba(102, 126, 234, ${opacity})`;
+                ctx.lineWidth = lineWidth;
+                ctx.beginPath();
+                ctx.moveTo(from.x, from.y);
+                ctx.lineTo(to.x, to.y);
+                ctx.stroke();
+            }
+        }
+    }
+
+    // Draw neurons
+    for (let l = 0; l < numLayers; l++) {
+        for (let n = 0; n < architecture[l]; n++) {
+            const pos = neuronPositions[l][n];
+
+            // Determine neuron color
+            let fillColor = '#667eea';
+            let strokeColor = '#2d3748';
+            let strokeWidth = 2;
+
+            // Animation effect
+            if (animating) {
+                const progress = animationFrame / 100;
+                const layerProgress = l / (numLayers - 1);
+
+                if (progress > layerProgress) {
+                    const activation = Math.random();
+                    const intensity = Math.floor(activation * 255);
+                    fillColor = `rgb(${255-intensity}, ${intensity}, 100)`;
+                }
+            }
+
+            // Highlight selected layer
+            if (l === selectedLayerIndex) {
+                strokeColor = '#ff9800';
+                strokeWidth = 4;
+            }
+
+            // Draw neuron
+            ctx.fillStyle = fillColor;
+            ctx.beginPath();
+            ctx.arc(pos.x, pos.y, NEURON_RADIUS, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.strokeStyle = strokeColor;
+            ctx.lineWidth = strokeWidth;
+            ctx.stroke();
+        }
+    }
+
+    // Draw layer labels
+    ctx.fillStyle = '#2d3748';
+    ctx.font = 'bold 14px Arial';
+    ctx.textAlign = 'center';
+
+    const labels = ['Input', ...Array(numLayers - 2).fill(0).map((_, i) => `Hidden ${i+1}`), 'Output'];
+
+    for (let l = 0; l < numLayers; l++) {
+        const x = startX + l * LAYER_SPACING;
+        ctx.fillText(labels[l], x, 30);
+        ctx.fillText(`(${architecture[l]})`, x, 50);
+    }
+
+    updateStats();
+}
+
+function updateStats() {
+    document.getElementById('totalLayers').textContent = architecture.length;
+
+    const totalNeurons = architecture.reduce((sum, size) => sum + size, 0);
+    document.getElementById('totalNeurons').textContent = totalNeurons;
+
+    let totalConnections = 0;
+    for (let i = 0; i < architecture.length - 1; i++) {
+        totalConnections += architecture[i] * architecture[i + 1];
+    }
+    document.getElementById('totalConnections').textContent = totalConnections;
+}
+
+function updateLayerSize() {
+    const value = parseInt(document.getElementById('layerSizeSlider').value);
+    document.getElementById('layerSizeValue').textContent = value;
+}
+
+function addLayer() {
+    if (architecture.length >= 6) {
+        alert('Maximum 6 layers allowed for visualization!');
+        return;
+    }
+
+    const layerSize = parseInt(document.getElementById('layerSizeSlider').value);
+    // Insert before output layer
+    architecture.splice(architecture.length - 1, 0, layerSize);
+
+    document.getElementById('statusIndicator').textContent = `Added layer with ${layerSize} neurons`;
+    document.getElementById('statusIndicator').style.background = '#d4edda';
+    document.getElementById('statusIndicator').style.color = '#155724';
+
+    drawNetwork();
+
+    setTimeout(() => {
+        document.getElementById('statusIndicator').textContent = 'Ready to build';
+        document.getElementById('statusIndicator').style.background = '#e3f2fd';
+        document.getElementById('statusIndicator').style.color = '#1565c0';
+    }, 2000);
+}
+
+function modifySelectedLayer() {
+    if (selectedLayerIndex < 1 || selectedLayerIndex >= architecture.length - 1) {
+        alert('Please select a hidden layer first by clicking on it!');
+        return;
+    }
+
+    const newSize = parseInt(document.getElementById('layerSizeSlider').value);
+    architecture[selectedLayerIndex] = newSize;
+
+    document.getElementById('statusIndicator').textContent = `Modified layer to ${newSize} neurons`;
+    document.getElementById('statusIndicator').style.background = '#fff3cd';
+    document.getElementById('statusIndicator').style.color = '#856404';
+
+    drawNetwork();
+}
+
+function removeSelectedLayer() {
+    if (selectedLayerIndex < 1 || selectedLayerIndex >= architecture.length - 1) {
+        alert('Please select a hidden layer first! Cannot remove input or output layers.');
+        return;
+    }
+
+    if (architecture.length <= 3) {
+        alert('Need at least one hidden layer!');
+        return;
+    }
+
+    architecture.splice(selectedLayerIndex, 1);
+    selectedLayerIndex = -1;
+    document.getElementById('selectedLayer').textContent = 'None';
+
+    document.getElementById('statusIndicator').textContent = 'Layer removed';
+    document.getElementById('statusIndicator').style.background = '#f8d7da';
+    document.getElementById('statusIndicator').style.color = '#721c24';
+
+    drawNetwork();
+
+    setTimeout(() => {
+        document.getElementById('statusIndicator').textContent = 'Ready to build';
+        document.getElementById('statusIndicator').style.background = '#e3f2fd';
+        document.getElementById('statusIndicator').style.color = '#1565c0';
+    }, 2000);
+}
+
+function animateForwardPass() {
+    if (animating) return;
+
+    animating = true;
+    animationFrame = 0;
+
+    document.getElementById('statusIndicator').textContent = 'Forward propagation in progress...';
+    document.getElementById('statusIndicator').style.background = '#d4edda';
+    document.getElementById('statusIndicator').style.color = '#155724';
+
+    animationInterval = setInterval(() => {
+        animationFrame += 2;
+
+        if (animationFrame >= 100) {
+            animationFrame = 0;
+        }
+
+        drawNetwork();
+    }, 50);
+}
+
+function stopAnimation() {
+    animating = false;
+    if (animationInterval) {
+        clearInterval(animationInterval);
+        animationInterval = null;
+    }
+
+    document.getElementById('statusIndicator').textContent = 'Animation stopped';
+    document.getElementById('statusIndicator').style.background = '#fff3cd';
+    document.getElementById('statusIndicator').style.color = '#856404';
+
+    drawNetwork();
+
+    setTimeout(() => {
+        document.getElementById('statusIndicator').textContent = 'Ready to build';
+        document.getElementById('statusIndicator').style.background = '#e3f2fd';
+        document.getElementById('statusIndicator').style.color = '#1565c0';
+    }, 2000);
+}
+
+function resetArchitecture() {
+    stopAnimation();
+    architecture = [3, 8, 8, 2];
+    selectedLayerIndex = -1;
+    document.getElementById('selectedLayer').textContent = 'None';
+    drawNetwork();
+}
+
+function loadArchitecture(type) {
+    stopAnimation();
+
+    switch(type) {
+        case 'simple':
+            architecture = [2, 4, 1];
+            break;
+        case 'deep':
+            architecture = [3, 8, 6, 4, 2];
+            break;
+        case 'wide':
+            architecture = [4, 12, 12, 3];
+            break;
+        case 'pyramid':
+            architecture = [2, 8, 6, 4, 2, 1];
+            break;
+    }
+
+    selectedLayerIndex = -1;
+    document.getElementById('selectedLayer').textContent = 'None';
+    drawNetwork();
+}
+
+// Click to select layer
+canvas.addEventListener('click', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    const startX = 80;
+    const numLayers = architecture.length;
+
+    // Check each layer
+    for (let l = 1; l < numLayers - 1; l++) {  // Only hidden layers
+        const layerX = startX + l * LAYER_SPACING;
+
+        if (Math.abs(x - layerX) < 50) {
+            selectedLayerIndex = l;
+            document.getElementById('selectedLayer').textContent = `Hidden ${l} (${architecture[l]} neurons)`;
+            drawNetwork();
+            return;
+        }
+    }
+
+    // Deselect if clicked elsewhere
+    selectedLayerIndex = -1;
+    document.getElementById('selectedLayer').textContent = 'None';
+    drawNetwork();
+});
+
+// Initialize
+drawNetwork();
+</script>
+</body>
+</html>

@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Attention Mechanism Visualizer - Deep Learning Tool</title>
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 0;
+}
+
+.nav-header {
+    background: #2d3748;
+    padding: 15px 30px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.nav-header a {
+    color: #90cdf4;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1.1em;
+    transition: color 0.3s;
+    margin-left: 15px;
+}
+
+.nav-header a:hover {
+    color: #63b3ed;
+}
+
+.nav-title {
+    color: #fff;
+    font-size: 1.2em;
+    font-weight: 700;
+}
+
+.nav-links {
+    display: flex;
+    gap: 10px;
+}
+
+.page-wrapper {
+    padding: 20px;
+}
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+
+h1 {
+    text-align: center;
+    color: #2d3748;
+    margin-bottom: 10px;
+    font-size: 2.5em;
+}
+
+.subtitle {
+    text-align: center;
+    color: #4a5568;
+    margin-bottom: 30px;
+    font-size: 1.1em;
+}
+
+.info-section {
+    background: #e8f5e9;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 25px;
+    border-left: 5px solid #4CAF50;
+}
+
+.info-section h3 {
+    color: #2e7d32;
+    margin-bottom: 10px;
+}
+
+.info-section p {
+    color: #1b5e20;
+    line-height: 1.6;
+    margin-bottom: 8px;
+}
+
+.info-section ul {
+    list-style-position: inside;
+    color: #1b5e20;
+    line-height: 1.8;
+}
+
+.main-content {
+    display: grid;
+    grid-template-columns: 350px 1fr;
+    gap: 30px;
+    margin-bottom: 30px;
+}
+
+.sidebar {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 10px;
+    height: fit-content;
+}
+
+.sidebar h3 {
+    color: #2d3748;
+    margin-bottom: 15px;
+    font-size: 1.3em;
+}
+
+.control-section {
+    margin-bottom: 20px;
+}
+
+.control-section label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #4a5568;
+}
+
+textarea {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    font-family: inherit;
+    resize: vertical;
+    min-height: 80px;
+}
+
+button {
+    width: 100%;
+    padding: 12px;
+    font-size: 14px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    margin-bottom: 10px;
+}
+
+button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+.btn-primary {
+    background: #4CAF50;
+    color: #fff;
+}
+
+.btn-primary:hover {
+    background: #45a049;
+}
+
+.btn-secondary {
+    background: #2196F3;
+    color: #fff;
+}
+
+.btn-secondary:hover {
+    background: #0b7dda;
+}
+
+.btn-danger {
+    background: #f44336;
+    color: #fff;
+}
+
+.btn-danger:hover {
+    background: #da190b;
+}
+
+.sample-buttons {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+    margin-bottom: 15px;
+}
+
+.sample-buttons button {
+    font-size: 12px;
+    padding: 8px;
+    text-align: left;
+}
+
+.visualization-area {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    padding: 20px;
+}
+
+.word-display {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 30px;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.word-box {
+    padding: 12px 20px;
+    background: #667eea;
+    color: white;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.word-box:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+
+.word-box.selected {
+    background: #ff9800;
+    transform: scale(1.1);
+}
+
+.canvas-container {
+    margin-bottom: 20px;
+}
+
+canvas {
+    display: block;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    background: #fafafa;
+    margin: 0 auto;
+}
+
+.qkv-section {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.qkv-box {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.qkv-box h4 {
+    margin-bottom: 10px;
+    font-size: 1.1em;
+}
+
+.qkv-box p {
+    font-size: 0.9em;
+    opacity: 0.9;
+}
+
+.status-indicator {
+    background: #e3f2fd;
+    padding: 10px;
+    border-radius: 6px;
+    margin-bottom: 15px;
+    font-size: 0.9em;
+    color: #1565c0;
+    font-weight: 600;
+    text-align: center;
+}
+
+@media (max-width: 1200px) {
+    .main-content {
+        grid-template-columns: 1fr;
+    }
+
+    .qkv-section {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+</head>
+<body>
+<nav class="nav-header">
+    <div class="nav-title">Attention Mechanism Visualizer</div>
+    <div class="nav-links">
+        <a href="../../deep-learning.html">Deep Learning Hub</a>
+        <a href="../../index.html">Home</a>
+    </div>
+</nav>
+
+<div class="page-wrapper">
+    <div class="container">
+        <h1>Attention Mechanism Visualizer</h1>
+        <p class="subtitle">Explore how Transformers use attention to understand language!</p>
+
+        <div class="info-section">
+            <h3>What is Attention?</h3>
+            <p>
+                Attention is a mechanism that allows neural networks to focus on relevant parts of the input when
+                processing each element. It's the key innovation behind Transformers, powering models like GPT and BERT.
+            </p>
+            <p><strong>Key concepts:</strong></p>
+            <ul>
+                <li><strong>Query (Q):</strong> "What am I looking for?" - represents the current word</li>
+                <li><strong>Key (K):</strong> "What do I contain?" - represents each word's content</li>
+                <li><strong>Value (V):</strong> "What information do I provide?" - the actual information to extract</li>
+                <li><strong>Attention Scores:</strong> How much each word should focus on every other word</li>
+                <li><strong>Self-Attention:</strong> Words in a sentence attending to each other</li>
+            </ul>
+        </div>
+
+        <div class="main-content">
+            <div class="sidebar">
+                <h3>Controls</h3>
+
+                <div class="status-indicator" id="statusIndicator">
+                    Enter a sentence to begin
+                </div>
+
+                <div class="control-section">
+                    <label>Enter Your Sentence:</label>
+                    <textarea id="sentenceInput" placeholder="Type a sentence here...">The cat sat on the mat</textarea>
+                </div>
+
+                <button class="btn-primary" onclick="processSentence()">Calculate Attention</button>
+
+                <div class="control-section">
+                    <label>Sample Sentences:</label>
+                    <div class="sample-buttons">
+                        <button class="btn-secondary" onclick="loadSample('The quick brown fox jumps')">The quick brown fox jumps</button>
+                        <button class="btn-secondary" onclick="loadSample('I love machine learning')">I love machine learning</button>
+                        <button class="btn-secondary" onclick="loadSample('Attention is all you need')">Attention is all you need</button>
+                        <button class="btn-secondary" onclick="loadSample('The student learned about neural networks')">The student learned about neural networks</button>
+                    </div>
+                </div>
+
+                <div class="control-section">
+                    <label>Instructions:</label>
+                    <p style="font-size: 0.9em; color: #4a5568; line-height: 1.6;">
+                        1. Enter or select a sentence<br>
+                        2. Click "Calculate Attention"<br>
+                        3. Click on any word to see what it attends to<br>
+                        4. Darker lines = stronger attention
+                    </p>
+                </div>
+            </div>
+
+            <div class="visualization-area">
+                <h3 style="color: #2d3748; margin-bottom: 15px;">Attention Visualization</h3>
+
+                <div class="word-display" id="wordDisplay">
+                    <p style="color: #999;">Enter a sentence and click "Calculate Attention"</p>
+                </div>
+
+                <div class="canvas-container">
+                    <canvas id="attentionCanvas" width="900" height="400"></canvas>
+                </div>
+
+                <h3 style="color: #2d3748; margin: 20px 0 15px 0;">Attention Matrix</h3>
+                <div class="canvas-container">
+                    <canvas id="matrixCanvas" width="900" height="400"></canvas>
+                </div>
+
+                <div class="qkv-section">
+                    <div class="qkv-box">
+                        <h4>Query (Q)</h4>
+                        <p>"What am I looking for?"</p>
+                        <p style="margin-top: 10px;">Represents the word asking the question</p>
+                    </div>
+                    <div class="qkv-box">
+                        <h4>Key (K)</h4>
+                        <p>"What do I offer?"</p>
+                        <p style="margin-top: 10px;">Represents what each word contains</p>
+                    </div>
+                    <div class="qkv-box">
+                        <h4>Value (V)</h4>
+                        <p>"What info do I give?"</p>
+                        <p style="margin-top: 10px;">The actual information passed along</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const canvas = document.getElementById('attentionCanvas');
+const ctx = canvas.getContext('2d');
+const matrixCanvas = document.getElementById('matrixCanvas');
+const matrixCtx = matrixCanvas.getContext('2d');
+
+let words = [];
+let attentionMatrix = [];
+let selectedWordIndex = -1;
+
+function processSentence() {
+    const sentence = document.getElementById('sentenceInput').value.trim();
+
+    if (!sentence) {
+        alert('Please enter a sentence!');
+        return;
+    }
+
+    words = sentence.toLowerCase().split(/\s+/).filter(w => w.length > 0);
+
+    if (words.length < 2) {
+        alert('Please enter at least 2 words!');
+        return;
+    }
+
+    if (words.length > 10) {
+        alert('Please keep sentences to 10 words or less for better visualization!');
+        return;
+    }
+
+    calculateAttention();
+    displayWords();
+    drawAttentionVisualization();
+    drawAttentionMatrix();
+
+    document.getElementById('statusIndicator').textContent = 'Click on words to see attention!';
+    document.getElementById('statusIndicator').style.background = '#d4edda';
+    document.getElementById('statusIndicator').style.color = '#155724';
+}
+
+function calculateAttention() {
+    const n = words.length;
+    attentionMatrix = [];
+
+    // Simulate attention scores based on word positions and simple heuristics
+    for (let i = 0; i < n; i++) {
+        attentionMatrix[i] = [];
+
+        for (let j = 0; j < n; j++) {
+            if (i === j) {
+                // Self-attention is usually high
+                attentionMatrix[i][j] = 0.3 + Math.random() * 0.3;
+            } else {
+                // Adjacent words get more attention
+                const distance = Math.abs(i - j);
+                let score = Math.exp(-distance * 0.5) * (0.2 + Math.random() * 0.3);
+
+                // Add some word-specific patterns
+                // Articles often attend to nouns
+                if (words[i] === 'the' || words[i] === 'a' || words[i] === 'an') {
+                    if (j > i && j <= i + 2) score *= 1.5;
+                }
+
+                // Verbs often attend to subjects and objects
+                const verbs = ['is', 'are', 'was', 'were', 'love', 'like', 'jumps', 'sat', 'learned'];
+                if (verbs.includes(words[i])) {
+                    score *= 1.3;
+                }
+
+                attentionMatrix[i][j] = score;
+            }
+        }
+
+        // Normalize row to sum to 1 (softmax-like)
+        const rowSum = attentionMatrix[i].reduce((a, b) => a + b, 0);
+        attentionMatrix[i] = attentionMatrix[i].map(val => val / rowSum);
+    }
+}
+
+function displayWords() {
+    const wordDisplay = document.getElementById('wordDisplay');
+    wordDisplay.innerHTML = '';
+
+    words.forEach((word, index) => {
+        const wordBox = document.createElement('div');
+        wordBox.className = 'word-box';
+        wordBox.textContent = word;
+        wordBox.onclick = () => selectWord(index);
+        wordBox.id = `word-${index}`;
+        wordDisplay.appendChild(wordBox);
+    });
+}
+
+function selectWord(index) {
+    selectedWordIndex = index;
+
+    // Update word box styling
+    document.querySelectorAll('.word-box').forEach((box, i) => {
+        box.classList.toggle('selected', i === index);
+    });
+
+    drawAttentionVisualization();
+}
+
+function drawAttentionVisualization() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    if (words.length === 0) return;
+
+    const n = words.length;
+    const spacing = Math.min(canvas.width / (n + 1), 100);
+    const y1 = 100;
+    const y2 = 300;
+
+    // Draw connections
+    if (selectedWordIndex >= 0) {
+        const sourceX = spacing * (selectedWordIndex + 1);
+
+        for (let j = 0; j < n; j++) {
+            const targetX = spacing * (j + 1);
+            const attention = attentionMatrix[selectedWordIndex][j];
+
+            // Line thickness and opacity based on attention score
+            const opacity = attention;
+            const lineWidth = 1 + attention * 8;
+
+            // Color gradient based on attention strength
+            const color = attention > 0.3 ? '#4CAF50' : attention > 0.15 ? '#ff9800' : '#2196F3';
+
+            ctx.strokeStyle = color;
+            ctx.globalAlpha = opacity;
+            ctx.lineWidth = lineWidth;
+
+            ctx.beginPath();
+            ctx.moveTo(sourceX, y1 + 30);
+
+            // Curved line
+            const midY = (y1 + y2) / 2;
+            ctx.bezierCurveTo(sourceX, midY, targetX, midY, targetX, y2 - 30);
+            ctx.stroke();
+
+            // Attention score label
+            ctx.globalAlpha = 1;
+            ctx.fillStyle = '#2d3748';
+            ctx.font = '11px Arial';
+            ctx.textAlign = 'center';
+            const labelY = midY + (j % 2 === 0 ? -5 : 15);
+            ctx.fillText((attention * 100).toFixed(0) + '%', (sourceX + targetX) / 2, labelY);
+        }
+
+        ctx.globalAlpha = 1;
+    }
+
+    // Draw word circles
+    for (let i = 0; i < n; i++) {
+        const x = spacing * (i + 1);
+
+        // Source words (top)
+        drawWordCircle(x, y1, words[i], i === selectedWordIndex ? '#ff9800' : '#667eea');
+
+        // Target words (bottom)
+        const targetHighlight = selectedWordIndex >= 0 && attentionMatrix[selectedWordIndex][i] > 0.2;
+        drawWordCircle(x, y2, words[i], targetHighlight ? '#4CAF50' : '#764ba2');
+    }
+
+    // Labels
+    ctx.fillStyle = '#2d3748';
+    ctx.font = 'bold 14px Arial';
+    ctx.textAlign = 'left';
+    ctx.fillText('Query Word (click to select):', 20, 40);
+    ctx.fillText('Attending To:', 20, 240);
+}
+
+function drawWordCircle(x, y, text, color) {
+    const radius = 25;
+
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.arc(x, y, radius, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.strokeStyle = '#2d3748';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 12px Arial';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(text.substring(0, 4), x, y);
+}
+
+function drawAttentionMatrix() {
+    matrixCtx.clearRect(0, 0, matrixCanvas.width, matrixCanvas.height);
+
+    if (words.length === 0) return;
+
+    const n = words.length;
+    const cellSize = Math.min(50, (matrixCanvas.width - 100) / n);
+    const startX = 80;
+    const startY = 50;
+
+    // Draw matrix cells
+    for (let i = 0; i < n; i++) {
+        for (let j = 0; j < n; j++) {
+            const x = startX + j * cellSize;
+            const y = startY + i * cellSize;
+            const attention = attentionMatrix[i][j];
+
+            // Color intensity based on attention score
+            const intensity = Math.floor(attention * 255);
+            matrixCtx.fillStyle = `rgb(${255-intensity}, ${intensity + 100}, ${100})`;
+            matrixCtx.fillRect(x, y, cellSize, cellSize);
+
+            matrixCtx.strokeStyle = '#2d3748';
+            matrixCtx.lineWidth = 1;
+            matrixCtx.strokeRect(x, y, cellSize, cellSize);
+
+            // Attention value
+            matrixCtx.fillStyle = '#2d3748';
+            matrixCtx.font = 'bold 11px Arial';
+            matrixCtx.textAlign = 'center';
+            matrixCtx.textBaseline = 'middle';
+            matrixCtx.fillText((attention * 100).toFixed(0), x + cellSize/2, y + cellSize/2);
+        }
+    }
+
+    // Row labels (Query words)
+    matrixCtx.fillStyle = '#2d3748';
+    matrixCtx.font = 'bold 12px Arial';
+    matrixCtx.textAlign = 'right';
+    matrixCtx.textBaseline = 'middle';
+
+    for (let i = 0; i < n; i++) {
+        const y = startY + i * cellSize + cellSize/2;
+        matrixCtx.fillText(words[i], startX - 10, y);
+    }
+
+    // Column labels (Key words)
+    matrixCtx.textAlign = 'center';
+    matrixCtx.textBaseline = 'bottom';
+
+    for (let j = 0; j < n; j++) {
+        const x = startX + j * cellSize + cellSize/2;
+        matrixCtx.save();
+        matrixCtx.translate(x, startY - 10);
+        matrixCtx.rotate(-Math.PI / 4);
+        matrixCtx.fillText(words[j], 0, 0);
+        matrixCtx.restore();
+    }
+
+    // Axis labels
+    matrixCtx.fillStyle = '#667eea';
+    matrixCtx.font = 'bold 14px Arial';
+    matrixCtx.textAlign = 'center';
+    matrixCtx.fillText('Keys (attending to) →', startX + (n * cellSize) / 2, startY + n * cellSize + 30);
+
+    matrixCtx.save();
+    matrixCtx.translate(20, startY + (n * cellSize) / 2);
+    matrixCtx.rotate(-Math.PI / 2);
+    matrixCtx.fillText('Queries (from) →', 0, 0);
+    matrixCtx.restore();
+}
+
+function loadSample(sentence) {
+    document.getElementById('sentenceInput').value = sentence;
+    processSentence();
+}
+
+// Initialize with default
+window.addEventListener('load', () => {
+    processSentence();
+});
+</script>
+</body>
+</html>

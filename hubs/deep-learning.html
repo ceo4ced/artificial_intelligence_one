@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deep Learning - Mr. Williams' AI 1</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .nav-header {
+            background: #f8f9fa;
+            padding: 20px 40px;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .nav-header a {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 1.1em;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            transition: color 0.3s;
+        }
+
+        .nav-header a:hover {
+            color: #764ba2;
+        }
+
+        .topic-banner {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 60px 40px;
+            text-align: center;
+        }
+
+        .topic-icon {
+            font-size: 5em;
+            margin-bottom: 20px;
+        }
+
+        .topic-banner h1 {
+            font-size: 3em;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .topic-banner p {
+            font-size: 1.3em;
+            opacity: 0.95;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .stats-summary {
+            background: #f8f9fa;
+            padding: 30px 40px;
+            text-align: center;
+            border-bottom: 3px solid #e9ecef;
+        }
+
+        .stats-summary h2 {
+            font-size: 1.5em;
+            color: #2d3748;
+        }
+
+        .content-section {
+            padding: 50px 40px;
+        }
+
+        .content-section h2 {
+            text-align: center;
+            font-size: 2em;
+            color: #2d3748;
+            margin-bottom: 40px;
+        }
+
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .tool-card {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 30px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+        }
+
+        .tool-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+            border-color: #667eea;
+        }
+
+        .tool-icon {
+            font-size: 4em;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .tool-card h3 {
+            color: #2d3748;
+            font-size: 1.8em;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .tool-card p {
+            color: #4a5568;
+            margin-bottom: 20px;
+            font-size: 1.05em;
+            text-align: center;
+        }
+
+        .tool-link {
+            display: block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-align: center;
+            padding: 15px 30px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+        }
+
+        .tool-link:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        footer {
+            background: #2d3748;
+            color: white;
+            text-align: center;
+            padding: 30px;
+            font-size: 0.95em;
+        }
+
+        footer a {
+            color: #90cdf4;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .topic-banner h1 {
+                font-size: 2em;
+            }
+
+            .topic-banner p {
+                font-size: 1.1em;
+            }
+
+            .tools-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .tool-card {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav-header">
+            <a href="../index.html">← Back to Home</a>
+        </div>
+
+        <div class="topic-banner">
+            <div class="topic-icon">🧠</div>
+            <h1>Deep Learning</h1>
+            <p>Explore different types of neural networks and their architectures</p>
+        </div>
+
+        <div class="stats-summary">
+            <h2>7 Neural Network Types • 7 Lessons • 7 Games • 7 Quizzes • 4 Visualizers</h2>
+        </div>
+
+        <div class="content-section">
+            <div class="tools-grid">
+                <div class="tool-card">
+                    <div class="tool-icon">🧠</div>
+                    <h3>Feedforward Neural Networks</h3>
+                    <p>The simplest neural network - data flows forward without loops</p>
+                    <a href="../lessons/feedforward-nn/index.html" class="tool-link">Start Lesson →</a>
+                </div>
+
+                <div class="tool-card">
+                    <div class="tool-icon">🏗️</div>
+                    <h3>Network Architect Game</h3>
+                    <p>Design your own feedforward network architecture</p>
+                    <a href="../games/feedforward-nn/index.html" class="tool-link">Play Game →</a>
+                </div>
+
+                <div class="tool-card">
+                    <div class="tool-icon">🔄</div>
+                    <h3>Recurrent Neural Networks (RNN)</h3>
+                    <p>Networks with memory - perfect for sequences and time series</p>
+                    <a href="../lessons/rnn/index.html" class="tool-link">Start Lesson →</a>
+                </div>
+
+                <div class="tool-card">
+                    <div class="tool-icon">📝</div>
+                    <h3>Text Predictor Game</h3>
+                    <p>Predict the next word using sequence memory</p>
+                    <a href="../games/rnn/index.html" class="tool-link">Play Game →</a>
+                </div>
+
+                <div class="tool-card">
+                    <div class="tool-icon">🖼️</div>
+                    <h3>Convolutional Neural Networks (CNN)</h3>
+                    <p>Specialized for image processing with filters and pooling</p>
+                    <a href="../lessons/cnn/index.html" class="tool-link">Start Lesson →</a>
+                </div>
+
+                <div class="tool-card">
+                    <div class="tool-icon">🔍</div>
+                    <h3>Filter Detective Game</h3>
+                    <p>Match filters to detect edges, blurs, and patterns</p>
+                    <a href="../games/cnn/index.html" class="tool-link">Play Game →</a>
+                </div>
+
+                <div class="tool-card">
+                    <div class="tool-icon">⏳</div>
+                    <h3>Long Short-Term Memory (LSTM)</h3>
+                    <p>Advanced RNN that solves the vanishing gradient problem</p>
+                    <a href="../lessons/lstm/index.html" class="tool-link">Start Lesson →</a>
+                </div>
+
+                <div class="tool-card">
+                    <div class="tool-icon">🎯</div>
+                    <h3>Sequence Memory Master</h3>
+                    <p>Test your long-term sequence memory skills</p>
+                    <a href="../games/lstm/index.html" class="tool-link">Play Game →</a>
+                </div>
+
+                <div class="tool-card">
+                    <div class="tool-icon">🎨</div>
+                    <h3>Generative Adversarial Networks (GAN)</h3>
+                    <p>Two networks compete - generator vs discriminator</p>
+                    <a href="../lessons/gan/index.html" class="tool-link">Start Lesson →</a>
+                </div>
+
+                <div class="tool-card">
+                    <div class="tool-icon">🕵️</div>
+                    <h3>Real or Fake Detective</h3>
+                    <p>Identify real vs AI-generated patterns</p>
+                    <a href="../games/gan/index.html" class="tool-link">Play Game →</a>
+                </div>
+
+                <div class="tool-card">
+                    <div class="tool-icon">🔐</div>
+                    <h3>Autoencoders</h3>
+                    <p>Compress and reconstruct data through bottleneck layers</p>
+                    <a href="../lessons/autoencoders/index.html" class="tool-link">Start Lesson →</a>
+                </div>
+
+                <div class="tool-card">
+                    <div class="tool-icon">🧹</div>
+                    <h3>Image Denoiser Game</h3>
+                    <p>Remove noise while preserving image quality</p>
+                    <a href="../games/autoencoders/index.html" class="tool-link">Play Game →</a>
+                </div>
+
+                <div class="tool-card">
+                    <div class="tool-icon">⚡</div>
+                    <h3>Transformer Networks</h3>
+                    <p>Self-attention mechanism powering GPT and modern LLMs</p>
+                    <a href="../lessons/transformers/index.html" class="tool-link">Start Lesson →</a>
+                </div>
+
+                <div class="tool-card">
+                    <div class="tool-icon">🎓</div>
+                    <h3>Attention Master Game</h3>
+                    <p>Identify which words should attend to each other</p>
+                    <a href="../games/transformers/index.html" class="tool-link">Play Game →</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-section" style="background: #f7fafc;">
+            <h2>🔬 Interactive Visualizers</h2>
+            <div class="tools-grid">
+                <div class="tool-card">
+                    <div class="tool-icon">🏗️</div>
+                    <h3>Neural Architecture Builder</h3>
+                    <p>Build custom neural networks and watch forward propagation</p>
+                    <a href="../dl-visualizers/neural-architecture/index.html" class="tool-link">Launch Visualizer →</a>
+                </div>
+
+                <div class="tool-card">
+                    <div class="tool-icon">🔲</div>
+                    <h3>Convolution Operation Demo</h3>
+                    <p>See how CNN filters slide across images</p>
+                    <a href="../dl-visualizers/convolution-demo/index.html" class="tool-link">Launch Visualizer →</a>
+                </div>
+
+                <div class="tool-card">
+                    <div class="tool-icon">🎯</div>
+                    <h3>Attention Mechanism</h3>
+                    <p>Visualize self-attention in Transformer networks</p>
+                    <a href="../dl-visualizers/attention-mechanism/index.html" class="tool-link">Launch Visualizer →</a>
+                </div>
+
+                <div class="tool-card">
+                    <div class="tool-icon">⚔️</div>
+                    <h3>GAN Training Simulator</h3>
+                    <p>Watch generator and discriminator compete in real-time</p>
+                    <a href="../dl-visualizers/gan-training/index.html" class="tool-link">Launch Visualizer →</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <h2>📝 Test Your Knowledge</h2>
+            <div class="tools-grid">
+                <div class="tool-card" style="background: #e8f5e9;">
+                    <div class="tool-icon">📋</div>
+                    <h3>Deep Learning Quizzes</h3>
+                    <p>Take quizzes for each neural network type to test your understanding</p>
+                    <a href="../quizzes/index.html#deepLearning" class="tool-link" style="background: #4CAF50;">View All Quizzes →</a>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p><strong>Deep Learning</strong></p>
+            <p>Part of Mr. Williams' AI 1 - Interactive Learning Tools</p>
+            <p><a href="../index.html">Return to Home</a></p>
+        </footer>
+    </div>
+</body>
+</html>
