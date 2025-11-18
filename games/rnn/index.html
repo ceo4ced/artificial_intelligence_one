@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Text Predictor - RNN Game</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 0; }
+.nav-header { background: #2d3748; padding: 15px 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; }
+.nav-header a { color: #90cdf4; text-decoration: none; font-weight: 600; font-size: 1.1em; }
+.nav-title { color: #fff; font-size: 1.2em; font-weight: 700; }
+.container { max-width: 1200px; margin: 20px auto; background: #fff; border-radius: 15px; padding: 30px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+h1 { text-align: center; color: #2d3748; font-size: 2.5em; margin-bottom: 10px; }
+.subtitle { text-align: center; color: #666; margin-bottom: 30px; font-size: 1.1em; }
+.game-area { display: grid; grid-template-columns: 300px 1fr; gap: 30px; }
+.sidebar { background: #f8f9fa; padding: 20px; border-radius: 10px; height: fit-content; }
+.text-display { background: #f0f4f8; padding: 30px; border-radius: 10px; min-height: 300px; font-size: 1.3em; line-height: 1.8; }
+.current-word { color: #667eea; font-weight: bold; }
+.prediction-buttons { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin: 20px 0; }
+.predict-btn { padding: 20px; background: #fff; border: 2px solid #667eea; border-radius: 10px; cursor: pointer; font-size: 1.1em; font-weight: 600; color: #667eea; transition: all 0.3s; }
+.predict-btn:hover { background: #667eea; color: white; transform: translateY(-2px); }
+.predict-btn.correct { background: #4CAF50; color: white; border-color: #4CAF50; }
+.predict-btn.wrong { background: #f44336; color: white; border-color: #f44336; }
+.stats { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; padding: 15px; border-radius: 10px; margin: 15px 0; }
+.stat-row { display: flex; justify-content: space-between; margin: 8px 0; }
+.score { text-align: center; font-size: 2.5em; font-weight: bold; color: #4CAF50; margin: 15px 0; }
+button { width: 100%; padding: 12px; margin: 5px 0; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }
+.btn-primary { background: #4CAF50; color: #fff; }
+.btn-secondary { background: #2196F3; color: #fff; }
+.info { background: #e3f2fd; padding: 15px; border-radius: 8px; margin: 15px 0; }
+.info h4 { color: #1976d2; margin-bottom: 8px; }
+.challenge { background: #fff9c4; padding: 15px; border-radius: 8px; margin: 15px 0; border-left: 4px solid #fbc02d; }
+.challenge h4 { color: #f57c00; margin-bottom: 8px; }
+</style>
+</head>
+<body>
+<nav class="nav-header">
+    <div class="nav-title">📝 Text Predictor Game</div>
+    <a href="../../index.html">← Back to Home</a>
+</nav>
+<div class="container">
+    <h1>📝 Text Predictor</h1>
+    <p class="subtitle">Use your RNN skills to predict the next word in sentences!</p>
+
+    <div class="game-area">
+        <div class="sidebar">
+            <div class="challenge">
+                <h4>🎯 Challenge:</h4>
+                <p style="font-size: 0.9em;">Predict the next word in each sentence correctly!</p>
+            </div>
+
+            <div class="stats">
+                <div class="stat-row"><span>Correct:</span><span id="correct">0</span></div>
+                <div class="stat-row"><span>Total:</span><span id="total">0</span></div>
+                <div class="stat-row"><span>Accuracy:</span><span id="accuracy">0%</span></div>
+                <div class="stat-row"><span>Streak:</span><span id="streak">0</span></div>
+            </div>
+
+            <div class="score" id="score">0</div>
+
+            <button class="btn-primary" onclick="nextSentence()">⏭️ Next Sentence</button>
+            <button class="btn-secondary" onclick="reset()">🔄 Reset Game</button>
+
+            <div class="info">
+                <h4>💡 How to Play:</h4>
+                <p style="font-size: 0.9em; line-height: 1.6;">
+                    1. Read the sentence context<br>
+                    2. Think about what word comes next<br>
+                    3. Click your prediction<br>
+                    4. RNN uses sequence context!<br><br>
+                    <strong>+10 points</strong> per correct answer<br>
+                    <strong>+5 bonus</strong> for streaks!
+                </p>
+            </div>
+        </div>
+
+        <div>
+            <div class="text-display" id="textDisplay">
+                <p style="color: #999; text-align: center; margin-top: 80px;">Click "Next Sentence" to begin!</p>
+            </div>
+
+            <div class="prediction-buttons" id="predictionButtons">
+                <!-- Populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const sentences = [
+    { text: "The cat sat on the", answer: "mat", options: ["mat", "sky", "ocean", "bicycle"] },
+    { text: "I love eating ice", answer: "cream", options: ["cream", "rocks", "clouds", "metal"] },
+    { text: "The sun rises in the", answer: "east", options: ["west", "east", "north", "ocean"] },
+    { text: "She went to the store to buy", answer: "groceries", options: ["groceries", "mountains", "clouds", "planets"] },
+    { text: "The dog wagged its", answer: "tail", options: ["tail", "breakfast", "computer", "ocean"] },
+    { text: "Birds fly in the", answer: "sky", options: ["ground", "sky", "water", "fire"] },
+    { text: "He drinks a glass of", answer: "water", options: ["water", "chairs", "books", "clouds"] },
+    { text: "The moon shines at", answer: "night", options: ["noon", "breakfast", "lunch", "night"] },
+    { text: "Students go to", answer: "school", options: ["mars", "ocean", "school", "space"] },
+    { text: "Fish swim in the", answer: "water", options: ["sky", "desert", "water", "volcano"] },
+    { text: "I write with a", answer: "pen", options: ["elephant", "pen", "cloud", "mountain"] },
+    { text: "Trees grow in the", answer: "forest", options: ["ocean", "sky", "forest", "moon"] },
+    { text: "She plays the", answer: "piano", options: ["sandwich", "piano", "ocean", "cloud"] },
+    { text: "Cars drive on the", answer: "road", options: ["ocean", "sky", "road", "moon"] },
+    { text: "We sleep in a", answer: "bed", options: ["tree", "ocean", "cloud", "bed"] }
+];
+
+let currentIndex = 0;
+let correctCount = 0;
+let totalCount = 0;
+let streak = 0;
+let score = 0;
+let answered = false;
+
+function shuffle(array) {
+    return array.sort(() => Math.random() - 0.5);
+}
+
+function nextSentence() {
+    if (currentIndex >= sentences.length) {
+        currentIndex = 0;
+        shuffle(sentences);
+    }
+
+    const sentence = sentences[currentIndex];
+    const textDisplay = document.getElementById('textDisplay');
+    textDisplay.innerHTML = `<p style="font-size: 1.2em;">${sentence.text} <span class="current-word">____</span></p>`;
+
+    const buttonsDiv = document.getElementById('predictionButtons');
+    buttonsDiv.innerHTML = '';
+
+    const shuffledOptions = shuffle([...sentence.options]);
+    shuffledOptions.forEach(option => {
+        const btn = document.createElement('button');
+        btn.className = 'predict-btn';
+        btn.textContent = option;
+        btn.onclick = () => checkAnswer(option, sentence.answer);
+        buttonsDiv.appendChild(btn);
+    });
+
+    answered = false;
+    currentIndex++;
+}
+
+function checkAnswer(selected, correct) {
+    if (answered) return;
+    answered = true;
+
+    totalCount++;
+    const buttons = document.querySelectorAll('.predict-btn');
+
+    buttons.forEach(btn => {
+        btn.onclick = null;
+        if (btn.textContent === correct) {
+            btn.classList.add('correct');
+        } else if (btn.textContent === selected && selected !== correct) {
+            btn.classList.add('wrong');
+        }
+    });
+
+    if (selected === correct) {
+        correctCount++;
+        streak++;
+        score += 10 + (streak > 2 ? 5 : 0);
+
+        setTimeout(() => {
+            alert(`✅ Correct! +${10 + (streak > 2 ? 5 : 0)} points`);
+        }, 300);
+    } else {
+        streak = 0;
+        setTimeout(() => {
+            alert(`❌ Wrong! The correct answer was "${correct}"`);
+        }, 300);
+    }
+
+    updateStats();
+}
+
+function updateStats() {
+    document.getElementById('correct').textContent = correctCount;
+    document.getElementById('total').textContent = totalCount;
+    document.getElementById('accuracy').textContent = totalCount > 0 ? Math.round((correctCount / totalCount) * 100) + '%' : '0%';
+    document.getElementById('streak').textContent = streak;
+    document.getElementById('score').textContent = score;
+}
+
+function reset() {
+    currentIndex = 0;
+    correctCount = 0;
+    totalCount = 0;
+    streak = 0;
+    score = 0;
+    answered = false;
+    shuffle(sentences);
+    updateStats();
+
+    document.getElementById('textDisplay').innerHTML = '<p style="color: #999; text-align: center; margin-top: 80px;">Click "Next Sentence" to begin!</p>';
+    document.getElementById('predictionButtons').innerHTML = '';
+}
+
+// Initialize
+shuffle(sentences);
+updateStats();
+</script>
+</body>
+</html>

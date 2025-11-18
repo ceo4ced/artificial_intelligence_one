@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Long Short-Term Memory Networks - Interactive Lesson</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 0; }
+.nav-header { background: #2d3748; padding: 15px 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; }
+.nav-header a { color: #90cdf4; text-decoration: none; font-weight: 600; font-size: 1.1em; }
+.nav-title { color: #fff; font-size: 1.2em; font-weight: 700; }
+.container { max-width: 1400px; margin: 20px auto; background: #fff; border-radius: 15px; padding: 40px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+h1 { text-align: center; color: #2d3748; font-size: 2.5em; margin-bottom: 20px; }
+.intro { background: #e3f2fd; padding: 25px; border-radius: 10px; margin-bottom: 30px; line-height: 1.8; }
+.intro h2 { color: #1976d2; margin-bottom: 15px; }
+.content-section { margin: 30px 0; }
+.content-section h3 { color: #2d3748; margin-bottom: 15px; font-size: 1.6em; }
+.content-section p { line-height: 1.8; color: #4a5568; margin-bottom: 15px; }
+.visual-demo { background: #f8f9fa; padding: 30px; border-radius: 10px; margin: 20px 0; text-align: center; }
+canvas { border: 2px solid #ddd; border-radius: 8px; background: #fff; margin: 20px auto; display: block; }
+.info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin: 20px 0; }
+.info-card { background: #f0f4f8; padding: 20px; border-radius: 10px; border-left: 4px solid #667eea; }
+.info-card h4 { color: #667eea; margin-bottom: 10px; }
+.info-card ul { margin-left: 20px; line-height: 1.8; color: #4a5568; }
+.highlight { background: #fff9c4; padding: 20px; border-radius: 10px; border-left: 4px solid #fbc02d; margin: 20px 0; }
+.highlight h4 { color: #f57c00; margin-bottom: 10px; }
+.example-box { background: #e8f5e9; padding: 20px; border-radius: 10px; margin: 20px 0; border-left: 4px solid #4CAF50; }
+.example-box h4 { color: #2e7d32; margin-bottom: 10px; }
+.controls { text-align: center; margin: 20px 0; }
+button { padding: 15px 30px; margin: 10px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 1.1em; background: #667eea; color: white; transition: all 0.3s; }
+button:hover { background: #5568d3; transform: translateY(-2px); }
+</style>
+</head>
+<body>
+<nav class="nav-header">
+    <div class="nav-title">🧠 Long Short-Term Memory Networks</div>
+    <a href="../../index.html">← Back to Home</a>
+</nav>
+<div class="container">
+    <h1>🧠 Long Short-Term Memory Networks (LSTM)</h1>
+
+    <div class="intro">
+        <h2>What is an LSTM Network?</h2>
+        <p>
+            Long Short-Term Memory (LSTM) networks are a special type of Recurrent Neural Network designed
+            to solve the vanishing gradient problem. They can learn long-term dependencies in sequential data
+            through a sophisticated gating mechanism. LSTMs have memory cells that can maintain information
+            over many time steps, making them incredibly powerful for tasks like language modeling, speech
+            recognition, and time series prediction.
+        </p>
+    </div>
+
+    <div class="content-section">
+        <h3>📚 Key Concepts</h3>
+        <div class="info-grid">
+            <div class="info-card">
+                <h4>Architecture Components</h4>
+                <ul>
+                    <li><strong>Cell State:</strong> Long-term memory highway</li>
+                    <li><strong>Hidden State:</strong> Short-term working memory</li>
+                    <li><strong>Forget Gate:</strong> What to remove from memory</li>
+                    <li><strong>Input Gate:</strong> What new info to store</li>
+                    <li><strong>Output Gate:</strong> What to output</li>
+                </ul>
+            </div>
+
+            <div class="info-card">
+                <h4>How It Works</h4>
+                <ul>
+                    <li>Cell state acts as memory conveyor belt</li>
+                    <li>Gates control information flow</li>
+                    <li>Forget gate removes irrelevant info</li>
+                    <li>Input gate adds new information</li>
+                    <li>Output gate produces hidden state</li>
+                </ul>
+            </div>
+
+            <div class="info-card">
+                <h4>Gate Mechanisms</h4>
+                <ul>
+                    <li><strong>Forget Gate:</strong> σ(Wf·[ht-1, xt] + bf)</li>
+                    <li><strong>Input Gate:</strong> σ(Wi·[ht-1, xt] + bi)</li>
+                    <li><strong>Cell Update:</strong> tanh(Wc·[ht-1, xt] + bc)</li>
+                    <li><strong>Output Gate:</strong> σ(Wo·[ht-1, xt] + bo)</li>
+                </ul>
+            </div>
+
+            <div class="info-card">
+                <h4>Applications</h4>
+                <ul>
+                    <li>Language translation and modeling</li>
+                    <li>Speech recognition and synthesis</li>
+                    <li>Video captioning and analysis</li>
+                    <li>Time series forecasting</li>
+                    <li>Music generation</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="visual-demo">
+        <h3>🎨 LSTM Cell Visualization</h3>
+        <p>Watch how information flows through the LSTM gates</p>
+        <canvas id="lstmCanvas" width="800" height="400"></canvas>
+        <div class="controls">
+            <button onclick="animateLSTM()">▶️ Animate Information Flow</button>
+            <button onclick="reset()">↺ Reset</button>
+        </div>
+        <p style="margin-top: 15px; color: #666;">
+            Cell state (top) carries long-term memory, gates control what to remember and forget
+        </p>
+    </div>
+
+    <div class="highlight">
+        <h4>🔑 Key Insight</h4>
+        <p>
+            The genius of LSTMs lies in their <strong>gating mechanism</strong>. Unlike vanilla RNNs that
+            struggle with long sequences, LSTMs use three gates (forget, input, output) to carefully regulate
+            information flow. The cell state acts like a "highway" that information can travel along unchanged,
+            with gates deciding what to add, remove, or output. This architecture allows LSTMs to remember
+            important information from hundreds of time steps ago while forgetting irrelevant details.
+        </p>
+    </div>
+
+    <div class="example-box">
+        <h4>🌟 Real-World Example: Sentence Completion</h4>
+        <p>
+            When predicting the next word in: "I grew up in France... I speak fluent ___"<br><br>
+            <strong>Many words ago:</strong> "France" enters the network<br>
+            <strong>Forget Gate:</strong> Keeps "France" in cell state (relevant for language)<br>
+            <strong>Input Gates:</strong> Add intermediate words but don't overwrite "France"<br>
+            <strong>Cell State:</strong> Maintains "France" information across many time steps<br>
+            <strong>Output:</strong> When predicting language, retrieves "France" from cell state<br>
+            <strong>Prediction:</strong> "French" (95% confidence) - using long-term context!
+        </p>
+    </div>
+
+    <div class="content-section">
+        <h3>⚡ LSTM Forward Pass</h3>
+        <p>
+            <strong>1. Forget Gate:</strong> Decides what information to discard from cell state (0 = forget, 1 = keep)<br>
+            <strong>2. Input Gate:</strong> Determines what new information to add to cell state<br>
+            <strong>3. Cell State Update:</strong> Combines forget and input decisions to update memory<br>
+            <strong>4. Output Gate:</strong> Controls what parts of cell state to expose as output<br>
+            <strong>5. Hidden State:</strong> Filtered version of cell state becomes new hidden state<br>
+            <strong>6. Repeat:</strong> Process continues for each element in the sequence
+        </p>
+    </div>
+
+    <div class="content-section">
+        <h3>🔄 LSTM vs Standard RNN</h3>
+        <div class="info-grid">
+            <div class="example-box">
+                <h4>Standard RNN Problems</h4>
+                <p style="font-size: 0.95em; line-height: 1.7;">
+                    <strong>Vanishing Gradients:</strong> Information from early time steps gets lost<br>
+                    <strong>Limited Memory:</strong> Can only remember recent context (5-10 steps)<br>
+                    <strong>Unstable Training:</strong> Gradients explode or vanish during backprop<br>
+                    <strong>Poor Long Dependencies:</strong> Fails on tasks requiring long-term memory
+                </p>
+            </div>
+
+            <div class="highlight">
+                <h4>LSTM Solutions</h4>
+                <p style="font-size: 0.95em; line-height: 1.7;">
+                    <strong>Gradient Highway:</strong> Cell state prevents vanishing gradients<br>
+                    <strong>Extended Memory:</strong> Can remember for 100+ time steps<br>
+                    <strong>Stable Training:</strong> Gates regulate gradient flow<br>
+                    <strong>Long Dependencies:</strong> Excels at learning long-range patterns
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="info-grid" style="margin-top: 30px;">
+        <div class="example-box">
+            <h4>✅ Advantages</h4>
+            <ul>
+                <li>Learns long-term dependencies effectively</li>
+                <li>Solves vanishing gradient problem</li>
+                <li>Flexible memory through gating</li>
+                <li>State-of-the-art for many sequence tasks</li>
+                <li>Can handle variable length sequences</li>
+            </ul>
+        </div>
+
+        <div class="highlight" style="background: #ffebee;">
+            <h4>⚠️ Limitations</h4>
+            <ul>
+                <li>Computationally expensive (4x parameters vs RNN)</li>
+                <li>Slower to train than simple RNNs</li>
+                <li>Still processes sequences sequentially</li>
+                <li>Can be overkill for simple tasks</li>
+                <li>Being replaced by Transformers for some tasks</li>
+            </ul>
+        </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 40px;">
+        <a href="../../games/lstm/index.html" style="display: inline-block; background: #4CAF50; color: white; padding: 20px 40px; border-radius: 10px; text-decoration: none; font-weight: 700; font-size: 1.2em;">
+            🎮 Play the LSTM Game →
+        </a>
+    </div>
+</div>
+
+<script>
+const canvas = document.getElementById('lstmCanvas');
+const ctx = canvas.getContext('2d');
+
+let animating = false;
+let animationStep = 0;
+
+function drawLSTM() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const cellX = 400;
+    const cellY = 200;
+    const cellWidth = 200;
+    const cellHeight = 150;
+
+    // Draw cell state line (memory highway)
+    ctx.strokeStyle = animationStep >= 1 ? '#4CAF50' : '#ccc';
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.moveTo(50, 100);
+    ctx.lineTo(750, 100);
+    ctx.stroke();
+
+    // Draw LSTM cell
+    ctx.fillStyle = '#f0f4f8';
+    ctx.fillRect(cellX - cellWidth/2, cellY - cellHeight/2, cellWidth, cellHeight);
+    ctx.strokeStyle = '#2d3748';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(cellX - cellWidth/2, cellY - cellHeight/2, cellWidth, cellHeight);
+
+    // Draw gates
+    const gateSize = 40;
+    const gates = [
+        { x: 320, y: 160, label: 'f', name: 'Forget', color: '#f44336', active: animationStep >= 2 },
+        { x: 370, y: 160, label: 'i', name: 'Input', color: '#2196F3', active: animationStep >= 3 },
+        { x: 420, y: 160, label: 'o', name: 'Output', color: '#FF9800', active: animationStep >= 4 }
+    ];
+
+    gates.forEach(gate => {
+        ctx.fillStyle = gate.active ? gate.color : '#e0e0e0';
+        ctx.beginPath();
+        ctx.arc(gate.x, gate.y, 20, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = '#2d3748';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold 16px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText(gate.label, gate.x, gate.y + 5);
+    });
+
+    // Draw input arrow
+    ctx.strokeStyle = animationStep >= 1 ? '#667eea' : '#ccc';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(400, 320);
+    ctx.lineTo(400, 275);
+    ctx.stroke();
+
+    // Arrow head
+    if (animationStep >= 1) {
+        ctx.beginPath();
+        ctx.moveTo(395, 280);
+        ctx.lineTo(400, 275);
+        ctx.lineTo(405, 280);
+        ctx.stroke();
+    }
+
+    // Draw output arrow
+    ctx.strokeStyle = animationStep >= 5 ? '#4CAF50' : '#ccc';
+    ctx.beginPath();
+    ctx.moveTo(400, 125);
+    ctx.lineTo(400, 80);
+    ctx.stroke();
+
+    if (animationStep >= 5) {
+        ctx.beginPath();
+        ctx.moveTo(395, 85);
+        ctx.lineTo(400, 80);
+        ctx.lineTo(405, 85);
+        ctx.stroke();
+    }
+
+    // Labels
+    ctx.fillStyle = '#2d3748';
+    ctx.font = '16px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('Input (xt)', 400, 350);
+    ctx.fillText('Hidden State (ht)', 400, 65);
+    ctx.fillText('Cell State (ct)', 50, 90);
+
+    ctx.font = 'bold 18px Arial';
+    ctx.fillText('LSTM Cell', 400, 210);
+
+    // Gate names below
+    if (animationStep >= 2) {
+        ctx.font = '12px Arial';
+        gates.forEach(gate => {
+            if (gate.active) {
+                ctx.fillStyle = gate.color;
+                ctx.fillText(gate.name, gate.x, gate.y + 35);
+            }
+        });
+    }
+}
+
+function animateLSTM() {
+    if (animating) return;
+    animating = true;
+    animationStep = 0;
+
+    const interval = setInterval(() => {
+        animationStep++;
+        drawLSTM();
+
+        if (animationStep >= 6) {
+            animating = false;
+            clearInterval(interval);
+        }
+    }, 800);
+}
+
+function reset() {
+    animating = false;
+    animationStep = 0;
+    drawLSTM();
+}
+
+// Initial draw
+drawLSTM();
+</script>
+</body>
+</html>

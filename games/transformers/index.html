@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Attention Master - Transformer Game</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 0; }
+.nav-header { background: #2d3748; padding: 15px 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; }
+.nav-header a { color: #90cdf4; text-decoration: none; font-weight: 600; font-size: 1.1em; }
+.nav-title { color: #fff; font-size: 1.2em; font-weight: 700; }
+.container { max-width: 1200px; margin: 20px auto; background: #fff; border-radius: 15px; padding: 30px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+h1 { text-align: center; color: #2d3748; font-size: 2.5em; margin-bottom: 10px; }
+.subtitle { text-align: center; color: #666; margin-bottom: 30px; font-size: 1.1em; }
+.game-area { display: grid; grid-template-columns: 300px 1fr; gap: 30px; }
+.sidebar { background: #f8f9fa; padding: 20px; border-radius: 10px; height: fit-content; }
+button { width: 100%; padding: 12px; margin: 5px 0; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.3s; }
+.btn-primary { background: #4CAF50; color: #fff; }
+.btn-primary:hover { background: #45a049; }
+.btn-secondary { background: #2196F3; color: #fff; }
+.btn-secondary:hover { background: #0b7dda; }
+.btn-danger { background: #f44336; color: #fff; }
+.btn-danger:hover { background: #da190b; }
+.stats { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; padding: 15px; border-radius: 10px; margin: 15px 0; }
+.stat-row { display: flex; justify-content: space-between; margin: 8px 0; }
+.challenge { background: #fff9c4; padding: 15px; border-radius: 8px; margin: 15px 0; border-left: 4px solid #fbc02d; }
+.challenge h4 { color: #f57c00; margin-bottom: 8px; }
+.info { background: #e3f2fd; padding: 15px; border-radius: 8px; margin: 15px 0; }
+.info h4 { color: #1976d2; margin-bottom: 8px; }
+.score { text-align: center; font-size: 2em; font-weight: bold; color: #4CAF50; margin: 15px 0; }
+.sentence-display { background: #f8f9fa; padding: 40px; border-radius: 10px; text-align: center; min-height: 300px; }
+.sentence-text { font-size: 1.8em; line-height: 2.2; margin: 30px 0; }
+.word { display: inline-block; padding: 10px 20px; margin: 5px; border-radius: 8px; cursor: pointer; transition: all 0.3s; background: #e0e0e0; }
+.word:hover { transform: scale(1.1); background: #d0d0d0; }
+.word.selected { background: #667eea; color: white; font-weight: bold; }
+.word.target { background: #FF9800; color: white; font-weight: bold; }
+.word.correct { background: #4CAF50; color: white; }
+.word.wrong { background: #f44336; color: white; }
+.question { font-size: 1.3em; color: #667eea; font-weight: bold; margin: 20px 0; }
+</style>
+</head>
+<body>
+<nav class="nav-header">
+    <div class="nav-title">🎯 Attention Master Game</div>
+    <a href="../../index.html">← Back to Home</a>
+</nav>
+<div class="container">
+    <h1>🎯 Attention Master</h1>
+    <p class="subtitle">Master the art of attention! Identify which words should attend to each other.</p>
+
+    <div class="game-area">
+        <div class="sidebar">
+            <div class="challenge">
+                <h4>🎯 Challenge:</h4>
+                <p style="font-size: 0.9em;">Click the word that the highlighted word should pay most attention to!</p>
+            </div>
+
+            <button class="btn-primary" onclick="startGame()">🚀 Start Game</button>
+            <button class="btn-secondary" onclick="nextQuestion()">⏭️ Next Question</button>
+            <button class="btn-danger" onclick="reset()">🔄 Reset</button>
+
+            <div class="stats">
+                <div class="stat-row"><span>Question:</span><span id="question">0</span></div>
+                <div class="stat-row"><span>Correct:</span><span id="correct">0</span></div>
+                <div class="stat-row"><span>Wrong:</span><span id="wrong">0</span></div>
+                <div class="stat-row"><span>Streak:</span><span id="streak">0</span></div>
+            </div>
+
+            <div class="score">
+                <div style="font-size: 0.6em; color: #666;">Score</div>
+                <div id="score">0</div>
+            </div>
+
+            <div class="info">
+                <h4>💡 How to Play:</h4>
+                <p style="font-size: 0.9em; line-height: 1.6;">
+                    1. Click "Start Game"<br>
+                    2. Look at the highlighted word (orange)<br>
+                    3. Click the word it should attend to<br>
+                    4. Think about meaning and context!<br><br>
+                    Like a Transformer, determine which words are most relevant to understanding each word!<br><br>
+                    <strong>+10 points</strong> per correct answer<br>
+                    <strong>+5 bonus</strong> for streak ≥ 3
+                </p>
+            </div>
+        </div>
+
+        <div>
+            <div class="sentence-display" id="displayArea">
+                <p style="color: #999; margin-top: 80px;">Click "Start Game" to begin!</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let gameActive = false;
+let currentQuestion = 0;
+let score = 0;
+let correct = 0;
+let wrong = 0;
+let streak = 0;
+let answered = false;
+let currentSentence = null;
+
+const sentences = [
+    {
+        text: ['The', 'cat', 'sat', 'on', 'the', 'mat'],
+        questions: [
+            { target: 1, answer: 2, explanation: '"cat" should attend to "sat" (what did the cat do?)' },
+            { target: 2, answer: 5, explanation: '"sat" should attend to "mat" (where did it sit?)' }
+        ]
+    },
+    {
+        text: ['She', 'loves', 'her', 'beautiful', 'garden'],
+        questions: [
+            { target: 2, answer: 0, explanation: '"her" should attend to "She" (whose garden?)' },
+            { target: 3, answer: 4, explanation: '"beautiful" should attend to "garden" (what is beautiful?)' }
+        ]
+    },
+    {
+        text: ['The', 'dog', 'chased', 'its', 'tail'],
+        questions: [
+            { target: 2, answer: 1, explanation: '"chased" should attend to "dog" (who chased?)' },
+            { target: 3, answer: 1, explanation: '"its" should attend to "dog" (whose tail?)' }
+        ]
+    },
+    {
+        text: ['John', 'gave', 'Mary', 'his', 'book'],
+        questions: [
+            { target: 3, answer: 0, explanation: '"his" should attend to "John" (whose book?)' },
+            { target: 1, answer: 2, explanation: '"gave" should attend to "Mary" (gave to whom?)' }
+        ]
+    },
+    {
+        text: ['The', 'teacher', 'explained', 'the', 'complex', 'topic'],
+        questions: [
+            { target: 2, answer: 5, explanation: '"explained" should attend to "topic" (explained what?)' },
+            { target: 4, answer: 5, explanation: '"complex" should attend to "topic" (what is complex?)' }
+        ]
+    },
+    {
+        text: ['She', 'quickly', 'solved', 'the', 'difficult', 'puzzle'],
+        questions: [
+            { target: 1, answer: 2, explanation: '"quickly" should attend to "solved" (how did she solve?)' },
+            { target: 4, answer: 5, explanation: '"difficult" should attend to "puzzle" (what is difficult?)' }
+        ]
+    },
+    {
+        text: ['The', 'red', 'car', 'stopped', 'at', 'the', 'light'],
+        questions: [
+            { target: 1, answer: 2, explanation: '"red" should attend to "car" (what is red?)' },
+            { target: 3, answer: 6, explanation: '"stopped" should attend to "light" (stopped where?)' }
+        ]
+    },
+    {
+        text: ['Birds', 'fly', 'south', 'during', 'winter'],
+        questions: [
+            { target: 1, answer: 0, explanation: '"fly" should attend to "Birds" (who flies?)' },
+            { target: 2, answer: 1, explanation: '"south" should attend to "fly" (fly where?)' }
+        ]
+    }
+];
+
+function startGame() {
+    if (gameActive) return;
+    gameActive = true;
+    currentQuestion = 0;
+    nextQuestion();
+}
+
+function nextQuestion() {
+    if (!gameActive) {
+        alert('Please start the game first!');
+        return;
+    }
+
+    if (currentQuestion >= sentences.length * 2) {
+        endGame();
+        return;
+    }
+
+    answered = false;
+    const sentenceIdx = Math.floor(currentQuestion / 2);
+    const questionIdx = currentQuestion % 2;
+
+    currentSentence = sentences[sentenceIdx];
+    const question = currentSentence.questions[questionIdx];
+
+    displaySentence(question);
+
+    currentQuestion++;
+    document.getElementById('question').textContent = currentQuestion;
+}
+
+function displaySentence(question) {
+    const displayArea = document.getElementById('displayArea');
+
+    let html = '<div class="question">Which word should the highlighted word attend to?</div>';
+    html += '<div class="sentence-text">';
+
+    currentSentence.text.forEach((word, idx) => {
+        let className = 'word';
+        if (idx === question.target) {
+            className += ' target';
+        }
+
+        html += `<span class="${className}" onclick="selectWord(${idx}, ${question.answer})">${word}</span>`;
+    });
+
+    html += '</div>';
+    displayArea.innerHTML = html;
+}
+
+function selectWord(selectedIdx, correctIdx) {
+    if (answered || !gameActive) return;
+
+    answered = true;
+    const isCorrect = selectedIdx === correctIdx;
+
+    // Update word colors
+    const words = document.querySelectorAll('.word');
+    words.forEach((word, idx) => {
+        word.onclick = null;
+        if (idx === correctIdx) {
+            word.classList.add('correct');
+        } else if (idx === selectedIdx && !isCorrect) {
+            word.classList.add('wrong');
+        }
+    });
+
+    if (isCorrect) {
+        correct++;
+        streak++;
+        const points = 10 + (streak >= 3 ? 5 : 0);
+        score += points;
+
+        setTimeout(() => {
+            alert(`✅ Correct! +${points} points\n\n${currentSentence.questions[(currentQuestion - 1) % 2].explanation}`);
+        }, 300);
+    } else {
+        wrong++;
+        streak = 0;
+
+        setTimeout(() => {
+            alert(`❌ Wrong!\n\n${currentSentence.questions[(currentQuestion - 1) % 2].explanation}`);
+        }, 300);
+    }
+
+    updateStats();
+
+    setTimeout(() => {
+        if (gameActive && currentQuestion < sentences.length * 2) {
+            nextQuestion();
+        } else if (gameActive) {
+            endGame();
+        }
+    }, isCorrect ? 2000 : 2500);
+}
+
+function updateStats() {
+    document.getElementById('correct').textContent = correct;
+    document.getElementById('wrong').textContent = wrong;
+    document.getElementById('streak').textContent = streak;
+    document.getElementById('score').textContent = score;
+}
+
+function endGame() {
+    gameActive = false;
+
+    const accuracy = Math.round((correct / (correct + wrong)) * 100);
+    let message = `🎮 Game Complete!\n\n`;
+    message += `Final Score: ${score}\n`;
+    message += `Correct: ${correct}\n`;
+    message += `Wrong: ${wrong}\n`;
+    message += `Accuracy: ${accuracy}%\n\n`;
+
+    if (accuracy >= 90) {
+        message += '🏆 Outstanding! You understand attention like a Transformer!';
+    } else if (accuracy >= 75) {
+        message += '🌟 Great job! You have strong attention skills!';
+    } else if (accuracy >= 60) {
+        message += '👍 Good effort! Keep practicing attention mechanisms!';
+    } else {
+        message += '💪 Keep learning! Attention takes practice!';
+    }
+
+    alert(message);
+
+    const displayArea = document.getElementById('displayArea');
+    displayArea.innerHTML = '<p style="color: #999; margin-top: 80px;">Click "Start Game" to play again!</p>';
+}
+
+function reset() {
+    gameActive = false;
+    currentQuestion = 0;
+    score = 0;
+    correct = 0;
+    wrong = 0;
+    streak = 0;
+    answered = false;
+    currentSentence = null;
+
+    document.getElementById('question').textContent = '0';
+    updateStats();
+
+    const displayArea = document.getElementById('displayArea');
+    displayArea.innerHTML = '<p style="color: #999; margin-top: 80px;">Click "Start Game" to begin!</p>';
+}
+
+// Initialize
+updateStats();
+</script>
+</body>
+</html>

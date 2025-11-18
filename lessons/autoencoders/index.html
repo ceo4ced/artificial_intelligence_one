@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Autoencoders - Interactive Lesson</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 0; }
+.nav-header { background: #2d3748; padding: 15px 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; }
+.nav-header a { color: #90cdf4; text-decoration: none; font-weight: 600; font-size: 1.1em; }
+.nav-title { color: #fff; font-size: 1.2em; font-weight: 700; }
+.container { max-width: 1400px; margin: 20px auto; background: #fff; border-radius: 15px; padding: 40px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+h1 { text-align: center; color: #2d3748; font-size: 2.5em; margin-bottom: 20px; }
+.intro { background: #e3f2fd; padding: 25px; border-radius: 10px; margin-bottom: 30px; line-height: 1.8; }
+.intro h2 { color: #1976d2; margin-bottom: 15px; }
+.content-section { margin: 30px 0; }
+.content-section h3 { color: #2d3748; margin-bottom: 15px; font-size: 1.6em; }
+.content-section p { line-height: 1.8; color: #4a5568; margin-bottom: 15px; }
+.visual-demo { background: #f8f9fa; padding: 30px; border-radius: 10px; margin: 20px 0; text-align: center; }
+canvas { border: 2px solid #ddd; border-radius: 8px; background: #fff; margin: 20px auto; display: block; }
+.info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin: 20px 0; }
+.info-card { background: #f0f4f8; padding: 20px; border-radius: 10px; border-left: 4px solid #667eea; }
+.info-card h4 { color: #667eea; margin-bottom: 10px; }
+.info-card ul { margin-left: 20px; line-height: 1.8; color: #4a5568; }
+.highlight { background: #fff9c4; padding: 20px; border-radius: 10px; border-left: 4px solid #fbc02d; margin: 20px 0; }
+.highlight h4 { color: #f57c00; margin-bottom: 10px; }
+.example-box { background: #e8f5e9; padding: 20px; border-radius: 10px; margin: 20px 0; border-left: 4px solid #4CAF50; }
+.example-box h4 { color: #2e7d32; margin-bottom: 10px; }
+.controls { text-align: center; margin: 20px 0; }
+button { padding: 15px 30px; margin: 10px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 1.1em; background: #667eea; color: white; transition: all 0.3s; }
+button:hover { background: #5568d3; transform: translateY(-2px); }
+</style>
+</head>
+<body>
+<nav class="nav-header">
+    <div class="nav-title">🔄 Autoencoders</div>
+    <a href="../../index.html">← Back to Home</a>
+</nav>
+<div class="container">
+    <h1>🔄 Autoencoders</h1>
+
+    <div class="intro">
+        <h2>What is an Autoencoder?</h2>
+        <p>
+            An Autoencoder is an unsupervised neural network that learns to compress data into a lower-dimensional
+            representation (encoding) and then reconstruct the original data from that representation (decoding).
+            Think of it as learning to create a compact summary of data that still contains all the essential
+            information. Autoencoders are used for dimensionality reduction, denoising, anomaly detection, and
+            generating new data.
+        </p>
+    </div>
+
+    <div class="content-section">
+        <h3>📚 Key Concepts</h3>
+        <div class="info-grid">
+            <div class="info-card">
+                <h4>Architecture Components</h4>
+                <ul>
+                    <li><strong>Encoder:</strong> Compresses input to latent space</li>
+                    <li><strong>Latent Space:</strong> Compact representation (bottleneck)</li>
+                    <li><strong>Decoder:</strong> Reconstructs from latent space</li>
+                    <li><strong>Loss:</strong> Measures reconstruction error</li>
+                </ul>
+            </div>
+
+            <div class="info-card">
+                <h4>How It Works</h4>
+                <ul>
+                    <li>Input passes through encoder layers</li>
+                    <li>Compressed to bottleneck (latent code)</li>
+                    <li>Decoder expands back to original size</li>
+                    <li>Network learns meaningful features</li>
+                </ul>
+            </div>
+
+            <div class="info-card">
+                <h4>Types of Autoencoders</h4>
+                <ul>
+                    <li><strong>Vanilla:</strong> Basic encoder-decoder</li>
+                    <li><strong>Denoising:</strong> Learns to remove noise</li>
+                    <li><strong>Variational (VAE):</strong> Generates new samples</li>
+                    <li><strong>Sparse:</strong> Enforces sparsity constraint</li>
+                </ul>
+            </div>
+
+            <div class="info-card">
+                <h4>Applications</h4>
+                <ul>
+                    <li>Image compression and denoising</li>
+                    <li>Anomaly detection</li>
+                    <li>Feature extraction and learning</li>
+                    <li>Data generation</li>
+                    <li>Dimensionality reduction</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="visual-demo">
+        <h3>🎨 Autoencoder Visualization</h3>
+        <p>Watch data compress through the bottleneck and reconstruct</p>
+        <canvas id="autoCanvas" width="800" height="400"></canvas>
+        <div class="controls">
+            <button onclick="animateAutoencoder()">▶️ Animate Encoding & Decoding</button>
+            <button onclick="reset()">↺ Reset</button>
+        </div>
+        <p style="margin-top: 15px; color: #666;">
+            Data is compressed in the middle, then reconstructed to match the original
+        </p>
+    </div>
+
+    <div class="highlight">
+        <h4>🔑 Key Insight</h4>
+        <p>
+            The magic of autoencoders is the <strong>bottleneck layer</strong>. By forcing the network to
+            compress data through a narrow bottleneck, it must learn the most important features. It can't
+            simply memorize the input—it must learn meaningful patterns and structure. This compressed
+            representation (latent code) captures the essence of the data in just a few numbers. It's like
+            explaining a complex story in a single sentence—you keep only what matters most!
+        </p>
+    </div>
+
+    <div class="example-box">
+        <h4>🌟 Real-World Example: Image Denoising</h4>
+        <p>
+            Training an autoencoder to remove noise from photos:<br><br>
+            <strong>Input:</strong> Noisy image (256×256×3 = 196,608 pixels)<br>
+            <strong>Encoder:</strong> Conv layers reduce to 128 → 64 → 32 → 16 features<br>
+            <strong>Bottleneck:</strong> Just 256 numbers capture the essential image<br>
+            <strong>Decoder:</strong> Transpose conv layers expand back: 16 → 32 → 64 → 128<br>
+            <strong>Output:</strong> Clean reconstructed image (256×256×3)<br>
+            <strong>Result:</strong> Noise is filtered out because it's not in the learned representation!
+        </p>
+    </div>
+
+    <div class="content-section">
+        <h3>⚡ Training Process</h3>
+        <p>
+            <strong>1. Forward Pass (Encoding):</strong> Input → Encoder → Latent code (compressed representation)<br>
+            <strong>2. Forward Pass (Decoding):</strong> Latent code → Decoder → Reconstruction<br>
+            <strong>3. Calculate Loss:</strong> Compare reconstruction to original input (MSE, BCE)<br>
+            <strong>4. Backpropagation:</strong> Update weights to minimize reconstruction error<br>
+            <strong>5. Iterate:</strong> Repeat until reconstructions match originals closely<br>
+            <strong>6. Result:</strong> Learned compressed representation that preserves key features
+        </p>
+    </div>
+
+    <div class="content-section">
+        <h3>🔬 Variational Autoencoders (VAE)</h3>
+        <div class="info-grid">
+            <div class="info-card">
+                <h4>Standard Autoencoder</h4>
+                <p style="font-size: 0.95em; line-height: 1.7;">
+                    <strong>Latent Space:</strong> Discrete points<br>
+                    <strong>Purpose:</strong> Compression and reconstruction<br>
+                    <strong>Generation:</strong> Can't generate new samples<br>
+                    <strong>Training:</strong> Minimize reconstruction loss only
+                </p>
+            </div>
+
+            <div class="example-box">
+                <h4>Variational Autoencoder</h4>
+                <p style="font-size: 0.95em; line-height: 1.7;">
+                    <strong>Latent Space:</strong> Probability distributions<br>
+                    <strong>Purpose:</strong> Generation + reconstruction<br>
+                    <strong>Generation:</strong> Sample new points from distribution<br>
+                    <strong>Training:</strong> Reconstruction + KL divergence loss
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="example-box">
+        <h4>💡 Understanding the Bottleneck</h4>
+        <p style="line-height: 1.7;">
+            Imagine compressing a 1000-page book into a 1-page summary:<br><br>
+            <strong>Too large (500 pages):</strong> Can include lots of details, but haven't really compressed<br>
+            <strong>Just right (1 page):</strong> Must capture only the key plot points and themes<br>
+            <strong>Too small (1 word):</strong> Loses too much information, can't reconstruct the story<br><br>
+            The bottleneck size is crucial: large enough to preserve information, small enough to learn
+            meaningful features. This is the art of autoencoder design!
+        </p>
+    </div>
+
+    <div class="info-grid" style="margin-top: 30px;">
+        <div class="example-box">
+            <h4>✅ Advantages</h4>
+            <ul>
+                <li>Unsupervised learning (no labels needed)</li>
+                <li>Learns compact representations automatically</li>
+                <li>Effective for dimensionality reduction</li>
+                <li>Can denoise and reconstruct data</li>
+                <li>VAEs can generate new samples</li>
+                <li>Good for anomaly detection</li>
+            </ul>
+        </div>
+
+        <div class="highlight" style="background: #ffebee;">
+            <h4>⚠️ Limitations</h4>
+            <ul>
+                <li>Reconstructions may be blurry</li>
+                <li>Choosing bottleneck size is tricky</li>
+                <li>May not capture all data variations</li>
+                <li>Training can be unstable for VAEs</li>
+                <li>Generated samples less sharp than GANs</li>
+                <li>Requires careful architecture design</li>
+            </ul>
+        </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 40px;">
+        <a href="../../games/autoencoders/index.html" style="display: inline-block; background: #4CAF50; color: white; padding: 20px 40px; border-radius: 10px; text-decoration: none; font-weight: 700; font-size: 1.2em;">
+            🎮 Play the Autoencoder Game →
+        </a>
+    </div>
+</div>
+
+<script>
+const canvas = document.getElementById('autoCanvas');
+const ctx = canvas.getContext('2d');
+
+let animating = false;
+let animationStep = 0;
+
+function drawAutoencoder() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const layers = [
+        { neurons: 6, x: 100, label: 'Input', color: '#2196F3' },
+        { neurons: 4, x: 250, label: 'Encode', color: '#667eea' },
+        { neurons: 2, x: 400, label: 'Bottleneck', color: '#9C27B0' },
+        { neurons: 4, x: 550, label: 'Decode', color: '#667eea' },
+        { neurons: 6, x: 700, label: 'Output', color: '#4CAF50' }
+    ];
+
+    // Draw connections
+    for (let i = 0; i < layers.length - 1; i++) {
+        const currentLayer = layers[i];
+        const nextLayer = layers[i + 1];
+
+        for (let j = 0; j < currentLayer.neurons; j++) {
+            const y1 = getY(j, currentLayer.neurons);
+            for (let k = 0; k < nextLayer.neurons; k++) {
+                const y2 = getY(k, nextLayer.neurons);
+
+                let isActive = false;
+                if (animationStep >= 1 && i < 2) isActive = true; // Encoding
+                if (animationStep >= 2 && i >= 2) isActive = true; // Decoding
+
+                ctx.strokeStyle = isActive ? currentLayer.color : '#e0e0e0';
+                ctx.lineWidth = isActive ? 2 : 1;
+                ctx.beginPath();
+                ctx.moveTo(currentLayer.x, y1);
+                ctx.lineTo(nextLayer.x, y2);
+                ctx.stroke();
+            }
+        }
+    }
+
+    // Draw neurons
+    layers.forEach((layer, layerIdx) => {
+        for (let i = 0; i < layer.neurons; i++) {
+            const y = getY(i, layer.neurons);
+
+            let isActive = false;
+            if (animationStep >= 1 && layerIdx <= 2) isActive = true; // Encoding
+            if (animationStep >= 2 && layerIdx >= 2) isActive = true; // Decoding
+
+            ctx.fillStyle = isActive ? layer.color : '#f0f0f0';
+            ctx.strokeStyle = '#2d3748';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(layer.x, y, 15, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+        }
+
+        // Draw labels
+        ctx.fillStyle = '#2d3748';
+        ctx.font = 'bold 14px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText(layer.label, layer.x, 30);
+    });
+
+    // Draw phase labels
+    if (animationStep >= 1) {
+        ctx.fillStyle = '#667eea';
+        ctx.font = '16px Arial';
+        ctx.fillText('← Compression →', 250, 360);
+    }
+    if (animationStep >= 2) {
+        ctx.fillStyle = '#4CAF50';
+        ctx.fillText('← Reconstruction →', 550, 360);
+    }
+}
+
+function getY(index, total) {
+    const spacing = 50;
+    const startY = (canvas.height - (total - 1) * spacing) / 2;
+    return startY + index * spacing;
+}
+
+function animateAutoencoder() {
+    if (animating) return;
+    animating = true;
+    animationStep = 0;
+
+    const interval = setInterval(() => {
+        animationStep++;
+        drawAutoencoder();
+
+        if (animationStep >= 3) {
+            animating = false;
+            clearInterval(interval);
+        }
+    }, 1000);
+}
+
+function reset() {
+    animating = false;
+    animationStep = 0;
+    drawAutoencoder();
+}
+
+// Initial draw
+drawAutoencoder();
+</script>
+</body>
+</html>

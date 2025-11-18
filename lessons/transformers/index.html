@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Transformers - Interactive Lesson</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 0; }
+.nav-header { background: #2d3748; padding: 15px 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; }
+.nav-header a { color: #90cdf4; text-decoration: none; font-weight: 600; font-size: 1.1em; }
+.nav-title { color: #fff; font-size: 1.2em; font-weight: 700; }
+.container { max-width: 1400px; margin: 20px auto; background: #fff; border-radius: 15px; padding: 40px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+h1 { text-align: center; color: #2d3748; font-size: 2.5em; margin-bottom: 20px; }
+.intro { background: #e3f2fd; padding: 25px; border-radius: 10px; margin-bottom: 30px; line-height: 1.8; }
+.intro h2 { color: #1976d2; margin-bottom: 15px; }
+.content-section { margin: 30px 0; }
+.content-section h3 { color: #2d3748; margin-bottom: 15px; font-size: 1.6em; }
+.content-section p { line-height: 1.8; color: #4a5568; margin-bottom: 15px; }
+.visual-demo { background: #f8f9fa; padding: 30px; border-radius: 10px; margin: 20px 0; text-align: center; }
+canvas { border: 2px solid #ddd; border-radius: 8px; background: #fff; margin: 20px auto; display: block; }
+.info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin: 20px 0; }
+.info-card { background: #f0f4f8; padding: 20px; border-radius: 10px; border-left: 4px solid #667eea; }
+.info-card h4 { color: #667eea; margin-bottom: 10px; }
+.info-card ul { margin-left: 20px; line-height: 1.8; color: #4a5568; }
+.highlight { background: #fff9c4; padding: 20px; border-radius: 10px; border-left: 4px solid #fbc02d; margin: 20px 0; }
+.highlight h4 { color: #f57c00; margin-bottom: 10px; }
+.example-box { background: #e8f5e9; padding: 20px; border-radius: 10px; margin: 20px 0; border-left: 4px solid #4CAF50; }
+.example-box h4 { color: #2e7d32; margin-bottom: 10px; }
+.controls { text-align: center; margin: 20px 0; }
+button { padding: 15px 30px; margin: 10px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 1.1em; background: #667eea; color: white; transition: all 0.3s; }
+button:hover { background: #5568d3; transform: translateY(-2px); }
+.attention-box { background: #f3e5f5; padding: 20px; border-radius: 10px; margin: 20px 0; border-left: 4px solid #9C27B0; }
+.attention-box h4 { color: #6A1B9A; margin-bottom: 10px; }
+</style>
+</head>
+<body>
+<nav class="nav-header">
+    <div class="nav-title">⚡ Transformers</div>
+    <a href="../../index.html">← Back to Home</a>
+</nav>
+<div class="container">
+    <h1>⚡ Transformers</h1>
+
+    <div class="intro">
+        <h2>What is a Transformer?</h2>
+        <p>
+            Transformers are a revolutionary neural network architecture that has transformed AI. Unlike RNNs
+            that process sequences one step at a time, Transformers process all positions simultaneously using
+            <strong>self-attention</strong> mechanisms. They can weigh the importance of different parts of
+            the input when making predictions. Transformers power GPT, BERT, ChatGPT, and most modern large
+            language models. They've become the foundation of state-of-the-art NLP, and increasingly, computer
+            vision and other domains.
+        </p>
+    </div>
+
+    <div class="content-section">
+        <h3>📚 Key Concepts</h3>
+        <div class="info-grid">
+            <div class="info-card">
+                <h4>Architecture Components</h4>
+                <ul>
+                    <li><strong>Self-Attention:</strong> Weighs importance of all words</li>
+                    <li><strong>Multi-Head Attention:</strong> Multiple attention perspectives</li>
+                    <li><strong>Positional Encoding:</strong> Adds position information</li>
+                    <li><strong>Feed-Forward Networks:</strong> Process attended information</li>
+                </ul>
+            </div>
+
+            <div class="info-card">
+                <h4>How It Works</h4>
+                <ul>
+                    <li>Processes entire sequence in parallel</li>
+                    <li>Each word attends to all other words</li>
+                    <li>Learns which words are most relevant</li>
+                    <li>No sequential bottleneck like RNNs</li>
+                </ul>
+            </div>
+
+            <div class="info-card">
+                <h4>Attention Mechanism</h4>
+                <ul>
+                    <li><strong>Query (Q):</strong> What I'm looking for</li>
+                    <li><strong>Key (K):</strong> What I have to offer</li>
+                    <li><strong>Value (V):</strong> What I'll provide if matched</li>
+                    <li><strong>Score:</strong> Attention(Q,K,V) = softmax(QK^T/√d)V</li>
+                </ul>
+            </div>
+
+            <div class="info-card">
+                <h4>Applications</h4>
+                <ul>
+                    <li>Language translation (Google Translate)</li>
+                    <li>Text generation (ChatGPT, GPT-4)</li>
+                    <li>Question answering (BERT)</li>
+                    <li>Code generation (GitHub Copilot)</li>
+                    <li>Image generation (DALL-E, Stable Diffusion)</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="visual-demo">
+        <h3>🎨 Self-Attention Visualization</h3>
+        <p>Watch how words attend to each other in a sentence</p>
+        <canvas id="transformerCanvas" width="800" height="400"></canvas>
+        <div class="controls">
+            <button onclick="animateAttention()">▶️ Animate Attention</button>
+            <button onclick="reset()">↺ Reset</button>
+        </div>
+        <p style="margin-top: 15px; color: #666;">
+            Each word looks at all other words to understand context
+        </p>
+    </div>
+
+    <div class="attention-box">
+        <h4>🔑 Key Insight: Self-Attention</h4>
+        <p>
+            The breakthrough of Transformers is <strong>self-attention</strong>. When processing the word "it"
+            in the sentence "The animal didn't cross the street because it was too tired", the network can
+            attend more to "animal" than "street" to understand what "it" refers to. Unlike RNNs that forget
+            distant words, Transformers can directly connect any two words, regardless of distance. This allows
+            them to capture long-range dependencies effortlessly and process sequences in parallel, making them
+            much faster to train than RNNs.
+        </p>
+    </div>
+
+    <div class="example-box">
+        <h4>🌟 Real-World Example: Machine Translation</h4>
+        <p>
+            Translating "The bank can guarantee deposits will eventually cover future tuition costs" to French:<br><br>
+            <strong>Input:</strong> English sentence tokens<br>
+            <strong>Positional Encoding:</strong> Add position information to each word<br>
+            <strong>Self-Attention:</strong> "bank" attends to "deposits" and "guarantee" (financial context)<br>
+            <strong>Multi-Head Attention:</strong> Different heads capture different relationships<br>
+            <strong>Encoder Output:</strong> Rich contextual representation of English sentence<br>
+            <strong>Decoder Attention:</strong> French words attend to relevant English words<br>
+            <strong>Output:</strong> "La banque peut garantir..." (accurate translation preserving meaning)
+        </p>
+    </div>
+
+    <div class="content-section">
+        <h3>⚡ Transformer Architecture</h3>
+        <p>
+            <strong>1. Input Embeddings:</strong> Convert words to vectors + positional encoding<br>
+            <strong>2. Encoder Stack (6-12 layers):</strong><br>
+            &nbsp;&nbsp;&nbsp;• Multi-head self-attention (words attend to all words)<br>
+            &nbsp;&nbsp;&nbsp;• Add & Normalize<br>
+            &nbsp;&nbsp;&nbsp;• Feed-forward network<br>
+            &nbsp;&nbsp;&nbsp;• Add & Normalize<br>
+            <strong>3. Decoder Stack (6-12 layers):</strong><br>
+            &nbsp;&nbsp;&nbsp;• Masked self-attention (attend to previous words only)<br>
+            &nbsp;&nbsp;&nbsp;• Cross-attention to encoder output<br>
+            &nbsp;&nbsp;&nbsp;• Feed-forward network<br>
+            <strong>4. Output:</strong> Softmax over vocabulary to predict next word
+        </p>
+    </div>
+
+    <div class="content-section">
+        <h3>🔄 Transformers vs RNNs/LSTMs</h3>
+        <div class="info-grid">
+            <div class="highlight">
+                <h4>RNN/LSTM Limitations</h4>
+                <p style="font-size: 0.95em; line-height: 1.7;">
+                    <strong>Sequential Processing:</strong> Must process one word at a time<br>
+                    <strong>Slow Training:</strong> Can't parallelize across time steps<br>
+                    <strong>Limited Context:</strong> Struggles with very long sequences<br>
+                    <strong>Vanishing Gradients:</strong> Hard to learn long-term dependencies
+                </p>
+            </div>
+
+            <div class="example-box">
+                <h4>Transformer Advantages</h4>
+                <p style="font-size: 0.95em; line-height: 1.7;">
+                    <strong>Parallel Processing:</strong> Process all words simultaneously<br>
+                    <strong>Fast Training:</strong> Highly parallelizable on GPUs<br>
+                    <strong>Global Context:</strong> Direct connections to all positions<br>
+                    <strong>Stable Gradients:</strong> Attention provides gradient highways
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="attention-box">
+        <h4>🌐 Famous Transformer Models</h4>
+        <div class="info-grid" style="margin-top: 15px;">
+            <div style="background: white; padding: 15px; border-radius: 8px;">
+                <h5 style="color: #667eea; margin-bottom: 8px;">GPT (Generative Pre-trained Transformer)</h5>
+                <p style="font-size: 0.9em; line-height: 1.6;">
+                    Decoder-only architecture. Trained to predict next word. Powers ChatGPT, GPT-4.
+                    Excels at text generation and few-shot learning.
+                </p>
+            </div>
+
+            <div style="background: white; padding: 15px; border-radius: 8px;">
+                <h5 style="color: #667eea; margin-bottom: 8px;">BERT (Bidirectional Encoder Representations)</h5>
+                <p style="font-size: 0.9em; line-height: 1.6;">
+                    Encoder-only architecture. Trained with masked language modeling. Great for
+                    understanding and classification tasks.
+                </p>
+            </div>
+
+            <div style="background: white; padding: 15px; border-radius: 8px;">
+                <h5 style="color: #667eea; margin-bottom: 8px;">T5 (Text-to-Text Transfer Transformer)</h5>
+                <p style="font-size: 0.9em; line-height: 1.6;">
+                    Full encoder-decoder. Treats all tasks as text-to-text. Unified framework for
+                    translation, summarization, question answering.
+                </p>
+            </div>
+
+            <div style="background: white; padding: 15px; border-radius: 8px;">
+                <h5 style="color: #667eea; margin-bottom: 8px;">Vision Transformer (ViT)</h5>
+                <p style="font-size: 0.9em; line-height: 1.6;">
+                    Applies Transformers to images by treating patches as tokens. Outperforms CNNs
+                    on many vision tasks when trained with sufficient data.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="info-grid" style="margin-top: 30px;">
+        <div class="example-box">
+            <h4>✅ Advantages</h4>
+            <ul>
+                <li>Processes sequences in parallel (fast)</li>
+                <li>Captures long-range dependencies easily</li>
+                <li>No vanishing gradient problems</li>
+                <li>State-of-the-art on most NLP tasks</li>
+                <li>Highly scalable to huge datasets</li>
+                <li>Transfer learning works excellently</li>
+            </ul>
+        </div>
+
+        <div class="highlight" style="background: #ffebee;">
+            <h4>⚠️ Limitations</h4>
+            <ul>
+                <li>Quadratic memory complexity O(n²)</li>
+                <li>Requires massive amounts of data</li>
+                <li>Very computationally expensive to train</li>
+                <li>Large model size (billions of parameters)</li>
+                <li>Limited to fixed maximum sequence length</li>
+                <li>Lacks built-in notion of sequential order</li>
+            </ul>
+        </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 40px;">
+        <a href="../../games/transformers/index.html" style="display: inline-block; background: #4CAF50; color: white; padding: 20px 40px; border-radius: 10px; text-decoration: none; font-weight: 700; font-size: 1.2em;">
+            🎮 Play the Transformer Game →
+        </a>
+    </div>
+</div>
+
+<script>
+const canvas = document.getElementById('transformerCanvas');
+const ctx = canvas.getContext('2d');
+
+let animating = false;
+let animationStep = 0;
+
+const words = ['The', 'cat', 'sat', 'on', 'mat'];
+const wordPositions = [
+    { x: 160, y: 200 },
+    { x: 280, y: 200 },
+    { x: 400, y: 200 },
+    { x: 520, y: 200 },
+    { x: 640, y: 200 }
+];
+
+function drawTransformer() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Draw words
+    words.forEach((word, idx) => {
+        const pos = wordPositions[idx];
+
+        ctx.fillStyle = animationStep === idx + 1 ? '#667eea' : '#f0f0f0';
+        ctx.strokeStyle = '#2d3748';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(pos.x, pos.y, 40, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = '#2d3748';
+        ctx.font = 'bold 16px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText(word, pos.x, pos.y + 5);
+    });
+
+    // Draw attention connections
+    if (animationStep > 0) {
+        const currentIdx = animationStep - 1;
+        const currentPos = wordPositions[currentIdx];
+
+        words.forEach((word, idx) => {
+            if (idx !== currentIdx) {
+                const targetPos = wordPositions[idx];
+
+                // Attention strength (just for visualization)
+                const distance = Math.abs(idx - currentIdx);
+                const strength = 1 / (distance + 1);
+                const alpha = strength * 0.7;
+
+                ctx.strokeStyle = `rgba(103, 110, 234, ${alpha})`;
+                ctx.lineWidth = 2 + strength * 3;
+
+                ctx.beginPath();
+                ctx.moveTo(currentPos.x, currentPos.y);
+                ctx.lineTo(targetPos.x, targetPos.y);
+                ctx.stroke();
+
+                // Arrow head
+                const angle = Math.atan2(targetPos.y - currentPos.y, targetPos.x - currentPos.x);
+                const arrowSize = 10;
+                ctx.beginPath();
+                ctx.moveTo(targetPos.x - arrowSize * Math.cos(angle - Math.PI / 6),
+                          targetPos.y - arrowSize * Math.sin(angle - Math.PI / 6));
+                ctx.lineTo(targetPos.x, targetPos.y);
+                ctx.lineTo(targetPos.x - arrowSize * Math.cos(angle + Math.PI / 6),
+                          targetPos.y - arrowSize * Math.sin(angle + Math.PI / 6));
+                ctx.stroke();
+            }
+        });
+
+        // Draw label
+        ctx.fillStyle = '#667eea';
+        ctx.font = 'bold 18px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText(`"${words[currentIdx]}" attending to other words`, canvas.width / 2, 50);
+    } else {
+        ctx.fillStyle = '#2d3748';
+        ctx.font = '18px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('Each word will attend to all other words', canvas.width / 2, 50);
+    }
+
+    // Draw sentence below
+    ctx.fillStyle = '#666';
+    ctx.font = '14px Arial';
+    ctx.fillText('Sentence: "The cat sat on mat"', canvas.width / 2, 350);
+}
+
+function animateAttention() {
+    if (animating) return;
+    animating = true;
+    animationStep = 0;
+
+    const interval = setInterval(() => {
+        animationStep++;
+        drawTransformer();
+
+        if (animationStep > words.length) {
+            animating = false;
+            animationStep = 0;
+            clearInterval(interval);
+        }
+    }, 1500);
+}
+
+function reset() {
+    animating = false;
+    animationStep = 0;
+    drawTransformer();
+}
+
+// Initial draw
+drawTransformer();
+</script>
+</body>
+</html>

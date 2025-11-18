@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Real or Fake Detective - GAN Game</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 0; }
+.nav-header { background: #2d3748; padding: 15px 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; }
+.nav-header a { color: #90cdf4; text-decoration: none; font-weight: 600; font-size: 1.1em; }
+.nav-title { color: #fff; font-size: 1.2em; font-weight: 700; }
+.container { max-width: 1400px; margin: 20px auto; background: #fff; border-radius: 15px; padding: 30px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+h1 { text-align: center; color: #2d3748; font-size: 2.5em; margin-bottom: 10px; }
+.subtitle { text-align: center; color: #666; margin-bottom: 30px; font-size: 1.1em; }
+.game-area { display: grid; grid-template-columns: 350px 1fr; gap: 30px; }
+.sidebar { background: #f8f9fa; padding: 20px; border-radius: 10px; height: fit-content; }
+button { width: 100%; padding: 12px; margin: 5px 0; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.3s; }
+.btn-primary { background: #4CAF50; color: #fff; }
+.btn-primary:hover { background: #45a049; }
+.btn-danger { background: #f44336; color: #fff; }
+.btn-danger:hover { background: #da190b; }
+.btn-secondary { background: #2196F3; color: #fff; }
+.btn-secondary:hover { background: #0b7dda; }
+canvas { border: 3px solid #ddd; border-radius: 10px; display: block; background: #fff; margin: 0 auto; cursor: pointer; }
+.stats { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; padding: 15px; border-radius: 10px; margin-top: 15px; }
+.stat-row { display: flex; justify-content: space-between; margin: 8px 0; }
+.challenge { background: #fff9c4; padding: 15px; border-radius: 8px; margin: 15px 0; border-left: 4px solid #fbc02d; }
+.challenge h4 { color: #f57c00; margin-bottom: 8px; }
+.info { background: #e3f2fd; padding: 15px; border-radius: 8px; margin: 15px 0; }
+.info h4 { color: #1976d2; margin-bottom: 8px; }
+.score { text-align: center; font-size: 2em; font-weight: bold; color: #4CAF50; margin: 15px 0; }
+.choice-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 20px 0; }
+.choice-btn { padding: 30px; font-size: 1.3em; border-radius: 10px; cursor: pointer; font-weight: bold; transition: all 0.3s; }
+.real-btn { background: #4CAF50; color: white; border: none; }
+.fake-btn { background: #f44336; color: white; border: none; }
+.real-btn:hover, .fake-btn:hover { transform: scale(1.05); }
+.difficulty-selector { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 15px 0; }
+.diff-btn { padding: 10px; border: 2px solid #667eea; background: #fff; color: #667eea; border-radius: 8px; cursor: pointer; font-weight: 600; }
+.diff-btn.active { background: #667eea; color: #fff; }
+.timer { font-size: 1.5em; text-align: center; color: #f57c00; margin: 10px 0; font-weight: bold; }
+</style>
+</head>
+<body>
+<nav class="nav-header">
+    <div class="nav-title">🕵️ Real or Fake Detective</div>
+    <a href="../../index.html">← Back to Home</a>
+</nav>
+<div class="container">
+    <h1>🕵️ Real or Fake Detective</h1>
+    <p class="subtitle">Be the Discriminator! Can you tell real from fake?</p>
+
+    <div class="game-area">
+        <div class="sidebar">
+            <h3>🎮 Game Controls</h3>
+
+            <div class="challenge">
+                <h4>🎯 Challenge:</h4>
+                <p id="challengeText" style="font-size: 0.9em;">Identify if the pattern is REAL or generated FAKE!</p>
+            </div>
+
+            <div class="timer" id="timer">Time: 60s</div>
+
+            <h4 style="margin: 15px 0;">Difficulty:</h4>
+            <div class="difficulty-selector">
+                <button class="diff-btn" onclick="setDifficulty('easy')">Easy</button>
+                <button class="diff-btn active" onclick="setDifficulty('medium')">Medium</button>
+                <button class="diff-btn" onclick="setDifficulty('hard')">Hard</button>
+            </div>
+
+            <button class="btn-primary" onclick="startGame()">🚀 Start Game</button>
+            <button class="btn-secondary" onclick="nextRound()">⏭️ Next Round</button>
+            <button class="btn-danger" onclick="reset()">🔄 Reset</button>
+
+            <div class="stats">
+                <div class="stat-row"><span>Round:</span><span id="round">0</span></div>
+                <div class="stat-row"><span>Correct:</span><span id="correct">0</span></div>
+                <div class="stat-row"><span>Wrong:</span><span id="wrong">0</span></div>
+                <div class="stat-row"><span>Accuracy:</span><span id="accuracy">0%</span></div>
+            </div>
+
+            <div class="score">
+                <div style="font-size: 0.6em; color: #666;">Score</div>
+                <div id="score">0</div>
+            </div>
+
+            <div class="info">
+                <h4>💡 How to Play:</h4>
+                <p style="font-size: 0.9em; line-height: 1.6;">
+                    1. Click "Start Game"<br>
+                    2. Look at the pattern carefully<br>
+                    3. Decide: Real or Fake?<br>
+                    4. Click your choice!<br><br>
+                    <strong>Easy:</strong> Obvious differences<br>
+                    <strong>Medium:</strong> Subtle artifacts<br>
+                    <strong>Hard:</strong> Nearly perfect fakes!<br><br>
+                    <strong>+10 points</strong> per correct answer
+                </p>
+            </div>
+        </div>
+
+        <div>
+            <canvas id="canvas" width="800" height="500"></canvas>
+            <div class="choice-buttons">
+                <button class="choice-btn real-btn" onclick="makeChoice('real')">✅ REAL</button>
+                <button class="choice-btn fake-btn" onclick="makeChoice('fake')">❌ FAKE</button>
+            </div>
+            <div style="text-align: center; margin-top: 10px;">
+                <p style="color: #666; font-size: 0.9em;" id="feedback">
+                    Make your choice: Real or Fake?
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+
+let gameActive = false;
+let difficulty = 'medium';
+let currentAnswer = null;
+let score = 0;
+let correct = 0;
+let wrong = 0;
+let round = 0;
+let timeLeft = 60;
+let timerInterval = null;
+let answered = false;
+
+function drawPattern(isReal, difficulty) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Background
+    ctx.fillStyle = '#f0f0f0';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    const patternType = Math.floor(Math.random() * 4);
+
+    switch(patternType) {
+        case 0:
+            drawCirclePattern(isReal, difficulty);
+            break;
+        case 1:
+            drawGridPattern(isReal, difficulty);
+            break;
+        case 2:
+            drawWavePattern(isReal, difficulty);
+            break;
+        case 3:
+            drawDotsPattern(isReal, difficulty);
+            break;
+    }
+
+    // Add title
+    ctx.fillStyle = '#2d3748';
+    ctx.font = 'bold 24px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('Is this REAL or FAKE?', canvas.width / 2, 40);
+}
+
+function drawCirclePattern(isReal, difficulty) {
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+
+    for (let i = 0; i < 8; i++) {
+        const angle = (i / 8) * Math.PI * 2;
+        const radius = 150;
+        const x = centerX + Math.cos(angle) * radius;
+        const y = centerY + Math.sin(angle) * radius;
+
+        // Add artifacts for fake
+        let artifactX = 0, artifactY = 0;
+        if (!isReal) {
+            if (difficulty === 'easy') {
+                artifactX = Math.random() * 40 - 20;
+                artifactY = Math.random() * 40 - 20;
+            } else if (difficulty === 'medium') {
+                artifactX = Math.random() * 15 - 7.5;
+                artifactY = Math.random() * 15 - 7.5;
+            } else {
+                artifactX = Math.random() * 5 - 2.5;
+                artifactY = Math.random() * 5 - 2.5;
+            }
+        }
+
+        ctx.fillStyle = '#667eea';
+        ctx.beginPath();
+        ctx.arc(x + artifactX, y + artifactY, 30, 0, Math.PI * 2);
+        ctx.fill();
+    }
+}
+
+function drawGridPattern(isReal, difficulty) {
+    const cellSize = 60;
+    const startX = 100;
+    const startY = 80;
+
+    for (let i = 0; i < 10; i++) {
+        for (let j = 0; j < 6; j++) {
+            let x = startX + i * cellSize;
+            let y = startY + j * cellSize;
+
+            // Add artifacts for fake
+            if (!isReal) {
+                if (difficulty === 'easy' && Math.random() > 0.7) {
+                    x += Math.random() * 20 - 10;
+                    y += Math.random() * 20 - 10;
+                } else if (difficulty === 'medium' && Math.random() > 0.8) {
+                    x += Math.random() * 8 - 4;
+                    y += Math.random() * 8 - 4;
+                } else if (difficulty === 'hard' && Math.random() > 0.9) {
+                    x += Math.random() * 3 - 1.5;
+                    y += Math.random() * 3 - 1.5;
+                }
+            }
+
+            if ((i + j) % 2 === 0) {
+                ctx.fillStyle = '#4CAF50';
+                ctx.fillRect(x, y, cellSize - 2, cellSize - 2);
+            }
+        }
+    }
+}
+
+function drawWavePattern(isReal, difficulty) {
+    ctx.strokeStyle = '#E91E63';
+    ctx.lineWidth = 4;
+
+    for (let wave = 0; wave < 5; wave++) {
+        ctx.beginPath();
+        for (let x = 0; x < canvas.width; x += 5) {
+            let y = canvas.height / 2 + Math.sin((x + wave * 100) / 30) * 50 + wave * 40 - 100;
+
+            // Add artifacts for fake
+            if (!isReal) {
+                if (difficulty === 'easy') {
+                    y += Math.random() * 20 - 10;
+                } else if (difficulty === 'medium') {
+                    y += Math.random() * 8 - 4;
+                } else if (difficulty === 'hard') {
+                    y += Math.random() * 3 - 1.5;
+                }
+            }
+
+            if (x === 0) {
+                ctx.moveTo(x, y);
+            } else {
+                ctx.lineTo(x, y);
+            }
+        }
+        ctx.stroke();
+    }
+}
+
+function drawDotsPattern(isReal, difficulty) {
+    const spacing = 50;
+    const startX = 100;
+    const startY = 100;
+
+    for (let i = 0; i < 14; i++) {
+        for (let j = 0; j < 8; j++) {
+            let x = startX + i * spacing;
+            let y = startY + j * spacing;
+            let radius = 8;
+
+            // Add artifacts for fake
+            if (!isReal) {
+                if (difficulty === 'easy') {
+                    x += Math.random() * 15 - 7.5;
+                    y += Math.random() * 15 - 7.5;
+                    radius += Math.random() * 6 - 3;
+                } else if (difficulty === 'medium') {
+                    x += Math.random() * 6 - 3;
+                    y += Math.random() * 6 - 3;
+                    radius += Math.random() * 3 - 1.5;
+                } else if (difficulty === 'hard') {
+                    x += Math.random() * 2 - 1;
+                    y += Math.random() * 2 - 1;
+                    radius += Math.random() * 1 - 0.5;
+                }
+            }
+
+            ctx.fillStyle = '#FF9800';
+            ctx.beginPath();
+            ctx.arc(x, y, radius, 0, Math.PI * 2);
+            ctx.fill();
+        }
+    }
+}
+
+function setDifficulty(level) {
+    difficulty = level;
+    document.querySelectorAll('.diff-btn').forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+}
+
+function startGame() {
+    if (gameActive) return;
+
+    gameActive = true;
+    timeLeft = 60;
+    nextRound();
+
+    timerInterval = setInterval(() => {
+        timeLeft--;
+        document.getElementById('timer').textContent = `Time: ${timeLeft}s`;
+
+        if (timeLeft <= 0) {
+            endGame();
+        }
+    }, 1000);
+}
+
+function nextRound() {
+    if (!gameActive) {
+        alert('Please start the game first!');
+        return;
+    }
+
+    round++;
+    answered = false;
+    currentAnswer = Math.random() > 0.5 ? 'real' : 'fake';
+    drawPattern(currentAnswer === 'real', difficulty);
+
+    document.getElementById('round').textContent = round;
+    document.getElementById('feedback').textContent = 'Make your choice: Real or Fake?';
+    document.getElementById('feedback').style.color = '#666';
+}
+
+function makeChoice(choice) {
+    if (!gameActive || answered) return;
+
+    answered = true;
+    const isCorrect = choice === currentAnswer;
+
+    if (isCorrect) {
+        correct++;
+        score += 10;
+        document.getElementById('feedback').textContent = '✅ Correct! Well done, Discriminator!';
+        document.getElementById('feedback').style.color = '#4CAF50';
+    } else {
+        wrong++;
+        document.getElementById('feedback').textContent = `❌ Wrong! It was ${currentAnswer.toUpperCase()}`;
+        document.getElementById('feedback').style.color = '#f44336';
+    }
+
+    updateStats();
+
+    setTimeout(() => {
+        if (gameActive) {
+            nextRound();
+        }
+    }, 1500);
+}
+
+function updateStats() {
+    document.getElementById('correct').textContent = correct;
+    document.getElementById('wrong').textContent = wrong;
+    const total = correct + wrong;
+    document.getElementById('accuracy').textContent = total > 0 ? Math.round((correct / total) * 100) + '%' : '0%';
+    document.getElementById('score').textContent = score;
+}
+
+function endGame() {
+    gameActive = false;
+    clearInterval(timerInterval);
+
+    const accuracy = Math.round((correct / (correct + wrong)) * 100);
+    let message = `⏱️ Time's Up!\n\n`;
+    message += `Final Score: ${score}\n`;
+    message += `Correct: ${correct}\n`;
+    message += `Wrong: ${wrong}\n`;
+    message += `Accuracy: ${accuracy}%\n\n`;
+
+    if (accuracy >= 80) {
+        message += '🏆 Excellent! You\'re as good as a trained GAN Discriminator!';
+    } else if (accuracy >= 60) {
+        message += '👍 Good job! You can spot most fakes!';
+    } else {
+        message += '💪 Keep practicing! The Generator is fooling you!';
+    }
+
+    alert(message);
+}
+
+function reset() {
+    gameActive = false;
+    clearInterval(timerInterval);
+    score = 0;
+    correct = 0;
+    wrong = 0;
+    round = 0;
+    timeLeft = 60;
+    answered = false;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#f0f0f0';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#666';
+    ctx.font = '24px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('Click "Start Game" to begin!', canvas.width / 2, canvas.height / 2);
+
+    document.getElementById('timer').textContent = 'Time: 60s';
+    document.getElementById('feedback').textContent = 'Make your choice: Real or Fake?';
+    document.getElementById('feedback').style.color = '#666';
+
+    updateStats();
+}
+
+// Initialize
+reset();
+</script>
+</body>
+</html>
