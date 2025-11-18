@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sequence Memory - LSTM Game</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 0; }
+.nav-header { background: #2d3748; padding: 15px 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; }
+.nav-header a { color: #90cdf4; text-decoration: none; font-weight: 600; font-size: 1.1em; }
+.nav-title { color: #fff; font-size: 1.2em; font-weight: 700; }
+.container { max-width: 1200px; margin: 20px auto; background: #fff; border-radius: 15px; padding: 30px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+h1 { text-align: center; color: #2d3748; font-size: 2.5em; margin-bottom: 10px; }
+.subtitle { text-align: center; color: #666; margin-bottom: 30px; font-size: 1.1em; }
+.game-area { display: grid; grid-template-columns: 300px 1fr; gap: 30px; }
+.sidebar { background: #f8f9fa; padding: 20px; border-radius: 10px; height: fit-content; }
+button { width: 100%; padding: 12px; margin: 5px 0; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.3s; }
+.btn-primary { background: #4CAF50; color: #fff; }
+.btn-primary:hover { background: #45a049; }
+.btn-secondary { background: #2196F3; color: #fff; }
+.btn-secondary:hover { background: #0b7dda; }
+.stats { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; padding: 15px; border-radius: 10px; margin: 15px 0; }
+.stat-row { display: flex; justify-content: space-between; margin: 8px 0; }
+.challenge { background: #fff9c4; padding: 15px; border-radius: 8px; margin: 15px 0; border-left: 4px solid #fbc02d; }
+.challenge h4 { color: #f57c00; margin-bottom: 8px; }
+.info { background: #e3f2fd; padding: 15px; border-radius: 8px; margin: 15px 0; }
+.info h4 { color: #1976d2; margin-bottom: 8px; }
+.score { text-align: center; font-size: 2em; font-weight: bold; color: #4CAF50; margin: 15px 0; }
+.sequence-display { background: #f8f9fa; padding: 40px; border-radius: 10px; text-align: center; min-height: 400px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+.sequence-items { display: flex; gap: 15px; margin: 20px 0; flex-wrap: wrap; justify-content: center; }
+.sequence-item { width: 80px; height: 80px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 2em; font-weight: bold; transition: all 0.3s; cursor: pointer; }
+.color-red { background: #f44336; color: white; }
+.color-blue { background: #2196F3; color: white; }
+.color-green { background: #4CAF50; color: white; }
+.color-yellow { background: #FFC107; color: white; }
+.color-purple { background: #9C27B0; color: white; }
+.color-orange { background: #FF9800; color: white; }
+.input-buttons { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin: 20px 0; }
+.input-btn { padding: 20px; border: 3px solid #ddd; background: white; border-radius: 10px; cursor: pointer; font-size: 1.5em; font-weight: bold; transition: all 0.3s; }
+.input-btn:hover { transform: scale(1.05); }
+.phase-text { font-size: 1.5em; color: #667eea; font-weight: bold; margin: 20px 0; }
+</style>
+</head>
+<body>
+<nav class="nav-header">
+    <div class="nav-title">🧠 Sequence Memory Game</div>
+    <a href="../../index.html">← Back to Home</a>
+</nav>
+<div class="container">
+    <h1>🧠 Sequence Memory Master</h1>
+    <p class="subtitle">Train your LSTM-like memory by remembering and predicting sequences!</p>
+
+    <div class="game-area">
+        <div class="sidebar">
+            <div class="challenge">
+                <h4>🎯 Challenge:</h4>
+                <p style="font-size: 0.9em;">Watch the sequence, then predict what comes next!</p>
+            </div>
+
+            <button class="btn-primary" onclick="startRound()">🚀 Start Round</button>
+            <button class="btn-secondary" onclick="reset()">🔄 Reset Game</button>
+
+            <div class="stats">
+                <div class="stat-row"><span>Level:</span><span id="level">1</span></div>
+                <div class="stat-row"><span>Sequence Length:</span><span id="seqLength">3</span></div>
+                <div class="stat-row"><span>Correct:</span><span id="correct">0</span></div>
+                <div class="stat-row"><span>Wrong:</span><span id="wrong">0</span></div>
+                <div class="stat-row"><span>Streak:</span><span id="streak">0</span></div>
+            </div>
+
+            <div class="score">
+                <div style="font-size: 0.6em; color: #666;">Score</div>
+                <div id="score">0</div>
+            </div>
+
+            <div class="info">
+                <h4>💡 How to Play:</h4>
+                <p style="font-size: 0.9em; line-height: 1.6;">
+                    1. Click "Start Round"<br>
+                    2. Watch the sequence carefully<br>
+                    3. Click the item that comes next<br>
+                    4. Sequences get longer as you progress!<br><br>
+                    <strong>+10 points</strong> per correct answer<br>
+                    <strong>+5 bonus</strong> for each difficulty level<br>
+                    Like an LSTM, you need to remember long-term patterns!
+                </p>
+            </div>
+        </div>
+
+        <div>
+            <div class="sequence-display" id="displayArea">
+                <div class="phase-text">Click "Start Round" to begin!</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let gameActive = false;
+let currentSequence = [];
+let level = 1;
+let sequenceLength = 3;
+let score = 0;
+let correct = 0;
+let wrong = 0;
+let streak = 0;
+let phase = 'ready'; // ready, showing, input
+
+const colors = [
+    { name: 'Red', class: 'color-red', emoji: '🔴' },
+    { name: 'Blue', class: 'color-blue', emoji: '🔵' },
+    { name: 'Green', class: 'color-green', emoji: '🟢' },
+    { name: 'Yellow', class: 'color-yellow', emoji: '🟡' },
+    { name: 'Purple', class: 'color-purple', emoji: '🟣' },
+    { name: 'Orange', class: 'color-orange', emoji: '🟠' }
+];
+
+function generateSequence() {
+    currentSequence = [];
+    for (let i = 0; i < sequenceLength; i++) {
+        currentSequence.push(colors[Math.floor(Math.random() * colors.length)]);
+    }
+}
+
+function startRound() {
+    phase = 'showing';
+    generateSequence();
+    showSequence();
+}
+
+function showSequence() {
+    const displayArea = document.getElementById('displayArea');
+    displayArea.innerHTML = '<div class="phase-text">Watch carefully...</div><div class="sequence-items" id="sequenceItems"></div>';
+
+    const itemsContainer = document.getElementById('sequenceItems');
+    let index = 0;
+
+    const interval = setInterval(() => {
+        if (index < currentSequence.length) {
+            const item = document.createElement('div');
+            item.className = `sequence-item ${currentSequence[index].class}`;
+            item.textContent = currentSequence[index].emoji;
+            itemsContainer.appendChild(item);
+            index++;
+        } else {
+            clearInterval(interval);
+            setTimeout(() => {
+                showInputPhase();
+            }, 1000);
+        }
+    }, 800);
+}
+
+function showInputPhase() {
+    phase = 'input';
+    const displayArea = document.getElementById('displayArea');
+
+    displayArea.innerHTML = `
+        <div class="phase-text">What comes next in the pattern?</div>
+        <div class="sequence-items" id="shownSequence"></div>
+        <div class="input-buttons" id="inputButtons"></div>
+    `;
+
+    // Show the sequence again (without the last item)
+    const shownContainer = document.getElementById('shownSequence');
+    for (let i = 0; i < currentSequence.length - 1; i++) {
+        const item = document.createElement('div');
+        item.className = `sequence-item ${currentSequence[i].class}`;
+        item.textContent = currentSequence[i].emoji;
+        shownContainer.appendChild(item);
+    }
+
+    // Add question mark
+    const questionMark = document.createElement('div');
+    questionMark.className = 'sequence-item';
+    questionMark.style.background = '#e0e0e0';
+    questionMark.style.color = '#666';
+    questionMark.textContent = '?';
+    shownContainer.appendChild(questionMark);
+
+    // Create input buttons
+    const inputContainer = document.getElementById('inputButtons');
+    const shuffledColors = [...colors].sort(() => Math.random() - 0.5).slice(0, 6);
+
+    shuffledColors.forEach(color => {
+        const btn = document.createElement('button');
+        btn.className = `input-btn ${color.class}`;
+        btn.textContent = color.emoji;
+        btn.onclick = () => checkAnswer(color);
+        inputContainer.appendChild(btn);
+    });
+}
+
+function checkAnswer(selectedColor) {
+    if (phase !== 'input') return;
+
+    const correctAnswer = currentSequence[currentSequence.length - 1];
+    const isCorrect = selectedColor.name === correctAnswer.name;
+
+    if (isCorrect) {
+        correct++;
+        streak++;
+        const points = 10 + (level * 5);
+        score += points;
+
+        showFeedback(true, points);
+
+        // Level up every 3 correct answers
+        if (correct % 3 === 0 && sequenceLength < 8) {
+            level++;
+            sequenceLength++;
+            alert(`🎉 Level Up! Now at level ${level}\nSequence length increased to ${sequenceLength}!`);
+        }
+    } else {
+        wrong++;
+        streak = 0;
+        showFeedback(false, 0);
+    }
+
+    updateStats();
+}
+
+function showFeedback(isCorrect, points) {
+    const displayArea = document.getElementById('displayArea');
+
+    if (isCorrect) {
+        displayArea.innerHTML = `
+            <div class="phase-text" style="color: #4CAF50;">✅ Correct! +${points} points</div>
+            <div class="sequence-items">
+                ${currentSequence.map(c => `<div class="sequence-item ${c.class}">${c.emoji}</div>`).join('')}
+            </div>
+        `;
+    } else {
+        displayArea.innerHTML = `
+            <div class="phase-text" style="color: #f44336;">❌ Wrong!</div>
+            <div class="sequence-items">
+                ${currentSequence.map(c => `<div class="sequence-item ${c.class}">${c.emoji}</div>`).join('')}
+            </div>
+            <p style="margin-top: 20px;">The correct answer was: ${currentSequence[currentSequence.length - 1].emoji}</p>
+        `;
+    }
+
+    setTimeout(() => {
+        displayArea.innerHTML = '<div class="phase-text">Click "Start Round" for next sequence!</div>';
+        phase = 'ready';
+    }, 2000);
+}
+
+function updateStats() {
+    document.getElementById('level').textContent = level;
+    document.getElementById('seqLength').textContent = sequenceLength;
+    document.getElementById('correct').textContent = correct;
+    document.getElementById('wrong').textContent = wrong;
+    document.getElementById('streak').textContent = streak;
+    document.getElementById('score').textContent = score;
+}
+
+function reset() {
+    level = 1;
+    sequenceLength = 3;
+    score = 0;
+    correct = 0;
+    wrong = 0;
+    streak = 0;
+    phase = 'ready';
+
+    updateStats();
+
+    const displayArea = document.getElementById('displayArea');
+    displayArea.innerHTML = '<div class="phase-text">Click "Start Round" to begin!</div>';
+}
+
+// Initialize
+updateStats();
+</script>
+</body>
+</html>

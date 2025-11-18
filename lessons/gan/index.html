@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Generative Adversarial Networks - Interactive Lesson</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 0; }
+.nav-header { background: #2d3748; padding: 15px 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; }
+.nav-header a { color: #90cdf4; text-decoration: none; font-weight: 600; font-size: 1.1em; }
+.nav-title { color: #fff; font-size: 1.2em; font-weight: 700; }
+.container { max-width: 1400px; margin: 20px auto; background: #fff; border-radius: 15px; padding: 40px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+h1 { text-align: center; color: #2d3748; font-size: 2.5em; margin-bottom: 20px; }
+.intro { background: #e3f2fd; padding: 25px; border-radius: 10px; margin-bottom: 30px; line-height: 1.8; }
+.intro h2 { color: #1976d2; margin-bottom: 15px; }
+.content-section { margin: 30px 0; }
+.content-section h3 { color: #2d3748; margin-bottom: 15px; font-size: 1.6em; }
+.content-section p { line-height: 1.8; color: #4a5568; margin-bottom: 15px; }
+.visual-demo { background: #f8f9fa; padding: 30px; border-radius: 10px; margin: 20px 0; text-align: center; }
+canvas { border: 2px solid #ddd; border-radius: 8px; background: #fff; margin: 20px auto; display: block; }
+.info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin: 20px 0; }
+.info-card { background: #f0f4f8; padding: 20px; border-radius: 10px; border-left: 4px solid #667eea; }
+.info-card h4 { color: #667eea; margin-bottom: 10px; }
+.info-card ul { margin-left: 20px; line-height: 1.8; color: #4a5568; }
+.highlight { background: #fff9c4; padding: 20px; border-radius: 10px; border-left: 4px solid #fbc02d; margin: 20px 0; }
+.highlight h4 { color: #f57c00; margin-bottom: 10px; }
+.example-box { background: #e8f5e9; padding: 20px; border-radius: 10px; margin: 20px 0; border-left: 4px solid #4CAF50; }
+.example-box h4 { color: #2e7d32; margin-bottom: 10px; }
+.controls { text-align: center; margin: 20px 0; }
+button { padding: 15px 30px; margin: 10px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 1.1em; background: #667eea; color: white; transition: all 0.3s; }
+button:hover { background: #5568d3; transform: translateY(-2px); }
+.adversarial-box { background: #fff3e0; padding: 20px; border-radius: 10px; margin: 20px 0; border-left: 4px solid #FF9800; }
+.adversarial-box h4 { color: #E65100; margin-bottom: 10px; }
+</style>
+</head>
+<body>
+<nav class="nav-header">
+    <div class="nav-title">🎨 Generative Adversarial Networks</div>
+    <a href="../../index.html">← Back to Home</a>
+</nav>
+<div class="container">
+    <h1>🎨 Generative Adversarial Networks (GAN)</h1>
+
+    <div class="intro">
+        <h2>What is a GAN?</h2>
+        <p>
+            Generative Adversarial Networks (GANs) are a revolutionary approach to generative modeling where
+            two neural networks compete against each other in a game. The <strong>Generator</strong> creates
+            fake data trying to fool the <strong>Discriminator</strong>, while the Discriminator tries to
+            distinguish real data from fake. Through this adversarial training, GANs can generate incredibly
+            realistic images, videos, and even music. They're behind deepfakes, art generation, and photo
+            enhancement.
+        </p>
+    </div>
+
+    <div class="content-section">
+        <h3>📚 Key Concepts</h3>
+        <div class="info-grid">
+            <div class="info-card">
+                <h4>The Two Networks</h4>
+                <ul>
+                    <li><strong>Generator (G):</strong> Creates fake data from random noise</li>
+                    <li><strong>Discriminator (D):</strong> Classifies data as real or fake</li>
+                    <li><strong>Adversarial:</strong> They compete against each other</li>
+                    <li><strong>Goal:</strong> Generator tries to fool Discriminator</li>
+                </ul>
+            </div>
+
+            <div class="info-card">
+                <h4>How It Works</h4>
+                <ul>
+                    <li>Generator creates fake samples</li>
+                    <li>Discriminator sees real and fake samples</li>
+                    <li>Both networks improve through competition</li>
+                    <li>Reaches equilibrium when fakes look real</li>
+                </ul>
+            </div>
+
+            <div class="info-card">
+                <h4>Training Process</h4>
+                <ul>
+                    <li><strong>Step 1:</strong> Train D on real and fake data</li>
+                    <li><strong>Step 2:</strong> Train G to fool D</li>
+                    <li><strong>Alternate:</strong> Train D and G in turns</li>
+                    <li><strong>Converge:</strong> When D can't tell real from fake</li>
+                </ul>
+            </div>
+
+            <div class="info-card">
+                <h4>Applications</h4>
+                <ul>
+                    <li>Image generation and synthesis</li>
+                    <li>Photo enhancement and super-resolution</li>
+                    <li>Style transfer and artistic creation</li>
+                    <li>Video generation and deepfakes</li>
+                    <li>Data augmentation for training</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="visual-demo">
+        <h3>🎨 GAN Training Visualization</h3>
+        <p>Watch the Generator and Discriminator compete!</p>
+        <canvas id="ganCanvas" width="800" height="400"></canvas>
+        <div class="controls">
+            <button onclick="animateGAN()">▶️ Animate Training</button>
+            <button onclick="reset()">↺ Reset</button>
+        </div>
+        <p style="margin-top: 15px; color: #666;">
+            Generator improves over time, creating increasingly realistic samples
+        </p>
+    </div>
+
+    <div class="highlight">
+        <h4>🔑 Key Insight</h4>
+        <p>
+            GANs use an ingenious <strong>adversarial training</strong> approach inspired by game theory.
+            Think of it like a counterfeiter (Generator) trying to make fake money and a detective
+            (Discriminator) trying to spot fakes. As the detective gets better at spotting fakes, the
+            counterfeiter must improve their technique. Eventually, the counterfeiter becomes so good that
+            even the expert detective can't tell real from fake. This competitive process drives both
+            networks to improve, resulting in highly realistic generated content.
+        </p>
+    </div>
+
+    <div class="example-box">
+        <h4>🌟 Real-World Example: Face Generation</h4>
+        <p>
+            Training a GAN to generate realistic human faces:<br><br>
+            <strong>Initial:</strong> Generator produces random noise that looks nothing like faces<br>
+            <strong>Iteration 100:</strong> Vague face-like blobs appear, Discriminator easily spots fakes (95% accuracy)<br>
+            <strong>Iteration 1000:</strong> Recognizable faces with odd features, Discriminator accuracy drops to 80%<br>
+            <strong>Iteration 10000:</strong> Realistic faces with minor artifacts, Discriminator at 60% accuracy<br>
+            <strong>Iteration 50000:</strong> Photorealistic faces, Discriminator can barely tell real from fake (52% accuracy)<br>
+            <strong>Result:</strong> Generator creates faces indistinguishable from real photos!
+        </p>
+    </div>
+
+    <div class="adversarial-box">
+        <h4>⚔️ The Adversarial Game</h4>
+        <p style="line-height: 1.7;">
+            <strong>Generator's Objective:</strong> Maximize log(D(G(z))) - fool the discriminator<br>
+            <strong>Discriminator's Objective:</strong> Maximize log(D(x)) + log(1 - D(G(z))) - correctly classify real and fake<br><br>
+            This is a minimax game where one player's gain is another's loss. The networks reach a Nash
+            equilibrium when the Generator produces perfect fakes and the Discriminator can only guess randomly
+            (50% accuracy). At this point, the Generator has learned the true data distribution!
+        </p>
+    </div>
+
+    <div class="content-section">
+        <h3>⚡ GAN Training Steps</h3>
+        <p>
+            <strong>1. Initialize:</strong> Create both Generator and Discriminator networks with random weights<br>
+            <strong>2. Train Discriminator:</strong> Show it real data (label 1) and generated fake data (label 0)<br>
+            <strong>3. Train Generator:</strong> Generate fakes and get Discriminator's feedback (try to get label 1)<br>
+            <strong>4. Alternate:</strong> Train D for k steps, then G for 1 step (typically k=1)<br>
+            <strong>5. Monitor:</strong> Watch Discriminator accuracy approach 50% (random guessing)<br>
+            <strong>6. Converge:</strong> Stop when generated samples look realistic and D can't distinguish them
+        </p>
+    </div>
+
+    <div class="content-section">
+        <h3>🔄 Popular GAN Variants</h3>
+        <div class="info-grid">
+            <div class="info-card">
+                <h4>DCGAN</h4>
+                <p style="font-size: 0.95em; line-height: 1.7;">
+                    <strong>Deep Convolutional GAN:</strong> Uses CNNs for both networks, stable training,
+                    produces high-quality images. Foundation for many modern GANs.
+                </p>
+            </div>
+
+            <div class="info-card">
+                <h4>StyleGAN</h4>
+                <p style="font-size: 0.95em; line-height: 1.7;">
+                    <strong>Style-Based Generator:</strong> Controls different aspects of generated images
+                    at different levels. Creates photorealistic faces with adjustable features.
+                </p>
+            </div>
+
+            <div class="info-card">
+                <h4>CycleGAN</h4>
+                <p style="font-size: 0.95em; line-height: 1.7;">
+                    <strong>Unpaired Image Translation:</strong> Converts images between domains (horses↔zebras,
+                    summer↔winter) without paired training data.
+                </p>
+            </div>
+
+            <div class="info-card">
+                <h4>Pix2Pix</h4>
+                <p style="font-size: 0.95em; line-height: 1.7;">
+                    <strong>Paired Image Translation:</strong> Converts images with paired training data
+                    (sketches→photos, day→night, maps→satellite images).
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="info-grid" style="margin-top: 30px;">
+        <div class="example-box">
+            <h4>✅ Advantages</h4>
+            <ul>
+                <li>Generates highly realistic samples</li>
+                <li>No need for explicit probability models</li>
+                <li>Can learn complex data distributions</li>
+                <li>Versatile across many domains</li>
+                <li>Continuously improving through competition</li>
+            </ul>
+        </div>
+
+        <div class="highlight" style="background: #ffebee;">
+            <h4>⚠️ Limitations</h4>
+            <ul>
+                <li>Training instability and mode collapse</li>
+                <li>Difficult to achieve convergence</li>
+                <li>Requires careful hyperparameter tuning</li>
+                <li>Prone to generating artifacts</li>
+                <li>No direct way to control output</li>
+                <li>Ethical concerns (deepfakes, misinformation)</li>
+            </ul>
+        </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 40px;">
+        <a href="../../games/gan/index.html" style="display: inline-block; background: #4CAF50; color: white; padding: 20px 40px; border-radius: 10px; text-decoration: none; font-weight: 700; font-size: 1.2em;">
+            🎮 Play the GAN Game →
+        </a>
+    </div>
+</div>
+
+<script>
+const canvas = document.getElementById('ganCanvas');
+const ctx = canvas.getContext('2d');
+
+let animating = false;
+let trainingStep = 0;
+
+function drawGAN() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const genX = 150;
+    const discX = 550;
+    const y = 200;
+    const boxSize = 120;
+
+    // Draw Generator
+    ctx.fillStyle = '#E3F2FD';
+    ctx.fillRect(genX - boxSize/2, y - boxSize/2, boxSize, boxSize);
+    ctx.strokeStyle = '#2196F3';
+    ctx.lineWidth = 3;
+    ctx.strokeRect(genX - boxSize/2, y - boxSize/2, boxSize, boxSize);
+
+    ctx.fillStyle = '#2d3748';
+    ctx.font = 'bold 16px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('Generator', genX, y - 10);
+    ctx.font = '12px Arial';
+    ctx.fillText('Creates Fakes', genX, y + 10);
+
+    // Draw noise input
+    ctx.strokeStyle = '#999';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(genX, y + boxSize/2 + 20);
+    ctx.lineTo(genX, y + boxSize/2);
+    ctx.stroke();
+    ctx.fillText('Random Noise', genX, y + boxSize/2 + 35);
+
+    // Draw Discriminator
+    ctx.fillStyle = '#FCE4EC';
+    ctx.fillRect(discX - boxSize/2, y - boxSize/2, boxSize, boxSize);
+    ctx.strokeStyle = '#E91E63';
+    ctx.lineWidth = 3;
+    ctx.strokeRect(discX - boxSize/2, y - boxSize/2, boxSize, boxSize);
+
+    ctx.fillStyle = '#2d3748';
+    ctx.font = 'bold 16px Arial';
+    ctx.fillText('Discriminator', discX, y - 10);
+    ctx.font = '12px Arial';
+    ctx.fillText('Real or Fake?', discX, y + 10);
+
+    // Draw arrow from Generator to Discriminator
+    const arrowColor = animating && trainingStep > 0 ? '#4CAF50' : '#999';
+    ctx.strokeStyle = arrowColor;
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(genX + boxSize/2, y);
+    ctx.lineTo(discX - boxSize/2, y);
+    ctx.stroke();
+
+    // Arrow head
+    ctx.beginPath();
+    ctx.moveTo(discX - boxSize/2 - 10, y - 5);
+    ctx.lineTo(discX - boxSize/2, y);
+    ctx.lineTo(discX - boxSize/2 - 10, y + 5);
+    ctx.stroke();
+
+    // Draw fake sample
+    if (animating && trainingStep > 0) {
+        const quality = Math.min(trainingStep / 10, 1);
+        const sampleX = (genX + discX) / 2;
+        const sampleY = y - 80;
+
+        ctx.fillStyle = `rgba(76, 175, 80, ${quality})`;
+        ctx.beginPath();
+        ctx.arc(sampleX, sampleY, 30, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = '#2d3748';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        ctx.fillStyle = '#2d3748';
+        ctx.font = '12px Arial';
+        ctx.fillText(`Quality: ${Math.round(quality * 100)}%`, sampleX, sampleY + 50);
+    }
+
+    // Draw real data input
+    ctx.strokeStyle = '#999';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(discX, y - boxSize/2 - 20);
+    ctx.lineTo(discX, y - boxSize/2);
+    ctx.stroke();
+    ctx.fillStyle = '#2d3748';
+    ctx.font = '12px Arial';
+    ctx.fillText('Real Data', discX, y - boxSize/2 - 30);
+
+    // Training step indicator
+    if (animating) {
+        ctx.font = 'bold 18px Arial';
+        ctx.fillStyle = '#667eea';
+        ctx.textAlign = 'center';
+        ctx.fillText(`Training Step: ${trainingStep}`, canvas.width / 2, 50);
+
+        const discAccuracy = Math.max(95 - trainingStep * 4, 50);
+        ctx.font = '14px Arial';
+        ctx.fillText(`Discriminator Accuracy: ${discAccuracy}%`, canvas.width / 2, 380);
+    }
+}
+
+function animateGAN() {
+    if (animating) return;
+    animating = true;
+    trainingStep = 0;
+
+    const interval = setInterval(() => {
+        trainingStep++;
+        drawGAN();
+
+        if (trainingStep >= 12) {
+            animating = false;
+            clearInterval(interval);
+        }
+    }, 500);
+}
+
+function reset() {
+    animating = false;
+    trainingStep = 0;
+    drawGAN();
+}
+
+// Initial draw
+drawGAN();
+</script>
+</body>
+</html>

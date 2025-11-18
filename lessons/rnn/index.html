@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Recurrent Neural Networks - Interactive Lesson</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 0; }
+.nav-header { background: #2d3748; padding: 15px 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; }
+.nav-header a { color: #90cdf4; text-decoration: none; font-weight: 600; font-size: 1.1em; }
+.nav-title { color: #fff; font-size: 1.2em; font-weight: 700; }
+.container { max-width: 1400px; margin: 20px auto; background: #fff; border-radius: 15px; padding: 40px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+h1 { text-align: center; color: #2d3748; font-size: 2.5em; margin-bottom: 20px; }
+.intro { background: #e3f2fd; padding: 25px; border-radius: 10px; margin-bottom: 30px; line-height: 1.8; }
+.intro h2 { color: #1976d2; margin-bottom: 15px; }
+.content-section { margin: 30px 0; }
+.content-section h3 { color: #2d3748; margin-bottom: 15px; font-size: 1.6em; }
+.content-section p { line-height: 1.8; color: #4a5568; margin-bottom: 15px; }
+.visual-demo { background: #f8f9fa; padding: 30px; border-radius: 10px; margin: 20px 0; text-align: center; }
+canvas { border: 2px solid #ddd; border-radius: 8px; background: #fff; margin: 20px auto; display: block; }
+.info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin: 20px 0; }
+.info-card { background: #f0f4f8; padding: 20px; border-radius: 10px; border-left: 4px solid #667eea; }
+.info-card h4 { color: #667eea; margin-bottom: 10px; }
+.info-card ul { margin-left: 20px; line-height: 1.8; color: #4a5568; }
+.highlight { background: #fff9c4; padding: 20px; border-radius: 10px; border-left: 4px solid #fbc02d; margin: 20px 0; }
+.highlight h4 { color: #f57c00; margin-bottom: 10px; }
+.example-box { background: #e8f5e9; padding: 20px; border-radius: 10px; margin: 20px 0; border-left: 4px solid #4CAF50; }
+.example-box h4 { color: #2e7d32; margin-bottom: 10px; }
+.controls { text-align: center; margin: 20px 0; }
+button { padding: 15px 30px; margin: 10px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 1.1em; background: #667eea; color: white; transition: all 0.3s; }
+button:hover { background: #5568d3; transform: translateY(-2px); }
+.sequence-demo { display: flex; gap: 10px; justify-content: center; align-items: center; margin: 20px 0; flex-wrap: wrap; }
+.sequence-item { background: #667eea; color: white; padding: 15px 25px; border-radius: 8px; font-weight: bold; font-size: 1.2em; }
+</style>
+</head>
+<body>
+<nav class="nav-header">
+    <div class="nav-title">🔄 Recurrent Neural Networks</div>
+    <a href="../../index.html">← Back to Home</a>
+</nav>
+<div class="container">
+    <h1>🔄 Recurrent Neural Networks (RNN)</h1>
+
+    <div class="intro">
+        <h2>What is a Recurrent Neural Network?</h2>
+        <p>
+            Unlike feedforward networks, Recurrent Neural Networks (RNNs) have memory! They process
+            sequences by maintaining a hidden state that gets updated at each time step. This allows
+            them to remember previous inputs, making them perfect for tasks involving sequential data
+            like text, speech, and time series.
+        </p>
+    </div>
+
+    <div class="content-section">
+        <h3>📚 Key Concepts</h3>
+        <div class="info-grid">
+            <div class="info-card">
+                <h4>Architecture</h4>
+                <ul>
+                    <li><strong>Hidden State:</strong> Memory that persists across time steps</li>
+                    <li><strong>Recurrent Connection:</strong> Output feeds back as input</li>
+                    <li><strong>Temporal Dynamics:</strong> Process sequences step-by-step</li>
+                    <li><strong>Weight Sharing:</strong> Same weights used at each time step</li>
+                </ul>
+            </div>
+
+            <div class="info-card">
+                <h4>How It Works</h4>
+                <ul>
+                    <li>Process one element of sequence at a time</li>
+                    <li>Update hidden state with current input</li>
+                    <li>Hidden state carries information forward</li>
+                    <li>Can handle variable-length sequences</li>
+                </ul>
+            </div>
+
+            <div class="info-card">
+                <h4>Common Types</h4>
+                <ul>
+                    <li><strong>Vanilla RNN:</strong> Basic recurrent architecture</li>
+                    <li><strong>Bidirectional RNN:</strong> Process forward and backward</li>
+                    <li><strong>Deep RNN:</strong> Multiple stacked layers</li>
+                    <li><strong>GRU:</strong> Simplified LSTM variant</li>
+                </ul>
+            </div>
+
+            <div class="info-card">
+                <h4>Applications</h4>
+                <ul>
+                    <li>Language modeling and text generation</li>
+                    <li>Speech recognition</li>
+                    <li>Machine translation</li>
+                    <li>Time series prediction</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="visual-demo">
+        <h3>🎨 Sequence Processing Visualization</h3>
+        <p>Watch how an RNN processes a sequence word by word</p>
+
+        <div class="sequence-demo" id="sequenceDemo">
+            <div class="sequence-item">The</div>
+            <div class="sequence-item">→</div>
+            <div class="sequence-item">cat</div>
+            <div class="sequence-item">→</div>
+            <div class="sequence-item">sat</div>
+            <div class="sequence-item">→</div>
+            <div class="sequence-item">?</div>
+        </div>
+
+        <canvas id="rnnCanvas" width="800" height="300"></canvas>
+        <div class="controls">
+            <button onclick="animateSequence()">▶️ Process Sequence</button>
+            <button onclick="resetAnimation()">🔄 Reset</button>
+        </div>
+        <p style="margin-top: 15px; color: #666;">
+            Hidden state (blue) accumulates information as it processes each word
+        </p>
+    </div>
+
+    <div class="highlight">
+        <h4>🔑 Key Insight</h4>
+        <p>
+            The power of RNNs comes from their ability to maintain a "memory" through the hidden state.
+            Each time step, the network considers both the current input AND what it remembers from
+            previous steps. This makes them fundamentally different from feedforward networks that
+            treat each input independently.
+        </p>
+    </div>
+
+    <div class="example-box">
+        <h4>🌟 Real-World Example: Text Prediction</h4>
+        <p>
+            When your phone predicts the next word you'll type:<br><br>
+            <strong>Input:</strong> "I love eating"<br>
+            <strong>Step 1:</strong> Process "I" → Hidden state remembers subject<br>
+            <strong>Step 2:</strong> Process "love" → Remembers positive sentiment<br>
+            <strong>Step 3:</strong> Process "eating" → Combines all context<br>
+            <strong>Output:</strong> Predict likely next words: "pizza", "ice cream", "sushi"
+        </p>
+    </div>
+
+    <div class="content-section">
+        <h3>⚡ How RNNs Process Sequences</h3>
+        <p>
+            <strong>1. Initialize:</strong> Start with a zero or random hidden state.<br>
+            <strong>2. First Input:</strong> Combine input with hidden state to produce new hidden state.<br>
+            <strong>3. Subsequent Inputs:</strong> Each new input updates the hidden state, carrying forward information.<br>
+            <strong>4. Output:</strong> At each step (or just the final step), produce an output based on hidden state.<br>
+            <strong>5. Training:</strong> Use Backpropagation Through Time (BPTT) to learn patterns.
+        </p>
+    </div>
+
+    <div class="info-grid" style="margin-top: 30px;">
+        <div class="example-box">
+            <h4>✅ Advantages</h4>
+            <ul>
+                <li>Can process variable-length sequences</li>
+                <li>Maintains memory of previous inputs</li>
+                <li>Shares parameters across time steps</li>
+                <li>Perfect for sequential data</li>
+            </ul>
+        </div>
+
+        <div class="highlight" style="background: #ffebee;">
+            <h4>⚠️ Limitations</h4>
+            <ul>
+                <li>Vanishing gradient problem</li>
+                <li>Difficulty learning long-term dependencies</li>
+                <li>Sequential processing (slow training)</li>
+                <li>Hard to parallelize</li>
+            </ul>
+        </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 40px;">
+        <a href="../../games/rnn/index.html" style="display: inline-block; background: #4CAF50; color: white; padding: 20px 40px; border-radius: 10px; text-decoration: none; font-weight: 700; font-size: 1.2em;">
+            🎮 Play the RNN Game →
+        </a>
+    </div>
+</div>
+
+<script>
+const canvas = document.getElementById('rnnCanvas');
+const ctx = canvas.getContext('2d');
+
+let animationStep = 0;
+let isAnimating = false;
+const sequence = ['The', 'cat', 'sat'];
+
+function drawRNN() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const steps = 4;
+    const stepWidth = canvas.width / (steps + 1);
+    const cellY = canvas.height / 2;
+
+    for (let i = 0; i < steps; i++) {
+        const x = (i + 1) * stepWidth;
+        const isActive = i < animationStep;
+
+        // Draw RNN cell
+        ctx.fillStyle = isActive ? '#667eea' : '#e0e0e0';
+        ctx.fillRect(x - 40, cellY - 40, 80, 80);
+        ctx.strokeStyle = '#2d3748';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(x - 40, cellY - 40, 80, 80);
+
+        // Draw label
+        ctx.fillStyle = '#2d3748';
+        ctx.font = '14px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('RNN', x, cellY);
+
+        // Draw input arrow
+        ctx.strokeStyle = isActive ? '#4CAF50' : '#ccc';
+        ctx.beginPath();
+        ctx.moveTo(x, cellY - 80);
+        ctx.lineTo(x, cellY - 40);
+        ctx.stroke();
+
+        // Draw input text
+        if (i < sequence.length) {
+            ctx.fillStyle = isActive ? '#4CAF50' : '#999';
+            ctx.fillText(sequence[i], x, cellY - 90);
+        }
+
+        // Draw recurrent connection
+        if (i < steps - 1) {
+            ctx.strokeStyle = isActive ? '#667eea' : '#ccc';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(x + 40, cellY);
+            ctx.lineTo(x + stepWidth - 40, cellY);
+            ctx.stroke();
+
+            // Arrow head
+            ctx.beginPath();
+            ctx.moveTo(x + stepWidth - 45, cellY - 5);
+            ctx.lineTo(x + stepWidth - 40, cellY);
+            ctx.lineTo(x + stepWidth - 45, cellY + 5);
+            ctx.stroke();
+
+            // Hidden state label
+            if (isActive) {
+                ctx.fillStyle = '#667eea';
+                ctx.font = '12px Arial';
+                ctx.fillText('h' + i, x + stepWidth/2, cellY - 10);
+            }
+        }
+    }
+}
+
+function animateSequence() {
+    if (isAnimating) return;
+    isAnimating = true;
+    animationStep = 0;
+
+    const interval = setInterval(() => {
+        animationStep++;
+        drawRNN();
+
+        if (animationStep > 4) {
+            isAnimating = false;
+            clearInterval(interval);
+        }
+    }, 800);
+}
+
+function resetAnimation() {
+    isAnimating = false;
+    animationStep = 0;
+    drawRNN();
+}
+
+// Initial draw
+drawRNN();
+</script>
+</body>
+</html>
