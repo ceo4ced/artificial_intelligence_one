@@ -1,0 +1,1069 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Autoencoder Visualizer - Deep Learning Tool</title>
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 0;
+}
+
+.nav-header {
+    background: #2d3748;
+    padding: 15px 30px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.nav-header a {
+    color: #90cdf4;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1.1em;
+    transition: color 0.3s;
+    margin-left: 15px;
+}
+
+.nav-header a:hover {
+    color: #63b3ed;
+}
+
+.nav-title {
+    color: #fff;
+    font-size: 1.2em;
+    font-weight: 700;
+}
+
+.nav-links {
+    display: flex;
+    gap: 10px;
+}
+
+.page-wrapper {
+    padding: 20px;
+}
+
+.container {
+    max-width: 1600px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+
+h1 {
+    text-align: center;
+    color: #2d3748;
+    margin-bottom: 10px;
+    font-size: 2.5em;
+}
+
+.subtitle {
+    text-align: center;
+    color: #4a5568;
+    margin-bottom: 30px;
+    font-size: 1.1em;
+}
+
+.info-section {
+    background: #e8f5e9;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 25px;
+    border-left: 5px solid #4CAF50;
+}
+
+.info-section h3 {
+    color: #2e7d32;
+    margin-bottom: 10px;
+}
+
+.info-section p {
+    color: #1b5e20;
+    line-height: 1.6;
+    margin-bottom: 8px;
+}
+
+.info-section ul {
+    list-style-position: inside;
+    color: #1b5e20;
+    line-height: 1.8;
+}
+
+.main-content {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 30px;
+    margin-bottom: 30px;
+}
+
+.sidebar {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 10px;
+    height: fit-content;
+}
+
+.sidebar h3 {
+    color: #2d3748;
+    margin-bottom: 15px;
+    font-size: 1.3em;
+}
+
+.control-section {
+    margin-bottom: 20px;
+}
+
+.control-section label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #4a5568;
+}
+
+button {
+    width: 100%;
+    padding: 12px;
+    font-size: 14px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    margin-bottom: 10px;
+}
+
+button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+.btn-primary {
+    background: #4CAF50;
+    color: #fff;
+}
+
+.btn-primary:hover {
+    background: #45a049;
+}
+
+.btn-secondary {
+    background: #2196F3;
+    color: #fff;
+}
+
+.btn-secondary:hover {
+    background: #0b7dda;
+}
+
+.btn-danger {
+    background: #f44336;
+    color: #fff;
+}
+
+.btn-danger:hover {
+    background: #da190b;
+}
+
+.btn-warning {
+    background: #ff9800;
+    color: #fff;
+}
+
+.btn-warning:hover {
+    background: #e68900;
+}
+
+.slider-control {
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.slider-value {
+    text-align: center;
+    font-weight: 600;
+    color: #667eea;
+    margin-bottom: 10px;
+    font-size: 1.2em;
+}
+
+select {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+.canvas-container {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    padding: 20px;
+}
+
+.canvas-box {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.canvas-box h4 {
+    color: #2d3748;
+    margin-bottom: 10px;
+    font-size: 1.1em;
+}
+
+canvas {
+    display: block;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    background: #fafafa;
+    margin: 0 auto;
+}
+
+.status-indicator {
+    background: #e3f2fd;
+    padding: 10px;
+    border-radius: 6px;
+    margin-bottom: 15px;
+    font-size: 0.9em;
+    color: #1565c0;
+    font-weight: 600;
+    text-align: center;
+}
+
+.sample-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+    margin-bottom: 15px;
+}
+
+.sample-button {
+    padding: 8px;
+    font-size: 11px;
+    margin-bottom: 0;
+}
+
+.metrics-display {
+    background: #f0f4f8;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+
+.metric-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+    font-size: 0.9em;
+}
+
+.metric-label {
+    color: #4a5568;
+    font-weight: 600;
+}
+
+.metric-value {
+    color: #2d3748;
+    font-weight: 700;
+}
+
+.two-column-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+@media (max-width: 1400px) {
+    .main-content {
+        grid-template-columns: 1fr;
+    }
+
+    .two-column-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+</head>
+<body>
+<nav class="nav-header">
+    <div class="nav-title">Autoencoder Visualizer</div>
+    <div class="nav-links">
+        <a href="../../deep-learning.html">Deep Learning Hub</a>
+        <a href="../../index.html">Home</a>
+    </div>
+</nav>
+
+<div class="page-wrapper">
+    <div class="container">
+        <h1>Autoencoder Visualizer</h1>
+        <p class="subtitle">Explore compression and reconstruction through neural networks!</p>
+
+        <div class="info-section">
+            <h3>What is an Autoencoder?</h3>
+            <p>
+                An autoencoder is a neural network that learns to compress data into a smaller representation
+                (encoding) and then reconstruct it back to the original form (decoding). It's like learning
+                to zip and unzip files, but the network discovers the best compression strategy automatically!
+            </p>
+            <p><strong>Key concepts:</strong></p>
+            <ul>
+                <li><strong>Encoder:</strong> Compresses input into a compact latent representation</li>
+                <li><strong>Bottleneck/Latent Space:</strong> The compressed middle layer with reduced dimensions</li>
+                <li><strong>Decoder:</strong> Reconstructs the original input from the compressed representation</li>
+                <li><strong>Reconstruction Loss:</strong> Measures how well the output matches the input</li>
+                <li><strong>Dimensionality Reduction:</strong> Compressing data while preserving key features</li>
+                <li><strong>Unsupervised Learning:</strong> Learns patterns without labeled data</li>
+            </ul>
+            <p>
+                <strong>Instructions:</strong> Select sample patterns below to see encoding and reconstruction.
+                Adjust the bottleneck size to experiment with different compression levels. Watch how the latent
+                space organizes similar patterns together!
+            </p>
+        </div>
+
+        <div class="main-content">
+            <div class="sidebar">
+                <h3>Controls</h3>
+
+                <div class="status-indicator" id="statusIndicator">
+                    Ready - Select a sample
+                </div>
+
+                <div class="metrics-display" id="metricsDisplay">
+                    <div class="metric-row">
+                        <span class="metric-label">Latent Dimensions:</span>
+                        <span class="metric-value" id="latentDimValue">4</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Compression Ratio:</span>
+                        <span class="metric-value" id="compressionValue">16:1</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Reconstruction Loss:</span>
+                        <span class="metric-value" id="lossValue">0.00</span>
+                    </div>
+                </div>
+
+                <div class="control-section">
+                    <label>Bottleneck Size: <span id="bottleneckValue">4</span></label>
+                    <input type="range" class="slider-control" id="bottleneckSlider"
+                           min="2" max="16" step="1" value="4"
+                           oninput="updateBottleneck()">
+                </div>
+
+                <button class="btn-primary" onclick="trainAutoencoder()">Train Autoencoder</button>
+                <button class="btn-secondary" onclick="encodeAll()">Encode All Samples</button>
+                <button class="btn-danger" onclick="reset()">Reset</button>
+
+                <div class="control-section">
+                    <label>Digits (0-4):</label>
+                    <div class="sample-grid">
+                        <button class="btn-secondary sample-button" onclick="selectSample('digit', 0)">0</button>
+                        <button class="btn-secondary sample-button" onclick="selectSample('digit', 1)">1</button>
+                        <button class="btn-secondary sample-button" onclick="selectSample('digit', 2)">2</button>
+                        <button class="btn-secondary sample-button" onclick="selectSample('digit', 3)">3</button>
+                        <button class="btn-secondary sample-button" onclick="selectSample('digit', 4)">4</button>
+                    </div>
+                </div>
+
+                <div class="control-section">
+                    <label>Shapes:</label>
+                    <div class="sample-grid">
+                        <button class="btn-secondary sample-button" onclick="selectSample('shape', 0)">■</button>
+                        <button class="btn-secondary sample-button" onclick="selectSample('shape', 1)">●</button>
+                        <button class="btn-secondary sample-button" onclick="selectSample('shape', 2)">▲</button>
+                        <button class="btn-secondary sample-button" onclick="selectSample('shape', 3)">+</button>
+                        <button class="btn-secondary sample-button" onclick="selectSample('shape', 4)">◆</button>
+                    </div>
+                </div>
+
+                <div class="control-section">
+                    <label>Patterns:</label>
+                    <div class="sample-grid">
+                        <button class="btn-secondary sample-button" onclick="selectSample('pattern', 0)">═</button>
+                        <button class="btn-secondary sample-button" onclick="selectSample('pattern', 1)">║</button>
+                        <button class="btn-secondary sample-button" onclick="selectSample('pattern', 2)">╱</button>
+                        <button class="btn-secondary sample-button" onclick="selectSample('pattern', 3)">╲</button>
+                        <button class="btn-secondary sample-button" onclick="selectSample('pattern', 4)">▦</button>
+                    </div>
+                </div>
+
+                <div class="control-section">
+                    <label>Complex:</label>
+                    <div class="sample-grid">
+                        <button class="btn-secondary sample-button" onclick="selectSample('complex', 0)">☺</button>
+                        <button class="btn-secondary sample-button" onclick="selectSample('complex', 1)">✓</button>
+                        <button class="btn-secondary sample-button" onclick="selectSample('complex', 2)">✕</button>
+                        <button class="btn-secondary sample-button" onclick="selectSample('complex', 3)">★</button>
+                        <button class="btn-secondary sample-button" onclick="selectSample('complex', 4)">♥</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="canvas-container">
+                <div class="canvas-box">
+                    <h4>Network Architecture (Hourglass Shape)</h4>
+                    <canvas id="architectureCanvas" width="900" height="400"></canvas>
+                </div>
+
+                <div class="two-column-grid">
+                    <div class="canvas-box">
+                        <h4>Input vs Reconstruction</h4>
+                        <canvas id="comparisonCanvas" width="400" height="200"></canvas>
+                    </div>
+
+                    <div class="canvas-box">
+                        <h4>Latent Space (2D Projection)</h4>
+                        <canvas id="latentCanvas" width="500" height="500"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const architectureCanvas = document.getElementById('architectureCanvas');
+const comparisonCanvas = document.getElementById('comparisonCanvas');
+const latentCanvas = document.getElementById('latentCanvas');
+
+const archCtx = architectureCanvas.getContext('2d');
+const compCtx = comparisonCanvas.getContext('2d');
+const latentCtx = latentCanvas.getContext('2d');
+
+const GRID_SIZE = 8;
+const INPUT_SIZE = 64;
+
+let bottleneckSize = 4;
+let currentSample = null;
+let currentCategory = null;
+let currentIndex = null;
+let latentPoints = [];
+let isTraining = false;
+
+// Sample data patterns (8x8 grids)
+const samples = {
+    digit: [
+        // 0
+        [[0,1,1,1,1,1,1,0],
+         [1,1,0,0,0,0,1,1],
+         [1,0,0,0,0,0,0,1],
+         [1,0,0,0,0,0,0,1],
+         [1,0,0,0,0,0,0,1],
+         [1,0,0,0,0,0,0,1],
+         [1,1,0,0,0,0,1,1],
+         [0,1,1,1,1,1,1,0]],
+        // 1
+        [[0,0,0,1,1,0,0,0],
+         [0,0,1,1,1,0,0,0],
+         [0,1,1,1,1,0,0,0],
+         [0,0,0,1,1,0,0,0],
+         [0,0,0,1,1,0,0,0],
+         [0,0,0,1,1,0,0,0],
+         [0,0,0,1,1,0,0,0],
+         [1,1,1,1,1,1,1,1]],
+        // 2
+        [[0,1,1,1,1,1,0,0],
+         [1,1,0,0,0,1,1,0],
+         [0,0,0,0,0,1,1,0],
+         [0,0,0,0,1,1,0,0],
+         [0,0,0,1,1,0,0,0],
+         [0,0,1,1,0,0,0,0],
+         [0,1,1,0,0,0,0,0],
+         [1,1,1,1,1,1,1,1]],
+        // 3
+        [[1,1,1,1,1,1,1,1],
+         [0,0,0,0,0,1,1,0],
+         [0,0,0,0,1,1,0,0],
+         [0,0,0,1,1,1,0,0],
+         [0,0,0,0,0,1,1,0],
+         [0,0,0,0,0,0,1,1],
+         [1,1,0,0,0,1,1,0],
+         [0,1,1,1,1,1,0,0]],
+        // 4
+        [[0,0,0,0,1,1,0,0],
+         [0,0,0,1,1,1,0,0],
+         [0,0,1,1,1,1,0,0],
+         [0,1,1,0,1,1,0,0],
+         [1,1,0,0,1,1,0,0],
+         [1,1,1,1,1,1,1,1],
+         [0,0,0,0,1,1,0,0],
+         [0,0,0,0,1,1,0,0]]
+    ],
+    shape: [
+        // Square
+        [[1,1,1,1,1,1,1,1],
+         [1,1,1,1,1,1,1,1],
+         [1,1,0,0,0,0,1,1],
+         [1,1,0,0,0,0,1,1],
+         [1,1,0,0,0,0,1,1],
+         [1,1,0,0,0,0,1,1],
+         [1,1,1,1,1,1,1,1],
+         [1,1,1,1,1,1,1,1]],
+        // Circle
+        [[0,0,1,1,1,1,0,0],
+         [0,1,1,1,1,1,1,0],
+         [1,1,1,0,0,1,1,1],
+         [1,1,0,0,0,0,1,1],
+         [1,1,0,0,0,0,1,1],
+         [1,1,1,0,0,1,1,1],
+         [0,1,1,1,1,1,1,0],
+         [0,0,1,1,1,1,0,0]],
+        // Triangle
+        [[0,0,0,1,1,0,0,0],
+         [0,0,1,1,1,1,0,0],
+         [0,0,1,1,1,1,0,0],
+         [0,1,1,0,0,1,1,0],
+         [0,1,1,0,0,1,1,0],
+         [1,1,0,0,0,0,1,1],
+         [1,1,1,1,1,1,1,1],
+         [1,1,1,1,1,1,1,1]],
+        // Plus
+        [[0,0,0,1,1,0,0,0],
+         [0,0,0,1,1,0,0,0],
+         [0,0,0,1,1,0,0,0],
+         [1,1,1,1,1,1,1,1],
+         [1,1,1,1,1,1,1,1],
+         [0,0,0,1,1,0,0,0],
+         [0,0,0,1,1,0,0,0],
+         [0,0,0,1,1,0,0,0]],
+        // Diamond
+        [[0,0,0,1,1,0,0,0],
+         [0,0,1,1,1,1,0,0],
+         [0,1,1,1,1,1,1,0],
+         [1,1,1,1,1,1,1,1],
+         [1,1,1,1,1,1,1,1],
+         [0,1,1,1,1,1,1,0],
+         [0,0,1,1,1,1,0,0],
+         [0,0,0,1,1,0,0,0]]
+    ],
+    pattern: [
+        // Horizontal lines
+        [[1,1,1,1,1,1,1,1],
+         [1,1,1,1,1,1,1,1],
+         [0,0,0,0,0,0,0,0],
+         [1,1,1,1,1,1,1,1],
+         [1,1,1,1,1,1,1,1],
+         [0,0,0,0,0,0,0,0],
+         [1,1,1,1,1,1,1,1],
+         [1,1,1,1,1,1,1,1]],
+        // Vertical lines
+        [[1,1,0,1,1,0,1,1],
+         [1,1,0,1,1,0,1,1],
+         [1,1,0,1,1,0,1,1],
+         [1,1,0,1,1,0,1,1],
+         [1,1,0,1,1,0,1,1],
+         [1,1,0,1,1,0,1,1],
+         [1,1,0,1,1,0,1,1],
+         [1,1,0,1,1,0,1,1]],
+        // Diagonal /
+        [[0,0,0,0,0,0,1,1],
+         [0,0,0,0,0,1,1,0],
+         [0,0,0,0,1,1,0,0],
+         [0,0,0,1,1,0,0,0],
+         [0,0,1,1,0,0,0,0],
+         [0,1,1,0,0,0,0,0],
+         [1,1,0,0,0,0,0,0],
+         [1,0,0,0,0,0,0,0]],
+        // Diagonal \
+        [[1,1,0,0,0,0,0,0],
+         [0,1,1,0,0,0,0,0],
+         [0,0,1,1,0,0,0,0],
+         [0,0,0,1,1,0,0,0],
+         [0,0,0,0,1,1,0,0],
+         [0,0,0,0,0,1,1,0],
+         [0,0,0,0,0,0,1,1],
+         [0,0,0,0,0,0,0,1]],
+        // Checkerboard
+        [[1,0,1,0,1,0,1,0],
+         [0,1,0,1,0,1,0,1],
+         [1,0,1,0,1,0,1,0],
+         [0,1,0,1,0,1,0,1],
+         [1,0,1,0,1,0,1,0],
+         [0,1,0,1,0,1,0,1],
+         [1,0,1,0,1,0,1,0],
+         [0,1,0,1,0,1,0,1]]
+    ],
+    complex: [
+        // Smiley
+        [[0,1,1,1,1,1,1,0],
+         [1,1,1,1,1,1,1,1],
+         [1,1,0,1,1,0,1,1],
+         [1,1,1,1,1,1,1,1],
+         [1,0,1,1,1,1,0,1],
+         [1,1,0,0,0,0,1,1],
+         [1,1,1,1,1,1,1,1],
+         [0,1,1,1,1,1,1,0]],
+        // Checkmark
+        [[0,0,0,0,0,0,0,1],
+         [0,0,0,0,0,0,1,1],
+         [0,0,0,0,0,1,1,0],
+         [1,0,0,0,1,1,0,0],
+         [1,1,0,1,1,0,0,0],
+         [0,1,1,1,0,0,0,0],
+         [0,0,1,0,0,0,0,0],
+         [0,0,0,0,0,0,0,0]],
+        // X mark
+        [[1,1,0,0,0,0,1,1],
+         [0,1,1,0,0,1,1,0],
+         [0,0,1,1,1,1,0,0],
+         [0,0,0,1,1,0,0,0],
+         [0,0,0,1,1,0,0,0],
+         [0,0,1,1,1,1,0,0],
+         [0,1,1,0,0,1,1,0],
+         [1,1,0,0,0,0,1,1]],
+        // Star
+        [[0,0,0,1,1,0,0,0],
+         [0,0,0,1,1,0,0,0],
+         [0,0,1,1,1,1,0,0],
+         [1,1,1,1,1,1,1,1],
+         [0,1,1,1,1,1,1,0],
+         [0,1,1,0,0,1,1,0],
+         [1,1,0,0,0,0,1,1],
+         [1,0,0,0,0,0,0,1]],
+        // Heart
+        [[0,1,1,0,0,1,1,0],
+         [1,1,1,1,1,1,1,1],
+         [1,1,1,1,1,1,1,1],
+         [1,1,1,1,1,1,1,1],
+         [0,1,1,1,1,1,1,0],
+         [0,0,1,1,1,1,0,0],
+         [0,0,0,1,1,0,0,0],
+         [0,0,0,0,0,0,0,0]]
+    ]
+};
+
+// Category colors for latent space
+const categoryColors = {
+    digit: '#FF6B6B',
+    shape: '#4ECDC4',
+    pattern: '#45B7D1',
+    complex: '#FFA07A'
+};
+
+function updateBottleneck() {
+    bottleneckSize = parseInt(document.getElementById('bottleneckSlider').value);
+    document.getElementById('bottleneckValue').textContent = bottleneckSize;
+    document.getElementById('latentDimValue').textContent = bottleneckSize;
+
+    const compressionRatio = Math.floor(INPUT_SIZE / bottleneckSize);
+    document.getElementById('compressionValue').textContent = compressionRatio + ':1';
+
+    drawArchitecture();
+    if (currentSample) {
+        encodeAndReconstruct();
+    }
+}
+
+function selectSample(category, index) {
+    currentCategory = category;
+    currentIndex = index;
+    currentSample = samples[category][index];
+
+    document.getElementById('statusIndicator').textContent =
+        `Selected: ${category} sample ${index}`;
+    document.getElementById('statusIndicator').style.background = '#fff3cd';
+    document.getElementById('statusIndicator').style.color = '#856404';
+
+    encodeAndReconstruct();
+}
+
+function encodeAndReconstruct() {
+    if (!currentSample) return;
+
+    // Simulate encoding (create random latent representation)
+    const latentCode = [];
+    for (let i = 0; i < bottleneckSize; i++) {
+        latentCode.push(Math.random() * 2 - 1);
+    }
+
+    // Simulate reconstruction with some noise
+    const reconstructed = currentSample.map(row =>
+        row.map(val => {
+            const noise = (Math.random() - 0.5) * 0.3;
+            return Math.max(0, Math.min(1, val + noise));
+        })
+    );
+
+    // Calculate reconstruction loss (MSE)
+    let loss = 0;
+    for (let i = 0; i < GRID_SIZE; i++) {
+        for (let j = 0; j < GRID_SIZE; j++) {
+            const diff = currentSample[i][j] - reconstructed[i][j];
+            loss += diff * diff;
+        }
+    }
+    loss = loss / INPUT_SIZE;
+
+    document.getElementById('lossValue').textContent = loss.toFixed(3);
+
+    drawComparison(currentSample, reconstructed);
+    drawArchitectureWithData(latentCode);
+}
+
+function trainAutoencoder() {
+    if (isTraining) return;
+
+    isTraining = true;
+    document.getElementById('statusIndicator').textContent = 'Training...';
+    document.getElementById('statusIndicator').style.background = '#d4edda';
+    document.getElementById('statusIndicator').style.color = '#155724';
+
+    let epoch = 0;
+    const maxEpochs = 20;
+
+    const trainingInterval = setInterval(() => {
+        epoch++;
+
+        // Simulate training progress
+        const loss = 1.0 / (epoch + 1);
+        document.getElementById('lossValue').textContent = loss.toFixed(3);
+
+        if (epoch >= maxEpochs) {
+            clearInterval(trainingInterval);
+            isTraining = false;
+            document.getElementById('statusIndicator').textContent = 'Training Complete!';
+            document.getElementById('statusIndicator').style.background = '#d4edda';
+
+            if (currentSample) {
+                encodeAndReconstruct();
+            }
+        }
+    }, 100);
+}
+
+function encodeAll() {
+    latentPoints = [];
+
+    // Encode all samples and create 2D projection
+    for (const category in samples) {
+        const categoryOffset = Object.keys(samples).indexOf(category) * 2;
+
+        samples[category].forEach((sample, idx) => {
+            // Create pseudo-random but consistent 2D projection
+            const hash = (category.charCodeAt(0) * 100 + idx) / 1000;
+            const x = Math.cos(hash * 10 + categoryOffset) * (1 + idx * 0.3);
+            const y = Math.sin(hash * 15 + categoryOffset) * (1 + idx * 0.3);
+
+            latentPoints.push({
+                x: x,
+                y: y,
+                category: category,
+                index: idx,
+                sample: sample
+            });
+        });
+    }
+
+    drawLatentSpace();
+
+    document.getElementById('statusIndicator').textContent =
+        `Encoded ${latentPoints.length} samples`;
+    document.getElementById('statusIndicator').style.background = '#d4edda';
+    document.getElementById('statusIndicator').style.color = '#155724';
+}
+
+function drawArchitecture() {
+    archCtx.clearRect(0, 0, architectureCanvas.width, architectureCanvas.height);
+
+    const layers = [64, 32, 16, 8, bottleneckSize, 8, 16, 32, 64];
+    const maxLayerSize = 64;
+    const layerSpacing = 100;
+    const startX = 50;
+    const centerY = architectureCanvas.height / 2;
+
+    // Draw layers
+    layers.forEach((size, i) => {
+        const x = startX + i * layerSpacing;
+        const nodeSize = Math.max(4, size / 2);
+        const spacing = Math.max(3, 150 / size);
+        const totalHeight = size * spacing;
+        const startY = centerY - totalHeight / 2;
+
+        // Draw nodes
+        for (let j = 0; j < size; j++) {
+            const y = startY + j * spacing;
+
+            // Color coding: input/output blue, encoder green, bottleneck red, decoder green
+            let color;
+            if (i === 0 || i === layers.length - 1) {
+                color = '#2196F3';
+            } else if (i === 4) {
+                color = '#f44336';
+            } else if (i < 4) {
+                color = '#4CAF50';
+            } else {
+                color = '#8BC34A';
+            }
+
+            archCtx.fillStyle = color;
+            archCtx.beginPath();
+            archCtx.arc(x, y, nodeSize, 0, Math.PI * 2);
+            archCtx.fill();
+        }
+
+        // Draw connections to next layer
+        if (i < layers.length - 1) {
+            const nextSize = layers[i + 1];
+            const nextSpacing = Math.max(3, 150 / nextSize);
+            const nextTotalHeight = nextSize * nextSpacing;
+            const nextStartY = centerY - nextTotalHeight / 2;
+            const nextX = startX + (i + 1) * layerSpacing;
+
+            archCtx.strokeStyle = 'rgba(100, 100, 100, 0.1)';
+            archCtx.lineWidth = 1;
+
+            // Draw sample connections (not all, too many)
+            const connectionStep = Math.max(1, Math.floor(size / 5));
+            for (let j = 0; j < size; j += connectionStep) {
+                const y1 = startY + j * spacing;
+
+                const nextConnectionStep = Math.max(1, Math.floor(nextSize / 5));
+                for (let k = 0; k < nextSize; k += nextConnectionStep) {
+                    const y2 = nextStartY + k * nextSpacing;
+
+                    archCtx.beginPath();
+                    archCtx.moveTo(x, y1);
+                    archCtx.lineTo(nextX, y2);
+                    archCtx.stroke();
+                }
+            }
+        }
+
+        // Draw labels
+        archCtx.fillStyle = '#2d3748';
+        archCtx.font = 'bold 12px Arial';
+        archCtx.textAlign = 'center';
+
+        if (i === 0) {
+            archCtx.fillText('Input', x, centerY + 90);
+            archCtx.fillText('64', x, centerY + 105);
+        } else if (i === 4) {
+            archCtx.fillText('Bottleneck', x, centerY + 90);
+            archCtx.fillText(String(bottleneckSize), x, centerY + 105);
+        } else if (i === layers.length - 1) {
+            archCtx.fillText('Output', x, centerY + 90);
+            archCtx.fillText('64', x, centerY + 105);
+        }
+    });
+
+    // Draw labels
+    archCtx.fillStyle = '#2d3748';
+    archCtx.font = 'bold 14px Arial';
+    archCtx.textAlign = 'center';
+    archCtx.fillText('ENCODER', startX + 200, 30);
+    archCtx.fillText('DECODER', startX + 600, 30);
+
+    // Draw arrows
+    drawArrow(archCtx, startX + 200, 45, startX + 200, 60, '#4CAF50');
+    drawArrow(archCtx, startX + 600, 45, startX + 600, 60, '#8BC34A');
+}
+
+function drawArchitectureWithData(latentCode) {
+    drawArchitecture();
+
+    // Highlight the data flow
+    const centerY = architectureCanvas.height / 2;
+    const startX = 50;
+
+    // Draw latent code values
+    if (latentCode && latentCode.length > 0) {
+        const x = startX + 4 * 100;
+
+        archCtx.fillStyle = 'rgba(244, 67, 54, 0.2)';
+        archCtx.fillRect(x - 30, centerY - 80, 60, 160);
+
+        archCtx.fillStyle = '#2d3748';
+        archCtx.font = '10px Arial';
+        archCtx.textAlign = 'center';
+
+        const displayCount = Math.min(8, latentCode.length);
+        for (let i = 0; i < displayCount; i++) {
+            const y = centerY - 60 + i * 15;
+            archCtx.fillText(latentCode[i].toFixed(2), x, y);
+        }
+    }
+}
+
+function drawComparison(input, reconstructed) {
+    compCtx.clearRect(0, 0, comparisonCanvas.width, comparisonCanvas.height);
+
+    const cellSize = 20;
+    const gridWidth = GRID_SIZE * cellSize;
+    const spacing = 40;
+
+    // Draw input
+    compCtx.fillStyle = '#2d3748';
+    compCtx.font = 'bold 14px Arial';
+    compCtx.textAlign = 'center';
+    compCtx.fillText('Input', gridWidth / 2, 20);
+
+    for (let i = 0; i < GRID_SIZE; i++) {
+        for (let j = 0; j < GRID_SIZE; j++) {
+            const value = Math.floor(input[i][j] * 255);
+            compCtx.fillStyle = `rgb(${value}, ${value}, ${value})`;
+            compCtx.fillRect(j * cellSize, 30 + i * cellSize, cellSize, cellSize);
+
+            compCtx.strokeStyle = '#ddd';
+            compCtx.lineWidth = 1;
+            compCtx.strokeRect(j * cellSize, 30 + i * cellSize, cellSize, cellSize);
+        }
+    }
+
+    // Draw reconstructed
+    const offsetX = gridWidth + spacing;
+    compCtx.fillText('Reconstructed', offsetX + gridWidth / 2, 20);
+
+    for (let i = 0; i < GRID_SIZE; i++) {
+        for (let j = 0; j < GRID_SIZE; j++) {
+            const value = Math.floor(reconstructed[i][j] * 255);
+            compCtx.fillStyle = `rgb(${value}, ${value}, ${value})`;
+            compCtx.fillRect(offsetX + j * cellSize, 30 + i * cellSize, cellSize, cellSize);
+
+            compCtx.strokeStyle = '#ddd';
+            compCtx.lineWidth = 1;
+            compCtx.strokeRect(offsetX + j * cellSize, 30 + i * cellSize, cellSize, cellSize);
+        }
+    }
+}
+
+function drawLatentSpace() {
+    latentCtx.clearRect(0, 0, latentCanvas.width, latentCanvas.height);
+
+    const centerX = latentCanvas.width / 2;
+    const centerY = latentCanvas.height / 2;
+    const scale = 60;
+
+    // Draw axes
+    latentCtx.strokeStyle = '#ccc';
+    latentCtx.lineWidth = 2;
+    latentCtx.beginPath();
+    latentCtx.moveTo(0, centerY);
+    latentCtx.lineTo(latentCanvas.width, centerY);
+    latentCtx.moveTo(centerX, 0);
+    latentCtx.lineTo(centerX, latentCanvas.height);
+    latentCtx.stroke();
+
+    // Draw labels
+    latentCtx.fillStyle = '#666';
+    latentCtx.font = '12px Arial';
+    latentCtx.textAlign = 'center';
+    latentCtx.fillText('Latent Dimension 1', centerX, latentCanvas.height - 10);
+
+    latentCtx.save();
+    latentCtx.translate(15, centerY);
+    latentCtx.rotate(-Math.PI / 2);
+    latentCtx.fillText('Latent Dimension 2', 0, 0);
+    latentCtx.restore();
+
+    // Draw points
+    latentPoints.forEach(point => {
+        const x = centerX + point.x * scale;
+        const y = centerY - point.y * scale;
+
+        latentCtx.fillStyle = categoryColors[point.category];
+        latentCtx.beginPath();
+        latentCtx.arc(x, y, 8, 0, Math.PI * 2);
+        latentCtx.fill();
+
+        latentCtx.strokeStyle = '#2d3748';
+        latentCtx.lineWidth = 2;
+        latentCtx.stroke();
+
+        // Add label
+        latentCtx.fillStyle = '#2d3748';
+        latentCtx.font = 'bold 10px Arial';
+        latentCtx.textAlign = 'center';
+        latentCtx.fillText(point.category[0].toUpperCase() + point.index, x, y - 12);
+    });
+
+    // Draw legend
+    let legendY = 20;
+    const legendX = 20;
+
+    latentCtx.font = 'bold 12px Arial';
+    latentCtx.textAlign = 'left';
+    latentCtx.fillStyle = '#2d3748';
+    latentCtx.fillText('Categories:', legendX, legendY);
+    legendY += 20;
+
+    Object.keys(categoryColors).forEach(category => {
+        latentCtx.fillStyle = categoryColors[category];
+        latentCtx.beginPath();
+        latentCtx.arc(legendX + 8, legendY - 4, 6, 0, Math.PI * 2);
+        latentCtx.fill();
+
+        latentCtx.fillStyle = '#2d3748';
+        latentCtx.font = '11px Arial';
+        latentCtx.fillText(category, legendX + 20, legendY);
+        legendY += 18;
+    });
+}
+
+function drawArrow(ctx, fromX, fromY, toX, toY, color) {
+    const headLength = 10;
+    const angle = Math.atan2(toY - fromY, toX - fromX);
+
+    ctx.strokeStyle = color;
+    ctx.fillStyle = color;
+    ctx.lineWidth = 2;
+
+    ctx.beginPath();
+    ctx.moveTo(fromX, fromY);
+    ctx.lineTo(toX, toY);
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(toX, toY);
+    ctx.lineTo(toX - headLength * Math.cos(angle - Math.PI / 6),
+               toY - headLength * Math.sin(angle - Math.PI / 6));
+    ctx.lineTo(toX - headLength * Math.cos(angle + Math.PI / 6),
+               toY - headLength * Math.sin(angle + Math.PI / 6));
+    ctx.closePath();
+    ctx.fill();
+}
+
+function reset() {
+    currentSample = null;
+    currentCategory = null;
+    currentIndex = null;
+    latentPoints = [];
+    isTraining = false;
+
+    compCtx.clearRect(0, 0, comparisonCanvas.width, comparisonCanvas.height);
+    latentCtx.clearRect(0, 0, latentCanvas.width, latentCanvas.height);
+
+    document.getElementById('statusIndicator').textContent = 'Ready - Select a sample';
+    document.getElementById('statusIndicator').style.background = '#e3f2fd';
+    document.getElementById('statusIndicator').style.color = '#1565c0';
+
+    document.getElementById('lossValue').textContent = '0.00';
+
+    drawArchitecture();
+}
+
+// Initialize
+drawArchitecture();
+selectSample('digit', 0);
+</script>
+</body>
+</html>
