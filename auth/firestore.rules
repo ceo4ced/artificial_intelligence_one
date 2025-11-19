@@ -23,6 +23,15 @@ service cloud.firestore {
       return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'student';
     }
 
+    function isGuest() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'guest';
+    }
+
+    function isStudentOrHigher() {
+      let userRole = get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+      return userRole == 'student' || userRole == 'teacher';
+    }
+
     // Refactored to remove 'let' statements for better compatibility
     function calculateAge(birthdate) {
       return int((request.time - timestamp(birthdate)) / duration.value('31536000s'));
@@ -41,8 +50,11 @@ service cloud.firestore {
     }
 
     // REFACTORED: Single expression, no IF statements
+    // Users can register as 'guest' (default) or 'student'
+    // Teachers must use approved email
     function isValidRoleAssignment(newRole, email) {
-      return newRole == 'student'
+      return newRole == 'guest'
+          || newRole == 'student'
           || (newRole == 'teacher' && isApprovedTeacherEmail(email));
     }
 
@@ -85,12 +97,15 @@ service cloud.firestore {
 
       // ============================================
       // QUIZ SCORES SUBCOLLECTION RULES
+      // GUESTS CANNOT CREATE/UPDATE - STUDENTS AND TEACHERS ONLY
       // ============================================
 
       match /quizScores/{quizId} {
         allow read: if isCurrentUser(userId) || isTeacher();
 
+        // Only students and teachers can create quiz scores (guests cannot)
         allow create: if isCurrentUser(userId)
+          && isStudentOrHigher()
           && request.resource.data.keys().hasAll(['quizId', 'score', 'maxScore', 'completedAt'])
           && request.resource.data.score >= 0
           && request.resource.data.score <= request.resource.data.maxScore
@@ -99,8 +114,9 @@ service cloud.firestore {
                'timeTaken', 'feedback', 'attempts'
              ]);
 
+        // Only students and teachers can update quiz scores (guests cannot)
         allow update: if isCurrentUser(userId)
-          && isStudent()
+          && isStudentOrHigher()
           && request.resource.data.quizId == resource.data.quizId
           && request.resource.data.completedAt == resource.data.completedAt
           && request.resource.data.keys().hasOnly([

@@ -504,6 +504,16 @@
 
         // Initialize on page load
         initDashboard();
+
+        // Apply auth guard - require authentication
+        import('./auth-guard.js').then(({ initAuthGuard }) => {
+            initAuthGuard({
+                requireAuth: true,
+                onFailure: () => {
+                    window.location.href = 'login.html';
+                }
+            });
+        });
     </script>
 </body>
 </html>
