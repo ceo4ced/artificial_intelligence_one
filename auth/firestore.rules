@@ -64,7 +64,7 @@ service cloud.firestore {
     }
 
     function hasRequiredUserFields() {
-      return request.resource.data.keys().hasAll(['email', 'name', 'birthdate', 'role', 'createdAt']);
+      return request.resource.data.keys().hasAll(['email', 'displayName', 'birthdate', 'role', 'createdAt']);
     }
 
     // ============================================
@@ -79,8 +79,9 @@ service cloud.firestore {
         && isAtLeast13(request.resource.data.birthdate)
         && isValidRoleAssignment(request.resource.data.role, request.resource.data.email)
         && request.resource.data.keys().hasOnly([
-             'email', 'name', 'birthdate', 'role', 'createdAt',
-             'bio', 'profilePictureUrl', 'school', 'grade'
+             'uid', 'email', 'displayName', 'birthdate', 'age', 'role', 'createdAt',
+             'bio', 'profilePictureUrl', 'school', 'grade', 'photoURL',
+             'totalQuizzesTaken', 'averageScore'
            ]);
 
       allow update: if isCurrentUser(userId)
@@ -88,9 +89,9 @@ service cloud.firestore {
         && request.resource.data.createdAt == resource.data.createdAt
         && request.resource.data.birthdate == resource.data.birthdate
         && request.resource.data.keys().hasOnly([
-             'email', 'name', 'birthdate', 'role', 'createdAt',
-             'bio', 'profilePictureUrl', 'school', 'grade',
-             'lastUpdated'
+             'uid', 'email', 'displayName', 'birthdate', 'age', 'role', 'createdAt',
+             'bio', 'profilePictureUrl', 'school', 'grade', 'photoURL',
+             'totalQuizzesTaken', 'averageScore', 'lastUpdated'
            ]);
 
       allow delete: if false;
