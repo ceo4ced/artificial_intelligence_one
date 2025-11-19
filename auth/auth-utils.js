@@ -57,7 +57,7 @@ export async function registerUser(email, password, displayName, birthdate) {
             birthdate: birthdate,
             age: age,
             createdAt: Timestamp.now(),
-            role: 'student', // Default role
+            role: 'guest', // Default role - teachers can upgrade to 'student'
             totalQuizzesTaken: 0,
             averageScore: 0
         });
@@ -202,7 +202,7 @@ export async function completeGoogleRegistration(birthdate) {
             birthdate: birthdate,
             age: age,
             createdAt: Timestamp.now(),
-            role: 'student',
+            role: 'guest', // Default role - teachers can upgrade to 'student'
             totalQuizzesTaken: 0,
             averageScore: 0
         });
