@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Comprehensive AI learning platform with interactive visualizations for search algorithms, machine learning, game playing, and constraint satisfaction problems">
-    <title>Mr. Williams' AI 1 - Interactive Learning Tools</title>
+    <meta name="description" content="Mr. Williams' Artificial Intelligence 1 - Interactive learning platform for AI concepts, machine learning, and computational thinking">
+    <title>AI 1 - Mr. Williams, MSCS</title>
     <style>
         * {
             margin: 0;
@@ -14,777 +14,345 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
-            line-height: 1.6;
-            color: #333;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            padding: 20px;
+            color: #fff;
         }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            overflow: hidden;
-        }
-
-        header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 60px 40px;
-            text-align: center;
-        }
-
-        header h1 {
-            font-size: 3em;
-            margin-bottom: 10px;
-            font-weight: 700;
-        }
-
-        header p {
-            font-size: 1.3em;
-            opacity: 0.95;
-        }
-
-        .intro {
-            padding: 40px;
-            background: #f8f9fa;
-            border-bottom: 3px solid #e9ecef;
-        }
-
-        .intro h2 {
-            color: #2d3748;
-            margin-bottom: 15px;
-            font-size: 2em;
-        }
-
-        .intro p {
-            font-size: 1.1em;
-            color: #4a5568;
-            margin-bottom: 10px;
-        }
-
-        .tools-section {
-            padding: 50px 40px;
-        }
-
-        .tools-section h2 {
-            text-align: center;
-            font-size: 2.5em;
-            color: #2d3748;
-            margin-bottom: 40px;
-        }
-
-        .tools-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
-            gap: 30px;
-            margin-bottom: 40px;
-        }
-
-        .hub-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
-            gap: 35px;
-            margin: 40px 0;
-        }
-
-        .hub-card {
-            background: white;
-            border-radius: 20px;
-            padding: 0;
-            overflow: hidden;
-            transition: all 0.4s ease;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
-            border: 3px solid transparent;
-            position: relative;
-        }
-
-        .hub-card:hover {
-            transform: translateY(-8px) scale(1.02);
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
-            border-color: rgba(255, 255, 255, 0.3);
-        }
-
-        .hub-card-header {
-            padding: 40px 35px 30px;
-            color: white;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .hub-card-header::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-            transform: rotate(45deg);
-        }
-
-        .hub-icon {
-            font-size: 4.5em;
-            margin-bottom: 15px;
-            display: block;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
-            position: relative;
-            z-index: 1;
-        }
-
-        .hub-card h3 {
-            font-size: 2em;
-            margin-bottom: 12px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .hub-card-desc {
-            font-size: 1.05em;
-            line-height: 1.6;
-            opacity: 0.95;
-            position: relative;
-            z-index: 1;
-        }
-
-        .hub-card-body {
-            padding: 30px 35px 35px;
-        }
-
-        .hub-stats {
+        /* Navigation */
+        nav {
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            padding: 15px 30px;
             display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .nav-brand {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 25px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            padding: 8px 15px;
+            border-radius: 8px;
+        }
+
+        .nav-links a:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-login, .btn-register {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: 2px solid #fff;
+        }
+
+        .btn-login:hover, .btn-register:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .user-menu {
+            display: none;
+            align-items: center;
             gap: 15px;
-            margin-bottom: 25px;
+        }
+
+        .user-menu.active {
+            display: flex;
+        }
+
+        .user-name {
+            font-weight: 600;
+        }
+
+        .dropdown {
+            position: relative;
+        }
+
+        .dropdown-toggle {
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px 15px;
+            border-radius: 8px;
+        }
+
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 45px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            min-width: 180px;
+            z-index: 1000;
+        }
+
+        .dropdown-menu.show {
+            display: block;
+        }
+
+        .dropdown-menu a {
+            display: block;
+            padding: 12px 20px;
+            color: #2d3748;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .dropdown-menu a:hover {
+            background: #f7fafc;
+        }
+
+        .dropdown-menu .teacher-only {
+            border-top: 1px solid #e2e8f0;
+            background: #f0f4f8;
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            padding: 100px 20px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .hero h1 {
+            font-size: 4em;
+            margin-bottom: 20px;
+            text-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .hero .subtitle {
+            font-size: 1.8em;
+            opacity: 0.95;
+            margin-bottom: 15px;
+        }
+
+        .hero .instructor {
+            font-size: 1.3em;
+            opacity: 0.9;
+            margin-bottom: 40px;
+        }
+
+        .hero p {
+            font-size: 1.2em;
+            line-height: 1.8;
+            opacity: 0.9;
+            margin-bottom: 40px;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
             flex-wrap: wrap;
         }
 
-        .hub-stat-badge {
-            background: linear-gradient(135deg, #f0f4f8 0%, #e2e8f0 100%);
-            padding: 10px 18px;
-            border-radius: 25px;
-            font-weight: 600;
-            color: #2d3748;
-            font-size: 0.95em;
-            border: 2px solid #cbd5e0;
-        }
-
-        .hub-link {
-            display: block;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            text-align: center;
-            padding: 16px 30px;
+        .btn {
+            padding: 18px 40px;
             border-radius: 12px;
             text-decoration: none;
             font-weight: 700;
-            font-size: 1.15em;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-        }
-
-        .hub-link:hover {
-            transform: scale(1.05);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
-        }
-
-        .gradient-ethics { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
-        .gradient-hcd { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
-        .gradient-data { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
-        .gradient-ml { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
-        .gradient-dl { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
-        .gradient-search { background: linear-gradient(135deg, #30cfd0 0%, #330867 100%); }
-        .gradient-game { background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); }
-
-        .tool-card {
-            background: white;
-            border: 2px solid #e2e8f0;
-            border-radius: 12px;
-            padding: 30px;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
-        }
-
-        .tool-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
-            border-color: #667eea;
-        }
-
-        @media (max-width: 1200px) {
-            .hub-grid {
-                grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
-            }
-        }
-
-        @media (max-width: 768px) {
-            .hub-grid {
-                grid-template-columns: 1fr;
-                gap: 25px;
-            }
-
-            .hub-card-header {
-                padding: 35px 25px 25px;
-            }
-
-            .hub-icon {
-                font-size: 3.5em;
-            }
-
-            .hub-card h3 {
-                font-size: 1.7em;
-            }
-        }
-
-        .tool-icon {
-            font-size: 4em;
-            margin-bottom: 15px;
-            text-align: center;
-        }
-
-        .tool-card h3 {
-            color: #2d3748;
-            font-size: 1.8em;
-            margin-bottom: 15px;
-            text-align: center;
-        }
-
-        .tool-card p {
-            color: #4a5568;
-            margin-bottom: 20px;
-            font-size: 1.05em;
-            text-align: center;
-        }
-
-        .features {
-            list-style: none;
-            margin-bottom: 25px;
-        }
-
-        .features li {
-            padding: 8px 0;
-            padding-left: 30px;
-            position: relative;
-            color: #4a5568;
-        }
-
-        .features li::before {
-            content: "✓";
-            position: absolute;
-            left: 0;
-            color: #48bb78;
-            font-weight: bold;
             font-size: 1.2em;
+            transition: all 0.3s;
+            display: inline-block;
         }
 
-        .tool-link {
-            display: block;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            text-align: center;
-            padding: 15px 30px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 1.1em;
-            transition: all 0.3s ease;
-        }
-
-        .tool-link:hover {
-            transform: scale(1.05);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-        }
-
-        .algorithms-section {
-            background: #f7fafc;
-            padding: 40px;
-            margin-top: 40px;
-        }
-
-        .algorithms-section h3 {
-            color: #2d3748;
-            font-size: 1.8em;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        .algorithm-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-        }
-
-        .algorithm-box {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            border-left: 4px solid #667eea;
-        }
-
-        .algorithm-box h4 {
+        .btn-primary {
+            background: #fff;
             color: #667eea;
-            margin-bottom: 8px;
-            font-size: 1.2em;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
         }
 
-        .algorithm-box p {
-            color: #4a5568;
-            font-size: 0.95em;
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
         }
 
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            border: 2px solid #fff;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Features Section */
+        .features {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 60px 20px;
+            margin: 40px 20px;
+            border-radius: 20px;
+            max-width: 1200px;
+            margin: 40px auto;
+        }
+
+        .features h2 {
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 40px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .feature-card:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-5px);
+        }
+
+        .feature-icon {
+            font-size: 3.5em;
+            margin-bottom: 15px;
+        }
+
+        .feature-card h3 {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+
+        .feature-card p {
+            opacity: 0.9;
+            line-height: 1.6;
+        }
+
+        /* Footer */
         footer {
-            background: #2d3748;
-            color: white;
             text-align: center;
             padding: 30px;
+            opacity: 0.8;
             font-size: 0.95em;
-        }
-
-        footer p {
-            margin: 5px 0;
-        }
-
-        footer a {
-            color: #90cdf4;
-            text-decoration: none;
-        }
-
-        footer a:hover {
-            text-decoration: underline;
         }
 
         @media (max-width: 768px) {
-            header h1 {
-                font-size: 2em;
+            .hero h1 {
+                font-size: 2.5em;
             }
 
-            header p {
-                font-size: 1.1em;
+            .hero .subtitle {
+                font-size: 1.3em;
             }
 
-            .tools-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .tool-card {
-                padding: 20px;
-            }
-
-            .algorithm-grid {
-                grid-template-columns: 1fr;
+            .nav-links {
+                flex-direction: column;
+                gap: 10px;
             }
         }
     </style>
 </head>
 <body>
-    <nav style="background: rgba(0, 0, 0, 0.3); backdrop-filter: blur(10px); padding: 15px 30px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; gap: 20px; flex-wrap: wrap;">
-        <div style="display: flex; gap: 20px; align-items: center;">
-            <a href="home.html" style="color: #fff; text-decoration: none; font-weight: 700; font-size: 1.2em;">🤖 AI 1</a>
-            <a href="index.html" style="color: #fff; text-decoration: none; font-weight: 600;">Topics</a>
-            <a href="quizzes/index.html" style="color: #fff; text-decoration: none; font-weight: 600;">Quizzes</a>
-        </div>
-        <div style="display: flex; gap: 15px; align-items: center;">
-            <div id="authButtons" style="display: flex; gap: 10px;">
-                <a href="auth/login.html" style="color: #fff; text-decoration: none; font-weight: 600; padding: 8px 15px; background: rgba(255,255,255,0.2); border-radius: 8px; border: 2px solid #fff;">Login</a>
-                <a href="auth/register.html" style="color: #fff; text-decoration: none; font-weight: 600; padding: 8px 15px; background: rgba(255,255,255,0.2); border-radius: 8px; border: 2px solid #fff;">Register</a>
+    <nav>
+        <div class="nav-brand">🤖 AI 1</div>
+        <div class="nav-links">
+            <a href="topics.html">Explore Topics</a>
+            <a href="quizzes/index.html">Quizzes</a>
+            <div id="authButtons">
+                <a href="auth/login.html" class="btn-login">Login</a>
+                <a href="auth/register.html" class="btn-register">Register</a>
             </div>
-            <div class="user-menu" id="userMenu" style="display: none; align-items: center; gap: 15px;">
-                <span style="color: #fff; font-weight: 600;" id="userName"></span>
-                <div style="position: relative;">
-                    <div id="dropdownToggle" style="cursor: pointer; background: rgba(255,255,255,0.2); padding: 8px 15px; border-radius: 8px; color: #fff; font-weight: 600;">⚙️ Menu</div>
-                    <div id="dropdownMenu" style="display: none; position: absolute; right: 0; top: 45px; background: #fff; border-radius: 8px; box-shadow: 0 5px 20px rgba(0,0,0,0.3); min-width: 180px; z-index: 1000;">
-                        <a href="auth/dashboard.html" style="display: block; padding: 12px 20px; color: #2d3748; text-decoration: none;">📊 Dashboard</a>
-                        <a href="auth/profile.html" style="display: block; padding: 12px 20px; color: #2d3748; text-decoration: none;">👤 Profile</a>
-                        <a href="auth/settings.html" style="display: block; padding: 12px 20px; color: #2d3748; text-decoration: none;">⚙️ Settings</a>
-                        <a href="auth/teacher-admin.html" id="teacherLink" style="display: none; padding: 12px 20px; color: #2d3748; text-decoration: none; border-top: 1px solid #e2e8f0; background: #f0f4f8;">👨‍🏫 Teacher Admin</a>
-                        <a href="#" id="logoutBtn" style="display: block; padding: 12px 20px; color: #2d3748; text-decoration: none;">🚪 Logout</a>
+            <div class="user-menu" id="userMenu">
+                <span class="user-name" id="userName"></span>
+                <div class="dropdown">
+                    <div class="dropdown-toggle" id="dropdownToggle">
+                        <span>⚙️ Menu</span>
+                    </div>
+                    <div class="dropdown-menu" id="dropdownMenu">
+                        <a href="auth/dashboard.html">📊 Dashboard</a>
+                        <a href="auth/profile.html">👤 Profile</a>
+                        <a href="auth/settings.html">⚙️ Settings</a>
+                        <a href="auth/teacher-admin.html" class="teacher-only" id="teacherLink" style="display:none;">👨‍🏫 Teacher Admin</a>
+                        <a href="#" id="logoutBtn">🚪 Logout</a>
                     </div>
                 </div>
             </div>
         </div>
     </nav>
-    <div class="container">
-        <header>
-            <h1>Mr. Williams' 🤖 AI 1 - Interactive Learning Tools</h1>
-            <p>Explore AI algorithms through hands-on visualization</p>
-        </header>
 
-        <div class="intro">
-            <h2>Welcome to AI Class!</h2>
-            <p>
-                Learn artificial intelligence concepts by interacting with real algorithms, lessons, and games.
-                Explore AI ethics, data science, machine learning, search algorithms, and more through hands-on
-                visualization tools designed for high school students.
-            </p>
-            <p>
-                Each topic includes interactive lessons, visualizations, and quizzes to test your knowledge.
-                Start with AI ethics to understand responsible AI use, then dive into data science and machine learning!
-            </p>
+    <div class="hero">
+        <h1>🤖 Artificial Intelligence 1</h1>
+        <div class="subtitle">Interactive Learning Platform</div>
+        <div class="instructor">Mr. Williams, MSCS</div>
+        <p>
+            Welcome to AI 1! Explore the fascinating world of artificial intelligence through
+            interactive visualizations, hands-on projects, and engaging quizzes. From machine
+            learning to neural networks, discover how AI is shaping our future.
+        </p>
+        <div class="cta-buttons">
+            <a href="topics.html" class="btn btn-primary">🚀 Start Learning</a>
+            <a href="auth/register.html" class="btn btn-secondary">📝 Create Account</a>
         </div>
-
-        <div class="tools-section">
-            <h2>🚀 Explore AI Topics</h2>
-            <p style="text-align: center; color: #4a5568; margin-bottom: 20px; font-size: 1.1em;">
-                Choose a topic to dive into interactive lessons, games, and visualizations
-            </p>
-
-            <div class="hub-grid">
-                <!-- AI Ethics Hub Card -->
-                <div class="hub-card">
-                    <div class="hub-card-header gradient-ethics">
-                        <span class="hub-icon">⚖️</span>
-                        <h3>AI Ethics & Responsible Use</h3>
-                        <p class="hub-card-desc">Learn about bias, fairness, privacy, and how to use AI tools responsibly in your academic and personal life.</p>
-                    </div>
-                    <div class="hub-card-body">
-                        <div class="hub-stats">
-                            <span class="hub-stat-badge">📚 4 Lessons</span>
-                            <span class="hub-stat-badge">🎮 4 Games</span>
-                        </div>
-                        <a href="hubs/ai-ethics.html" class="hub-link">Explore AI Ethics →</a>
-                    </div>
-                </div>
-
-                <!-- Human Centered Design Hub Card -->
-                <div class="hub-card">
-                    <div class="hub-card-header gradient-hcd">
-                        <span class="hub-icon">🎨</span>
-                        <h3>Human Centered Design</h3>
-                        <p class="hub-card-desc">Design products with users at the center through empathy, ideation, prototyping, and iterative testing.</p>
-                    </div>
-                    <div class="hub-card-body">
-                        <div class="hub-stats">
-                            <span class="hub-stat-badge">📚 3 Lessons</span>
-                            <span class="hub-stat-badge">🎮 3 Games</span>
-                        </div>
-                        <a href="hubs/human-centered-design.html" class="hub-link">Explore HCD →</a>
-                    </div>
-                </div>
-                <!-- Data Science Hub Card -->
-                <div class="hub-card">
-                    <div class="hub-card-header gradient-data">
-                        <span class="hub-icon">📊</span>
-                        <h3>Data Science & Visualization</h3>
-                        <p class="hub-card-desc">Learn to work with data structures, visualize data effectively, and discover patterns through analysis and cleaning techniques.</p>
-                    </div>
-                    <div class="hub-card-body">
-                        <div class="hub-stats">
-                            <span class="hub-stat-badge">📚 8 Lessons</span>
-                            <span class="hub-stat-badge">🎮 8 Games</span>
-                        </div>
-                        <a href="hubs/data-science.html" class="hub-link">Explore Data Science →</a>
-                    </div>
-                </div>
-
-                <!-- Machine Learning Hub Card -->
-                <div class="hub-card">
-                    <div class="hub-card-header gradient-ml">
-                        <span class="hub-icon">🤖</span>
-                        <h3>Machine Learning</h3>
-                        <p class="hub-card-desc">Interactive lessons and games for ML algorithms including supervised learning, unsupervised learning, NLP, and more with visualizers.</p>
-                    </div>
-                    <div class="hub-card-body">
-                        <div class="hub-stats">
-                            <span class="hub-stat-badge">📚 6 Lessons</span>
-                            <span class="hub-stat-badge">🎮 8 Games</span>
-                            <span class="hub-stat-badge">🔬 7 Visualizers</span>
-                        </div>
-                        <a href="hubs/machine-learning.html" class="hub-link">Explore Machine Learning →</a>
-                    </div>
-                </div>
-
-                <!-- Deep Learning Hub Card -->
-                <div class="hub-card">
-                    <div class="hub-card-header gradient-dl">
-                        <span class="hub-icon">🧠</span>
-                        <h3>Deep Learning</h3>
-                        <p class="hub-card-desc">Explore different types of neural networks and their architectures including CNNs, RNNs, LSTMs, GANs, Autoencoders, and Transformers.</p>
-                    </div>
-                    <div class="hub-card-body">
-                        <div class="hub-stats">
-                            <span class="hub-stat-badge">📚 7 Lessons</span>
-                            <span class="hub-stat-badge">🎮 7 Games</span>
-                        </div>
-                        <a href="hubs/deep-learning.html" class="hub-link">Explore Deep Learning →</a>
-                    </div>
-                </div>
-
-                <!-- Search Algorithms Hub Card -->
-                <div class="hub-card">
-                    <div class="hub-card-header gradient-search">
-                        <span class="hub-icon">🛠</span>
-                        <h3>Search Algorithms</h3>
-                        <p class="hub-card-desc">Visualize how AI finds paths through trees and mazes using BFS, DFS, UCS, A*, and other pathfinding algorithms.</p>
-                    </div>
-                    <div class="hub-card-body">
-                        <div class="hub-stats">
-                            <span class="hub-stat-badge">🔬 2 Visualizers</span>
-                            <span class="hub-stat-badge">📖 6 Algorithms</span>
-                        </div>
-                        <a href="hubs/search-algorithms.html" class="hub-link">Explore Search Algorithms →</a>
-                    </div>
-                </div>
-
-                <!-- Game AI Hub Card -->
-                <div class="hub-card">
-                    <div class="hub-card-header gradient-game">
-                        <span class="hub-icon">🎮</span>
-                        <h3>Game AI</h3>
-                        <p class="hub-card-desc">Learn how AI plays games strategically using the Minimax algorithm with alpha-beta pruning and game tree search.</p>
-                    </div>
-                    <div class="hub-card-body">
-                        <div class="hub-stats">
-                            <span class="hub-stat-badge">📚 1 Lesson</span>
-                            <span class="hub-stat-badge">🎮 1 Game</span>
-                        </div>
-                        <a href="hubs/game-ai.html" class="hub-link">Explore Game AI →</a>
-                    </div>
-                </div>
-            </div>
-
-            <div class="algorithms-section">
-                <h3>⚖️ AI Ethics & Responsible Use Lessons</h3>
-                <div class="algorithm-grid">
-                    <div class="algorithm-box">
-                        <h4><a href="lessons/ai-bias/index.html" style="color: #667eea; text-decoration: none;">AI Bias Lesson</a></h4>
-                        <p>Understanding how AI systems become unfair and what we can do about it.</p>
-                        <p style="margin-top: 8px; font-size: 0.9em;"><strong>Game:</strong> <a href="games/ai-bias/index.html" style="color: #48bb78;">Bias Detective</a> - Identify different types of bias in AI scenarios</p>
-                    </div>
-
-                    <div class="algorithm-box">
-                        <h4><a href="lessons/ethical-ai/index.html" style="color: #667eea; text-decoration: none;">Ethical AI Lesson</a></h4>
-                        <p>What makes an AI decision fair? Explore core ethical principles.</p>
-                        <p style="margin-top: 8px; font-size: 0.9em;"><strong>Game:</strong> <a href="games/ethical-ai/index.html" style="color: #48bb78;">Ethics Compass</a> - Rate AI scenarios on an ethical risk slider</p>
-                    </div>
-
-                    <div class="algorithm-box">
-                        <h4><a href="lessons/responsible-ai/index.html" style="color: #667eea; text-decoration: none;">Responsible AI Usage Lesson</a></h4>
-                        <p>How students should interact with AI tools for learning.</p>
-                        <p style="margin-top: 8px; font-size: 0.9em;"><strong>Game:</strong> <a href="games/responsible-ai/index.html" style="color: #48bb78;">AI Use Judge</a> - Label AI usage as responsible, gray area, or unsafe</p>
-                    </div>
-
-                    <div class="algorithm-box">
-                        <h4><a href="lessons/digital-privacy/index.html" style="color: #667eea; text-decoration: none;">Digital Privacy & AI Lesson</a></h4>
-                        <p>How AI tools store and infer information from your data.</p>
-                        <p style="margin-top: 8px; font-size: 0.9em;"><strong>Game:</strong> <a href="games/digital-privacy/index.html" style="color: #48bb78;">Digital Footprint Meter</a> - Discover how much private data you reveal</p>
-                    </div>
-                </div>
-
-                <h3 style="margin-top: 40px;">🎨 Human Centered Design Lessons</h3>
-                <div class="algorithm-grid">
-                    <div class="algorithm-box">
-                        <h4><a href="lessons/hcd-empathy/index.html" style="color: #667eea; text-decoration: none;">HCD Part 1: Empathy & Understanding Users</a></h4>
-                        <p>Learn to understand users through research, personas, and empathy mapping.</p>
-                        <p style="margin-top: 8px; font-size: 0.9em;"><strong>Game:</strong> <a href="games/persona-builder/index.html" style="color: #48bb78;">Persona Builder</a> - Build personas from user interviews</p>
-                    </div>
-
-                    <div class="algorithm-box">
-                        <h4><a href="lessons/hcd-ideation/index.html" style="color: #667eea; text-decoration: none;">HCD Part 2: Ideation & Prototyping</a></h4>
-                        <p>Generate creative solutions and build prototypes to test ideas.</p>
-                        <p style="margin-top: 8px; font-size: 0.9em;"><strong>Game:</strong> <a href="games/solution-sprint/index.html" style="color: #48bb78;">Solution Sprint</a> - Design user-centered solutions under time pressure</p>
-                    </div>
-
-                    <div class="algorithm-box">
-                        <h4><a href="lessons/hcd-testing/index.html" style="color: #667eea; text-decoration: none;">HCD Part 3: Testing & Iteration</a></h4>
-                        <p>Test designs with users and iterate based on feedback.</p>
-                        <p style="margin-top: 8px; font-size: 0.9em;"><strong>Game:</strong> <a href="games/usability-detective/index.html" style="color: #48bb78;">Usability Detective</a> - Find and fix usability issues in mockups</p>
-                    </div>
-                </div>
-
-                <h3 style="margin-top: 40px;">📊 Data Science & Visualization Lessons</h3>
-                <div class="algorithm-grid">
-                    <div class="algorithm-box">
-                        <h4><a href="lessons/data-structures/index.html" style="color: #667eea; text-decoration: none;">Data Structures Lesson</a></h4>
-                        <p>What they are and why they matter for AI and computer science.</p>
-                        <p style="margin-top: 8px; font-size: 0.9em;"><strong>Game:</strong> <a href="games/data-structures/index.html" style="color: #48bb78;">Data Structure Playground</a> - Organize data into lists, tables, trees, graphs</p>
-                    </div>
-
-                    <div class="algorithm-box">
-                        <h4><a href="lessons/trees/index.html" style="color: #667eea; text-decoration: none;">Trees Lesson</a></h4>
-                        <p>Learn about hierarchies and decision paths in tree structures.</p>
-                        <p style="margin-top: 8px; font-size: 0.9em;"><strong>Game:</strong> <a href="games/trees/index.html" style="color: #48bb78;">Folder Tree Builder</a> - Build folder hierarchies and test search efficiency</p>
-                    </div>
-
-                    <div class="algorithm-box">
-                        <h4><a href="lessons/graphs/index.html" style="color: #667eea; text-decoration: none;">Graphs Lesson</a></h4>
-                        <p>Networks, connections, and relationships in graph structures.</p>
-                        <p style="margin-top: 8px; font-size: 0.9em;"><strong>Game:</strong> <a href="games/graphs/index.html" style="color: #48bb78;">Graph Your World</a> - Create graphs to model social networks, maps, and more</p>
-                    </div>
-
-                    <div class="algorithm-box">
-                        <h4><a href="lessons/data-science-intro/index.html" style="color: #667eea; text-decoration: none;">Intro to Data Science Lesson</a></h4>
-                        <p>Reading and interpreting different types of graphs.</p>
-                        <p style="margin-top: 8px; font-size: 0.9em;"><strong>Game:</strong> <a href="games/data-science-intro/index.html" style="color: #48bb78;">Chart Switcher</a> - Toggle datasets through different chart types</p>
-                    </div>
-
-                    <div class="algorithm-box">
-                        <h4><a href="lessons/data-visualization/index.html" style="color: #667eea; text-decoration: none;">Data Visualization Lesson</a></h4>
-                        <p>Tell compelling stories with data through effective visuals.</p>
-                        <p style="margin-top: 8px; font-size: 0.9em;"><strong>Game:</strong> <a href="games/data-visualization/index.html" style="color: #48bb78;">Story from a Scatterplot</a> - Interpret patterns and write data stories</p>
-                    </div>
-
-                    <div class="algorithm-box">
-                        <h4><a href="lessons/misleading-graphs/index.html" style="color: #667eea; text-decoration: none;">Misleading Graphs Lesson</a></h4>
-                        <p>How visuals can trick you and how to spot deception.</p>
-                        <p style="margin-top: 8px; font-size: 0.9em;"><strong>Game:</strong> <a href="games/misleading-graphs/index.html" style="color: #48bb78;">Spot the Sketchy Graph</a> - Identify deceptive charts and explain what's wrong</p>
-                    </div>
-
-                    <div class="algorithm-box">
-                        <h4><a href="lessons/data-cleaning/index.html" style="color: #667eea; text-decoration: none;">Data Cleaning Lesson</a></h4>
-                        <p>Why messy data creates wrong conclusions in AI.</p>
-                        <p style="margin-top: 8px; font-size: 0.9em;"><strong>Game:</strong> <a href="games/data-cleaning/index.html" style="color: #48bb78;">Fix the Dataset</a> - Correct errors, duplicates, and outliers</p>
-                    </div>
-
-                    <div class="algorithm-box">
-                        <h4><a href="lessons/pattern-finding/index.html" style="color: #667eea; text-decoration: none;">Pattern Finding Lesson</a></h4>
-                        <p>Human data insight skills - finding patterns without AI.</p>
-                        <p style="margin-top: 8px; font-size: 0.9em;"><strong>Game:</strong> <a href="games/pattern-finding/index.html" style="color: #48bb78;">Manual Clustering Board</a> - Cluster data manually vs. K-means algorithm</p>
-                    </div>
-                </div>
-
-                <h3 style="margin-top: 40px;">🤖 Machine Learning Lessons</h3>
-                <div class="algorithm-grid">
-                    <div class="algorithm-box">
-                        <h4><a href="lessons/supervised-learning/index.html" style="color: #667eea; text-decoration: none;">Supervised Learning Lesson</a></h4>
-                        <p>Learn how AI learns from labeled examples.</p>
-                        <p style="margin-top: 8px; font-size: 0.9em;"><strong>Games:</strong> <a href="games/linear-regression/index.html" style="color: #48bb78;">Stock Market Prophet</a> & <a href="games/logistic-regression/index.html" style="color: #48bb78;">Spam Filter Trainer</a></p>
-                    </div>
-
-                    <div class="algorithm-box">
-                        <h4><a href="lessons/unsupervised-learning/index.html" style="color: #667eea; text-decoration: none;">Unsupervised Learning Lesson</a></h4>
-                        <p>Discover how AI finds patterns without labels.</p>
-                        <p style="margin-top: 8px; font-size: 0.9em;"><strong>Game:</strong> <a href="games/kmeans/index.html" style="color: #48bb78;">Color Palette Creator</a> - Use K-means clustering for color palettes</p>
-                    </div>
-
-                    <div class="algorithm-box">
-                        <h4><a href="lessons/deep-learning/index.html" style="color: #667eea; text-decoration: none;">Deep Learning Lesson</a></h4>
-                        <p>Neural networks and how they learn.</p>
-                        <p style="margin-top: 8px; font-size: 0.9em;"><strong>Game:</strong> <a href="games/deep-learning/index.html" style="color: #48bb78;">Image Classifier Challenge</a> - Build a neural network to classify images</p>
-                    </div>
-
-                    <div class="algorithm-box">
-                        <h4><a href="lessons/nlp/index.html" style="color: #667eea; text-decoration: none;">NLP Lesson</a></h4>
-                        <p>Natural Language Processing and text AI.</p>
-                        <p style="margin-top: 8px; font-size: 0.9em;"><strong>Game:</strong> <a href="games/nlp/index.html" style="color: #48bb78;">Sentiment Detective</a> - Analyze text sentiment with NLP</p>
-                    </div>
-
-                    <div class="algorithm-box">
-                        <h4><a href="lessons/dimension-reduction/index.html" style="color: #667eea; text-decoration: none;">Dimension Reduction Lesson</a></h4>
-                        <p>Simplifying complex data while keeping information.</p>
-                        <p style="margin-top: 8px; font-size: 0.9em;"><strong>Game:</strong> <a href="games/dimension-reduction/index.html" style="color: #48bb78;">Dimension Compressor</a> - Reduce dimensions while preserving variance</p>
-                    </div>
-
-                    <div class="algorithm-box">
-                        <h4><a href="lessons/reinforcement-learning/index.html" style="color: #667eea; text-decoration: none;">Reinforcement Learning Lesson</a></h4>
-                        <p>How AI learns through trial and error.</p>
-                        <p style="margin-top: 8px; font-size: 0.9em;"><strong>Game:</strong> <a href="games/reinforcement-learning/index.html" style="color: #48bb78;">Q-Learning Grid World</a> - Train an AI agent with rewards and penalties</p>
-                    </div>
-
-                    <div class="algorithm-box">
-                        <h4><a href="lessons/svm/index.html" style="color: #667eea; text-decoration: none;">SVM Lesson</a></h4>
-                        <p>Support Vector Machines: Finding optimal boundaries with maximum margin.</p>
-                        <p style="margin-top: 8px; font-size: 0.9em;"><strong>Game:</strong> <a href="games/svm/index.html" style="color: #48bb78;">Margin Maximizer</a> - Draw decision boundaries to maximize margin</p>
-                    </div>
-                </div>
-
-                <h3 style="margin-top: 40px;">🧠 Deep Learning Neural Networks</h3>
-                <div class="algorithm-grid">
-                    <div class="algorithm-box">
-                        <h4><a href="lessons/feedforward-nn/index.html" style="color: #667eea; text-decoration: none;">Feedforward Neural Networks</a></h4>
-                        <p>The simplest neural network where data flows forward without loops.</p>
-                        <p style="margin-top: 8px; font-size: 0.9em;"><strong>Game:</strong> <a href="games/feedforward-nn/index.html" style="color: #48bb78;">Network Architect</a> - Design your own feedforward network architecture</p>
-                    </div>
-
-                    <div class="algorithm-box">
-                        <h4><a href="lessons/rnn/index.html" style="color: #667eea; text-decoration: none;">Recurrent Neural Networks (RNN)</a></h4>
-                        <p>Networks with memory - perfect for sequences and time series data.</p>
-                        <p style="margin-top: 8px; font-size: 0.9em;"><strong>Game:</strong> <a href="games/rnn/index.html" style="color: #48bb78;">Text Predictor</a> - Predict the next word using sequence memory</p>
-                    </div>
-
-                    <div class="algorithm-box">
-                        <h4><a href="lessons/cnn/index.html" style="color: #667eea; text-decoration: none;">Convolutional Neural Networks (CNN)</a></h4>
-                        <p>Specialized for image processing with filters and pooling layers.</p>
-                        <p style="margin-top: 8px; font-size: 0.9em;"><strong>Game:</strong> <a href="games/cnn/index.html" style="color: #48bb78;">Filter Detective</a> - Match filters to detect edges, blurs, and patterns</p>
-                    </div>
-
-                    <div class="algorithm-box">
-                        <h4><a href="lessons/lstm/index.html" style="color: #667eea; text-decoration: none;">Long Short-Term Memory (LSTM)</a></h4>
-                        <p>Advanced RNN that solves the vanishing gradient problem.</p>
-                        <p style="margin-top: 8px; font-size: 0.9em;"><strong>Game:</strong> <a href="games/lstm/index.html" style="color: #48bb78;">Sequence Memory Master</a> - Test your long-term sequence memory</p>
-                    </div>
-
-                    <div class="algorithm-box">
-                        <h4><a href="lessons/gan/index.html" style="color: #667eea; text-decoration: none;">Generative Adversarial Networks (GAN)</a></h4>
-                        <p>Two networks compete - generator creates, discriminator judges.</p>
-                        <p style="margin-top: 8px; font-size: 0.9em;"><strong>Game:</strong> <a href="games/gan/index.html" style="color: #48bb78;">Real or Fake Detective</a> - Identify real vs AI-generated patterns</p>
-                    </div>
-
-                    <div class="algorithm-box">
-                        <h4><a href="lessons/autoencoders/index.html" style="color: #667eea; text-decoration: none;">Autoencoders</a></h4>
-                        <p>Compress and reconstruct data through bottleneck layers.</p>
-                        <p style="margin-top: 8px; font-size: 0.9em;"><strong>Game:</strong> <a href="games/autoencoders/index.html" style="color: #48bb78;">Image Denoiser</a> - Remove noise while preserving image quality</p>
-                    </div>
-
-                    <div class="algorithm-box">
-                        <h4><a href="lessons/transformers/index.html" style="color: #667eea; text-decoration: none;">Transformer Networks</a></h4>
-                        <p>Self-attention mechanism powering GPT, BERT, and modern LLMs.</p>
-                        <p style="margin-top: 8px; font-size: 0.9em;"><strong>Game:</strong> <a href="games/transformers/index.html" style="color: #48bb78;">Attention Master</a> - Identify which words should attend to each other</p>
-                    </div>
-                </div>
-
-                <h3 style="margin-top: 40px;">🎮 Game AI Lessons</h3>
-                <div class="algorithm-grid">
-                    <div class="algorithm-box">
-                        <h4><a href="lessons/minimax/index.html" style="color: #667eea; text-decoration: none;">Minimax Algorithm Lesson</a></h4>
-                        <p>How AI makes strategic decisions in two-player games using game tree search.</p>
-                        <p style="margin-top: 8px; font-size: 0.9em;"><strong>Game:</strong> <a href="games/connect-four/index.html" style="color: #48bb78;">Connect Four</a> - Play against AI using Minimax with alpha-beta pruning</p>
-                    </div>
-                </div>
-
-                <h3 style="margin-top: 40px;">🛠 Search Algorithms Overview</h3>
-                <div class="algorithm-grid">
-                    <div class="algorithm-box">
-                        <h4>Breadth-First Search (BFS)</h4>
-                        <p>Explores all neighbors at the current depth before going deeper. Guarantees shortest path in unweighted graphs.</p>
-                    </div>
-
-                    <div class="algorithm-box">
-                        <h4>Depth-First Search (DFS)</h4>
-                        <p>Goes as deep as possible down one path before backtracking. Fast but doesn't guarantee shortest path.</p>
-                    </div>
-
-                    <div class="algorithm-box">
-                        <h4>Uniform Cost Search (UCS)</h4>
-                        <p>Always expands the lowest-cost path first. Finds optimal path in weighted graphs.</p>
-                    </div>
-
-                    <div class="algorithm-box">
-                        <h4>A* Search</h4>
-                        <p>Uses both actual cost and estimated distance to goal. Most efficient informed search algorithm.</p>
-                    </div>
-
-                    <div class="algorithm-box">
-                        <h4>Greedy Best-First</h4>
-                        <p>Only considers estimated distance to goal. Fast but not always optimal.</p>
-                    </div>
-
-                    <div class="algorithm-box">
-                        <h4>Iterative Deepening DFS</h4>
-                        <p>Combines benefits of BFS and DFS. Memory efficient with guaranteed shortest path.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <footer>
-            <p><strong>AI 1 - Comprehensive AI Education Platform</strong></p>
-            <p>Interactive learning tools, lessons, and games for high school students (Grades 9-12)</p>
-            <p>30 Lessons • 24 Games • 9 ML Visualizers • 6 Topics • Built with HTML5, CSS3, and JavaScript</p>
-            <p style="margin-top: 10px; font-size: 0.9em;">Topics: AI Ethics, Human Centered Design, Data Science, Machine Learning, Deep Learning, Search Algorithms, and Game AI</p>
-        </footer>
     </div>
+
+    <div class="features">
+        <h2>What You'll Learn</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">⚖️</div>
+                <h3>AI Ethics</h3>
+                <p>Understand responsible AI development, bias, privacy, and ethical considerations</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <h3>Data Science</h3>
+                <p>Master data visualization, cleaning, and analysis techniques</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🤖</div>
+                <h3>Machine Learning</h3>
+                <p>Explore supervised, unsupervised, and reinforcement learning algorithms</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🧠</div>
+                <h3>Deep Learning</h3>
+                <p>Dive into neural networks, CNNs, RNNs, and transformers</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🔍</div>
+                <h3>Search Algorithms</h3>
+                <p>Understand pathfinding, optimization, and intelligent search</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🎮</div>
+                <h3>Game AI</h3>
+                <p>Learn minimax, game trees, and strategic decision making</p>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2024 Mr. Williams' AI 1 Class | Interactive Learning Platform</p>
+        <p>Coming Soon: Cybersecurity 1</p>
+    </footer>
 
     <script type="module">
         import { getCurrentUser, logoutUser } from './auth/auth-utils.js';
@@ -799,35 +367,42 @@
 
                 if (user) {
                     authButtons.style.display = 'none';
-                    userMenu.style.display = 'flex';
-                    userName.textContent = user.name || user.email.split('@')[0];
+                    userMenu.classList.add('active');
+                    userName.textContent = user.displayName || user.email.split('@')[0];
 
+                    // Show teacher link if user is a teacher
                     if (user.role === 'teacher') {
                         teacherLink.style.display = 'block';
                     }
+                } else {
+                    authButtons.style.display = 'flex';
+                    userMenu.classList.remove('active');
                 }
             } catch (error) {
                 console.error('Auth error:', error);
             }
         }
 
-        document.getElementById('dropdownToggle')?.addEventListener('click', () => {
-            const menu = document.getElementById('dropdownMenu');
-            menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+        // Dropdown toggle
+        document.getElementById('dropdownToggle').addEventListener('click', () => {
+            document.getElementById('dropdownMenu').classList.toggle('show');
         });
 
+        // Close dropdown when clicking outside
         document.addEventListener('click', (e) => {
-            if (!e.target.closest('#dropdownToggle')) {
-                document.getElementById('dropdownMenu').style.display = 'none';
+            if (!e.target.closest('.dropdown')) {
+                document.getElementById('dropdownMenu').classList.remove('show');
             }
         });
 
-        document.getElementById('logoutBtn')?.addEventListener('click', async (e) => {
+        // Logout
+        document.getElementById('logoutBtn').addEventListener('click', async (e) => {
             e.preventDefault();
             await logoutUser();
             window.location.reload();
         });
 
+        // Initialize auth on page load
         initAuth();
     </script>
 </body>
