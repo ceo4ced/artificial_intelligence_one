@@ -10,7 +10,7 @@ import {
     signOut,
     onAuthStateChanged,
     updateProfile
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
 import {
     doc,
     setDoc,
@@ -23,8 +23,8 @@ import {
     Timestamp,
     updateDoc,
     arrayUnion
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import { logEvent } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js";
+} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+import { logEvent } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-analytics.js";
 
 // ============================================================================
 // REGISTRATION FUNCTIONS

@@ -1,19 +1,21 @@
 // Firebase Configuration and Initialization
 // This file initializes Firebase services for the AI Learning Platform
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getAuth } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { getFirestore } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+import { getAuth } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+import { getFirestore } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-analytics.js";
 
 // Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: "AIzaSyCIGRhw_1SnjiLLa6wpFNLA_vGc0PSbaqc",
   authDomain: "ai-learning-platform-ncca.firebaseapp.com",
   projectId: "ai-learning-platform-ncca",
   storageBucket: "ai-learning-platform-ncca.firebasestorage.app",
   messagingSenderId: "151453153772",
-  appId: "1:151453153772:web:483526bd45fa735824e8c9"
+  appId: "1:151453153772:web:483526bd45fa735824e8c9",
+  measurementId: "G-34C5GKM7GN"
 };
 
 // Initialize Firebase
