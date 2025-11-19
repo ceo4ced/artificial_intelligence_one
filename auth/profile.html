@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - AI 1</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        nav {
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            padding: 15px 30px;
+            margin-bottom: 30px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+        h1 {
+            color: #2d3748;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+        .profile-section {
+            margin-bottom: 30px;
+        }
+        .profile-field {
+            margin-bottom: 20px;
+            padding: 20px;
+            background: #f7fafc;
+            border-radius: 10px;
+        }
+        .profile-label {
+            font-weight: 600;
+            color: #4a5568;
+            margin-bottom: 8px;
+            font-size: 0.9em;
+            text-transform: uppercase;
+        }
+        .profile-value {
+            font-size: 1.2em;
+            color: #2d3748;
+        }
+        .profile-value input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1em;
+        }
+        .role-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+        .role-student {
+            background: #bee3f8;
+            color: #2c5282;
+        }
+        .role-teacher {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1em;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #2d3748;
+            margin-left: 10px;
+        }
+        .btn-secondary:hover {
+            background: #cbd5e0;
+        }
+        .edit-mode {
+            display: none;
+        }
+        .edit-mode.active {
+            display: block;
+        }
+        .view-mode.active {
+            display: block;
+        }
+        .view-mode {
+            display: none;
+        }
+        .message {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .message.success {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+        .message.error {
+            background: #fed7d7;
+            color: #9b2c2c;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div>
+            <a href="../home.html">🤖 AI 1</a>
+        </div>
+        <div>
+            <a href="dashboard.html">← Back to Dashboard</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1>👤 My Profile</h1>
+
+        <div id="message"></div>
+
+        <div class="profile-section">
+            <div class="profile-field">
+                <div class="profile-label">Full Name</div>
+                <div class="profile-value view-mode active" id="nameView"></div>
+                <div class="edit-mode" id="nameEdit">
+                    <input type="text" id="nameInput" placeholder="Your name">
+                </div>
+            </div>
+
+            <div class="profile-field">
+                <div class="profile-label">Email</div>
+                <div class="profile-value" id="emailView"></div>
+            </div>
+
+            <div class="profile-field">
+                <div class="profile-label">Role</div>
+                <div class="profile-value">
+                    <span class="role-badge" id="roleView"></span>
+                </div>
+            </div>
+
+            <div class="profile-field">
+                <div class="profile-label">School (Optional)</div>
+                <div class="profile-value view-mode active" id="schoolView"></div>
+                <div class="edit-mode" id="schoolEdit">
+                    <input type="text" id="schoolInput" placeholder="Your school">
+                </div>
+            </div>
+
+            <div class="profile-field">
+                <div class="profile-label">Grade (Optional)</div>
+                <div class="profile-value view-mode active" id="gradeView"></div>
+                <div class="edit-mode" id="gradeEdit">
+                    <input type="text" id="gradeInput" placeholder="Your grade">
+                </div>
+            </div>
+
+            <div class="profile-field">
+                <div class="profile-label">Bio (Optional)</div>
+                <div class="profile-value view-mode active" id="bioView"></div>
+                <div class="edit-mode" id="bioEdit">
+                    <input type="text" id="bioInput" placeholder="Tell us about yourself">
+                </div>
+            </div>
+
+            <div class="profile-field">
+                <div class="profile-label">Member Since</div>
+                <div class="profile-value" id="createdView"></div>
+            </div>
+        </div>
+
+        <div id="viewButtons" class="view-mode active">
+            <button class="btn btn-primary" onclick="enableEdit()">✏️ Edit Profile</button>
+        </div>
+
+        <div id="editButtons" class="edit-mode">
+            <button class="btn btn-primary" onclick="saveProfile()">💾 Save Changes</button>
+            <button class="btn btn-secondary" onclick="cancelEdit()">❌ Cancel</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { getCurrentUser } from './auth-utils.js';
+        import { doc, updateDoc } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+        import { db } from './firebase-config.js';
+
+        let currentUser = null;
+
+        async function loadProfile() {
+            try {
+                currentUser = await getCurrentUser();
+                if (!currentUser) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                // Display profile data
+                document.getElementById('nameView').textContent = currentUser.name || 'Not set';
+                document.getElementById('emailView').textContent = currentUser.email;
+                document.getElementById('schoolView').textContent = currentUser.school || 'Not set';
+                document.getElementById('gradeView').textContent = currentUser.grade || 'Not set';
+                document.getElementById('bioView').textContent = currentUser.bio || 'Not set';
+
+                const roleView = document.getElementById('roleView');
+                roleView.textContent = currentUser.role.charAt(0).toUpperCase() + currentUser.role.slice(1);
+                roleView.className = 'role-badge role-' + currentUser.role;
+
+                const createdDate = currentUser.createdAt?.toDate ?
+                    currentUser.createdAt.toDate().toLocaleDateString() :
+                    'Unknown';
+                document.getElementById('createdView').textContent = createdDate;
+
+                // Populate edit fields
+                document.getElementById('nameInput').value = currentUser.name || '';
+                document.getElementById('schoolInput').value = currentUser.school || '';
+                document.getElementById('gradeInput').value = currentUser.grade || '';
+                document.getElementById('bioInput').value = currentUser.bio || '';
+
+            } catch (error) {
+                console.error('Error loading profile:', error);
+                showMessage('Error loading profile', 'error');
+            }
+        }
+
+        window.enableEdit = function() {
+            document.querySelectorAll('.view-mode').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.edit-mode').forEach(el => el.classList.add('active'));
+        }
+
+        window.cancelEdit = function() {
+            document.querySelectorAll('.edit-mode').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.view-mode').forEach(el => el.classList.add('active'));
+
+            // Reset values
+            document.getElementById('nameInput').value = currentUser.name || '';
+            document.getElementById('schoolInput').value = currentUser.school || '';
+            document.getElementById('gradeInput').value = currentUser.grade || '';
+            document.getElementById('bioInput').value = currentUser.bio || '';
+        }
+
+        window.saveProfile = async function() {
+            try {
+                const name = document.getElementById('nameInput').value.trim();
+                const school = document.getElementById('schoolInput').value.trim();
+                const grade = document.getElementById('gradeInput').value.trim();
+                const bio = document.getElementById('bioInput').value.trim();
+
+                if (!name) {
+                    showMessage('Name is required', 'error');
+                    return;
+                }
+
+                const userRef = doc(db, 'users', currentUser.uid);
+                await updateDoc(userRef, {
+                    name: name,
+                    school: school || null,
+                    grade: grade || null,
+                    bio: bio || null,
+                    lastUpdated: new Date()
+                });
+
+                showMessage('Profile updated successfully!', 'success');
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1500);
+
+            } catch (error) {
+                console.error('Error saving profile:', error);
+                showMessage('Error saving profile: ' + error.message, 'error');
+            }
+        }
+
+        function showMessage(text, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = text;
+            messageDiv.className = 'message ' + type;
+            setTimeout(() => {
+                messageDiv.textContent = '';
+                messageDiv.className = '';
+            }, 5000);
+        }
+
+        // Load profile on page load
+        loadProfile();
+    </script>
+</body>
+</html>
