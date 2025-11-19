@@ -7,59 +7,32 @@ service cloud.firestore {
     // HELPER FUNCTIONS
     // ============================================
 
-    /**
-     * Check if the authenticated user is the same as the requested user
-     */
     function isCurrentUser(userId) {
       return request.auth.uid == userId;
     }
 
-    /**
-     * Check if the authenticated user has a specific role
-     */
     function hasRole(role) {
       return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == role;
     }
 
-    /**
-     * Check if user is a teacher
-     */
     function isTeacher() {
       return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'teacher';
     }
 
-    /**
-     * Check if user is a student
-     */
     function isStudent() {
       return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'student';
     }
 
-    /**
-     * Calculate age from birthdate
-     * Returns the age in years based on the provided birthdate
-     */
+    // Refactored to remove 'let' statements for better compatibility
     function calculateAge(birthdate) {
-      let now = request.time;
-      let birthTime = timestamp(birthdate);
-      let ageInSeconds = now - birthTime;
-      // Approximate: 1 year = 31,536,000 seconds (365 days)
-      return int(ageInSeconds / duration.value('31536000s'));
+      return int((request.time - timestamp(birthdate)) / duration.value('31536000s'));
     }
 
-    /**
-     * Verify user is at least 13 years old based on birthdate
-     */
     function isAtLeast13(birthdate) {
       return calculateAge(birthdate) >= 13;
     }
 
-    /**
-     * Check if user's email is a teacher-approved email
-     */
     function isApprovedTeacherEmail(email) {
-      // Approved teacher email addresses
-      // Modify this list to include actual authorized teacher emails
       return email in [
         'teacher@school.edu',
         'instructor@school.edu',
@@ -67,38 +40,19 @@ service cloud.firestore {
       ];
     }
 
-    /**
-     * Verify the role assignment is valid
-     * Students can only assign 'student' role to themselves
-     * Teachers can only assign 'teacher' role to themselves if they have approved email
-     */
+    // REFACTORED: Single expression, no IF statements
     function isValidRoleAssignment(newRole, email) {
-      // New users registering as student
-      if (newRole == 'student') {
-        return true;
-      }
-      // New users registering as teacher must use approved email
-      if (newRole == 'teacher') {
-        return isApprovedTeacherEmail(email);
-      }
-      return false;
+      return newRole == 'student'
+          || (newRole == 'teacher' && isApprovedTeacherEmail(email));
     }
 
-    /**
-     * Prevent role escalation/changes
-     * Users cannot modify their own role once created
-     */
     function roleNotChanged() {
       let currentUserDoc = get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
       return request.resource.data.role == currentUserDoc.role;
     }
 
-    /**
-     * Validate user profile has required fields
-     */
     function hasRequiredUserFields() {
-      let data = request.resource.data;
-      return data.keys().hasAll(['email', 'name', 'birthdate', 'role', 'createdAt']);
+      return request.resource.data.keys().hasAll(['email', 'name', 'birthdate', 'role', 'createdAt']);
     }
 
     // ============================================
@@ -106,22 +60,8 @@ service cloud.firestore {
     // ============================================
 
     match /users/{userId} {
-
-      /**
-       * READ RULES:
-       * - Users can read ONLY their own profile
-       * - Teachers can read ALL user profiles
-       */
       allow read: if isCurrentUser(userId) || isTeacher();
 
-      /**
-       * CREATE RULES:
-       * - New users can only create their own profile
-       * - Must include all required fields: email, name, birthdate, role, createdAt
-       * - Must be at least 13 years old (COPPA compliance)
-       * - If registering as teacher, email must be approved
-       * - Role assignment must be valid
-       */
       allow create: if isCurrentUser(userId)
         && hasRequiredUserFields()
         && isAtLeast13(request.resource.data.birthdate)
@@ -131,14 +71,6 @@ service cloud.firestore {
              'bio', 'profilePictureUrl', 'school', 'grade'
            ]);
 
-      /**
-       * UPDATE RULES:
-       * - Users can only update their own profile
-       * - Teachers can update their own profile
-       * - CRITICAL: Role field cannot be changed (prevents privilege escalation)
-       * - Cannot modify createdAt timestamp
-       * - Birthdate cannot be changed (prevents age verification bypass)
-       */
       allow update: if isCurrentUser(userId)
         && roleNotChanged()
         && request.resource.data.createdAt == resource.data.createdAt
@@ -149,11 +81,6 @@ service cloud.firestore {
              'lastUpdated'
            ]);
 
-      /**
-       * DELETE RULES:
-       * - DENIED: Users cannot delete profiles (data retention policy)
-       * - Only Firebase Admin SDK can delete profiles for GDPR compliance
-       */
       allow delete: if false;
 
       // ============================================
@@ -161,20 +88,8 @@ service cloud.firestore {
       // ============================================
 
       match /quizScores/{quizId} {
-
-        /**
-         * READ RULES:
-         * - Students can read ONLY their own quiz scores
-         * - Teachers can read ALL students' quiz scores
-         */
         allow read: if isCurrentUser(userId) || isTeacher();
 
-        /**
-         * CREATE RULES:
-         * - Only the student can create their own quiz score
-         * - Must include required fields: quizId, score, maxScore, completedAt, answers
-         * - Score must be between 0 and maxScore
-         */
         allow create: if isCurrentUser(userId)
           && request.resource.data.keys().hasAll(['quizId', 'score', 'maxScore', 'completedAt'])
           && request.resource.data.score >= 0
@@ -184,12 +99,6 @@ service cloud.firestore {
                'timeTaken', 'feedback', 'attempts'
              ]);
 
-        /**
-         * UPDATE RULES:
-         * - Students can update their own quiz scores (for retry attempts)
-         * - Teachers CANNOT modify student quiz scores (preserve academic records)
-         * - Cannot modify completedAt or previous attempt data
-         */
         allow update: if isCurrentUser(userId)
           && isStudent()
           && request.resource.data.quizId == resource.data.quizId
@@ -199,12 +108,6 @@ service cloud.firestore {
                'timeTaken', 'feedback', 'attempts', 'lastAttemptAt'
              ]);
 
-        /**
-         * DELETE RULES:
-         * - STRICTLY DENIED: Quiz scores cannot be deleted
-         * - Academic records must be preserved for integrity
-         * - Only Firebase Admin SDK can remove data for legal reasons
-         */
         allow delete: if false;
       }
     }
@@ -214,14 +117,7 @@ service cloud.firestore {
     // ============================================
 
     match /quizzes/{quizId} {
-      /**
-       * All authenticated users can read quiz definitions
-       */
       allow read: if request.auth != null;
-
-      /**
-       * Only admin (via Firebase Admin SDK) can create/update/delete quizzes
-       */
       allow write: if false;
     }
 
@@ -230,25 +126,14 @@ service cloud.firestore {
     // ============================================
 
     match /systemLogs/{logId} {
-      /**
-       * Only teachers can read system logs
-       */
       allow read: if isTeacher();
-
-      /**
-       * Only Firebase Admin SDK can write logs
-       */
       allow write: if false;
     }
 
     // ============================================
-    // CATCH-ALL: DENY ALL OTHER ACCESS
+    // CATCH-ALL
     // ============================================
 
-    /**
-     * Default deny rule for any collection not explicitly matched
-     * Ensures fail-safe security posture
-     */
     match /{document=**} {
       allow read, write: if false;
     }
