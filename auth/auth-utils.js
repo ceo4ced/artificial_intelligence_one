@@ -237,14 +237,50 @@ export async function logout() {
 // ============================================================================
 
 /**
- * Check if user is authenticated
- * Returns a promise that resolves with user or null
+ * Check if user is authenticated and fetch their profile data
+ * Returns a promise that resolves with combined user + profile data or null
  */
 export function getCurrentUser() {
     return new Promise((resolve) => {
-        const unsubscribe = onAuthStateChanged(auth, (user) => {
+        const unsubscribe = onAuthStateChanged(auth, async (user) => {
             unsubscribe();
-            resolve(user);
+
+            if (!user) {
+                resolve(null);
+                return;
+            }
+
+            // Fetch Firestore profile to get role and other data
+            try {
+                const userDoc = await getDoc(doc(db, 'users', user.uid));
+                if (userDoc.exists()) {
+                    // Combine Auth user with Firestore profile data
+                    const profileData = userDoc.data();
+                    resolve({
+                        ...user,
+                        uid: user.uid,
+                        email: user.email,
+                        displayName: profileData.displayName || user.displayName,
+                        role: profileData.role,
+                        name: profileData.displayName, // Alias for compatibility
+                        birthdate: profileData.birthdate,
+                        age: profileData.age,
+                        school: profileData.school,
+                        grade: profileData.grade,
+                        bio: profileData.bio,
+                        createdAt: profileData.createdAt,
+                        totalQuizzesTaken: profileData.totalQuizzesTaken || 0,
+                        averageScore: profileData.averageScore || 0
+                    });
+                } else {
+                    // Profile doesn't exist yet, return auth user only
+                    resolve(user);
+                }
+            } catch (error) {
+                console.error('Error fetching user profile:', error);
+                // Return auth user even if profile fetch fails
+                resolve(user);
+            }
         });
     });
 }

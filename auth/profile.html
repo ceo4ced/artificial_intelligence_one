@@ -283,7 +283,7 @@
 
                 const userRef = doc(db, 'users', currentUser.uid);
                 await updateDoc(userRef, {
-                    name: name,
+                    displayName: name,
                     school: school || null,
                     grade: grade || null,
                     bio: bio || null,
