@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Recurrent Neural Network Visualizer - Deep Learning Tool</title>
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 0;
+}
+
+.nav-header {
+    background: #2d3748;
+    padding: 15px 30px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.nav-header a {
+    color: #90cdf4;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1.1em;
+    transition: color 0.3s;
+    margin-left: 15px;
+}
+
+.nav-header a:hover {
+    color: #63b3ed;
+}
+
+.nav-title {
+    color: #fff;
+    font-size: 1.2em;
+    font-weight: 700;
+}
+
+.nav-links {
+    display: flex;
+    gap: 10px;
+}
+
+.page-wrapper {
+    padding: 20px;
+}
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+
+h1 {
+    text-align: center;
+    color: #2d3748;
+    margin-bottom: 10px;
+    font-size: 2.5em;
+}
+
+.subtitle {
+    text-align: center;
+    color: #4a5568;
+    margin-bottom: 30px;
+    font-size: 1.1em;
+}
+
+.info-section {
+    background: #e8f5e9;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 25px;
+    border-left: 5px solid #4CAF50;
+}
+
+.info-section h3 {
+    color: #2e7d32;
+    margin-bottom: 10px;
+}
+
+.info-section p {
+    color: #1b5e20;
+    line-height: 1.6;
+    margin-bottom: 8px;
+}
+
+.info-section ul {
+    list-style-position: inside;
+    color: #1b5e20;
+    line-height: 1.8;
+}
+
+.main-content {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 30px;
+    margin-bottom: 30px;
+}
+
+.sidebar {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 10px;
+    height: fit-content;
+}
+
+.sidebar h3 {
+    color: #2d3748;
+    margin-bottom: 15px;
+    font-size: 1.3em;
+}
+
+.control-section {
+    margin-bottom: 20px;
+}
+
+.control-section label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #4a5568;
+}
+
+input[type="text"],
+input[type="range"] {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    font-family: inherit;
+}
+
+input[type="range"] {
+    padding: 5px;
+    cursor: pointer;
+}
+
+.slider-value {
+    display: inline-block;
+    background: #667eea;
+    color: white;
+    padding: 4px 12px;
+    border-radius: 5px;
+    font-weight: 600;
+    margin-left: 10px;
+    font-size: 0.9em;
+}
+
+button {
+    width: 100%;
+    padding: 12px;
+    font-size: 14px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    margin-bottom: 10px;
+}
+
+button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+button:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn-primary {
+    background: #4CAF50;
+    color: #fff;
+}
+
+.btn-primary:hover:not(:disabled) {
+    background: #45a049;
+}
+
+.btn-secondary {
+    background: #2196F3;
+    color: #fff;
+}
+
+.btn-secondary:hover:not(:disabled) {
+    background: #0b7dda;
+}
+
+.btn-danger {
+    background: #f44336;
+    color: #fff;
+}
+
+.btn-danger:hover:not(:disabled) {
+    background: #da190b;
+}
+
+.sample-buttons {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+    margin-bottom: 15px;
+}
+
+.sample-buttons button {
+    font-size: 12px;
+    padding: 8px;
+    text-align: left;
+}
+
+.visualization-area {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    padding: 20px;
+}
+
+.canvas-container {
+    margin-bottom: 20px;
+}
+
+canvas {
+    display: block;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    background: #fafafa;
+    margin: 0 auto;
+}
+
+.status-indicator {
+    background: #e3f2fd;
+    padding: 10px;
+    border-radius: 6px;
+    margin-bottom: 15px;
+    font-size: 0.9em;
+    color: #1565c0;
+    font-weight: 600;
+    text-align: center;
+}
+
+.status-indicator.processing {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.status-indicator.complete {
+    background: #d4edda;
+    color: #155724;
+}
+
+.status-indicator.error {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.gradient-demo {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 15px;
+}
+
+.gradient-demo h4 {
+    margin-bottom: 10px;
+    font-size: 1.1em;
+}
+
+.gradient-bars {
+    display: flex;
+    gap: 5px;
+    margin-top: 10px;
+    height: 40px;
+}
+
+.gradient-bar {
+    flex: 1;
+    background: #4CAF50;
+    border-radius: 4px;
+    transition: all 0.5s;
+}
+
+@media (max-width: 1200px) {
+    .main-content {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+</head>
+<body>
+<nav class="nav-header">
+    <div class="nav-title">Recurrent Neural Network Visualizer</div>
+    <div class="nav-links">
+        <a href="../../deep-learning.html">Deep Learning Hub</a>
+        <a href="../../index.html">Home</a>
+    </div>
+</nav>
+
+<div class="page-wrapper">
+    <div class="container">
+        <h1>Recurrent Neural Network Visualizer</h1>
+        <p class="subtitle">Explore how RNNs process sequences step by step!</p>
+
+        <div class="info-section">
+            <h3>What are Recurrent Neural Networks (RNNs)?</h3>
+            <p>
+                RNNs are neural networks designed to process sequential data by maintaining a "memory" (hidden state)
+                that gets updated at each step. Unlike feedforward networks, RNNs have loops that allow information
+                to persist across timesteps, making them ideal for tasks like language modeling, time series prediction,
+                and speech recognition.
+            </p>
+            <p><strong>Key concepts:</strong></p>
+            <ul>
+                <li><strong>Hidden State:</strong> The network's memory that carries information from previous timesteps</li>
+                <li><strong>Recurrent Connection:</strong> Feedback loop that passes hidden state to the next timestep</li>
+                <li><strong>Sequence Processing:</strong> Input is processed one element at a time, left to right</li>
+                <li><strong>Temporal Dependencies:</strong> RNNs can learn patterns that span across time</li>
+                <li><strong>Vanishing Gradients:</strong> Common problem where gradients shrink exponentially over long sequences</li>
+                <li><strong>Unrolling:</strong> Visualizing the RNN as a chain of copies, one for each timestep</li>
+            </ul>
+        </div>
+
+        <div class="main-content">
+            <div class="sidebar">
+                <h3>Controls</h3>
+
+                <div class="status-indicator" id="statusIndicator">
+                    Enter a sequence to begin
+                </div>
+
+                <div class="control-section">
+                    <label>Input Sequence:</label>
+                    <input type="text" id="sequenceInput" placeholder="e.g., HELLO" value="HELLO" maxlength="10">
+                    <p style="font-size: 0.85em; color: #666; margin-top: 5px;">Max 10 characters</p>
+                </div>
+
+                <div class="control-section">
+                    <label>Hidden State Size: <span class="slider-value" id="hiddenSizeValue">8</span></label>
+                    <input type="range" id="hiddenSize" min="4" max="16" value="8" step="1">
+                </div>
+
+                <div class="control-section">
+                    <label>Animation Speed (ms): <span class="slider-value" id="speedValue">200</span></label>
+                    <input type="range" id="animationSpeed" min="100" max="300" value="200" step="50">
+                </div>
+
+                <button class="btn-primary" id="processBtn" onclick="processSequence()">Process Sequence</button>
+                <button class="btn-secondary" id="stepBtn" onclick="stepForward()" disabled>Step Forward</button>
+                <button class="btn-danger" id="resetBtn" onclick="resetVisualization()" disabled>Reset</button>
+
+                <div class="control-section">
+                    <label>Sample Sequences:</label>
+                    <div class="sample-buttons">
+                        <button class="btn-secondary" onclick="loadSample('HELLO')">Text: HELLO</button>
+                        <button class="btn-secondary" onclick="loadSample('1234')">Numbers: 1234</button>
+                        <button class="btn-secondary" onclick="loadSample('ABCDEF')">Pattern: ABCDEF</button>
+                        <button class="btn-secondary" onclick="loadSample('SINE')">Special: SINE (wave)</button>
+                    </div>
+                </div>
+
+                <div class="control-section">
+                    <label>Instructions:</label>
+                    <p style="font-size: 0.9em; color: #4a5568; line-height: 1.6;">
+                        1. Enter or select a sequence<br>
+                        2. Adjust hidden state size<br>
+                        3. Click "Process Sequence" to animate<br>
+                        4. Or use "Step Forward" for manual control<br>
+                        5. Watch the hidden state evolve!
+                    </p>
+                </div>
+
+                <div class="gradient-demo">
+                    <h4>Vanishing Gradient Demo</h4>
+                    <p style="font-size: 0.85em; margin-bottom: 10px;">
+                        Watch gradients shrink over long sequences:
+                    </p>
+                    <div class="gradient-bars" id="gradientBars"></div>
+                </div>
+            </div>
+
+            <div class="visualization-area">
+                <h3 style="color: #2d3748; margin-bottom: 15px;">Unrolled RNN Architecture</h3>
+                <div class="canvas-container">
+                    <canvas id="unrolledCanvas" width="900" height="400"></canvas>
+                </div>
+
+                <h3 style="color: #2d3748; margin: 20px 0 15px 0;">Hidden State Evolution (Heatmap)</h3>
+                <div class="canvas-container">
+                    <canvas id="heatmapCanvas" width="600" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const unrolledCanvas = document.getElementById('unrolledCanvas');
+const unrolledCtx = unrolledCanvas.getContext('2d');
+const heatmapCanvas = document.getElementById('heatmapCanvas');
+const heatmapCtx = heatmapCanvas.getContext('2d');
+
+let sequence = [];
+let hiddenStates = [];
+let currentStep = 0;
+let isProcessing = false;
+let animationInterval = null;
+let hiddenSize = 8;
+
+// Initialize gradient bars
+function initGradientBars() {
+    const container = document.getElementById('gradientBars');
+    container.innerHTML = '';
+    for (let i = 0; i < 10; i++) {
+        const bar = document.createElement('div');
+        bar.className = 'gradient-bar';
+        bar.id = `gradient-bar-${i}`;
+        container.appendChild(bar);
+    }
+}
+
+// Update slider displays
+document.getElementById('hiddenSize').addEventListener('input', (e) => {
+    hiddenSize = parseInt(e.target.value);
+    document.getElementById('hiddenSizeValue').textContent = hiddenSize;
+});
+
+document.getElementById('animationSpeed').addEventListener('input', (e) => {
+    document.getElementById('speedValue').textContent = e.target.value;
+});
+
+// Load sample sequence
+function loadSample(text) {
+    document.getElementById('sequenceInput').value = text;
+}
+
+// Process the entire sequence with animation
+function processSequence() {
+    const input = document.getElementById('sequenceInput').value.trim().toUpperCase();
+
+    if (!input) {
+        updateStatus('Please enter a sequence!', 'error');
+        return;
+    }
+
+    if (input.length > 10) {
+        updateStatus('Sequence too long! Max 10 characters.', 'error');
+        return;
+    }
+
+    // Initialize sequence
+    sequence = input.split('');
+    hiddenStates = [];
+    currentStep = 0;
+    isProcessing = true;
+
+    // Initialize first hidden state
+    let prevHidden = initializeHiddenState();
+    hiddenStates.push(prevHidden);
+
+    // Disable controls
+    document.getElementById('processBtn').disabled = true;
+    document.getElementById('stepBtn').disabled = true;
+    document.getElementById('resetBtn').disabled = false;
+
+    updateStatus(`Processing sequence: ${input}`, 'processing');
+
+    // Animate through sequence
+    const speed = parseInt(document.getElementById('animationSpeed').value);
+    let step = 0;
+
+    animationInterval = setInterval(() => {
+        if (step < sequence.length) {
+            currentStep = step;
+
+            // Calculate next hidden state
+            const nextHidden = calculateHiddenState(sequence[step], hiddenStates[step]);
+            hiddenStates.push(nextHidden);
+
+            // Update visualizations
+            drawUnrolledRNN();
+            drawHeatmap();
+            updateGradientBars(step);
+
+            step++;
+        } else {
+            clearInterval(animationInterval);
+            isProcessing = false;
+            currentStep = sequence.length;
+            updateStatus('Sequence processing complete!', 'complete');
+            document.getElementById('processBtn').disabled = false;
+            document.getElementById('stepBtn').disabled = false;
+        }
+    }, speed);
+}
+
+// Step through sequence manually
+function stepForward() {
+    if (currentStep >= sequence.length) {
+        updateStatus('Sequence complete! Reset to start over.', 'complete');
+        return;
+    }
+
+    if (currentStep === 0) {
+        // Initialize
+        const input = document.getElementById('sequenceInput').value.trim().toUpperCase();
+        sequence = input.split('');
+        hiddenStates = [initializeHiddenState()];
+
+        document.getElementById('resetBtn').disabled = false;
+        updateStatus(`Stepping through: ${input}`, 'processing');
+    }
+
+    // Calculate next hidden state
+    const nextHidden = calculateHiddenState(sequence[currentStep], hiddenStates[currentStep]);
+    hiddenStates.push(nextHidden);
+
+    // Update visualizations
+    drawUnrolledRNN();
+    drawHeatmap();
+    updateGradientBars(currentStep);
+
+    currentStep++;
+
+    if (currentStep >= sequence.length) {
+        updateStatus('Sequence complete!', 'complete');
+    }
+}
+
+// Reset visualization
+function resetVisualization() {
+    sequence = [];
+    hiddenStates = [];
+    currentStep = 0;
+    isProcessing = false;
+
+    if (animationInterval) {
+        clearInterval(animationInterval);
+        animationInterval = null;
+    }
+
+    document.getElementById('processBtn').disabled = false;
+    document.getElementById('stepBtn').disabled = false;
+    document.getElementById('resetBtn').disabled = true;
+
+    unrolledCtx.clearRect(0, 0, unrolledCanvas.width, unrolledCanvas.height);
+    heatmapCtx.clearRect(0, 0, heatmapCanvas.width, heatmapCanvas.height);
+
+    updateStatus('Enter a sequence to begin', '');
+    initGradientBars();
+}
+
+// Initialize hidden state with random small values
+function initializeHiddenState() {
+    const state = [];
+    for (let i = 0; i < hiddenSize; i++) {
+        state.push(Math.random() * 0.2 - 0.1); // Small random values
+    }
+    return state;
+}
+
+// Simulate RNN hidden state calculation
+function calculateHiddenState(input, prevHidden) {
+    const nextHidden = [];
+
+    // Simple RNN: h_t = tanh(W_x * x_t + W_h * h_{t-1} + b)
+    // Simulate with random weights
+
+    // Convert input to a simple embedding
+    const inputValue = input.charCodeAt(0) / 255.0;
+
+    for (let i = 0; i < hiddenSize; i++) {
+        // Random weights for demonstration
+        const w_x = (Math.sin(i + inputValue) + 1) / 2;
+        const w_h = 0.5 + Math.cos(i) * 0.3;
+
+        // Recurrent calculation
+        const raw = w_x * inputValue + w_h * prevHidden[i] + (Math.random() * 0.1 - 0.05);
+
+        // Tanh activation
+        nextHidden.push(Math.tanh(raw));
+    }
+
+    return nextHidden;
+}
+
+// Draw unrolled RNN visualization
+function drawUnrolledRNN() {
+    unrolledCtx.clearRect(0, 0, unrolledCanvas.width, unrolledCanvas.height);
+
+    if (sequence.length === 0) return;
+
+    const steps = Math.min(currentStep + 1, sequence.length);
+    const cellWidth = Math.min(100, (unrolledCanvas.width - 100) / (steps + 1));
+    const cellHeight = 60;
+    const startX = 50;
+    const rnnY = 200;
+    const inputY = 320;
+    const outputY = 80;
+
+    // Draw each timestep
+    for (let t = 0; t <= steps; t++) {
+        const x = startX + t * cellWidth;
+
+        // Draw RNN cell
+        const isActive = t === currentStep || (isProcessing && t <= currentStep);
+        const cellColor = isActive ? '#4CAF50' : '#667eea';
+
+        unrolledCtx.fillStyle = cellColor;
+        unrolledCtx.fillRect(x - 30, rnnY - 30, cellWidth - 20, cellHeight);
+        unrolledCtx.strokeStyle = '#2d3748';
+        unrolledCtx.lineWidth = 2;
+        unrolledCtx.strokeRect(x - 30, rnnY - 30, cellWidth - 20, cellHeight);
+
+        // Cell label
+        unrolledCtx.fillStyle = '#fff';
+        unrolledCtx.font = 'bold 14px Arial';
+        unrolledCtx.textAlign = 'center';
+        unrolledCtx.textBaseline = 'middle';
+        unrolledCtx.fillText(`RNN`, x + (cellWidth - 50) / 2 - 30, rnnY);
+
+        // Draw input if exists
+        if (t < sequence.length && t < steps) {
+            // Input node
+            unrolledCtx.fillStyle = '#2196F3';
+            unrolledCtx.beginPath();
+            unrolledCtx.arc(x + (cellWidth - 50) / 2 - 30, inputY, 20, 0, Math.PI * 2);
+            unrolledCtx.fill();
+            unrolledCtx.stroke();
+
+            // Input character
+            unrolledCtx.fillStyle = '#fff';
+            unrolledCtx.font = 'bold 16px Arial';
+            unrolledCtx.fillText(sequence[t], x + (cellWidth - 50) / 2 - 30, inputY);
+
+            // Arrow from input to RNN
+            drawArrow(x + (cellWidth - 50) / 2 - 30, inputY - 20, x + (cellWidth - 50) / 2 - 30, rnnY + 30, '#2196F3');
+        }
+
+        // Draw output
+        if (t > 0 && t <= steps) {
+            // Output node
+            unrolledCtx.fillStyle = '#ff9800';
+            unrolledCtx.beginPath();
+            unrolledCtx.arc(x + (cellWidth - 50) / 2 - 30, outputY, 20, 0, Math.PI * 2);
+            unrolledCtx.fill();
+            unrolledCtx.stroke();
+
+            // Output label
+            unrolledCtx.fillStyle = '#fff';
+            unrolledCtx.font = 'bold 12px Arial';
+            unrolledCtx.fillText('h' + t, x + (cellWidth - 50) / 2 - 30, outputY);
+
+            // Arrow from RNN to output
+            drawArrow(x + (cellWidth - 50) / 2 - 30, rnnY - 30, x + (cellWidth - 50) / 2 - 30, outputY + 20, '#ff9800');
+        }
+
+        // Draw recurrent connection
+        if (t > 0 && t <= steps) {
+            const prevX = startX + (t - 1) * cellWidth;
+            const curX = x;
+
+            // Curved recurrent arrow
+            unrolledCtx.strokeStyle = '#4CAF50';
+            unrolledCtx.lineWidth = 3;
+            unrolledCtx.beginPath();
+            unrolledCtx.moveTo(prevX + (cellWidth - 50) / 2 + 10, rnnY);
+
+            const midY = rnnY - 50;
+            unrolledCtx.bezierCurveTo(
+                prevX + (cellWidth - 50) / 2 + 10, midY,
+                curX + (cellWidth - 50) / 2 - 60, midY,
+                curX + (cellWidth - 50) / 2 - 60, rnnY
+            );
+            unrolledCtx.stroke();
+
+            // Arrow head
+            drawArrowHead(curX + (cellWidth - 50) / 2 - 60, rnnY, -Math.PI / 2, '#4CAF50');
+        }
+
+        // Timestep label
+        unrolledCtx.fillStyle = '#2d3748';
+        unrolledCtx.font = 'bold 12px Arial';
+        unrolledCtx.textAlign = 'center';
+        unrolledCtx.fillText(`t=${t}`, x + (cellWidth - 50) / 2 - 30, inputY + 40);
+    }
+
+    // Legend
+    unrolledCtx.fillStyle = '#2d3748';
+    unrolledCtx.font = 'bold 14px Arial';
+    unrolledCtx.textAlign = 'left';
+    unrolledCtx.fillText('Input Sequence', 10, inputY);
+    unrolledCtx.fillText('Hidden States', 10, outputY);
+    unrolledCtx.fillText('RNN Cells', 10, rnnY);
+}
+
+// Draw heatmap of hidden state evolution
+function drawHeatmap() {
+    heatmapCtx.clearRect(0, 0, heatmapCanvas.width, heatmapCanvas.height);
+
+    if (hiddenStates.length === 0) return;
+
+    const steps = hiddenStates.length;
+    const cellWidth = Math.min(50, (heatmapCanvas.width - 100) / steps);
+    const cellHeight = Math.min(25, (heatmapCanvas.height - 80) / hiddenSize);
+    const startX = 80;
+    const startY = 40;
+
+    // Draw heatmap cells
+    for (let t = 0; t < steps; t++) {
+        for (let h = 0; h < hiddenSize; h++) {
+            const x = startX + t * cellWidth;
+            const y = startY + h * cellHeight;
+            const value = hiddenStates[t][h];
+
+            // Color based on value (-1 to 1 from tanh)
+            const normalized = (value + 1) / 2; // 0 to 1
+            const color = getHeatmapColor(normalized);
+
+            heatmapCtx.fillStyle = color;
+            heatmapCtx.fillRect(x, y, cellWidth, cellHeight);
+
+            heatmapCtx.strokeStyle = '#ddd';
+            heatmapCtx.lineWidth = 1;
+            heatmapCtx.strokeRect(x, y, cellWidth, cellHeight);
+        }
+    }
+
+    // Draw timestep labels
+    heatmapCtx.fillStyle = '#2d3748';
+    heatmapCtx.font = 'bold 11px Arial';
+    heatmapCtx.textAlign = 'center';
+
+    for (let t = 0; t < steps; t++) {
+        const x = startX + t * cellWidth + cellWidth / 2;
+        heatmapCtx.fillText(`t${t}`, x, startY + hiddenSize * cellHeight + 20);
+
+        // Input character if exists
+        if (t > 0 && t - 1 < sequence.length) {
+            heatmapCtx.fillStyle = '#2196F3';
+            heatmapCtx.font = 'bold 10px Arial';
+            heatmapCtx.fillText(sequence[t - 1], x, startY - 10);
+            heatmapCtx.fillStyle = '#2d3748';
+            heatmapCtx.font = 'bold 11px Arial';
+        }
+    }
+
+    // Draw hidden unit labels
+    heatmapCtx.textAlign = 'right';
+    for (let h = 0; h < hiddenSize; h++) {
+        const y = startY + h * cellHeight + cellHeight / 2;
+        heatmapCtx.fillText(`h${h}`, startX - 10, y + 4);
+    }
+
+    // Axis labels
+    heatmapCtx.fillStyle = '#667eea';
+    heatmapCtx.font = 'bold 13px Arial';
+    heatmapCtx.textAlign = 'center';
+    heatmapCtx.fillText('Time Steps →', startX + (steps * cellWidth) / 2, heatmapCanvas.height - 10);
+
+    heatmapCtx.save();
+    heatmapCtx.translate(15, startY + (hiddenSize * cellHeight) / 2);
+    heatmapCtx.rotate(-Math.PI / 2);
+    heatmapCtx.fillText('Hidden Units →', 0, 0);
+    heatmapCtx.restore();
+
+    // Color scale legend
+    drawColorLegend();
+}
+
+// Draw color scale legend
+function drawColorLegend() {
+    const legendX = heatmapCanvas.width - 80;
+    const legendY = 40;
+    const legendWidth = 30;
+    const legendHeight = 150;
+
+    // Gradient
+    const gradient = heatmapCtx.createLinearGradient(0, legendY, 0, legendY + legendHeight);
+    gradient.addColorStop(0, '#ff0000');
+    gradient.addColorStop(0.5, '#ffff00');
+    gradient.addColorStop(1, '#0000ff');
+
+    heatmapCtx.fillStyle = gradient;
+    heatmapCtx.fillRect(legendX, legendY, legendWidth, legendHeight);
+    heatmapCtx.strokeStyle = '#2d3748';
+    heatmapCtx.lineWidth = 2;
+    heatmapCtx.strokeRect(legendX, legendY, legendWidth, legendHeight);
+
+    // Labels
+    heatmapCtx.fillStyle = '#2d3748';
+    heatmapCtx.font = 'bold 10px Arial';
+    heatmapCtx.textAlign = 'left';
+    heatmapCtx.fillText('1.0', legendX + legendWidth + 5, legendY + 5);
+    heatmapCtx.fillText('0.0', legendX + legendWidth + 5, legendY + legendHeight / 2 + 5);
+    heatmapCtx.fillText('-1.0', legendX + legendWidth + 5, legendY + legendHeight);
+}
+
+// Get heatmap color based on value (0 to 1)
+function getHeatmapColor(value) {
+    // Blue (low) -> Yellow (mid) -> Red (high)
+    if (value < 0.5) {
+        const t = value * 2;
+        const r = Math.floor(t * 255);
+        const g = Math.floor(t * 255);
+        const b = 255;
+        return `rgb(${r}, ${g}, ${b})`;
+    } else {
+        const t = (value - 0.5) * 2;
+        const r = 255;
+        const g = Math.floor((1 - t) * 255);
+        const b = Math.floor((1 - t) * 255);
+        return `rgb(${r}, ${g}, ${b})`;
+    }
+}
+
+// Update gradient bars to show vanishing gradient
+function updateGradientBars(step) {
+    for (let i = 0; i < 10; i++) {
+        const bar = document.getElementById(`gradient-bar-${i}`);
+        if (!bar) continue;
+
+        // Simulate exponential decay of gradients
+        const distance = Math.max(0, step - i);
+        const gradient = Math.exp(-distance * 0.3);
+
+        // Update bar height and opacity
+        const opacity = 0.3 + gradient * 0.7;
+        const height = gradient * 100;
+
+        bar.style.opacity = opacity;
+        bar.style.height = height + '%';
+
+        // Color based on gradient magnitude
+        if (gradient > 0.7) {
+            bar.style.background = '#4CAF50';
+        } else if (gradient > 0.3) {
+            bar.style.background = '#ff9800';
+        } else {
+            bar.style.background = '#f44336';
+        }
+    }
+}
+
+// Helper function to draw an arrow
+function drawArrow(x1, y1, x2, y2, color) {
+    unrolledCtx.strokeStyle = color;
+    unrolledCtx.lineWidth = 2;
+    unrolledCtx.beginPath();
+    unrolledCtx.moveTo(x1, y1);
+    unrolledCtx.lineTo(x2, y2);
+    unrolledCtx.stroke();
+
+    drawArrowHead(x2, y2, Math.atan2(y2 - y1, x2 - x1), color);
+}
+
+// Helper function to draw arrow head
+function drawArrowHead(x, y, angle, color) {
+    const headLength = 10;
+
+    unrolledCtx.fillStyle = color;
+    unrolledCtx.beginPath();
+    unrolledCtx.moveTo(x, y);
+    unrolledCtx.lineTo(
+        x - headLength * Math.cos(angle - Math.PI / 6),
+        y - headLength * Math.sin(angle - Math.PI / 6)
+    );
+    unrolledCtx.lineTo(
+        x - headLength * Math.cos(angle + Math.PI / 6),
+        y - headLength * Math.sin(angle + Math.PI / 6)
+    );
+    unrolledCtx.closePath();
+    unrolledCtx.fill();
+}
+
+// Update status indicator
+function updateStatus(message, type) {
+    const indicator = document.getElementById('statusIndicator');
+    indicator.textContent = message;
+    indicator.className = 'status-indicator';
+
+    if (type) {
+        indicator.classList.add(type);
+    }
+}
+
+// Initialize on load
+window.addEventListener('load', () => {
+    initGradientBars();
+    updateStatus('Enter a sequence to begin', '');
+});
+</script>
+</body>
+</html>

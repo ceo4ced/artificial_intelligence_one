@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LSTM Gates Visualizer - Deep Learning Tool</title>
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 0;
+}
+
+.nav-header {
+    background: #2d3748;
+    padding: 15px 30px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.nav-header a {
+    color: #90cdf4;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1.1em;
+    transition: color 0.3s;
+    margin-left: 15px;
+}
+
+.nav-header a:hover {
+    color: #63b3ed;
+}
+
+.nav-title {
+    color: #fff;
+    font-size: 1.2em;
+    font-weight: 700;
+}
+
+.nav-links {
+    display: flex;
+    gap: 10px;
+}
+
+.page-wrapper {
+    padding: 20px;
+}
+
+.container {
+    max-width: 1600px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+
+h1 {
+    text-align: center;
+    color: #2d3748;
+    margin-bottom: 10px;
+    font-size: 2.5em;
+}
+
+.subtitle {
+    text-align: center;
+    color: #4a5568;
+    margin-bottom: 30px;
+    font-size: 1.1em;
+}
+
+.info-section {
+    background: #e3f2fd;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 25px;
+    border-left: 5px solid #2196F3;
+}
+
+.info-section h3 {
+    color: #1565c0;
+    margin-bottom: 10px;
+}
+
+.info-section p {
+    color: #0d47a1;
+    line-height: 1.6;
+    margin-bottom: 8px;
+}
+
+.info-section ul {
+    list-style-position: inside;
+    color: #0d47a1;
+    line-height: 1.8;
+}
+
+.main-content {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 30px;
+    margin-bottom: 30px;
+}
+
+.sidebar {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 10px;
+    height: fit-content;
+}
+
+.sidebar h3 {
+    color: #2d3748;
+    margin-bottom: 15px;
+    font-size: 1.3em;
+}
+
+.control-section {
+    margin-bottom: 20px;
+}
+
+.control-section label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #4a5568;
+}
+
+input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: monospace;
+}
+
+button {
+    width: 100%;
+    padding: 12px;
+    font-size: 14px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    margin-bottom: 10px;
+}
+
+button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+.btn-primary {
+    background: #4CAF50;
+    color: #fff;
+}
+
+.btn-primary:hover {
+    background: #45a049;
+}
+
+.btn-secondary {
+    background: #2196F3;
+    color: #fff;
+}
+
+.btn-secondary:hover {
+    background: #0b7dda;
+}
+
+.btn-danger {
+    background: #f44336;
+    color: #fff;
+}
+
+.btn-danger:hover {
+    background: #da190b;
+}
+
+.btn-warning {
+    background: #ff9800;
+    color: #fff;
+}
+
+.btn-warning:hover {
+    background: #e68900;
+}
+
+.slider-control {
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.slider-value {
+    text-align: center;
+    font-weight: 600;
+    color: #667eea;
+    margin-bottom: 10px;
+    font-size: 1.1em;
+}
+
+.status-indicator {
+    background: #e3f2fd;
+    padding: 10px;
+    border-radius: 6px;
+    margin-bottom: 15px;
+    font-size: 0.9em;
+    color: #1565c0;
+    font-weight: 600;
+    text-align: center;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.stat-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #fff;
+    padding: 12px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.stat-label {
+    font-size: 0.85em;
+    opacity: 0.9;
+    margin-bottom: 5px;
+}
+
+.stat-value {
+    font-size: 1.3em;
+    font-weight: bold;
+    font-family: monospace;
+}
+
+.visualization-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.viz-box {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.viz-box h3 {
+    color: #2d3748;
+    margin-bottom: 15px;
+    font-size: 1.2em;
+    text-align: center;
+}
+
+canvas {
+    display: block;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    background: #fafafa;
+    margin: 0 auto;
+}
+
+.legend {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 10px;
+    font-size: 0.9em;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.legend-color {
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+    border: 1px solid #333;
+}
+
+.task-buttons {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+    margin-bottom: 15px;
+}
+
+.task-btn {
+    padding: 8px;
+    font-size: 12px;
+    background: #667eea;
+    color: #fff;
+}
+
+.task-btn:hover {
+    background: #5568d3;
+}
+
+@media (max-width: 1400px) {
+    .main-content {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+</head>
+<body>
+<nav class="nav-header">
+    <div class="nav-title">LSTM Gates Visualizer</div>
+    <div class="nav-links">
+        <a href="../../deep-learning.html">Deep Learning Hub</a>
+        <a href="../../index.html">Home</a>
+    </div>
+</nav>
+
+<div class="page-wrapper">
+    <div class="container">
+        <h1>LSTM Gates Visualizer</h1>
+        <p class="subtitle">Interactive visualization of Long Short-Term Memory gates and cell state dynamics</p>
+
+        <div class="info-section">
+            <h3>Understanding LSTM Networks</h3>
+            <p>
+                Long Short-Term Memory (LSTM) networks are a special type of Recurrent Neural Network capable of learning
+                long-term dependencies. Unlike standard RNNs, LSTMs have a cell state that runs through the entire chain,
+                with gates that regulate what information to keep or discard.
+            </p>
+            <p><strong>Key Components:</strong></p>
+            <ul>
+                <li><strong>Forget Gate (Orange):</strong> Decides what information to discard from the cell state using sigmoid activation</li>
+                <li><strong>Input Gate (Green):</strong> Decides what new information to store in the cell state</li>
+                <li><strong>Output Gate (Blue):</strong> Decides what to output based on the cell state</li>
+                <li><strong>Cell State:</strong> The memory that runs through time, carrying long-term information</li>
+                <li><strong>Hidden State:</strong> The output at each timestep, used for predictions and next step</li>
+            </ul>
+            <p>
+                <strong>How it works:</strong> At each timestep, the LSTM takes an input and the previous hidden state.
+                The forget gate decides what to remove from memory, the input gate adds new information, and the output
+                gate produces the new hidden state. This allows LSTMs to remember important information over many timesteps
+                and forget irrelevant details.
+            </p>
+        </div>
+
+        <div class="main-content">
+            <div class="sidebar">
+                <h3>Controls</h3>
+
+                <div class="status-indicator" id="statusIndicator">
+                    Ready to process sequence
+                </div>
+
+                <div class="control-section">
+                    <label>Input Sequence:</label>
+                    <input type="text" id="sequenceInput" value="Remember first: HELLO then lots of text"
+                           placeholder="Enter text sequence">
+                </div>
+
+                <div class="control-section">
+                    <label>Cell State Size:</label>
+                    <div class="slider-value" id="cellSizeValue">8 units</div>
+                    <input type="range" class="slider-control" id="cellSizeSlider"
+                           min="4" max="12" step="1" value="8"
+                           oninput="updateCellSize()">
+                </div>
+
+                <div class="control-section">
+                    <label>Animation Speed:</label>
+                    <div class="slider-value" id="speedValue">Medium (250ms)</div>
+                    <input type="range" class="slider-control" id="speedSlider"
+                           min="1" max="3" step="1" value="2"
+                           oninput="updateSpeed()">
+                </div>
+
+                <button class="btn-primary" onclick="startProcessing()">Start Processing</button>
+                <button class="btn-warning" onclick="pauseProcessing()">Pause</button>
+                <button class="btn-secondary" onclick="stepForward()">Step Forward</button>
+                <button class="btn-danger" onclick="resetLSTM()">Reset</button>
+
+                <div class="control-section">
+                    <label>Example Tasks:</label>
+                    <div class="task-buttons">
+                        <button class="task-btn" onclick="loadTask(0)">Long-term Memory</button>
+                        <button class="task-btn" onclick="loadTask(1)">Sequence Repeat</button>
+                        <button class="task-btn" onclick="loadTask(2)">Pattern Learning</button>
+                        <button class="task-btn" onclick="loadTask(3)">Context Switch</button>
+                    </div>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">Current Timestep</div>
+                        <div class="stat-value" id="timestepValue">0 / 0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Cell State Norm</div>
+                        <div class="stat-value" id="cellNormValue">0.00</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Hidden State Norm</div>
+                        <div class="stat-value" id="hiddenNormValue">0.00</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Current Token</div>
+                        <div class="stat-value" id="currentTokenValue">-</div>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <div class="visualization-grid">
+                    <div class="viz-box">
+                        <h3>LSTM Cell Architecture & Gate Activations</h3>
+                        <canvas id="cellCanvas" width="600" height="500"></canvas>
+                        <div class="legend">
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: #ff9800;"></div>
+                                <span>Forget Gate</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: #4CAF50;"></div>
+                                <span>Input Gate</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: #2196F3;"></div>
+                                <span>Output Gate</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="viz-box">
+                        <h3>Gate Activity Heatmaps Over Time</h3>
+                        <canvas id="heatmapCanvas" width="900" height="400"></canvas>
+                        <div class="legend">
+                            <div class="legend-item">
+                                <span>Darker = Higher activation (closer to 1)</span>
+                            </div>
+                            <div class="legend-item">
+                                <span>Lighter = Lower activation (closer to 0)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="viz-box">
+                        <h3>Cell State vs Hidden State Evolution</h3>
+                        <canvas id="stateCanvas" width="900" height="350"></canvas>
+                        <div class="legend">
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: #9C27B0;"></div>
+                                <span>Cell State (Long-term Memory)</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: #00BCD4;"></div>
+                                <span>Hidden State (Output)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const cellCanvas = document.getElementById('cellCanvas');
+const cellCtx = cellCanvas.getContext('2d');
+const heatmapCanvas = document.getElementById('heatmapCanvas');
+const heatmapCtx = heatmapCanvas.getContext('2d');
+const stateCanvas = document.getElementById('stateCanvas');
+const stateCtx = stateCanvas.getContext('2d');
+
+// LSTM state
+let cellStateSize = 8;
+let sequence = [];
+let currentStep = 0;
+let isProcessing = false;
+let processingInterval = null;
+let animationSpeed = 250;
+
+// LSTM internal state
+let cellState = [];
+let hiddenState = [];
+
+// Gate activations history
+let forgetGateHistory = [];
+let inputGateHistory = [];
+let outputGateHistory = [];
+
+// State history
+let cellStateHistory = [];
+let hiddenStateHistory = [];
+
+// Example tasks
+const exampleTasks = [
+    "Remember first: HELLO then lots of text",
+    "ABC ABC DEF DEF",
+    "101 202 303 404",
+    "START main task END"
+];
+
+function sigmoid(x) {
+    return 1 / (1 + Math.exp(-x));
+}
+
+function tanh(x) {
+    return Math.tanh(x);
+}
+
+function vectorNorm(vec) {
+    return Math.sqrt(vec.reduce((sum, v) => sum + v * v, 0));
+}
+
+function initializeLSTM() {
+    cellState = new Array(cellStateSize).fill(0);
+    hiddenState = new Array(cellStateSize).fill(0);
+
+    forgetGateHistory = [];
+    inputGateHistory = [];
+    outputGateHistory = [];
+    cellStateHistory = [];
+    hiddenStateHistory = [];
+
+    currentStep = 0;
+}
+
+function tokenize(text) {
+    // Simple character-level tokenization
+    const tokens = [];
+    for (let i = 0; i < text.length && i < 15; i++) {
+        tokens.push(text[i]);
+    }
+    return tokens;
+}
+
+function processToken(token) {
+    // Simple LSTM gate computation
+    // In real LSTM, this involves matrix multiplication with learnable weights
+    // Here we simulate the behavior
+
+    const tokenValue = token.charCodeAt(0) / 128.0; // Normalize character
+
+    // Forget gate: decides what to forget from cell state
+    const forgetGate = new Array(cellStateSize).fill(0);
+    for (let i = 0; i < cellStateSize; i++) {
+        const input = tokenValue * 0.5 + hiddenState[i] * 0.3 + Math.random() * 0.2 - 0.1;
+        forgetGate[i] = sigmoid(input);
+    }
+
+    // Input gate: decides what new information to add
+    const inputGate = new Array(cellStateSize).fill(0);
+    const candidateCell = new Array(cellStateSize).fill(0);
+    for (let i = 0; i < cellStateSize; i++) {
+        const input = tokenValue * 0.7 + hiddenState[i] * 0.2 + Math.random() * 0.1;
+        inputGate[i] = sigmoid(input);
+        candidateCell[i] = tanh(tokenValue * 0.8 + hiddenState[i] * 0.4 + (Math.random() - 0.5) * 0.3);
+    }
+
+    // Update cell state: forget old + add new
+    for (let i = 0; i < cellStateSize; i++) {
+        cellState[i] = cellState[i] * forgetGate[i] + inputGate[i] * candidateCell[i];
+    }
+
+    // Output gate: decides what to output
+    const outputGate = new Array(cellStateSize).fill(0);
+    for (let i = 0; i < cellStateSize; i++) {
+        const input = tokenValue * 0.6 + hiddenState[i] * 0.3 + cellState[i] * 0.1;
+        outputGate[i] = sigmoid(input);
+    }
+
+    // Update hidden state
+    for (let i = 0; i < cellStateSize; i++) {
+        hiddenState[i] = outputGate[i] * tanh(cellState[i]);
+    }
+
+    // Record history
+    forgetGateHistory.push([...forgetGate]);
+    inputGateHistory.push([...inputGate]);
+    outputGateHistory.push([...outputGate]);
+    cellStateHistory.push([...cellState]);
+    hiddenStateHistory.push([...hiddenState]);
+}
+
+function drawCellArchitecture() {
+    cellCtx.clearRect(0, 0, cellCanvas.width, cellCanvas.height);
+
+    const w = cellCanvas.width;
+    const h = cellCanvas.height;
+
+    if (currentStep === 0) {
+        // Draw initial architecture diagram
+        cellCtx.fillStyle = '#4a5568';
+        cellCtx.font = 'bold 14px Arial';
+        cellCtx.textAlign = 'center';
+        cellCtx.fillText('LSTM Cell Architecture', w/2, 30);
+
+        cellCtx.font = '12px Arial';
+        cellCtx.fillText('(Start processing to see gate activations)', w/2, 50);
+
+        // Draw simplified LSTM diagram
+        const centerX = w / 2;
+        const centerY = h / 2;
+
+        // Cell state line (horizontal)
+        cellCtx.strokeStyle = '#9C27B0';
+        cellCtx.lineWidth = 4;
+        cellCtx.beginPath();
+        cellCtx.moveTo(50, centerY - 80);
+        cellCtx.lineTo(w - 50, centerY - 80);
+        cellCtx.stroke();
+
+        // Forget gate
+        drawGate(cellCtx, 150, centerY - 80, '#ff9800', 'f_t', 'Forget Gate');
+
+        // Input gate
+        drawGate(cellCtx, 300, centerY - 80, '#4CAF50', 'i_t', 'Input Gate');
+
+        // Output gate
+        drawGate(cellCtx, 450, centerY, '#2196F3', 'o_t', 'Output Gate');
+
+        // Labels
+        cellCtx.fillStyle = '#2d3748';
+        cellCtx.font = '11px Arial';
+        cellCtx.textAlign = 'left';
+        cellCtx.fillText('x_t (input)', 50, centerY + 80);
+        cellCtx.fillText('h_{t-1} (prev hidden)', 50, centerY + 100);
+        cellCtx.fillText('C_t (cell state)', 50, centerY - 95);
+        cellCtx.fillText('h_t (output)', w - 120, centerY + 20);
+
+        return;
+    }
+
+    // Draw current gate activations
+    const step = currentStep - 1;
+    if (step < 0 || step >= forgetGateHistory.length) return;
+
+    const forgetGate = forgetGateHistory[step];
+    const inputGate = inputGateHistory[step];
+    const outputGate = outputGateHistory[step];
+
+    // Title
+    cellCtx.fillStyle = '#2d3748';
+    cellCtx.font = 'bold 16px Arial';
+    cellCtx.textAlign = 'center';
+    cellCtx.fillText(`Timestep ${currentStep}: "${sequence[step]}"`, w/2, 30);
+
+    // Draw three columns for each gate
+    const colWidth = w / 3;
+    const startY = 80;
+    const barWidth = Math.min(30, (colWidth - 40) / cellStateSize);
+
+    // Forget Gate
+    drawGateActivations(cellCtx, colWidth/2, startY, forgetGate, barWidth, '#ff9800', 'Forget Gate');
+
+    // Input Gate
+    drawGateActivations(cellCtx, colWidth + colWidth/2, startY, inputGate, barWidth, '#4CAF50', 'Input Gate');
+
+    // Output Gate
+    drawGateActivations(cellCtx, 2*colWidth + colWidth/2, startY, outputGate, barWidth, '#2196F3', 'Output Gate');
+}
+
+function drawGate(ctx, x, y, color, symbol, label) {
+    // Draw gate circle
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.arc(x, y, 30, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.strokeStyle = '#2d3748';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // Symbol
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 14px Arial';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(symbol, x, y);
+
+    // Label
+    ctx.fillStyle = '#2d3748';
+    ctx.font = '11px Arial';
+    ctx.fillText(label, x, y + 45);
+}
+
+function drawGateActivations(ctx, centerX, startY, activations, barWidth, color, label) {
+    // Draw label
+    ctx.fillStyle = '#2d3748';
+    ctx.font = 'bold 13px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText(label, centerX, startY - 10);
+
+    const barHeight = 200;
+    const spacing = 5;
+    const totalWidth = activations.length * (barWidth + spacing);
+    const startX = centerX - totalWidth / 2;
+
+    activations.forEach((value, i) => {
+        const x = startX + i * (barWidth + spacing);
+        const h = value * barHeight;
+        const y = startY + barHeight - h;
+
+        // Draw bar
+        ctx.fillStyle = color;
+        ctx.fillRect(x, y, barWidth, h);
+
+        ctx.strokeStyle = '#2d3748';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(x, y, barWidth, h);
+
+        // Draw value
+        ctx.fillStyle = '#2d3748';
+        ctx.font = '9px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText(value.toFixed(2), x + barWidth/2, startY + barHeight + 15);
+    });
+
+    // Draw axis
+    ctx.strokeStyle = '#2d3748';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(startX - 10, startY);
+    ctx.lineTo(startX - 10, startY + barHeight);
+    ctx.lineTo(startX + totalWidth + 10, startY + barHeight);
+    ctx.stroke();
+
+    // Axis labels
+    ctx.font = '10px Arial';
+    ctx.textAlign = 'right';
+    ctx.fillText('1.0', startX - 15, startY + 5);
+    ctx.fillText('0.0', startX - 15, startY + barHeight + 5);
+}
+
+function drawHeatmaps() {
+    heatmapCtx.clearRect(0, 0, heatmapCanvas.width, heatmapCanvas.height);
+
+    if (forgetGateHistory.length === 0) {
+        heatmapCtx.fillStyle = '#4a5568';
+        heatmapCtx.font = '14px Arial';
+        heatmapCtx.textAlign = 'center';
+        heatmapCtx.fillText('Gate activity will appear here as sequence is processed',
+                           heatmapCanvas.width/2, heatmapCanvas.height/2);
+        return;
+    }
+
+    const w = heatmapCanvas.width;
+    const h = heatmapCanvas.height;
+    const heatmapHeight = (h - 60) / 3;
+
+    // Draw three heatmaps stacked
+    drawHeatmap(heatmapCtx, 10, 10, w - 20, heatmapHeight - 10,
+                forgetGateHistory, '#ff9800', 'Forget Gate Activity');
+    drawHeatmap(heatmapCtx, 10, heatmapHeight + 20, w - 20, heatmapHeight - 10,
+                inputGateHistory, '#4CAF50', 'Input Gate Activity');
+    drawHeatmap(heatmapCtx, 10, 2*heatmapHeight + 30, w - 20, heatmapHeight - 10,
+                outputGateHistory, '#2196F3', 'Output Gate Activity');
+}
+
+function drawHeatmap(ctx, x, y, w, h, history, baseColor, label) {
+    // Label
+    ctx.fillStyle = '#2d3748';
+    ctx.font = 'bold 12px Arial';
+    ctx.textAlign = 'left';
+    ctx.fillText(label, x, y - 5);
+
+    const timesteps = history.length;
+    const units = history[0].length;
+
+    const cellWidth = Math.min(50, w / timesteps);
+    const cellHeight = h / units;
+
+    for (let t = 0; t < timesteps; t++) {
+        for (let u = 0; u < units; u++) {
+            const value = history[t][u];
+            const intensity = Math.floor(value * 255);
+
+            // Create color based on base color and intensity
+            let r, g, b;
+            if (baseColor === '#ff9800') {
+                r = 255;
+                g = 152 + (255 - 152) * (1 - value);
+                b = 255 * (1 - value);
+            } else if (baseColor === '#4CAF50') {
+                r = 76 + (255 - 76) * (1 - value);
+                g = 175 + (255 - 175) * (1 - value * 0.3);
+                b = 80 + (255 - 80) * (1 - value);
+            } else { // #2196F3
+                r = 33 + (255 - 33) * (1 - value);
+                g = 150 + (255 - 150) * (1 - value);
+                b = 243 + (255 - 243) * (1 - value * 0.05);
+            }
+
+            ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
+            ctx.fillRect(x + t * cellWidth, y + u * cellHeight, cellWidth - 1, cellHeight - 1);
+        }
+    }
+
+    // Draw border
+    ctx.strokeStyle = '#2d3748';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(x, y, timesteps * cellWidth, units * cellHeight);
+
+    // Draw tokens below
+    ctx.fillStyle = '#2d3748';
+    ctx.font = '10px Arial';
+    ctx.textAlign = 'center';
+    for (let t = 0; t < Math.min(timesteps, sequence.length); t++) {
+        const token = sequence[t];
+        ctx.fillText(token, x + t * cellWidth + cellWidth/2, y + units * cellHeight + 15);
+    }
+}
+
+function drawStateEvolution() {
+    stateCtx.clearRect(0, 0, stateCanvas.width, stateCanvas.height);
+
+    if (cellStateHistory.length === 0) {
+        stateCtx.fillStyle = '#4a5568';
+        stateCtx.font = '14px Arial';
+        stateCtx.textAlign = 'center';
+        stateCtx.fillText('Cell state and hidden state evolution will appear here',
+                         stateCanvas.width/2, stateCanvas.height/2);
+        return;
+    }
+
+    const padding = 50;
+    const w = stateCanvas.width - 2 * padding;
+    const h = stateCanvas.height - 2 * padding;
+
+    // Draw axes
+    stateCtx.strokeStyle = '#2d3748';
+    stateCtx.lineWidth = 2;
+    stateCtx.beginPath();
+    stateCtx.moveTo(padding, padding);
+    stateCtx.lineTo(padding, padding + h);
+    stateCtx.lineTo(padding + w, padding + h);
+    stateCtx.stroke();
+
+    // Calculate max magnitude for scaling
+    let maxMag = 0;
+    cellStateHistory.forEach(state => {
+        state.forEach(val => {
+            maxMag = Math.max(maxMag, Math.abs(val));
+        });
+    });
+    hiddenStateHistory.forEach(state => {
+        state.forEach(val => {
+            maxMag = Math.max(maxMag, Math.abs(val));
+        });
+    });
+    maxMag = Math.max(maxMag, 1);
+
+    // Draw each unit's evolution
+    const timesteps = cellStateHistory.length;
+
+    // Cell state (multiple thin lines)
+    for (let unit = 0; unit < cellStateSize; unit++) {
+        stateCtx.strokeStyle = `rgba(156, 39, 176, ${0.3 + 0.7 * unit / cellStateSize})`;
+        stateCtx.lineWidth = 1.5;
+        stateCtx.beginPath();
+
+        for (let t = 0; t < timesteps; t++) {
+            const x = padding + (t / (timesteps - 1)) * w;
+            const value = cellStateHistory[t][unit];
+            const y = padding + h/2 - (value / maxMag) * (h/2 * 0.8);
+
+            if (t === 0) stateCtx.moveTo(x, y);
+            else stateCtx.lineTo(x, y);
+        }
+        stateCtx.stroke();
+    }
+
+    // Hidden state (multiple thin lines)
+    for (let unit = 0; unit < cellStateSize; unit++) {
+        stateCtx.strokeStyle = `rgba(0, 188, 212, ${0.3 + 0.7 * unit / cellStateSize})`;
+        stateCtx.lineWidth = 1.5;
+        stateCtx.beginPath();
+
+        for (let t = 0; t < timesteps; t++) {
+            const x = padding + (t / (timesteps - 1)) * w;
+            const value = hiddenStateHistory[t][unit];
+            const y = padding + h/2 - (value / maxMag) * (h/2 * 0.8);
+
+            if (t === 0) stateCtx.moveTo(x, y);
+            else stateCtx.lineTo(x, y);
+        }
+        stateCtx.stroke();
+    }
+
+    // Draw zero line
+    stateCtx.strokeStyle = '#cbd5e0';
+    stateCtx.lineWidth = 1;
+    stateCtx.setLineDash([5, 5]);
+    stateCtx.beginPath();
+    stateCtx.moveTo(padding, padding + h/2);
+    stateCtx.lineTo(padding + w, padding + h/2);
+    stateCtx.stroke();
+    stateCtx.setLineDash([]);
+
+    // Labels
+    stateCtx.fillStyle = '#2d3748';
+    stateCtx.font = 'bold 12px Arial';
+    stateCtx.textAlign = 'center';
+    stateCtx.fillText('Timestep', padding + w/2, stateCanvas.height - 10);
+
+    stateCtx.save();
+    stateCtx.translate(15, padding + h/2);
+    stateCtx.rotate(-Math.PI/2);
+    stateCtx.fillText('State Value', 0, 0);
+    stateCtx.restore();
+}
+
+function drawAll() {
+    drawCellArchitecture();
+    drawHeatmaps();
+    drawStateEvolution();
+}
+
+function updateStats() {
+    document.getElementById('timestepValue').textContent = `${currentStep} / ${sequence.length}`;
+
+    if (currentStep > 0) {
+        const cellNorm = vectorNorm(cellState);
+        const hiddenNorm = vectorNorm(hiddenState);
+
+        document.getElementById('cellNormValue').textContent = cellNorm.toFixed(2);
+        document.getElementById('hiddenNormValue').textContent = hiddenNorm.toFixed(2);
+        document.getElementById('currentTokenValue').textContent =
+            currentStep <= sequence.length ? sequence[currentStep - 1] : '-';
+    } else {
+        document.getElementById('cellNormValue').textContent = '0.00';
+        document.getElementById('hiddenNormValue').textContent = '0.00';
+        document.getElementById('currentTokenValue').textContent = '-';
+    }
+}
+
+function updateCellSize() {
+    cellStateSize = parseInt(document.getElementById('cellSizeSlider').value);
+    document.getElementById('cellSizeValue').textContent = `${cellStateSize} units`;
+
+    if (!isProcessing) {
+        resetLSTM();
+    }
+}
+
+function updateSpeed() {
+    const speed = parseInt(document.getElementById('speedSlider').value);
+    const speeds = { 1: 'Slow (400ms)', 2: 'Medium (250ms)', 3: 'Fast (150ms)' };
+    const delays = { 1: 400, 2: 250, 3: 150 };
+
+    document.getElementById('speedValue').textContent = speeds[speed];
+    animationSpeed = delays[speed];
+
+    if (isProcessing) {
+        pauseProcessing();
+        startProcessing();
+    }
+}
+
+function loadTask(taskIndex) {
+    document.getElementById('sequenceInput').value = exampleTasks[taskIndex];
+    resetLSTM();
+}
+
+function startProcessing() {
+    if (isProcessing) return;
+
+    if (currentStep === 0) {
+        const input = document.getElementById('sequenceInput').value;
+        sequence = tokenize(input);
+        initializeLSTM();
+    }
+
+    if (currentStep >= sequence.length) {
+        return;
+    }
+
+    isProcessing = true;
+
+    document.getElementById('statusIndicator').textContent = 'Processing sequence...';
+    document.getElementById('statusIndicator').style.background = '#d4edda';
+    document.getElementById('statusIndicator').style.color = '#155724';
+
+    processingInterval = setInterval(() => {
+        stepForward();
+
+        if (currentStep >= sequence.length) {
+            pauseProcessing();
+            document.getElementById('statusIndicator').textContent = 'Sequence complete';
+            document.getElementById('statusIndicator').style.background = '#d1ecf1';
+            document.getElementById('statusIndicator').style.color = '#0c5460';
+        }
+    }, animationSpeed);
+}
+
+function pauseProcessing() {
+    isProcessing = false;
+
+    if (processingInterval) {
+        clearInterval(processingInterval);
+        processingInterval = null;
+    }
+
+    if (currentStep < sequence.length && currentStep > 0) {
+        document.getElementById('statusIndicator').textContent = 'Paused';
+        document.getElementById('statusIndicator').style.background = '#fff3cd';
+        document.getElementById('statusIndicator').style.color = '#856404';
+    }
+}
+
+function stepForward() {
+    if (currentStep === 0) {
+        const input = document.getElementById('sequenceInput').value;
+        sequence = tokenize(input);
+        initializeLSTM();
+    }
+
+    if (currentStep >= sequence.length) return;
+
+    processToken(sequence[currentStep]);
+    currentStep++;
+
+    updateStats();
+    drawAll();
+}
+
+function resetLSTM() {
+    pauseProcessing();
+
+    const input = document.getElementById('sequenceInput').value;
+    sequence = tokenize(input);
+    initializeLSTM();
+
+    updateStats();
+    drawAll();
+
+    document.getElementById('statusIndicator').textContent = 'Ready to process sequence';
+    document.getElementById('statusIndicator').style.background = '#e3f2fd';
+    document.getElementById('statusIndicator').style.color = '#1565c0';
+}
+
+// Initialize
+resetLSTM();
+</script>
+</body>
+</html>
