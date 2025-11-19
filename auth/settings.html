@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - AI 1</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        nav {
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            padding: 15px 30px;
+            margin-bottom: 30px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+        h1 {
+            color: #2d3748;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+        .subtitle {
+            color: #718096;
+            margin-bottom: 30px;
+        }
+        .settings-section {
+            margin-bottom: 40px;
+            padding-bottom: 30px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        .settings-section:last-child {
+            border-bottom: none;
+        }
+        .settings-section h2 {
+            color: #2d3748;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+        .setting-item {
+            padding: 20px;
+            background: #f7fafc;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+        .setting-item h3 {
+            color: #2d3748;
+            margin-bottom: 8px;
+            font-size: 1.1em;
+        }
+        .setting-item p {
+            color: #718096;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+        .role-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+        .role-student {
+            background: #bee3f8;
+            color: #2c5282;
+        }
+        .role-teacher {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1em;
+        }
+        .btn-danger {
+            background: #f56565;
+            color: #fff;
+        }
+        .btn-danger:hover {
+            background: #e53e3e;
+        }
+        .btn-danger:disabled {
+            background: #cbd5e0;
+            cursor: not-allowed;
+        }
+        .warning-box {
+            background: #fef5e7;
+            border-left: 4px solid #f39c12;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+        .warning-box strong {
+            color: #e67e22;
+        }
+        .info-box {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+        .message {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .message.success {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+        .message.error {
+            background: #fed7d7;
+            color: #9b2c2c;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div>
+            <a href="../home.html">🤖 AI 1</a>
+        </div>
+        <div>
+            <a href="dashboard.html">← Back to Dashboard</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1>⚙️ Settings</h1>
+        <p class="subtitle">Manage your account preferences and data</p>
+
+        <div id="message"></div>
+
+        <div class="settings-section">
+            <h2>👤 Account Information</h2>
+            <div class="setting-item">
+                <h3>Email</h3>
+                <p id="userEmail">Loading...</p>
+            </div>
+            <div class="setting-item">
+                <h3>Account Type</h3>
+                <p><span class="role-badge" id="userRole"></span></p>
+            </div>
+        </div>
+
+        <div class="settings-section">
+            <h2>📊 Data & Privacy</h2>
+            <div class="setting-item">
+                <h3>Quiz History</h3>
+                <p>All your quiz scores are saved to track your progress. Teachers can view your quiz results.</p>
+                <div class="info-box">
+                    <strong>Note:</strong> You cannot delete individual quiz scores. This ensures academic integrity.
+                </div>
+            </div>
+            <div class="setting-item">
+                <h3>Profile Visibility</h3>
+                <p>Your profile information (name, email, quiz scores) is visible to teachers. Students cannot view other students' data.</p>
+            </div>
+        </div>
+
+        <div class="settings-section">
+            <h2>⚠️ Account Deletion</h2>
+            <div class="setting-item" id="deleteSection">
+                <h3>Delete My Account</h3>
+                <p id="deleteDescription">Loading...</p>
+                <div class="warning-box" id="studentWarning" style="display:none;">
+                    <strong>Students cannot delete their own accounts.</strong><br>
+                    For account deletion, please contact your teacher: Mr. Williams, MSCS
+                </div>
+                <button class="btn btn-danger" id="deleteButton" disabled>
+                    🗑️ Delete Account
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { getCurrentUser } from './auth-utils.js';
+
+        async function loadSettings() {
+            try {
+                const user = await getCurrentUser();
+                if (!user) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                // Display user info
+                document.getElementById('userEmail').textContent = user.email;
+
+                const roleView = document.getElementById('userRole');
+                roleView.textContent = user.role.charAt(0).toUpperCase() + user.role.slice(1);
+                roleView.className = 'role-badge role-' + user.role;
+
+                // Handle delete account section
+                const deleteButton = document.getElementById('deleteButton');
+                const deleteDescription = document.getElementById('deleteDescription');
+                const studentWarning = document.getElementById('studentWarning');
+
+                if (user.role === 'student') {
+                    deleteDescription.textContent = 'Account deletion is restricted for student accounts to maintain academic records.';
+                    studentWarning.style.display = 'block';
+                    deleteButton.disabled = true;
+                } else if (user.role === 'teacher') {
+                    deleteDescription.textContent = 'Teachers can manage account deletions through the admin panel. Please use the Teacher Admin panel to manage accounts.';
+                    deleteButton.disabled = true;
+                }
+
+            } catch (error) {
+                console.error('Error loading settings:', error);
+                showMessage('Error loading settings', 'error');
+            }
+        }
+
+        function showMessage(text, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = text;
+            messageDiv.className = 'message ' + type;
+            setTimeout(() => {
+                messageDiv.textContent = '';
+                messageDiv.className = '';
+            }, 5000);
+        }
+
+        // Load settings on page load
+        loadSettings();
+    </script>
+</body>
+</html>
