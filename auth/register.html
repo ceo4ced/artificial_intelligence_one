@@ -408,10 +408,14 @@
                 window.location.href = 'dashboard.html';
             } else if (result.error === 'first_time_google_user') {
                 // First time Google user - show age verification
+                // User is still signed in with Google, just needs to verify age
                 registerForm.style.display = 'none';
                 googleSignInBtn.style.display = 'none';
                 document.querySelector('.divider').style.display = 'none';
                 googleRegisterSection.style.display = 'block';
+
+                // Clear the error message since this is expected flow
+                errorMessage.style.display = 'none';
             } else {
                 showError(result.error);
                 googleSignInBtn.disabled = false;
