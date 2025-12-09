@@ -53,8 +53,7 @@ export async function registerUser(email, password, displayName, birthdate) {
         // This ensures Firestore rules can parse it properly
         const birthdateISO = new Date(birthdate + 'T00:00:00Z').toISOString();
 
-        // Create user profile in Firestore
-        await setDoc(doc(db, 'users', user.uid), {
+        const profileData = {
             uid: user.uid,
             email: email,
             displayName: displayName,
@@ -64,7 +63,24 @@ export async function registerUser(email, password, displayName, birthdate) {
             role: 'guest', // Default role - teachers can upgrade to 'student'
             totalQuizzesTaken: 0,
             averageScore: 0
+        };
+
+        console.log('[registerUser] Creating Firestore profile with data:', {
+            ...profileData,
+            createdAt: 'Timestamp.now()',
+            birthdateFormat: birthdateISO
         });
+
+        // Create user profile in Firestore
+        try {
+            await setDoc(doc(db, 'users', user.uid), profileData);
+            console.log('[registerUser] Firestore profile created successfully');
+        } catch (firestoreError) {
+            console.error('[registerUser] Firestore permission denied error:', firestoreError);
+            console.error('[registerUser] Error code:', firestoreError.code);
+            console.error('[registerUser] Error message:', firestoreError.message);
+            throw new Error('Failed to create user profile. Please ensure Firestore rules are deployed correctly.');
+        }
 
         // Log registration event
         logEvent(analytics, 'sign_up', {
@@ -216,8 +232,7 @@ export async function completeGoogleRegistration(birthdate) {
         // This ensures Firestore rules can parse it properly
         const birthdateISO = new Date(birthdate + 'T00:00:00Z').toISOString();
 
-        // Create user profile
-        await setDoc(doc(db, 'users', user.uid), {
+        const profileData = {
             uid: user.uid,
             email: user.email,
             displayName: user.displayName,
@@ -228,7 +243,24 @@ export async function completeGoogleRegistration(birthdate) {
             role: 'guest', // Default role - teachers can upgrade to 'student'
             totalQuizzesTaken: 0,
             averageScore: 0
+        };
+
+        console.log('[completeGoogleRegistration] Creating Firestore profile with data:', {
+            ...profileData,
+            createdAt: 'Timestamp.now()',
+            birthdateFormat: birthdateISO
         });
+
+        // Create user profile
+        try {
+            await setDoc(doc(db, 'users', user.uid), profileData);
+            console.log('[completeGoogleRegistration] Firestore profile created successfully');
+        } catch (firestoreError) {
+            console.error('[completeGoogleRegistration] Firestore permission denied error:', firestoreError);
+            console.error('[completeGoogleRegistration] Error code:', firestoreError.code);
+            console.error('[completeGoogleRegistration] Error message:', firestoreError.message);
+            throw new Error('Failed to create user profile. Please ensure Firestore rules are deployed correctly.');
+        }
 
         logEvent(analytics, 'sign_up', {
             method: 'google',
