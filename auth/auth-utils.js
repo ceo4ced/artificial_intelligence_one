@@ -139,11 +139,13 @@ export async function loginWithGoogle() {
 
         if (!userDoc.exists()) {
             // First time Google sign-in - need age verification
-            // This should redirect to age verification page
-            await signOut(auth);
+            // Keep user signed in for age verification process
+            // DO NOT sign out here - they need to be authenticated to create profile
             return {
                 success: false,
                 error: 'first_time_google_user',
+                needsAgeVerification: true,
+                user: user,
                 message: 'Please complete registration with age verification first.'
             };
         }
