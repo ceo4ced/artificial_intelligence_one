@@ -363,14 +363,29 @@
 
         // Initialize dashboard
         async function initDashboard() {
+            console.log('[Dashboard] Initializing dashboard...');
+
             // Require authentication
             currentUser = await requireAuth();
-            if (!currentUser) return;
+            console.log('[Dashboard] requireAuth() returned:', currentUser);
+
+            if (!currentUser) {
+                console.error('[Dashboard] No current user - should have redirected to login');
+                return;
+            }
+
+            console.log('[Dashboard] User authenticated:', currentUser.email, 'Role:', currentUser.role);
 
             // Load user profile
             const profileResult = await getUserProfile(currentUser.uid);
+            console.log('[Dashboard] Profile fetch result:', profileResult);
+
             if (profileResult.success) {
                 document.getElementById('userName').textContent = `👋 ${profileResult.profile.displayName}`;
+            } else {
+                console.error('[Dashboard] Failed to load profile:', profileResult.error);
+                // Still show user name from auth
+                document.getElementById('userName').textContent = `👋 ${currentUser.displayName || currentUser.email}`;
             }
 
             // Load quiz scores

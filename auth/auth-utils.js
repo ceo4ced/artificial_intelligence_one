@@ -104,7 +104,18 @@ function calculateAge(birthdate) {
  */
 export async function loginWithEmail(email, password) {
     try {
+        console.log('[loginWithEmail] Attempting login for:', email);
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        console.log('[loginWithEmail] Firebase Auth successful, UID:', userCredential.user.uid);
+
+        // Check if Firestore profile exists
+        const userDoc = await getDoc(doc(db, 'users', userCredential.user.uid));
+        if (!userDoc.exists()) {
+            console.error('[loginWithEmail] WARNING: User authenticated but no Firestore profile found!');
+            console.error('[loginWithEmail] This user may need to complete registration');
+        } else {
+            console.log('[loginWithEmail] Firestore profile exists, role:', userDoc.data().role);
+        }
 
         // Log login event
         logEvent(analytics, 'login', {
@@ -114,7 +125,7 @@ export async function loginWithEmail(email, password) {
 
         return { success: true, user: userCredential.user };
     } catch (error) {
-        console.error('Login error:', error);
+        console.error('[loginWithEmail] Login error:', error);
         let errorMessage = 'Login failed. Please check your credentials.';
 
         if (error.code === 'auth/user-not-found') {
@@ -123,6 +134,8 @@ export async function loginWithEmail(email, password) {
             errorMessage = 'Incorrect password.';
         } else if (error.code === 'auth/invalid-email') {
             errorMessage = 'Invalid email address.';
+        } else if (error.code === 'auth/invalid-credential') {
+            errorMessage = 'Invalid credentials. Please check your email and password.';
         }
 
         return { success: false, error: errorMessage };
@@ -256,17 +269,28 @@ export function getCurrentUser() {
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
             unsubscribe();
 
+            console.log('[getCurrentUser] Auth state changed, user:', user ? user.email : 'null');
+
             if (!user) {
+                console.log('[getCurrentUser] No authenticated user found');
                 resolve(null);
                 return;
             }
 
             // Fetch Firestore profile to get role and other data
             try {
+                console.log('[getCurrentUser] Fetching Firestore profile for UID:', user.uid);
                 const userDoc = await getDoc(doc(db, 'users', user.uid));
+
                 if (userDoc.exists()) {
                     // Combine Auth user with Firestore profile data
                     const profileData = userDoc.data();
+                    console.log('[getCurrentUser] Profile found:', {
+                        email: user.email,
+                        role: profileData.role,
+                        displayName: profileData.displayName
+                    });
+
                     resolve({
                         ...user,
                         uid: user.uid,
@@ -285,10 +309,12 @@ export function getCurrentUser() {
                     });
                 } else {
                     // Profile doesn't exist yet, return auth user only
+                    console.warn('[getCurrentUser] No Firestore profile found for user:', user.email);
+                    console.warn('[getCurrentUser] User authenticated but profile missing - this may cause issues');
                     resolve(user);
                 }
             } catch (error) {
-                console.error('Error fetching user profile:', error);
+                console.error('[getCurrentUser] Error fetching user profile:', error);
                 // Return auth user even if profile fetch fails
                 resolve(user);
             }
