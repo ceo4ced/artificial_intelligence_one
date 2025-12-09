@@ -49,12 +49,16 @@ export async function registerUser(email, password, displayName, birthdate) {
         // Update display name
         await updateProfile(user, { displayName: displayName });
 
+        // Convert birthdate string to ISO 8601 format with time (midnight UTC)
+        // This ensures Firestore rules can parse it properly
+        const birthdateISO = new Date(birthdate + 'T00:00:00Z').toISOString();
+
         // Create user profile in Firestore
         await setDoc(doc(db, 'users', user.uid), {
             uid: user.uid,
             email: email,
             displayName: displayName,
-            birthdate: birthdate,
+            birthdate: birthdateISO,
             age: age,
             createdAt: Timestamp.now(),
             role: 'guest', // Default role - teachers can upgrade to 'student'
@@ -195,13 +199,17 @@ export async function completeGoogleRegistration(birthdate) {
             throw new Error('You must be at least 13 years old to register.');
         }
 
+        // Convert birthdate string to ISO 8601 format with time (midnight UTC)
+        // This ensures Firestore rules can parse it properly
+        const birthdateISO = new Date(birthdate + 'T00:00:00Z').toISOString();
+
         // Create user profile
         await setDoc(doc(db, 'users', user.uid), {
             uid: user.uid,
             email: user.email,
             displayName: user.displayName,
             photoURL: user.photoURL || null,
-            birthdate: birthdate,
+            birthdate: birthdateISO,
             age: age,
             createdAt: Timestamp.now(),
             role: 'guest', // Default role - teachers can upgrade to 'student'
@@ -216,6 +224,7 @@ export async function completeGoogleRegistration(birthdate) {
 
         return { success: true };
     } catch (error) {
+        console.error('Complete Google registration error:', error);
         return { success: false, error: error.message };
     }
 }
