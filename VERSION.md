@@ -1,5 +1,16 @@
 # Version History
 
+## v1.0.2 (2024-12-11)
+
+### Critical Bug Fix
+- 🔥 **FIXED: Firestore rules `duration.value()` syntax error**
+  - Changed `duration.value('31536000s')` to `duration.value(365, 'd')`
+  - This was causing ALL Google registrations to fail with "Missing or insufficient permissions"
+  - Firebase duration.value() requires TWO parameters: (number, unit)
+  - This fix resolves the permission-denied errors during Google registration
+
+---
+
 ## v1.0.1 (2024-12-11)
 
 ### Bug Fixes
