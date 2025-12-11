@@ -188,12 +188,17 @@ export async function loginWithGoogle() {
 export async function completeGoogleRegistration(birthdate) {
     try {
         const user = auth.currentUser;
+        console.log('[DEBUG] completeGoogleRegistration called');
+        console.log('[DEBUG] Current user:', user ? { uid: user.uid, email: user.email } : 'null');
+
         if (!user) {
             throw new Error('No user signed in');
         }
 
         // Verify age
         const age = calculateAge(birthdate);
+        console.log('[DEBUG] Calculated age:', age);
+
         if (age < 13) {
             await signOut(auth);
             throw new Error('You must be at least 13 years old to register.');
@@ -202,20 +207,33 @@ export async function completeGoogleRegistration(birthdate) {
         // Convert birthdate string to ISO 8601 format with time (midnight UTC)
         // This ensures Firestore rules can parse it properly
         const birthdateISO = new Date(birthdate + 'T00:00:00Z').toISOString();
+        console.log('[DEBUG] Birthdate ISO:', birthdateISO);
 
-        // Create user profile
-        await setDoc(doc(db, 'users', user.uid), {
+        // Prepare user profile data
+        const profileData = {
             uid: user.uid,
             email: user.email,
             displayName: user.displayName,
-            photoURL: user.photoURL || null,
             birthdate: birthdateISO,
             age: age,
             createdAt: Timestamp.now(),
             role: 'guest', // Default role - teachers can upgrade to 'student'
             totalQuizzesTaken: 0,
             averageScore: 0
-        });
+        };
+
+        // Only add photoURL if it exists (don't add null values)
+        if (user.photoURL) {
+            profileData.photoURL = user.photoURL;
+        }
+
+        console.log('[DEBUG] Profile data to be saved:', JSON.stringify(profileData, null, 2));
+        console.log('[DEBUG] Profile data keys:', Object.keys(profileData));
+
+        // Create user profile
+        await setDoc(doc(db, 'users', user.uid), profileData);
+
+        console.log('[DEBUG] Profile created successfully');
 
         logEvent(analytics, 'sign_up', {
             method: 'google',
@@ -225,6 +243,9 @@ export async function completeGoogleRegistration(birthdate) {
         return { success: true };
     } catch (error) {
         console.error('Complete Google registration error:', error);
+        console.error('[DEBUG] Error code:', error.code);
+        console.error('[DEBUG] Error message:', error.message);
+        console.error('[DEBUG] Full error:', error);
         return { success: false, error: error.message };
     }
 }
