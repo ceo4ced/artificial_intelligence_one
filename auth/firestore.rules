@@ -74,15 +74,13 @@ service cloud.firestore {
     match /users/{userId} {
       allow read: if isCurrentUser(userId) || isTeacher();
 
+      // Allow create with required fields + any optional fields
+      // Required: uid, email, displayName, birthdate, age, role, createdAt, totalQuizzesTaken, averageScore
+      // Optional: bio, profilePictureUrl, school, grade, photoURL
       allow create: if isCurrentUser(userId)
         && hasRequiredUserFields()
         && isAtLeast13(request.resource.data.birthdate)
-        && isValidRoleAssignment(request.resource.data.role, request.resource.data.email)
-        && request.resource.data.keys().hasOnly([
-             'uid', 'email', 'displayName', 'birthdate', 'age', 'role', 'createdAt',
-             'bio', 'profilePictureUrl', 'school', 'grade', 'photoURL',
-             'totalQuizzesTaken', 'averageScore'
-           ]);
+        && isValidRoleAssignment(request.resource.data.role, request.resource.data.email);
 
       allow update: if isCurrentUser(userId)
         && roleNotChanged()

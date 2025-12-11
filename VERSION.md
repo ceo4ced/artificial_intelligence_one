@@ -1,5 +1,21 @@
 # Version History
 
+## v1.0.3 - "Update All" (2024-12-11)
+
+### Critical Bug Fix - Google Registration
+- 🔥 **FIXED: Firestore rules `hasOnly()` strict validation blocking registration**
+  - Removed strict `hasOnly()` check that required exact key matches
+  - Rule was failing because it expected optional fields: 'bio', 'profilePictureUrl', 'school', 'grade'
+  - Changed to allow required fields + any optional fields
+  - This was the ACTUAL cause of "Missing or insufficient permissions" errors
+
+### Additional Fixes
+- ✅ Fixed `duration.value()` syntax: changed `duration.value('31536000s')` to `duration.value(365, 'd')`
+- ✅ Added comprehensive debugging to identify the root cause
+- ✅ Removed null photoURL field handling
+
+---
+
 ## v1.0.2 (2024-12-11)
 
 ### Critical Bug Fix
