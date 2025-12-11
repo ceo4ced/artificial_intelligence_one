@@ -34,7 +34,7 @@ service cloud.firestore {
 
     // Refactored to remove 'let' statements for better compatibility
     function calculateAge(birthdate) {
-      return int((request.time - timestamp(birthdate)) / duration.value('31536000s'));
+      return int((request.time - timestamp(birthdate)) / duration.value(365, 'd'));
     }
 
     function isAtLeast13(birthdate) {
