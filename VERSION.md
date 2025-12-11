@@ -1,5 +1,18 @@
 # Version History
 
+## v1.0.1 (2024-12-11)
+
+### Bug Fixes
+- ✅ Add comprehensive debugging to Google registration flow
+- ✅ Fix potential null photoURL issue (only include if exists)
+- ✅ Add detailed error logging to diagnose Firestore permission errors
+
+### Improvements
+- ✅ Enhanced error messages with error codes and full error objects
+- ✅ Added debug logging for user authentication status, age calculation, and profile data
+
+---
+
 ## v1.0.0 (2024-12-09)
 
 ### New Features
