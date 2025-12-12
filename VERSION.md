@@ -1,5 +1,33 @@
 # Version History
 
+## v1.0.5 - "Navigation Consistency" (2024-12-12)
+
+### Major Changes - UI/UX Improvements
+- 🎨 **Standardized navigation across all pages**
+  - All pages now use consistent purple gradient navigation
+  - Removed black/transparent nav inconsistencies
+  - Updated about.html, profile.html, settings.html navigation styles
+
+- 🏠 **Changed default landing page**
+  - Post-login/registration now redirects to topics.html instead of dashboard.html
+  - Topics page is now the primary landing page for authenticated users
+  - Dashboard remains accessible via navigation menu
+
+### Frontend Changes
+- ✅ Updated about.html - purple gradient nav with full auth menu
+- ✅ Updated profile.html - purple gradient nav
+- ✅ Updated settings.html - purple gradient nav
+- ✅ Updated login.html - redirects to topics.html
+- ✅ Updated register.html - redirects to topics.html
+
+### Philosophy
+This implements **consistent visual experience** throughout the platform:
+- **Same navigation everywhere** → Purple gradient branding on all pages
+- **Topics as home base** → Main content page is the default after auth
+- **Dashboard as tool** → Accessible but not the primary landing
+
+---
+
 ## v1.0.4 - "Low Barrier Registration" (2024-12-11)
 
 ### Major Changes - Registration Model

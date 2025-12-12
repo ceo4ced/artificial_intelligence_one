@@ -291,7 +291,7 @@
             if (result.success) {
                 showSuccess('Login successful! Redirecting...');
                 setTimeout(() => {
-                    window.location.href = 'dashboard.html';
+                    window.location.href = '../topics.html';
                 }, 1000);
             } else {
                 showError(result.error);
@@ -313,7 +313,7 @@
             if (result.success) {
                 showSuccess('Login successful! Redirecting...');
                 setTimeout(() => {
-                    window.location.href = 'dashboard.html';
+                    window.location.href = '../topics.html';
                 }, 1000);
             } else if (result.error === 'first_time_google_user') {
                 // Redirect to registration for age verification

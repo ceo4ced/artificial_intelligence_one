@@ -12,17 +12,122 @@
             min-height: 100vh;
             color: #fff;
         }
+
+        /* Navigation */
         nav {
-            background: rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(10px);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             padding: 15px 30px;
-            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.2);
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
-        nav a {
+
+        .nav-brand {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .version {
+            font-size: 0.5em;
+            font-weight: 400;
+            opacity: 0.7;
+            margin-top: -5px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 25px;
+            align-items: center;
+        }
+
+        .nav-links a {
             color: #fff;
             text-decoration: none;
             font-weight: 600;
-            margin-right: 20px;
+            transition: all 0.3s;
+            padding: 8px 15px;
+            border-radius: 8px;
+        }
+
+        .nav-links a:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-login, .btn-register {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: 2px solid #fff;
+        }
+
+        .btn-login:hover, .btn-register:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .user-menu {
+            display: none;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-menu.active {
+            display: flex;
+        }
+
+        .user-name {
+            font-weight: 600;
+        }
+
+        .dropdown {
+            position: relative;
+        }
+
+        .dropdown-toggle {
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px 15px;
+            border-radius: 8px;
+        }
+
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 45px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            min-width: 180px;
+            z-index: 1000;
+        }
+
+        .dropdown-menu.show {
+            display: block;
+        }
+
+        .dropdown-menu a {
+            display: block;
+            padding: 12px 20px;
+            color: #2d3748;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .dropdown-menu a:hover {
+            background: #f7fafc;
+        }
+
+        .dropdown-menu .teacher-only {
+            border-top: 1px solid #e2e8f0;
+            background: #f0f4f8;
         }
         .container {
             max-width: 900px;
@@ -53,10 +158,34 @@
 </head>
 <body>
     <nav>
-        <a href="index.html">🏠 Home</a>
-        <a href="topics.html">📚 Topics</a>
-        <a href="about.html">ℹ️ About</a>
-        <a href="auth/login.html">🔐 Login</a>
+        <div class="nav-brand">
+            <div>🤖 AI 1</div>
+            <div class="version">v1.0.5</div>
+        </div>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="topics.html">Explore Topics</a>
+            <a href="about.html">About</a>
+            <div id="authButtons">
+                <a href="auth/login.html" class="btn-login">Login</a>
+                <a href="auth/register.html" class="btn-register">Register</a>
+            </div>
+            <div class="user-menu" id="userMenu">
+                <span class="user-name" id="userName"></span>
+                <div class="dropdown">
+                    <div class="dropdown-toggle" id="dropdownToggle">
+                        <span>⚙️ Menu</span>
+                    </div>
+                    <div class="dropdown-menu" id="dropdownMenu">
+                        <a href="auth/dashboard.html">📊 Dashboard</a>
+                        <a href="auth/profile.html">👤 Profile</a>
+                        <a href="auth/settings.html">⚙️ Settings</a>
+                        <a href="auth/teacher-admin.html" class="teacher-only" id="teacherLink" style="display:none;">👨‍🏫 Teacher Admin</a>
+                        <a href="#" id="logoutBtn">🚪 Logout</a>
+                    </div>
+                </div>
+            </div>
+        </div>
     </nav>
 
     <div class="container">
@@ -104,5 +233,57 @@
             <p><strong>Cybersecurity 1</strong> - An upcoming course on information security and ethical hacking.</p>
         </div>
     </div>
+
+    <script type="module">
+        import { getCurrentUser, logoutUser } from './auth/auth-utils.js';
+
+        async function initAuth() {
+            try {
+                const user = await getCurrentUser();
+                const authButtons = document.getElementById('authButtons');
+                const userMenu = document.getElementById('userMenu');
+                const userName = document.getElementById('userName');
+                const teacherLink = document.getElementById('teacherLink');
+
+                if (user) {
+                    authButtons.style.display = 'none';
+                    userMenu.classList.add('active');
+                    userName.textContent = user.displayName || user.email.split('@')[0];
+
+                    // Show teacher link if user is a teacher
+                    if (user.role === 'teacher') {
+                        teacherLink.style.display = 'block';
+                    }
+                } else {
+                    authButtons.style.display = 'flex';
+                    userMenu.classList.remove('active');
+                }
+            } catch (error) {
+                console.error('Auth error:', error);
+            }
+        }
+
+        // Dropdown toggle
+        document.getElementById('dropdownToggle').addEventListener('click', () => {
+            document.getElementById('dropdownMenu').classList.toggle('show');
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.dropdown')) {
+                document.getElementById('dropdownMenu').classList.remove('show');
+            }
+        });
+
+        // Logout
+        document.getElementById('logoutBtn').addEventListener('click', async (e) => {
+            e.preventDefault();
+            await logoutUser();
+            window.location.reload();
+        });
+
+        // Initialize auth on page load
+        initAuth();
+    </script>
 </body>
 </html>

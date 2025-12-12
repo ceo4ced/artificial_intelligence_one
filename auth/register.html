@@ -346,9 +346,9 @@
             const result = await registerUser(email, password, displayName);
 
             if (result.success) {
-                showSuccess('Account created successfully! Redirecting to dashboard...');
+                showSuccess('Account created successfully! Redirecting...');
                 setTimeout(() => {
-                    window.location.href = 'dashboard.html';
+                    window.location.href = '../topics.html';
                 }, 2000);
             } else {
                 showError(result.error);
@@ -368,17 +368,17 @@
             const result = await loginWithGoogle();
 
             if (result.success) {
-                // User already registered, redirect to dashboard
-                window.location.href = 'dashboard.html';
+                // User already registered, redirect to topics page
+                window.location.href = '../topics.html';
             } else if (result.error === 'first_time_google_user') {
                 // First time Google user - complete registration automatically
                 // User is still signed in with Google, create their profile
                 const registrationResult = await completeGoogleRegistration();
 
                 if (registrationResult.success) {
-                    showSuccess('Account created successfully! Redirecting to dashboard...');
+                    showSuccess('Account created successfully! Redirecting...');
                     setTimeout(() => {
-                        window.location.href = 'dashboard.html';
+                        window.location.href = '../topics.html';
                     }, 2000);
                 } else {
                     showError(registrationResult.error);
