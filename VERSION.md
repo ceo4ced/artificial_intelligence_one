@@ -1,5 +1,37 @@
 # Version History
 
+## v1.0.4 - "Low Barrier Registration" (2024-12-11)
+
+### Major Changes - Registration Model
+- 🚀 **Removed age verification requirement**
+  - No more 13+ age check or birthdate collection
+  - Instant account creation - low barrier to register
+  - All users start as 'guest' role by default
+  - Requires teacher/admin approval for content access (high barrier to access)
+
+### Backend Changes
+- ✅ Updated `registerUser()` - removed birthdate parameter
+- ✅ Updated `completeGoogleRegistration()` - removed age verification logic
+- ✅ Updated `loginWithGoogle()` - auto-completes registration for new Google users
+- ✅ Removed `calculateAge()` function
+- ✅ Updated Firestore rules - removed age/birthdate validation
+- ✅ Updated `hasRequiredUserFields()` - no longer requires birthdate
+
+### Frontend Changes
+- ✅ Removed age requirement notice
+- ✅ Removed birthdate input field from registration form
+- ✅ Removed Google age verification form
+- ✅ Simplified registration flow - one-step process
+- ✅ Updated UI: "Start as a guest - teacher approval required for full access"
+
+### Philosophy
+This implements a **low-barrier registration** with **high-barrier content access** model:
+- **Easy to register** → Anyone can create an account instantly
+- **Hard to access content** → Requires teacher/admin approval
+- **Guest role default** → Limited permissions until promoted by educator
+
+---
+
 ## v1.0.3 - "Update All" (2024-12-11)
 
 ### Critical Bug Fix - Google Registration
