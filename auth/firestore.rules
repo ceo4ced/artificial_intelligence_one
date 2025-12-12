@@ -32,15 +32,6 @@ service cloud.firestore {
       return userRole == 'student' || userRole == 'teacher';
     }
 
-    // Refactored to remove 'let' statements for better compatibility
-    function calculateAge(birthdate) {
-      return int((request.time - timestamp(birthdate)) / duration.value(365, 'd'));
-    }
-
-    function isAtLeast13(birthdate) {
-      return calculateAge(birthdate) >= 13;
-    }
-
     function isApprovedTeacherEmail(email) {
       return email in [
         'teacher@school.edu',
@@ -64,7 +55,7 @@ service cloud.firestore {
     }
 
     function hasRequiredUserFields() {
-      return request.resource.data.keys().hasAll(['email', 'displayName', 'birthdate', 'role', 'createdAt']);
+      return request.resource.data.keys().hasAll(['email', 'displayName', 'role', 'createdAt']);
     }
 
     // ============================================
@@ -75,19 +66,18 @@ service cloud.firestore {
       allow read: if isCurrentUser(userId) || isTeacher();
 
       // Allow create with required fields + any optional fields
-      // Required: uid, email, displayName, birthdate, age, role, createdAt, totalQuizzesTaken, averageScore
-      // Optional: bio, profilePictureUrl, school, grade, photoURL
+      // Required: uid, email, displayName, role, createdAt
+      // Optional: bio, profilePictureUrl, school, grade, photoURL, totalQuizzesTaken, averageScore
+      // All users start as guests - teachers/admins grant access to content
       allow create: if isCurrentUser(userId)
         && hasRequiredUserFields()
-        && isAtLeast13(request.resource.data.birthdate)
         && isValidRoleAssignment(request.resource.data.role, request.resource.data.email);
 
       allow update: if isCurrentUser(userId)
         && roleNotChanged()
         && request.resource.data.createdAt == resource.data.createdAt
-        && request.resource.data.birthdate == resource.data.birthdate
         && request.resource.data.keys().hasOnly([
-             'uid', 'email', 'displayName', 'birthdate', 'age', 'role', 'createdAt',
+             'uid', 'email', 'displayName', 'role', 'createdAt',
              'bio', 'profilePictureUrl', 'school', 'grade', 'photoURL',
              'totalQuizzesTaken', 'averageScore', 'lastUpdated'
            ]);

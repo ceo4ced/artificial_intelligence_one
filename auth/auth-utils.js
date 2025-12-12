@@ -32,16 +32,10 @@ import { logEvent } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-ana
 
 /**
  * Register a new user with email/password
- * Includes age verification (must be 13+) for COPPA compliance
+ * No age verification - all users start as guests and require teacher approval for access
  */
-export async function registerUser(email, password, displayName, birthdate) {
+export async function registerUser(email, password, displayName) {
     try {
-        // Verify age (must be 13 or older)
-        const age = calculateAge(birthdate);
-        if (age < 13) {
-            throw new Error('You must be at least 13 years old to register. This is required by COPPA regulations to protect children\'s privacy.');
-        }
-
         // Create Firebase Auth account
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
@@ -49,19 +43,13 @@ export async function registerUser(email, password, displayName, birthdate) {
         // Update display name
         await updateProfile(user, { displayName: displayName });
 
-        // Convert birthdate string to ISO 8601 format with time (midnight UTC)
-        // This ensures Firestore rules can parse it properly
-        const birthdateISO = new Date(birthdate + 'T00:00:00Z').toISOString();
-
         // Create user profile in Firestore
         await setDoc(doc(db, 'users', user.uid), {
             uid: user.uid,
             email: email,
             displayName: displayName,
-            birthdate: birthdateISO,
-            age: age,
             createdAt: Timestamp.now(),
-            role: 'guest', // Default role - teachers can upgrade to 'student'
+            role: 'guest', // Default role - requires teacher/admin approval for access
             totalQuizzesTaken: 0,
             averageScore: 0
         });
@@ -77,22 +65,6 @@ export async function registerUser(email, password, displayName, birthdate) {
         console.error('Registration error:', error);
         return { success: false, error: error.message };
     }
-}
-
-/**
- * Calculate age from birthdate
- */
-function calculateAge(birthdate) {
-    const today = new Date();
-    const birth = new Date(birthdate);
-    let age = today.getFullYear() - birth.getFullYear();
-    const monthDiff = today.getMonth() - birth.getMonth();
-
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
-        age--;
-    }
-
-    return age;
 }
 
 // ============================================================================
@@ -142,25 +114,15 @@ export async function loginWithGoogle() {
         const userDoc = await getDoc(doc(db, 'users', user.uid));
 
         if (!userDoc.exists()) {
-            // First time Google sign-in - need age verification
-            // Keep user signed in for age verification process
+            // First time Google sign-in - need to complete registration
+            // Keep user signed in for registration process
             // DO NOT sign out here - they need to be authenticated to create profile
             return {
                 success: false,
                 error: 'first_time_google_user',
-                needsAgeVerification: true,
+                needsRegistration: true,
                 user: user,
-                message: 'Please complete registration with age verification first.'
-            };
-        }
-
-        // Verify user is 13+
-        const userData = userDoc.data();
-        if (userData.age < 13) {
-            await signOut(auth);
-            return {
-                success: false,
-                error: 'You must be at least 13 years old to use this platform.'
+                message: 'Please complete registration to continue.'
             };
         }
 
@@ -183,9 +145,10 @@ export async function loginWithGoogle() {
 }
 
 /**
- * Complete Google registration with age verification
+ * Complete Google registration
+ * No age verification - all users start as guests and require teacher approval for access
  */
-export async function completeGoogleRegistration(birthdate) {
+export async function completeGoogleRegistration() {
     try {
         const user = auth.currentUser;
         console.log('[DEBUG] completeGoogleRegistration called');
@@ -195,29 +158,13 @@ export async function completeGoogleRegistration(birthdate) {
             throw new Error('No user signed in');
         }
 
-        // Verify age
-        const age = calculateAge(birthdate);
-        console.log('[DEBUG] Calculated age:', age);
-
-        if (age < 13) {
-            await signOut(auth);
-            throw new Error('You must be at least 13 years old to register.');
-        }
-
-        // Convert birthdate string to ISO 8601 format with time (midnight UTC)
-        // This ensures Firestore rules can parse it properly
-        const birthdateISO = new Date(birthdate + 'T00:00:00Z').toISOString();
-        console.log('[DEBUG] Birthdate ISO:', birthdateISO);
-
         // Prepare user profile data
         const profileData = {
             uid: user.uid,
             email: user.email,
             displayName: user.displayName,
-            birthdate: birthdateISO,
-            age: age,
             createdAt: Timestamp.now(),
-            role: 'guest', // Default role - teachers can upgrade to 'student'
+            role: 'guest', // Default role - requires teacher/admin approval for access
             totalQuizzesTaken: 0,
             averageScore: 0
         };
