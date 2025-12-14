@@ -14,7 +14,7 @@ export default defineConfig({
         '*.config.js',
       ]
     },
-    include: ['tests/**/*.test.js', 'games/**/*.test.{js,ts}'],
+    include: ['tests/**/*.test.js', 'games/**/*.test.{js,ts}', 'lessons/**/*.test.{js,ts}', 'dl-visualizers/**/*.test.{js,ts}'],
   },
   resolve: {
     alias: {

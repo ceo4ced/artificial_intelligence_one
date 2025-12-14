@@ -1,5 +1,5 @@
 
-import { generateDataset, calculateStats, Dataset, SimulationStats, DataPoint } from './engine';
+import { generateDataset, calculateStats, Dataset, DataPoint } from './engine.js';
 
 // 🏠 State
 let currentDataset: Dataset = generateDataset('balanced');
@@ -68,7 +68,7 @@ function drawLegend() {
     ctx.fillText('Group B', 580, 97);
 }
 
-function drawImpact(type: 'balanced' | 'biased') {
+function drawImpact() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     // Header
@@ -76,7 +76,7 @@ function drawImpact(type: 'balanced' | 'biased') {
     ctx.fillStyle = '#333';
     ctx.fillText('Impact on Model Performance', 280, 30);
 
-    const isBalanced = type === 'balanced';
+
 
     // We replicate the original visual style but dynamic
     // Let's stick to the "Two Column" comparison look if we want to show difference, 
@@ -140,7 +140,7 @@ function renderStatBar(x: number, y: number, accuracy: number, label: string, co
     // For impact view, we calculate stats to ensure we use our functional core
     // But conceptually the view compares both states.
     // const stats = calculateStats(currentDataset); // Unused for now as we show full comparison
-    drawImpact(currentDataset.type);
+    drawImpact();
 
     explanationEl.innerHTML =
         '<strong>The Impact:</strong> When training data is biased, the AI performs much worse on ' +
