@@ -1,5 +1,6 @@
+
 import { describe, it, expect } from 'vitest';
-import { createGame, makeMove, checkWinner, getBestMove, minimax } from './engine.js';
+import { createGame, makeMove, checkWinner, getBestMove, GameState, Board } from './engine.js';
 
 describe('Tic-Tac-Toe Engine (Functional Core)', () => {
 
@@ -26,9 +27,10 @@ describe('Tic-Tac-Toe Engine (Functional Core)', () => {
         // X X X
         // . . .
         // . . .
-        const board = ['X', 'X', 'X', '', '', '', '', '', ''];
+        const board = ['X', 'X', 'X', '', '', '', '', '', ''] as Board;
         const result = checkWinner(board);
-        expect(result.winner).toBe('X');
+        expect(result).not.toBeNull();
+        if (result) expect(result.winner).toBe('X');
     });
 
     it('should block moves on completed game', () => {
@@ -41,7 +43,7 @@ describe('Tic-Tac-Toe Engine (Functional Core)', () => {
         state = makeMove(state, 2); // X wins
 
         expect(state.isGameOver).toBe(true);
-        expect(state.winResult.winner).toBe('X');
+        expect(state.winResult?.winner).toBe('X');
 
         // Try to move again
         const nextState = makeMove(state, 8);
@@ -53,8 +55,8 @@ describe('Tic-Tac-Toe Engine (Functional Core)', () => {
         // O . .
         // . . .
         // O should block at index 2
-        const state = {
-            board: ['X', 'X', '', 'O', '', '', '', '', ''],
+        const state: GameState = {
+            board: ['X', 'X', '', 'O', '', '', '', '', ''] as Board,
             currentPlayer: 'O',
             isGameOver: false,
             winResult: null,
@@ -65,3 +67,4 @@ describe('Tic-Tac-Toe Engine (Functional Core)', () => {
         expect(bestMove).toBe(2);
     });
 });
+
