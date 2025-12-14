@@ -79,10 +79,7 @@ export function generateData(dataset: DatasetType, count: number = 200): { train
 
 export function predictClass(dataset: DatasetType, x: number, y: number): number {
     // Ground truth prediction
-    const p = generatePoint(dataset);
-    // Wait, generatePoint generates random x,y. We need to check label for specific x,y.
-    // The logic inside generatePoint for label calculation is what we need.
-    // Let's refactor pure label logic.
+    // Note: generatePoint generates random x,y. We check label for specific input x,y here.
 
     switch (dataset) {
         case 'xor':
