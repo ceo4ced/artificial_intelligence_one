@@ -1,7 +1,7 @@
 
 import { describe, it, expect } from 'vitest';
 import {
-    INITIAL_STATE, checkJudgment, nextScenario, SCENARIOS
+    INITIAL_STATE, checkJudgment, nextScenario
 } from './engine.js';
 
 describe('Responsible AI Engine', () => {
