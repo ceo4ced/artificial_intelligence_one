@@ -1,6 +1,6 @@
 
 import { describe, it, expect } from 'vitest';
-import { createGame, makeMove, checkWin, isBoardFull, ROWS, COLS, GameState } from './engine.js';
+import { createGame, makeMove, checkWin, ROWS, COLS } from './engine.js';
 
 describe('Connect Four Engine (Functional Core)', () => {
     it('should create initial game state', () => {

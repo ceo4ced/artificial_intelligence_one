@@ -1,5 +1,3 @@
-
-```
 import {
     createGame, makeMove, getBestMove,
     GameState, Player, ROWS, COLS
@@ -138,7 +136,7 @@ canvas.addEventListener('click', (e) => {
 (window as any).updateDifficulty = () => {
     const el = document.getElementById('difficulty') as HTMLInputElement;
     aiDepth = parseInt(el.value);
-    document.getElementById('difficultyValue')!.textContent = `Level ${ aiDepth } `;
+    document.getElementById('difficultyValue')!.textContent = `Level ${aiDepth} `;
 };
 
 // Init
