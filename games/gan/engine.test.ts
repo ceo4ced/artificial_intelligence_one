@@ -1,7 +1,7 @@
 
 import { describe, it, expect } from 'vitest';
 import {
-    startGameState, nextRoundState, processChoice, tickTimer, INITIAL_STATE
+    startGameState, nextRoundState, processChoice, tickTimer
 } from './engine.js';
 
 describe('GAN Game Engine', () => {

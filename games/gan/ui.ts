@@ -121,7 +121,7 @@ function drawWavePattern(params: PatternParams) {
             // We need more artifacts or reuse them. Modulo is fine.
             const safeArt = params.artifacts[idx % params.artifacts.length] || { x: 0, y: 0 };
 
-            y += (safeArt.y || 0);
+            y += (safeArt.y || 0) + (art.y || 0);
 
             if (x === 0) {
                 ctx.moveTo(x, y);
