@@ -1,39 +1,160 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>About - AI 1</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             color: #fff;
         }
+
+        /* Navigation */
         nav {
             background: rgba(0, 0, 0, 0.3);
             backdrop-filter: blur(10px);
             padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.2);
             margin-bottom: 30px;
         }
-        nav a {
+
+        .nav-brand {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            text-decoration: none;
+        }
+
+        .version {
+            font-size: 0.5em;
+            font-weight: 400;
+            opacity: 0.7;
+            margin-top: -5px;
+            color: #fff;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 25px;
+            align-items: center;
+        }
+
+        .nav-links a {
             color: #fff;
             text-decoration: none;
             font-weight: 600;
-            margin-right: 20px;
+            transition: all 0.3s;
+            padding: 8px 15px;
+            border-radius: 8px;
         }
+
+        .nav-links a:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-login,
+        .btn-register {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: 2px solid #fff;
+        }
+
+        .btn-login:hover,
+        .btn-register:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .user-menu {
+            display: none;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-menu.active {
+            display: flex;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .dropdown {
+            position: relative;
+        }
+
+        .dropdown-toggle {
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px 15px;
+            border-radius: 8px;
+            color: #fff;
+        }
+
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 45px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            min-width: 180px;
+            z-index: 1000;
+        }
+
+        .dropdown-menu.show {
+            display: block;
+        }
+
+        .dropdown-menu a {
+            display: block;
+            padding: 12px 20px;
+            color: #2d3748 !important;
+            text-decoration: none;
+            transition: all 0.2s;
+            margin-right: 0;
+            /* Reset margin */
+        }
+
+        .dropdown-menu a:hover {
+            background: #f7fafc;
+        }
+
+        .dropdown-menu .teacher-only {
+            border-top: 1px solid #e2e8f0;
+            background: #f0f4f8;
+        }
+
         .container {
             max-width: 900px;
             margin: 0 auto;
             padding: 40px 20px;
         }
+
         h1 {
             font-size: 3em;
             margin-bottom: 20px;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
         }
+
         .content {
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
@@ -42,21 +163,49 @@
             line-height: 1.8;
             font-size: 1.1em;
         }
+
         h2 {
             margin: 30px 0 15px;
             font-size: 1.8em;
         }
+
         p {
             margin-bottom: 15px;
         }
     </style>
 </head>
+
 <body>
     <nav>
-        <a href="index.html">🏠 Home</a>
-        <a href="topics.html">📚 Topics</a>
-        <a href="about.html">ℹ️ About</a>
-        <a href="auth/login.html">🔐 Login</a>
+        <a href="index.html" class="nav-brand">
+            <div>🤖 AI 1</div>
+            <div class="version">v1.0.6</div>
+        </a>
+        <div class="nav-links">
+            <a href="topics.html">Explore Topics</a>
+            <a href="quizzes/index.html">Quizzes</a>
+            <a href="about.html">About</a>
+            <div id="authButtons">
+                <a href="auth/login.html" class="btn-login">Login</a>
+                <a href="auth/register.html" class="btn-register">Register</a>
+            </div>
+            <div class="user-menu" id="userMenu">
+                <span class="user-name" id="userName"></span>
+                <div class="dropdown">
+                    <div class="dropdown-toggle" id="dropdownToggle">
+                        <span>⚙️ Menu</span>
+                    </div>
+                    <div class="dropdown-menu" id="dropdownMenu">
+                        <a href="auth/dashboard.html">📊 Dashboard</a>
+                        <a href="auth/profile.html">👤 Profile</a>
+                        <a href="auth/settings.html">⚙️ Settings</a>
+                        <a href="auth/teacher-admin.html" class="teacher-only" id="teacherLink"
+                            style="display:none;">👨‍🏫 Teacher Admin</a>
+                        <a href="#" id="logoutBtn">🚪 Logout</a>
+                    </div>
+                </div>
+            </div>
+        </div>
     </nav>
 
     <div class="container">
@@ -104,5 +253,58 @@
             <p><strong>Cybersecurity 1</strong> - An upcoming course on information security and ethical hacking.</p>
         </div>
     </div>
+
+    <script type="module">
+        import { getCurrentUser, logout } from './auth/auth-utils.js';
+
+        async function initAuth() {
+            try {
+                const user = await getCurrentUser();
+                const authButtons = document.getElementById('authButtons');
+                const userMenu = document.getElementById('userMenu');
+                const userName = document.getElementById('userName');
+                const teacherLink = document.getElementById('teacherLink');
+
+                if (user) {
+                    authButtons.style.display = 'none';
+                    userMenu.classList.add('active');
+                    userName.textContent = user.displayName || user.email.split('@')[0];
+
+                    // Show teacher link if user is a teacher
+                    if (user.role === 'teacher') {
+                        teacherLink.style.display = 'block';
+                    }
+                } else {
+                    authButtons.style.display = 'flex';
+                    userMenu.classList.remove('active');
+                }
+            } catch (error) {
+                console.error('Auth error:', error);
+            }
+        }
+
+        // Dropdown toggle
+        document.getElementById('dropdownToggle').addEventListener('click', () => {
+            document.getElementById('dropdownMenu').classList.toggle('show');
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.dropdown')) {
+                document.getElementById('dropdownMenu').classList.remove('show');
+            }
+        });
+
+        // Logout
+        document.getElementById('logoutBtn').addEventListener('click', async (e) => {
+            e.preventDefault();
+            await logout();
+            window.location.reload();
+        });
+
+        // Initialize auth on page load
+        initAuth();
+    </script>
 </body>
+
 </html>

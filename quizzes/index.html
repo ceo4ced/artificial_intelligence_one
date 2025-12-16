@@ -19,26 +19,127 @@
             padding: 0;
         }
 
-        .nav-header {
-            background: #2d3748;
+        /* Navigation */
+        nav {
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
             padding: 15px 30px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
             display: flex;
             justify-content: space-between;
             align-items: center;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.2);
+            margin-bottom: 20px;
         }
 
-        .nav-header a {
-            color: #90cdf4;
+        .nav-brand {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            text-decoration: none;
+        }
+
+        .version {
+            font-size: 0.5em;
+            font-weight: 400;
+            opacity: 0.7;
+            margin-top: -5px;
+            color: #fff;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 25px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: #fff;
             text-decoration: none;
             font-weight: 600;
-            font-size: 1.1em;
+            transition: all 0.3s;
+            padding: 8px 15px;
+            border-radius: 8px;
         }
 
-        .nav-title {
+        .nav-links a:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-login,
+        .btn-register {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: 2px solid #fff;
+        }
+
+        .btn-login:hover,
+        .btn-register:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .user-menu {
+            display: none;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-menu.active {
+            display: flex;
+        }
+
+        .user-name {
+            font-weight: 600;
             color: #fff;
-            font-size: 1.2em;
-            font-weight: 700;
+        }
+
+        .dropdown {
+            position: relative;
+        }
+
+        .dropdown-toggle {
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px 15px;
+            border-radius: 8px;
+            color: #fff;
+        }
+
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 45px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            min-width: 180px;
+            z-index: 1000;
+        }
+
+        .dropdown-menu.show {
+            display: block;
+        }
+
+        .dropdown-menu a {
+            display: block;
+            padding: 12px 20px;
+            color: #2d3748 !important;
+            text-decoration: none;
+            transition: all 0.2s;
+            margin-right: 0;
+        }
+
+        .dropdown-menu a:hover {
+            background: #f7fafc;
+        }
+
+        .dropdown-menu .teacher-only {
+            border-top: 1px solid #e2e8f0;
+            background: #f0f4f8;
         }
 
         .container {
@@ -216,47 +317,32 @@
 </head>
 
 <body>
-    <nav class="nav-header"
-        style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
-        <div style="display: flex; gap: 20px; align-items: center;">
-            <a href="../index.html"
-                style="color: #90cdf4; text-decoration: none; font-weight: 700; font-size: 1.2em; display: flex; flex-direction: column; align-items: flex-start;">
-                <span>🤖 AI 1</span>
-                <span style="font-size: 0.5em; font-weight: 400; opacity: 0.7; margin-top: -5px;">v1.0.6</span>
-            </a>
-            <a href="../topics.html" style="color: #90cdf4; text-decoration: none; font-weight: 600;">Topics</a>
-            <div class="nav-title" style="color: #fff;">📝 Quizzes</div>
-        </div>
-        <div style="display: flex; gap: 15px; align-items: center;">
-            <div id="authButtons" style="display: flex; gap: 10px;">
-                <a href="../auth/login.html"
-                    style="color: #fff; text-decoration: none; font-weight: 600; padding: 8px 15px; background: rgba(255,255,255,0.2); border-radius: 8px; border: 1px solid #fff;">Login</a>
-                <a href="../auth/register.html"
-                    style="color: #fff; text-decoration: none; font-weight: 600; padding: 8px 15px; background: rgba(255,255,255,0.2); border-radius: 8px; border: 1px solid #fff;">Register</a>
+    <nav>
+        <a href="../index.html" class="nav-brand">
+            <div>🤖 AI 1</div>
+            <div class="version">v1.0.6</div>
+        </a>
+        <div class="nav-links">
+            <a href="../topics.html">Explore Topics</a>
+            <a href="index.html">Quizzes</a>
+            <a href="../about.html">About</a>
+            <div id="authButtons">
+                <a href="../auth/login.html" class="btn-login">Login</a>
+                <a href="../auth/register.html" class="btn-register">Register</a>
             </div>
-            <div class="user-menu" id="userMenu" style="display: none; align-items: center; gap: 15px;">
-                <span style="color: #fff; font-weight: 600;" id="userName"></span>
-                <div style="position: relative;">
-                    <div id="dropdownToggle"
-                        style="cursor: pointer; background: rgba(255,255,255,0.2); padding: 8px 15px; border-radius: 8px; color: #fff; font-weight: 600;">
-                        ⚙️</div>
-                    <div id="dropdownMenu"
-                        style="display: none; position: absolute; right: 0; top: 45px; background: #fff; border-radius: 8px; box-shadow: 0 5px 20px rgba(0,0,0,0.3); min-width: 180px; z-index: 1000;">
-                        <a href="../auth/dashboard.html"
-                            style="display: block; padding: 12px 20px; color: #2d3748; text-decoration: none;">📊
-                            Dashboard</a>
-                        <a href="../auth/profile.html"
-                            style="display: block; padding: 12px 20px; color: #2d3748; text-decoration: none;">👤
-                            Profile</a>
-                        <a href="../auth/settings.html"
-                            style="display: block; padding: 12px 20px; color: #2d3748; text-decoration: none;">⚙️
-                            Settings</a>
-                        <a href="../auth/teacher-admin.html" id="teacherLink"
-                            style="display: none; padding: 12px 20px; color: #2d3748; text-decoration: none; border-top: 1px solid #e2e8f0; background: #f0f4f8;">👨‍🏫
-                            Admin</a>
-                        <a href="#" id="logoutBtn"
-                            style="display: block; padding: 12px 20px; color: #2d3748; text-decoration: none;">🚪
-                            Logout</a>
+            <div class="user-menu" id="userMenu">
+                <span class="user-name" id="userName"></span>
+                <div class="dropdown">
+                    <div class="dropdown-toggle" id="dropdownToggle">
+                        <span>⚙️ Menu</span>
+                    </div>
+                    <div class="dropdown-menu" id="dropdownMenu">
+                        <a href="../auth/dashboard.html">📊 Dashboard</a>
+                        <a href="../auth/profile.html">👤 Profile</a>
+                        <a href="../auth/settings.html">⚙️ Settings</a>
+                        <a href="../auth/teacher-admin.html" class="teacher-only" id="teacherLink"
+                            style="display:none;">👨‍🏫 Teacher Admin</a>
+                        <a href="#" id="logoutBtn">🚪 Logout</a>
                     </div>
                 </div>
             </div>
@@ -443,7 +529,7 @@
         loadQuizzes();
 
         // Authentication
-        import('../auth/auth-utils.js').then(({ getCurrentUser, logoutUser }) => {
+        import('../auth/auth-utils.js').then(({ getCurrentUser, logout }) => {
             async function initAuth() {
                 try {
                     const user = await getCurrentUser();
@@ -454,12 +540,16 @@
 
                     if (user) {
                         authButtons.style.display = 'none';
-                        userMenu.style.display = 'flex';
-                        userName.textContent = user.name || user.email.split('@')[0];
+                        userMenu.classList.add('active');
+                        userName.textContent = user.displayName || user.email.split('@')[0];
 
+                        // Show teacher link if user is a teacher
                         if (user.role === 'teacher') {
                             teacherLink.style.display = 'block';
                         }
+                    } else {
+                        authButtons.style.display = 'flex';
+                        userMenu.classList.remove('active');
                     }
                 } catch (error) {
                     console.error('Auth error:', error);
@@ -467,19 +557,18 @@
             }
 
             document.getElementById('dropdownToggle')?.addEventListener('click', () => {
-                const menu = document.getElementById('dropdownMenu');
-                menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+                document.getElementById('dropdownMenu').classList.toggle('show');
             });
 
             document.addEventListener('click', (e) => {
-                if (!e.target.closest('#dropdownToggle')) {
-                    document.getElementById('dropdownMenu').style.display = 'none';
+                if (!e.target.closest('.dropdown')) {
+                    document.getElementById('dropdownMenu').classList.remove('show');
                 }
             });
 
             document.getElementById('logoutBtn')?.addEventListener('click', async (e) => {
                 e.preventDefault();
-                await logoutUser();
+                await logout();
                 window.location.reload();
             });
 
