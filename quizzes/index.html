@@ -1,193 +1,387 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI Class Quizzes - Track Your Progress</title>
-<style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 0; }
-.nav-header { background: #2d3748; padding: 15px 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; }
-.nav-header a { color: #90cdf4; text-decoration: none; font-weight: 600; font-size: 1.1em; }
-.nav-title { color: #fff; font-size: 1.2em; font-weight: 700; }
-.container { max-width: 1200px; margin: 20px auto; background: #fff; border-radius: 15px; padding: 40px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
-h1 { text-align: center; color: #2d3748; font-size: 2.5em; margin-bottom: 15px; }
-.subtitle { text-align: center; color: #666; margin-bottom: 40px; font-size: 1.1em; }
-.stats-banner { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; padding: 30px; border-radius: 10px; margin-bottom: 40px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; text-align: center; }
-.stat-box { padding: 15px; }
-.stat-value { font-size: 3em; font-weight: bold; }
-.stat-label { font-size: 1.1em; opacity: 0.9; margin-top: 5px; }
-.quiz-section { margin: 40px 0; }
-.quiz-section h2 { color: #2d3748; margin-bottom: 20px; font-size: 1.8em; border-left: 4px solid #667eea; padding-left: 15px; }
-.quiz-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; }
-.quiz-card { background: #fff; border: 2px solid #e2e8f0; border-radius: 10px; padding: 20px; transition: all 0.3s; cursor: pointer; position: relative; }
-.quiz-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.15); border-color: #667eea; }
-.quiz-card.completed { border-color: #4CAF50; background: #f1f8f4; }
-.quiz-card h3 { color: #2d3748; margin-bottom: 10px; font-size: 1.3em; }
-.quiz-card p { color: #666; line-height: 1.6; margin-bottom: 15px; }
-.quiz-status { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; padding-top: 15px; border-top: 2px solid #e2e8f0; }
-.status-badge { padding: 5px 12px; border-radius: 15px; font-size: 0.85em; font-weight: 600; }
-.status-badge.not-started { background: #e0e0e0; color: #666; }
-.status-badge.in-progress { background: #fff9c4; color: #f57c00; }
-.status-badge.completed { background: #c8e6c9; color: #2e7d32; }
-.score-display { font-weight: 600; color: #667eea; }
-.reset-btn { background: #f44336; color: #fff; border: none; padding: 12px 30px; border-radius: 8px; cursor: pointer; font-weight: 600; margin: 20px auto; display: block; }
-.reset-btn:hover { background: #da190b; }
-button { padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.3s; }
-.btn-primary { background: #667eea; color: #fff; }
-.btn-primary:hover { background: #5568d3; transform: scale(1.05); }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Class Quizzes - Track Your Progress</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 0;
+        }
+
+        .nav-header {
+            background: #2d3748;
+            padding: 15px 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-header a {
+            color: #90cdf4;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+
+        .nav-title {
+            color: #fff;
+            font-size: 1.2em;
+            font-weight: 700;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            background: #fff;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: #2d3748;
+            font-size: 2.5em;
+            margin-bottom: 15px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 40px;
+            font-size: 1.1em;
+        }
+
+        .stats-banner {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 40px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            text-align: center;
+        }
+
+        .stat-box {
+            padding: 15px;
+        }
+
+        .stat-value {
+            font-size: 3em;
+            font-weight: bold;
+        }
+
+        .stat-label {
+            font-size: 1.1em;
+            opacity: 0.9;
+            margin-top: 5px;
+        }
+
+        .quiz-section {
+            margin: 40px 0;
+        }
+
+        .quiz-section h2 {
+            color: #2d3748;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            border-left: 4px solid #667eea;
+            padding-left: 15px;
+        }
+
+        .quiz-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+        }
+
+        .quiz-card {
+            background: #fff;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 20px;
+            transition: all 0.3s;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .quiz-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+            border-color: #667eea;
+        }
+
+        .quiz-card.completed {
+            border-color: #4CAF50;
+            background: #f1f8f4;
+        }
+
+        .quiz-card h3 {
+            color: #2d3748;
+            margin-bottom: 10px;
+            font-size: 1.3em;
+        }
+
+        .quiz-card p {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .quiz-status {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 2px solid #e2e8f0;
+        }
+
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        .status-badge.not-started {
+            background: #e0e0e0;
+            color: #666;
+        }
+
+        .status-badge.in-progress {
+            background: #fff9c4;
+            color: #f57c00;
+        }
+
+        .status-badge.completed {
+            background: #c8e6c9;
+            color: #2e7d32;
+        }
+
+        .score-display {
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        .reset-btn {
+            background: #f44336;
+            color: #fff;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            margin: 20px auto;
+            display: block;
+        }
+
+        .reset-btn:hover {
+            background: #da190b;
+        }
+
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: scale(1.05);
+        }
+    </style>
 </head>
+
 <body>
-<nav class="nav-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
-    <div style="display: flex; gap: 20px; align-items: center;">
-        <a href="../index.html" style="color: #90cdf4; text-decoration: none; font-weight: 700; font-size: 1.2em; display: flex; flex-direction: column; align-items: flex-start;">
-            <span>🤖 AI 1</span>
-            <span style="font-size: 0.5em; font-weight: 400; opacity: 0.7; margin-top: -5px;">v1.0.4</span>
-        </a>
-        <a href="../topics.html" style="color: #90cdf4; text-decoration: none; font-weight: 600;">Topics</a>
-        <div class="nav-title" style="color: #fff;">📝 Quizzes</div>
-    </div>
-    <div style="display: flex; gap: 15px; align-items: center;">
-        <div id="authButtons" style="display: flex; gap: 10px;">
-            <a href="../auth/login.html" style="color: #fff; text-decoration: none; font-weight: 600; padding: 8px 15px; background: rgba(255,255,255,0.2); border-radius: 8px; border: 1px solid #fff;">Login</a>
-            <a href="../auth/register.html" style="color: #fff; text-decoration: none; font-weight: 600; padding: 8px 15px; background: rgba(255,255,255,0.2); border-radius: 8px; border: 1px solid #fff;">Register</a>
+    <nav class="nav-header"
+        style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+        <div style="display: flex; gap: 20px; align-items: center;">
+            <a href="../index.html"
+                style="color: #90cdf4; text-decoration: none; font-weight: 700; font-size: 1.2em; display: flex; flex-direction: column; align-items: flex-start;">
+                <span>🤖 AI 1</span>
+                <span style="font-size: 0.5em; font-weight: 400; opacity: 0.7; margin-top: -5px;">v1.0.6</span>
+            </a>
+            <a href="../topics.html" style="color: #90cdf4; text-decoration: none; font-weight: 600;">Topics</a>
+            <div class="nav-title" style="color: #fff;">📝 Quizzes</div>
         </div>
-        <div class="user-menu" id="userMenu" style="display: none; align-items: center; gap: 15px;">
-            <span style="color: #fff; font-weight: 600;" id="userName"></span>
-            <div style="position: relative;">
-                <div id="dropdownToggle" style="cursor: pointer; background: rgba(255,255,255,0.2); padding: 8px 15px; border-radius: 8px; color: #fff; font-weight: 600;">⚙️</div>
-                <div id="dropdownMenu" style="display: none; position: absolute; right: 0; top: 45px; background: #fff; border-radius: 8px; box-shadow: 0 5px 20px rgba(0,0,0,0.3); min-width: 180px; z-index: 1000;">
-                    <a href="../auth/dashboard.html" style="display: block; padding: 12px 20px; color: #2d3748; text-decoration: none;">📊 Dashboard</a>
-                    <a href="../auth/profile.html" style="display: block; padding: 12px 20px; color: #2d3748; text-decoration: none;">👤 Profile</a>
-                    <a href="../auth/settings.html" style="display: block; padding: 12px 20px; color: #2d3748; text-decoration: none;">⚙️ Settings</a>
-                    <a href="../auth/teacher-admin.html" id="teacherLink" style="display: none; padding: 12px 20px; color: #2d3748; text-decoration: none; border-top: 1px solid #e2e8f0; background: #f0f4f8;">👨‍🏫 Admin</a>
-                    <a href="#" id="logoutBtn" style="display: block; padding: 12px 20px; color: #2d3748; text-decoration: none;">🚪 Logout</a>
+        <div style="display: flex; gap: 15px; align-items: center;">
+            <div id="authButtons" style="display: flex; gap: 10px;">
+                <a href="../auth/login.html"
+                    style="color: #fff; text-decoration: none; font-weight: 600; padding: 8px 15px; background: rgba(255,255,255,0.2); border-radius: 8px; border: 1px solid #fff;">Login</a>
+                <a href="../auth/register.html"
+                    style="color: #fff; text-decoration: none; font-weight: 600; padding: 8px 15px; background: rgba(255,255,255,0.2); border-radius: 8px; border: 1px solid #fff;">Register</a>
+            </div>
+            <div class="user-menu" id="userMenu" style="display: none; align-items: center; gap: 15px;">
+                <span style="color: #fff; font-weight: 600;" id="userName"></span>
+                <div style="position: relative;">
+                    <div id="dropdownToggle"
+                        style="cursor: pointer; background: rgba(255,255,255,0.2); padding: 8px 15px; border-radius: 8px; color: #fff; font-weight: 600;">
+                        ⚙️</div>
+                    <div id="dropdownMenu"
+                        style="display: none; position: absolute; right: 0; top: 45px; background: #fff; border-radius: 8px; box-shadow: 0 5px 20px rgba(0,0,0,0.3); min-width: 180px; z-index: 1000;">
+                        <a href="../auth/dashboard.html"
+                            style="display: block; padding: 12px 20px; color: #2d3748; text-decoration: none;">📊
+                            Dashboard</a>
+                        <a href="../auth/profile.html"
+                            style="display: block; padding: 12px 20px; color: #2d3748; text-decoration: none;">👤
+                            Profile</a>
+                        <a href="../auth/settings.html"
+                            style="display: block; padding: 12px 20px; color: #2d3748; text-decoration: none;">⚙️
+                            Settings</a>
+                        <a href="../auth/teacher-admin.html" id="teacherLink"
+                            style="display: none; padding: 12px 20px; color: #2d3748; text-decoration: none; border-top: 1px solid #e2e8f0; background: #f0f4f8;">👨‍🏫
+                            Admin</a>
+                        <a href="#" id="logoutBtn"
+                            style="display: block; padding: 12px 20px; color: #2d3748; text-decoration: none;">🚪
+                            Logout</a>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-</nav>
-<div class="container">
-    <h1>📝 Test Your Knowledge</h1>
-    <p class="subtitle">Take quizzes for each lesson to track your progress and reinforce learning!</p>
+    </nav>
+    <div class="container">
+        <h1>📝 Test Your Knowledge</h1>
+        <p class="subtitle">Take quizzes for each lesson to track your progress and reinforce learning!</p>
 
-    <div class="stats-banner">
-        <div class="stat-box">
-            <div class="stat-value" id="totalQuizzes">30</div>
-            <div class="stat-label">Total Quizzes</div>
+        <div class="stats-banner">
+            <div class="stat-box">
+                <div class="stat-value" id="totalQuizzes">30</div>
+                <div class="stat-label">Total Quizzes</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value" id="completedQuizzes">0</div>
+                <div class="stat-label">Completed</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value" id="averageScore">0%</div>
+                <div class="stat-label">Average Score</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value" id="totalPoints">0</div>
+                <div class="stat-label">Total Points</div>
+            </div>
         </div>
-        <div class="stat-box">
-            <div class="stat-value" id="completedQuizzes">0</div>
-            <div class="stat-label">Completed</div>
+
+        <div class="quiz-section">
+            <h2>⚖️ AI Ethics & Responsible Use</h2>
+            <div class="quiz-grid" id="ethicsQuizzes"></div>
         </div>
-        <div class="stat-box">
-            <div class="stat-value" id="averageScore">0%</div>
-            <div class="stat-label">Average Score</div>
+
+        <div class="quiz-section">
+            <h2>🎨 Human Centered Design</h2>
+            <div class="quiz-grid" id="hcdQuizzes"></div>
         </div>
-        <div class="stat-box">
-            <div class="stat-value" id="totalPoints">0</div>
-            <div class="stat-label">Total Points</div>
+
+        <div class="quiz-section">
+            <h2>📊 Data Science & Visualization</h2>
+            <div class="quiz-grid" id="dataScienceQuizzes"></div>
         </div>
+
+        <div class="quiz-section">
+            <h2>🤖 Machine Learning</h2>
+            <div class="quiz-grid" id="mlQuizzes"></div>
+        </div>
+
+        <div class="quiz-section">
+            <h2>🧠 Deep Learning</h2>
+            <div class="quiz-grid" id="deepLearningQuizzes"></div>
+        </div>
+
+        <div class="quiz-section">
+            <h2>🎮 Game AI</h2>
+            <div class="quiz-grid" id="gameAIQuizzes"></div>
+        </div>
+
+        <button class="reset-btn" onclick="resetAllProgress()">Reset All Quiz Progress</button>
     </div>
 
-    <div class="quiz-section">
-        <h2>⚖️ AI Ethics & Responsible Use</h2>
-        <div class="quiz-grid" id="ethicsQuizzes"></div>
-    </div>
+    <script>
+        const quizzes = {
+            ethics: [
+                { id: 'ai-bias', title: 'AI Bias Quiz', description: 'Test your understanding of bias in AI systems', questions: 8 },
+                { id: 'ethical-ai', title: 'Ethical AI Quiz', description: 'Explore ethical principles in AI decision-making', questions: 8 },
+                { id: 'responsible-ai', title: 'Responsible AI Usage Quiz', description: 'Learn how students should use AI tools responsibly', questions: 8 },
+                { id: 'digital-privacy', title: 'Digital Privacy & AI Quiz', description: 'Understand how AI handles your personal data', questions: 8 }
+            ],
+            hcd: [
+                { id: 'hcd-empathy', title: 'HCD Part 1: Empathy Quiz', description: 'Test your knowledge of user research and empathy mapping', questions: 8 },
+                { id: 'hcd-ideation', title: 'HCD Part 2: Ideation Quiz', description: 'Master brainstorming and prototyping concepts', questions: 8 },
+                { id: 'hcd-testing', title: 'HCD Part 3: Testing Quiz', description: 'Learn about usability testing and iteration', questions: 8 }
+            ],
+            dataScience: [
+                { id: 'data-structures', title: 'Data Structures Quiz', description: 'Understand lists, tables, trees, and graphs', questions: 8 },
+                { id: 'trees', title: 'Trees Quiz', description: 'Test your knowledge of hierarchical data structures', questions: 7 },
+                { id: 'graphs', title: 'Graphs Quiz', description: 'Master networks and graph relationships', questions: 7 },
+                { id: 'data-science-intro', title: 'Intro to Data Science Quiz', description: 'Learn to read and interpret graphs', questions: 8 },
+                { id: 'data-visualization', title: 'Data Visualization Quiz', description: 'Tell stories with data through visuals', questions: 8 },
+                { id: 'misleading-graphs', title: 'Misleading Graphs Quiz', description: 'Spot deception in data visualizations', questions: 8 },
+                { id: 'data-cleaning', title: 'Data Cleaning Quiz', description: 'Understand the importance of clean data', questions: 7 },
+                { id: 'pattern-finding', title: 'Pattern Finding Quiz', description: 'Find patterns in data without AI', questions: 7 }
+            ],
+            ml: [
+                { id: 'supervised-learning', title: 'Supervised Learning Quiz', description: 'Master learning from labeled data', questions: 8 },
+                { id: 'unsupervised-learning', title: 'Unsupervised Learning Quiz', description: 'Understand pattern finding without labels', questions: 8 },
+                { id: 'deep-learning', title: 'Deep Learning Quiz', description: 'Test your neural network knowledge', questions: 8 },
+                { id: 'nlp', title: 'NLP Quiz', description: 'Natural Language Processing fundamentals', questions: 8 },
+                { id: 'dimension-reduction', title: 'Dimension Reduction Quiz', description: 'Simplify data while preserving information', questions: 7 },
+                { id: 'reinforcement-learning', title: 'Reinforcement Learning Quiz', description: 'Learn through trial and error', questions: 8 },
+                { id: 'svm', title: 'SVM Quiz', description: 'Support Vector Machines and margin maximization', questions: 8 }
+            ],
+            deepLearning: [
+                { id: 'feedforward-nn', title: 'Feedforward Neural Networks Quiz', description: 'Test your understanding of basic neural network architecture', questions: 12 },
+                { id: 'rnn', title: 'Recurrent Neural Networks Quiz', description: 'Master networks with memory for sequences', questions: 12 },
+                { id: 'cnn', title: 'Convolutional Neural Networks Quiz', description: 'Learn about image processing with CNNs', questions: 12 },
+                { id: 'lstm', title: 'Long Short-Term Memory Quiz', description: 'Understand advanced sequence learning with LSTMs', questions: 12 },
+                { id: 'gan', title: 'Generative Adversarial Networks Quiz', description: 'Explore generator vs discriminator training', questions: 12 },
+                { id: 'autoencoders', title: 'Autoencoders Quiz', description: 'Master data compression and reconstruction', questions: 12 },
+                { id: 'transformers', title: 'Transformer Networks Quiz', description: 'Learn about self-attention and modern LLMs', questions: 12 }
+            ],
+            gameAI: [
+                { id: 'minimax', title: 'Minimax Algorithm Quiz', description: 'Strategic decision-making in two-player games', questions: 8 }
+            ]
+        };
 
-    <div class="quiz-section">
-        <h2>🎨 Human Centered Design</h2>
-        <div class="quiz-grid" id="hcdQuizzes"></div>
-    </div>
+        function loadQuizzes() {
+            loadQuizSection('ethicsQuizzes', quizzes.ethics);
+            loadQuizSection('hcdQuizzes', quizzes.hcd);
+            loadQuizSection('dataScienceQuizzes', quizzes.dataScience);
+            loadQuizSection('mlQuizzes', quizzes.ml);
+            loadQuizSection('deepLearningQuizzes', quizzes.deepLearning);
+            loadQuizSection('gameAIQuizzes', quizzes.gameAI);
+            updateStats();
+        }
 
-    <div class="quiz-section">
-        <h2>📊 Data Science & Visualization</h2>
-        <div class="quiz-grid" id="dataScienceQuizzes"></div>
-    </div>
+        function loadQuizSection(containerId, quizList) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = quizList.map(quiz => {
+                const result = getQuizResult(quiz.id);
+                const status = getQuizStatus(result);
+                const statusClass = status.toLowerCase().replace(' ', '-');
 
-    <div class="quiz-section">
-        <h2>🤖 Machine Learning</h2>
-        <div class="quiz-grid" id="mlQuizzes"></div>
-    </div>
-
-    <div class="quiz-section">
-        <h2>🧠 Deep Learning</h2>
-        <div class="quiz-grid" id="deepLearningQuizzes"></div>
-    </div>
-
-    <div class="quiz-section">
-        <h2>🎮 Game AI</h2>
-        <div class="quiz-grid" id="gameAIQuizzes"></div>
-    </div>
-
-    <button class="reset-btn" onclick="resetAllProgress()">Reset All Quiz Progress</button>
-</div>
-
-<script>
-const quizzes = {
-    ethics: [
-        { id: 'ai-bias', title: 'AI Bias Quiz', description: 'Test your understanding of bias in AI systems', questions: 8 },
-        { id: 'ethical-ai', title: 'Ethical AI Quiz', description: 'Explore ethical principles in AI decision-making', questions: 8 },
-        { id: 'responsible-ai', title: 'Responsible AI Usage Quiz', description: 'Learn how students should use AI tools responsibly', questions: 8 },
-        { id: 'digital-privacy', title: 'Digital Privacy & AI Quiz', description: 'Understand how AI handles your personal data', questions: 8 }
-    ],
-    hcd: [
-        { id: 'hcd-empathy', title: 'HCD Part 1: Empathy Quiz', description: 'Test your knowledge of user research and empathy mapping', questions: 8 },
-        { id: 'hcd-ideation', title: 'HCD Part 2: Ideation Quiz', description: 'Master brainstorming and prototyping concepts', questions: 8 },
-        { id: 'hcd-testing', title: 'HCD Part 3: Testing Quiz', description: 'Learn about usability testing and iteration', questions: 8 }
-    ],
-    dataScience: [
-        { id: 'data-structures', title: 'Data Structures Quiz', description: 'Understand lists, tables, trees, and graphs', questions: 8 },
-        { id: 'trees', title: 'Trees Quiz', description: 'Test your knowledge of hierarchical data structures', questions: 7 },
-        { id: 'graphs', title: 'Graphs Quiz', description: 'Master networks and graph relationships', questions: 7 },
-        { id: 'data-science-intro', title: 'Intro to Data Science Quiz', description: 'Learn to read and interpret graphs', questions: 8 },
-        { id: 'data-visualization', title: 'Data Visualization Quiz', description: 'Tell stories with data through visuals', questions: 8 },
-        { id: 'misleading-graphs', title: 'Misleading Graphs Quiz', description: 'Spot deception in data visualizations', questions: 8 },
-        { id: 'data-cleaning', title: 'Data Cleaning Quiz', description: 'Understand the importance of clean data', questions: 7 },
-        { id: 'pattern-finding', title: 'Pattern Finding Quiz', description: 'Find patterns in data without AI', questions: 7 }
-    ],
-    ml: [
-        { id: 'supervised-learning', title: 'Supervised Learning Quiz', description: 'Master learning from labeled data', questions: 8 },
-        { id: 'unsupervised-learning', title: 'Unsupervised Learning Quiz', description: 'Understand pattern finding without labels', questions: 8 },
-        { id: 'deep-learning', title: 'Deep Learning Quiz', description: 'Test your neural network knowledge', questions: 8 },
-        { id: 'nlp', title: 'NLP Quiz', description: 'Natural Language Processing fundamentals', questions: 8 },
-        { id: 'dimension-reduction', title: 'Dimension Reduction Quiz', description: 'Simplify data while preserving information', questions: 7 },
-        { id: 'reinforcement-learning', title: 'Reinforcement Learning Quiz', description: 'Learn through trial and error', questions: 8 },
-        { id: 'svm', title: 'SVM Quiz', description: 'Support Vector Machines and margin maximization', questions: 8 }
-    ],
-    deepLearning: [
-        { id: 'feedforward-nn', title: 'Feedforward Neural Networks Quiz', description: 'Test your understanding of basic neural network architecture', questions: 12 },
-        { id: 'rnn', title: 'Recurrent Neural Networks Quiz', description: 'Master networks with memory for sequences', questions: 12 },
-        { id: 'cnn', title: 'Convolutional Neural Networks Quiz', description: 'Learn about image processing with CNNs', questions: 12 },
-        { id: 'lstm', title: 'Long Short-Term Memory Quiz', description: 'Understand advanced sequence learning with LSTMs', questions: 12 },
-        { id: 'gan', title: 'Generative Adversarial Networks Quiz', description: 'Explore generator vs discriminator training', questions: 12 },
-        { id: 'autoencoders', title: 'Autoencoders Quiz', description: 'Master data compression and reconstruction', questions: 12 },
-        { id: 'transformers', title: 'Transformer Networks Quiz', description: 'Learn about self-attention and modern LLMs', questions: 12 }
-    ],
-    gameAI: [
-        { id: 'minimax', title: 'Minimax Algorithm Quiz', description: 'Strategic decision-making in two-player games', questions: 8 }
-    ]
-};
-
-function loadQuizzes() {
-    loadQuizSection('ethicsQuizzes', quizzes.ethics);
-    loadQuizSection('hcdQuizzes', quizzes.hcd);
-    loadQuizSection('dataScienceQuizzes', quizzes.dataScience);
-    loadQuizSection('mlQuizzes', quizzes.ml);
-    loadQuizSection('deepLearningQuizzes', quizzes.deepLearning);
-    loadQuizSection('gameAIQuizzes', quizzes.gameAI);
-    updateStats();
-}
-
-function loadQuizSection(containerId, quizList) {
-    const container = document.getElementById(containerId);
-    container.innerHTML = quizList.map(quiz => {
-        const result = getQuizResult(quiz.id);
-        const status = getQuizStatus(result);
-        const statusClass = status.toLowerCase().replace(' ', '-');
-
-        return `
+                return `
             <div class="quiz-card ${result ? 'completed' : ''}" onclick="window.location.href='${quiz.id}/index.html'">
                 <h3>${quiz.title}</h3>
                 <p>${quiz.description}</p>
@@ -198,99 +392,100 @@ function loadQuizSection(containerId, quizList) {
                 </div>
             </div>
         `;
-    }).join('');
-}
-
-function getQuizResult(quizId) {
-    const stored = localStorage.getItem(`quiz_${quizId}`);
-    return stored ? JSON.parse(stored) : null;
-}
-
-function getQuizStatus(result) {
-    if (!result) return 'Not Started';
-    return 'Completed';
-}
-
-function updateStats() {
-    let completed = 0;
-    let totalScore = 0;
-    let totalPossible = 0;
-    let totalPoints = 0;
-
-    const allQuizzes = [...quizzes.ethics, ...quizzes.hcd, ...quizzes.dataScience, ...quizzes.ml, ...quizzes.gameAI];
-
-    allQuizzes.forEach(quiz => {
-        const result = getQuizResult(quiz.id);
-        if (result) {
-            completed++;
-            totalScore += result.score;
-            totalPossible += result.total;
-            totalPoints += result.score * 10; // 10 points per correct answer
+            }).join('');
         }
-    });
 
-    document.getElementById('completedQuizzes').textContent = completed;
-    document.getElementById('averageScore').textContent = totalPossible > 0 ? Math.round((totalScore / totalPossible) * 100) + '%' : '0%';
-    document.getElementById('totalPoints').textContent = totalPoints;
-}
+        function getQuizResult(quizId) {
+            const stored = localStorage.getItem(`quiz_${quizId}`);
+            return stored ? JSON.parse(stored) : null;
+        }
 
-function resetAllProgress() {
-    if (confirm('Are you sure you want to reset ALL quiz progress? This cannot be undone!')) {
-        const allQuizzes = [...quizzes.ethics, ...quizzes.hcd, ...quizzes.dataScience, ...quizzes.ml, ...quizzes.gameAI];
-        allQuizzes.forEach(quiz => {
-            localStorage.removeItem(`quiz_${quiz.id}`);
-        });
+        function getQuizStatus(result) {
+            if (!result) return 'Not Started';
+            return 'Completed';
+        }
+
+        function updateStats() {
+            let completed = 0;
+            let totalScore = 0;
+            let totalPossible = 0;
+            let totalPoints = 0;
+
+            const allQuizzes = [...quizzes.ethics, ...quizzes.hcd, ...quizzes.dataScience, ...quizzes.ml, ...quizzes.gameAI];
+
+            allQuizzes.forEach(quiz => {
+                const result = getQuizResult(quiz.id);
+                if (result) {
+                    completed++;
+                    totalScore += result.score;
+                    totalPossible += result.total;
+                    totalPoints += result.score * 10; // 10 points per correct answer
+                }
+            });
+
+            document.getElementById('completedQuizzes').textContent = completed;
+            document.getElementById('averageScore').textContent = totalPossible > 0 ? Math.round((totalScore / totalPossible) * 100) + '%' : '0%';
+            document.getElementById('totalPoints').textContent = totalPoints;
+        }
+
+        function resetAllProgress() {
+            if (confirm('Are you sure you want to reset ALL quiz progress? This cannot be undone!')) {
+                const allQuizzes = [...quizzes.ethics, ...quizzes.hcd, ...quizzes.dataScience, ...quizzes.ml, ...quizzes.gameAI];
+                allQuizzes.forEach(quiz => {
+                    localStorage.removeItem(`quiz_${quiz.id}`);
+                });
+                loadQuizzes();
+                alert('All quiz progress has been reset!');
+            }
+        }
+
+        // Initialize
         loadQuizzes();
-        alert('All quiz progress has been reset!');
-    }
-}
 
-// Initialize
-loadQuizzes();
+        // Authentication
+        import('../auth/auth-utils.js').then(({ getCurrentUser, logoutUser }) => {
+            async function initAuth() {
+                try {
+                    const user = await getCurrentUser();
+                    const authButtons = document.getElementById('authButtons');
+                    const userMenu = document.getElementById('userMenu');
+                    const userName = document.getElementById('userName');
+                    const teacherLink = document.getElementById('teacherLink');
 
-// Authentication
-import('../auth/auth-utils.js').then(({ getCurrentUser, logoutUser }) => {
-    async function initAuth() {
-        try {
-            const user = await getCurrentUser();
-            const authButtons = document.getElementById('authButtons');
-            const userMenu = document.getElementById('userMenu');
-            const userName = document.getElementById('userName');
-            const teacherLink = document.getElementById('teacherLink');
+                    if (user) {
+                        authButtons.style.display = 'none';
+                        userMenu.style.display = 'flex';
+                        userName.textContent = user.name || user.email.split('@')[0];
 
-            if (user) {
-                authButtons.style.display = 'none';
-                userMenu.style.display = 'flex';
-                userName.textContent = user.name || user.email.split('@')[0];
-
-                if (user.role === 'teacher') {
-                    teacherLink.style.display = 'block';
+                        if (user.role === 'teacher') {
+                            teacherLink.style.display = 'block';
+                        }
+                    }
+                } catch (error) {
+                    console.error('Auth error:', error);
                 }
             }
-        } catch (error) {
-            console.error('Auth error:', error);
-        }
-    }
 
-    document.getElementById('dropdownToggle')?.addEventListener('click', () => {
-        const menu = document.getElementById('dropdownMenu');
-        menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
-    });
+            document.getElementById('dropdownToggle')?.addEventListener('click', () => {
+                const menu = document.getElementById('dropdownMenu');
+                menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+            });
 
-    document.addEventListener('click', (e) => {
-        if (!e.target.closest('#dropdownToggle')) {
-            document.getElementById('dropdownMenu').style.display = 'none';
-        }
-    });
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('#dropdownToggle')) {
+                    document.getElementById('dropdownMenu').style.display = 'none';
+                }
+            });
 
-    document.getElementById('logoutBtn')?.addEventListener('click', async (e) => {
-        e.preventDefault();
-        await logoutUser();
-        window.location.reload();
-    });
+            document.getElementById('logoutBtn')?.addEventListener('click', async (e) => {
+                e.preventDefault();
+                await logoutUser();
+                window.location.reload();
+            });
 
-    initAuth();
-}).catch(err => console.log('Auth not available:', err));
-</script>
+            initAuth();
+        }).catch(err => console.log('Auth not available:', err));
+    </script>
 </body>
+
 </html>

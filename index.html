@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Mr. Williams' Artificial Intelligence 1 - Interactive learning platform for AI concepts, machine learning, and computational thinking">
+    <meta name="description"
+        content="Mr. Williams' Artificial Intelligence 1 - Interactive learning platform for AI concepts, machine learning, and computational thinking">
     <title>AI 1 - Mr. Williams, MSCS</title>
     <style>
         * {
@@ -65,14 +67,16 @@
             background: rgba(255, 255, 255, 0.2);
         }
 
-        .btn-login, .btn-register {
+        .btn-login,
+        .btn-register {
             background: rgba(255, 255, 255, 0.2);
             padding: 10px 20px;
             border-radius: 8px;
             border: 2px solid #fff;
         }
 
-        .btn-login:hover, .btn-register:hover {
+        .btn-login:hover,
+        .btn-register:hover {
             background: rgba(255, 255, 255, 0.3);
         }
 
@@ -280,11 +284,12 @@
         }
     </style>
 </head>
+
 <body>
     <nav>
         <div class="nav-brand">
             <div>🤖 AI 1</div>
-            <div class="version">v1.0.4</div>
+            <div class="version">v1.0.6</div>
         </div>
         <div class="nav-links">
             <a href="topics.html">Explore Topics</a>
@@ -303,7 +308,8 @@
                         <a href="auth/dashboard.html">📊 Dashboard</a>
                         <a href="auth/profile.html">👤 Profile</a>
                         <a href="auth/settings.html">⚙️ Settings</a>
-                        <a href="auth/teacher-admin.html" class="teacher-only" id="teacherLink" style="display:none;">👨‍🏫 Teacher Admin</a>
+                        <a href="auth/teacher-admin.html" class="teacher-only" id="teacherLink"
+                            style="display:none;">👨‍🏫 Teacher Admin</a>
                         <a href="#" id="logoutBtn">🚪 Logout</a>
                     </div>
                 </div>
@@ -368,7 +374,7 @@
     </footer>
 
     <script type="module">
-        import { getCurrentUser, logoutUser } from './auth/auth-utils.js';
+        import { getCurrentUser, logout } from './auth/auth-utils.js';
 
         async function initAuth() {
             try {
@@ -411,7 +417,7 @@
         // Logout
         document.getElementById('logoutBtn').addEventListener('click', async (e) => {
             e.preventDefault();
-            await logoutUser();
+            await logout();
             window.location.reload();
         });
 
@@ -419,4 +425,5 @@
         initAuth();
     </script>
 </body>
+
 </html>

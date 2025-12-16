@@ -2,7 +2,7 @@
 // This file initializes Firebase services for the AI Learning Platform
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
-import { getAuth } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+import { getAuth, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-analytics.js";
 
@@ -23,6 +23,9 @@ const app = initializeApp(firebaseConfig);
 
 // Initialize Firebase services
 export const auth = getAuth(app);
+setPersistence(auth, browserLocalPersistence).catch((error) => {
+  console.error("Error setting persistence:", error);
+});
 export const db = getFirestore(app);
 export const analytics = getAnalytics(app);
 

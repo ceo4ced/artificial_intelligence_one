@@ -1,5 +1,31 @@
 # Version History
 
+## v1.0.6 - "Maintenance Update" (2025-12-16)
+
+### Updates
+- 🔄 **Version Bump**: Updated version number across all pages (index, topics, quizzes) to ensure consistency.
+
+---
+
+## v1.0.5 - "Games Refactor & Persistence" (2024-12-16)
+
+### Major Improvements
+- 🎮 **Refactored All AI Games**: Standardized 33 AI games to Consistent Module Structure
+  - `engine.ts` (Core Logic)
+  - `ui.ts` (User Interface)
+  - `engine.test.ts` (Unit Tests)
+  - `index.html` (Module imports)
+- ✅ **Infrastructure Stability**: Verified unit tests pass across all game modules
+
+### Bug Fixes
+- 🐛 **Fixed Session Persistence**: Users now remain logged in across page navigations
+  - Explicitly enabled `browserLocalPersistence` in Firebase config
+- 🐛 **Fixed Logout Bug**: Corrected import error in `index.html` that prevented proper logout
+- 🐛 **Fixed Test Infrastructure**: Solved HTTPS module import issues in Vitest
+- 🔄 **Improved UX**: Login now redirects to previous page or "Topics" (Learning Hub) instead of Dashboard
+
+---
+
 ## v1.0.4 - "Low Barrier Registration" (2024-12-11)
 
 ### Major Changes - Registration Model

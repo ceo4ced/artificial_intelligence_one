@@ -4,6 +4,10 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+vi.mock('../auth/auth-utils.js', () => ({
+  getCurrentUser: vi.fn().mockResolvedValue(null),
+}));
+
 import { ROLES, PERMISSIONS, hasPermission, getRoleDisplayName, getNextRole, canUpgrade } from '../auth/auth-guard.js';
 
 describe('Auth Guard - Role System', () => {
@@ -94,7 +98,7 @@ describe('Auth Guard - Role System', () => {
     });
 
     it('should return false for unknown permissions', () => {
-      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => { });
       expect(hasPermission('student', 'UNKNOWN_PERMISSION')).toBe(false);
       expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('Unknown permission'));
       consoleSpy.mockRestore();

@@ -14,7 +14,7 @@ const accuracyEl = document.getElementById('accuracy')!;
 const bestScoreEl = document.getElementById('bestScore')!;
 const progressBar = document.getElementById('progressBar')!;
 const gameContent = document.getElementById('gameContent')!;
-const hintBox = document.getElementById('hintBox'); // Might not exist initially if dynamic
+
 
 function init() {
     (window as any).toggleIssue = handleToggleIssue;

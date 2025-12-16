@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Comprehensive AI learning platform with interactive visualizations for search algorithms, machine learning, game playing, and constraint satisfaction problems">
+    <meta name="description"
+        content="Comprehensive AI learning platform with interactive visualizations for search algorithms, machine learning, game playing, and constraint satisfaction problems">
     <title>Mr. Williams' AI 1 - Interactive Learning Tools</title>
     <style>
         * {
@@ -122,7 +124,7 @@
             right: -50%;
             width: 200%;
             height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
             transform: rotate(45deg);
         }
 
@@ -130,7 +132,7 @@
             font-size: 4.5em;
             margin-bottom: 15px;
             display: block;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
             position: relative;
             z-index: 1;
         }
@@ -190,13 +192,33 @@
             box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
         }
 
-        .gradient-ethics { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
-        .gradient-hcd { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
-        .gradient-data { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
-        .gradient-ml { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
-        .gradient-dl { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
-        .gradient-search { background: linear-gradient(135deg, #30cfd0 0%, #330867 100%); }
-        .gradient-game { background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); }
+        .gradient-ethics {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .gradient-hcd {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .gradient-data {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .gradient-ml {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        }
+
+        .gradient-dl {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        }
+
+        .gradient-search {
+            background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);
+        }
+
+        .gradient-game {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+        }
 
         .tool-card {
             background: white;
@@ -378,31 +400,47 @@
         }
     </style>
 </head>
+
 <body>
-    <nav style="background: rgba(0, 0, 0, 0.3); backdrop-filter: blur(10px); padding: 15px 30px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; gap: 20px; flex-wrap: wrap;">
+    <nav
+        style="background: rgba(0, 0, 0, 0.3); backdrop-filter: blur(10px); padding: 15px 30px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; gap: 20px; flex-wrap: wrap;">
         <div style="display: flex; gap: 20px; align-items: center;">
-            <a href="index.html" style="color: #fff; text-decoration: none; font-weight: 700; font-size: 1.2em; display: flex; flex-direction: column; align-items: flex-start;">
-                <span>🤖 AI 1</span>
-                <span style="font-size: 0.5em; font-weight: 400; opacity: 0.7; margin-top: -5px;">v1.0.4</span>
+            <span>🤖 AI 1</span>
+            <span style="font-size: 0.5em; font-weight: 400; opacity: 0.7; margin-top: -5px;">v1.0.6</span>
             </a>
             <a href="topics.html" style="color: #fff; text-decoration: none; font-weight: 600;">Topics</a>
             <a href="quizzes/index.html" style="color: #fff; text-decoration: none; font-weight: 600;">Quizzes</a>
         </div>
         <div style="display: flex; gap: 15px; align-items: center;">
             <div id="authButtons" style="display: flex; gap: 10px;">
-                <a href="auth/login.html" style="color: #fff; text-decoration: none; font-weight: 600; padding: 8px 15px; background: rgba(255,255,255,0.2); border-radius: 8px; border: 2px solid #fff;">Login</a>
-                <a href="auth/register.html" style="color: #fff; text-decoration: none; font-weight: 600; padding: 8px 15px; background: rgba(255,255,255,0.2); border-radius: 8px; border: 2px solid #fff;">Register</a>
+                <a href="auth/login.html"
+                    style="color: #fff; text-decoration: none; font-weight: 600; padding: 8px 15px; background: rgba(255,255,255,0.2); border-radius: 8px; border: 2px solid #fff;">Login</a>
+                <a href="auth/register.html"
+                    style="color: #fff; text-decoration: none; font-weight: 600; padding: 8px 15px; background: rgba(255,255,255,0.2); border-radius: 8px; border: 2px solid #fff;">Register</a>
             </div>
             <div class="user-menu" id="userMenu" style="display: none; align-items: center; gap: 15px;">
                 <span style="color: #fff; font-weight: 600;" id="userName"></span>
                 <div style="position: relative;">
-                    <div id="dropdownToggle" style="cursor: pointer; background: rgba(255,255,255,0.2); padding: 8px 15px; border-radius: 8px; color: #fff; font-weight: 600;">⚙️ Menu</div>
-                    <div id="dropdownMenu" style="display: none; position: absolute; right: 0; top: 45px; background: #fff; border-radius: 8px; box-shadow: 0 5px 20px rgba(0,0,0,0.3); min-width: 180px; z-index: 1000;">
-                        <a href="auth/dashboard.html" style="display: block; padding: 12px 20px; color: #2d3748; text-decoration: none;">📊 Dashboard</a>
-                        <a href="auth/profile.html" style="display: block; padding: 12px 20px; color: #2d3748; text-decoration: none;">👤 Profile</a>
-                        <a href="auth/settings.html" style="display: block; padding: 12px 20px; color: #2d3748; text-decoration: none;">⚙️ Settings</a>
-                        <a href="auth/teacher-admin.html" id="teacherLink" style="display: none; padding: 12px 20px; color: #2d3748; text-decoration: none; border-top: 1px solid #e2e8f0; background: #f0f4f8;">👨‍🏫 Teacher Admin</a>
-                        <a href="#" id="logoutBtn" style="display: block; padding: 12px 20px; color: #2d3748; text-decoration: none;">🚪 Logout</a>
+                    <div id="dropdownToggle"
+                        style="cursor: pointer; background: rgba(255,255,255,0.2); padding: 8px 15px; border-radius: 8px; color: #fff; font-weight: 600;">
+                        ⚙️ Menu</div>
+                    <div id="dropdownMenu"
+                        style="display: none; position: absolute; right: 0; top: 45px; background: #fff; border-radius: 8px; box-shadow: 0 5px 20px rgba(0,0,0,0.3); min-width: 180px; z-index: 1000;">
+                        <a href="auth/dashboard.html"
+                            style="display: block; padding: 12px 20px; color: #2d3748; text-decoration: none;">📊
+                            Dashboard</a>
+                        <a href="auth/profile.html"
+                            style="display: block; padding: 12px 20px; color: #2d3748; text-decoration: none;">👤
+                            Profile</a>
+                        <a href="auth/settings.html"
+                            style="display: block; padding: 12px 20px; color: #2d3748; text-decoration: none;">⚙️
+                            Settings</a>
+                        <a href="auth/teacher-admin.html" id="teacherLink"
+                            style="display: none; padding: 12px 20px; color: #2d3748; text-decoration: none; border-top: 1px solid #e2e8f0; background: #f0f4f8;">👨‍🏫
+                            Teacher Admin</a>
+                        <a href="#" id="logoutBtn"
+                            style="display: block; padding: 12px 20px; color: #2d3748; text-decoration: none;">🚪
+                            Logout</a>
                     </div>
                 </div>
             </div>
@@ -439,7 +477,8 @@
                     <div class="hub-card-header gradient-ethics">
                         <span class="hub-icon">⚖️</span>
                         <h3>AI Ethics & Responsible Use</h3>
-                        <p class="hub-card-desc">Learn about bias, fairness, privacy, and how to use AI tools responsibly in your academic and personal life.</p>
+                        <p class="hub-card-desc">Learn about bias, fairness, privacy, and how to use AI tools
+                            responsibly in your academic and personal life.</p>
                     </div>
                     <div class="hub-card-body">
                         <div class="hub-stats">
@@ -455,7 +494,8 @@
                     <div class="hub-card-header gradient-hcd">
                         <span class="hub-icon">🎨</span>
                         <h3>Human Centered Design</h3>
-                        <p class="hub-card-desc">Design products with users at the center through empathy, ideation, prototyping, and iterative testing.</p>
+                        <p class="hub-card-desc">Design products with users at the center through empathy, ideation,
+                            prototyping, and iterative testing.</p>
                     </div>
                     <div class="hub-card-body">
                         <div class="hub-stats">
@@ -470,7 +510,8 @@
                     <div class="hub-card-header gradient-data">
                         <span class="hub-icon">📊</span>
                         <h3>Data Science & Visualization</h3>
-                        <p class="hub-card-desc">Learn to work with data structures, visualize data effectively, and discover patterns through analysis and cleaning techniques.</p>
+                        <p class="hub-card-desc">Learn to work with data structures, visualize data effectively, and
+                            discover patterns through analysis and cleaning techniques.</p>
                     </div>
                     <div class="hub-card-body">
                         <div class="hub-stats">
@@ -486,7 +527,8 @@
                     <div class="hub-card-header gradient-ml">
                         <span class="hub-icon">🤖</span>
                         <h3>Machine Learning</h3>
-                        <p class="hub-card-desc">Interactive lessons and games for ML algorithms including supervised learning, unsupervised learning, NLP, and more with visualizers.</p>
+                        <p class="hub-card-desc">Interactive lessons and games for ML algorithms including supervised
+                            learning, unsupervised learning, NLP, and more with visualizers.</p>
                     </div>
                     <div class="hub-card-body">
                         <div class="hub-stats">
@@ -503,7 +545,8 @@
                     <div class="hub-card-header gradient-dl">
                         <span class="hub-icon">🧠</span>
                         <h3>Deep Learning</h3>
-                        <p class="hub-card-desc">Explore different types of neural networks and their architectures including CNNs, RNNs, LSTMs, GANs, Autoencoders, and Transformers.</p>
+                        <p class="hub-card-desc">Explore different types of neural networks and their architectures
+                            including CNNs, RNNs, LSTMs, GANs, Autoencoders, and Transformers.</p>
                     </div>
                     <div class="hub-card-body">
                         <div class="hub-stats">
@@ -519,7 +562,8 @@
                     <div class="hub-card-header gradient-search">
                         <span class="hub-icon">🛠</span>
                         <h3>Search Algorithms</h3>
-                        <p class="hub-card-desc">Visualize how AI finds paths through trees and mazes using BFS, DFS, UCS, A*, and other pathfinding algorithms.</p>
+                        <p class="hub-card-desc">Visualize how AI finds paths through trees and mazes using BFS, DFS,
+                            UCS, A*, and other pathfinding algorithms.</p>
                     </div>
                     <div class="hub-card-body">
                         <div class="hub-stats">
@@ -535,7 +579,8 @@
                     <div class="hub-card-header gradient-game">
                         <span class="hub-icon">🎮</span>
                         <h3>Game AI</h3>
-                        <p class="hub-card-desc">Learn how AI plays games strategically using the Minimax algorithm with alpha-beta pruning and game tree search.</p>
+                        <p class="hub-card-desc">Learn how AI plays games strategically using the Minimax algorithm with
+                            alpha-beta pruning and game tree search.</p>
                     </div>
                     <div class="hub-card-body">
                         <div class="hub-stats">
@@ -551,198 +596,290 @@
                 <h3>⚖️ AI Ethics & Responsible Use Lessons</h3>
                 <div class="algorithm-grid">
                     <div class="algorithm-box">
-                        <h4><a href="lessons/ai-bias/index.html" style="color: #667eea; text-decoration: none;">AI Bias Lesson</a></h4>
+                        <h4><a href="lessons/ai-bias/index.html" style="color: #667eea; text-decoration: none;">AI Bias
+                                Lesson</a></h4>
                         <p>Understanding how AI systems become unfair and what we can do about it.</p>
-                        <p style="margin-top: 8px; font-size: 0.9em;"><strong>Game:</strong> <a href="games/ai-bias/index.html" style="color: #48bb78;">Bias Detective</a> - Identify different types of bias in AI scenarios</p>
+                        <p style="margin-top: 8px; font-size: 0.9em;"><strong>Game:</strong> <a
+                                href="games/ai-bias/index.html" style="color: #48bb78;">Bias Detective</a> - Identify
+                            different types of bias in AI scenarios</p>
                     </div>
 
                     <div class="algorithm-box">
-                        <h4><a href="lessons/ethical-ai/index.html" style="color: #667eea; text-decoration: none;">Ethical AI Lesson</a></h4>
+                        <h4><a href="lessons/ethical-ai/index.html"
+                                style="color: #667eea; text-decoration: none;">Ethical AI Lesson</a></h4>
                         <p>What makes an AI decision fair? Explore core ethical principles.</p>
-                        <p style="margin-top: 8px; font-size: 0.9em;"><strong>Game:</strong> <a href="games/ethical-ai/index.html" style="color: #48bb78;">Ethics Compass</a> - Rate AI scenarios on an ethical risk slider</p>
+                        <p style="margin-top: 8px; font-size: 0.9em;"><strong>Game:</strong> <a
+                                href="games/ethical-ai/index.html" style="color: #48bb78;">Ethics Compass</a> - Rate AI
+                            scenarios on an ethical risk slider</p>
                     </div>
 
                     <div class="algorithm-box">
-                        <h4><a href="lessons/responsible-ai/index.html" style="color: #667eea; text-decoration: none;">Responsible AI Usage Lesson</a></h4>
+                        <h4><a href="lessons/responsible-ai/index.html"
+                                style="color: #667eea; text-decoration: none;">Responsible AI Usage Lesson</a></h4>
                         <p>How students should interact with AI tools for learning.</p>
-                        <p style="margin-top: 8px; font-size: 0.9em;"><strong>Game:</strong> <a href="games/responsible-ai/index.html" style="color: #48bb78;">AI Use Judge</a> - Label AI usage as responsible, gray area, or unsafe</p>
+                        <p style="margin-top: 8px; font-size: 0.9em;"><strong>Game:</strong> <a
+                                href="games/responsible-ai/index.html" style="color: #48bb78;">AI Use Judge</a> - Label
+                            AI usage as responsible, gray area, or unsafe</p>
                     </div>
 
                     <div class="algorithm-box">
-                        <h4><a href="lessons/digital-privacy/index.html" style="color: #667eea; text-decoration: none;">Digital Privacy & AI Lesson</a></h4>
+                        <h4><a href="lessons/digital-privacy/index.html"
+                                style="color: #667eea; text-decoration: none;">Digital Privacy & AI Lesson</a></h4>
                         <p>How AI tools store and infer information from your data.</p>
-                        <p style="margin-top: 8px; font-size: 0.9em;"><strong>Game:</strong> <a href="games/digital-privacy/index.html" style="color: #48bb78;">Digital Footprint Meter</a> - Discover how much private data you reveal</p>
+                        <p style="margin-top: 8px; font-size: 0.9em;"><strong>Game:</strong> <a
+                                href="games/digital-privacy/index.html" style="color: #48bb78;">Digital Footprint
+                                Meter</a> - Discover how much private data you reveal</p>
                     </div>
                 </div>
 
                 <h3 style="margin-top: 40px;">🎨 Human Centered Design Lessons</h3>
                 <div class="algorithm-grid">
                     <div class="algorithm-box">
-                        <h4><a href="lessons/hcd-empathy/index.html" style="color: #667eea; text-decoration: none;">HCD Part 1: Empathy & Understanding Users</a></h4>
+                        <h4><a href="lessons/hcd-empathy/index.html" style="color: #667eea; text-decoration: none;">HCD
+                                Part 1: Empathy & Understanding Users</a></h4>
                         <p>Learn to understand users through research, personas, and empathy mapping.</p>
-                        <p style="margin-top: 8px; font-size: 0.9em;"><strong>Game:</strong> <a href="games/persona-builder/index.html" style="color: #48bb78;">Persona Builder</a> - Build personas from user interviews</p>
+                        <p style="margin-top: 8px; font-size: 0.9em;"><strong>Game:</strong> <a
+                                href="games/persona-builder/index.html" style="color: #48bb78;">Persona Builder</a> -
+                            Build personas from user interviews</p>
                     </div>
 
                     <div class="algorithm-box">
-                        <h4><a href="lessons/hcd-ideation/index.html" style="color: #667eea; text-decoration: none;">HCD Part 2: Ideation & Prototyping</a></h4>
+                        <h4><a href="lessons/hcd-ideation/index.html" style="color: #667eea; text-decoration: none;">HCD
+                                Part 2: Ideation & Prototyping</a></h4>
                         <p>Generate creative solutions and build prototypes to test ideas.</p>
-                        <p style="margin-top: 8px; font-size: 0.9em;"><strong>Game:</strong> <a href="games/solution-sprint/index.html" style="color: #48bb78;">Solution Sprint</a> - Design user-centered solutions under time pressure</p>
+                        <p style="margin-top: 8px; font-size: 0.9em;"><strong>Game:</strong> <a
+                                href="games/solution-sprint/index.html" style="color: #48bb78;">Solution Sprint</a> -
+                            Design user-centered solutions under time pressure</p>
                     </div>
 
                     <div class="algorithm-box">
-                        <h4><a href="lessons/hcd-testing/index.html" style="color: #667eea; text-decoration: none;">HCD Part 3: Testing & Iteration</a></h4>
+                        <h4><a href="lessons/hcd-testing/index.html" style="color: #667eea; text-decoration: none;">HCD
+                                Part 3: Testing & Iteration</a></h4>
                         <p>Test designs with users and iterate based on feedback.</p>
-                        <p style="margin-top: 8px; font-size: 0.9em;"><strong>Game:</strong> <a href="games/usability-detective/index.html" style="color: #48bb78;">Usability Detective</a> - Find and fix usability issues in mockups</p>
+                        <p style="margin-top: 8px; font-size: 0.9em;"><strong>Game:</strong> <a
+                                href="games/usability-detective/index.html" style="color: #48bb78;">Usability
+                                Detective</a> - Find and fix usability issues in mockups</p>
                     </div>
                 </div>
 
                 <h3 style="margin-top: 40px;">📊 Data Science & Visualization Lessons</h3>
                 <div class="algorithm-grid">
                     <div class="algorithm-box">
-                        <h4><a href="lessons/data-structures/index.html" style="color: #667eea; text-decoration: none;">Data Structures Lesson</a></h4>
+                        <h4><a href="lessons/data-structures/index.html"
+                                style="color: #667eea; text-decoration: none;">Data Structures Lesson</a></h4>
                         <p>What they are and why they matter for AI and computer science.</p>
-                        <p style="margin-top: 8px; font-size: 0.9em;"><strong>Game:</strong> <a href="games/data-structures/index.html" style="color: #48bb78;">Data Structure Playground</a> - Organize data into lists, tables, trees, graphs</p>
+                        <p style="margin-top: 8px; font-size: 0.9em;"><strong>Game:</strong> <a
+                                href="games/data-structures/index.html" style="color: #48bb78;">Data Structure
+                                Playground</a> - Organize data into lists, tables, trees, graphs</p>
                     </div>
 
                     <div class="algorithm-box">
-                        <h4><a href="lessons/trees/index.html" style="color: #667eea; text-decoration: none;">Trees Lesson</a></h4>
+                        <h4><a href="lessons/trees/index.html" style="color: #667eea; text-decoration: none;">Trees
+                                Lesson</a></h4>
                         <p>Learn about hierarchies and decision paths in tree structures.</p>
-                        <p style="margin-top: 8px; font-size: 0.9em;"><strong>Game:</strong> <a href="games/trees/index.html" style="color: #48bb78;">Folder Tree Builder</a> - Build folder hierarchies and test search efficiency</p>
+                        <p style="margin-top: 8px; font-size: 0.9em;"><strong>Game:</strong> <a
+                                href="games/trees/index.html" style="color: #48bb78;">Folder Tree Builder</a> - Build
+                            folder hierarchies and test search efficiency</p>
                     </div>
 
                     <div class="algorithm-box">
-                        <h4><a href="lessons/graphs/index.html" style="color: #667eea; text-decoration: none;">Graphs Lesson</a></h4>
+                        <h4><a href="lessons/graphs/index.html" style="color: #667eea; text-decoration: none;">Graphs
+                                Lesson</a></h4>
                         <p>Networks, connections, and relationships in graph structures.</p>
-                        <p style="margin-top: 8px; font-size: 0.9em;"><strong>Game:</strong> <a href="games/graphs/index.html" style="color: #48bb78;">Graph Your World</a> - Create graphs to model social networks, maps, and more</p>
+                        <p style="margin-top: 8px; font-size: 0.9em;"><strong>Game:</strong> <a
+                                href="games/graphs/index.html" style="color: #48bb78;">Graph Your World</a> - Create
+                            graphs to model social networks, maps, and more</p>
                     </div>
 
                     <div class="algorithm-box">
-                        <h4><a href="lessons/data-science-intro/index.html" style="color: #667eea; text-decoration: none;">Intro to Data Science Lesson</a></h4>
+                        <h4><a href="lessons/data-science-intro/index.html"
+                                style="color: #667eea; text-decoration: none;">Intro to Data Science Lesson</a></h4>
                         <p>Reading and interpreting different types of graphs.</p>
-                        <p style="margin-top: 8px; font-size: 0.9em;"><strong>Game:</strong> <a href="games/data-science-intro/index.html" style="color: #48bb78;">Chart Switcher</a> - Toggle datasets through different chart types</p>
+                        <p style="margin-top: 8px; font-size: 0.9em;"><strong>Game:</strong> <a
+                                href="games/data-science-intro/index.html" style="color: #48bb78;">Chart Switcher</a> -
+                            Toggle datasets through different chart types</p>
                     </div>
 
                     <div class="algorithm-box">
-                        <h4><a href="lessons/data-visualization/index.html" style="color: #667eea; text-decoration: none;">Data Visualization Lesson</a></h4>
+                        <h4><a href="lessons/data-visualization/index.html"
+                                style="color: #667eea; text-decoration: none;">Data Visualization Lesson</a></h4>
                         <p>Tell compelling stories with data through effective visuals.</p>
-                        <p style="margin-top: 8px; font-size: 0.9em;"><strong>Game:</strong> <a href="games/data-visualization/index.html" style="color: #48bb78;">Story from a Scatterplot</a> - Interpret patterns and write data stories</p>
+                        <p style="margin-top: 8px; font-size: 0.9em;"><strong>Game:</strong> <a
+                                href="games/data-visualization/index.html" style="color: #48bb78;">Story from a
+                                Scatterplot</a> - Interpret patterns and write data stories</p>
                     </div>
 
                     <div class="algorithm-box">
-                        <h4><a href="lessons/misleading-graphs/index.html" style="color: #667eea; text-decoration: none;">Misleading Graphs Lesson</a></h4>
+                        <h4><a href="lessons/misleading-graphs/index.html"
+                                style="color: #667eea; text-decoration: none;">Misleading Graphs Lesson</a></h4>
                         <p>How visuals can trick you and how to spot deception.</p>
-                        <p style="margin-top: 8px; font-size: 0.9em;"><strong>Game:</strong> <a href="games/misleading-graphs/index.html" style="color: #48bb78;">Spot the Sketchy Graph</a> - Identify deceptive charts and explain what's wrong</p>
+                        <p style="margin-top: 8px; font-size: 0.9em;"><strong>Game:</strong> <a
+                                href="games/misleading-graphs/index.html" style="color: #48bb78;">Spot the Sketchy
+                                Graph</a> - Identify deceptive charts and explain what's wrong</p>
                     </div>
 
                     <div class="algorithm-box">
-                        <h4><a href="lessons/data-cleaning/index.html" style="color: #667eea; text-decoration: none;">Data Cleaning Lesson</a></h4>
+                        <h4><a href="lessons/data-cleaning/index.html"
+                                style="color: #667eea; text-decoration: none;">Data Cleaning Lesson</a></h4>
                         <p>Why messy data creates wrong conclusions in AI.</p>
-                        <p style="margin-top: 8px; font-size: 0.9em;"><strong>Game:</strong> <a href="games/data-cleaning/index.html" style="color: #48bb78;">Fix the Dataset</a> - Correct errors, duplicates, and outliers</p>
+                        <p style="margin-top: 8px; font-size: 0.9em;"><strong>Game:</strong> <a
+                                href="games/data-cleaning/index.html" style="color: #48bb78;">Fix the Dataset</a> -
+                            Correct errors, duplicates, and outliers</p>
                     </div>
 
                     <div class="algorithm-box">
-                        <h4><a href="lessons/pattern-finding/index.html" style="color: #667eea; text-decoration: none;">Pattern Finding Lesson</a></h4>
+                        <h4><a href="lessons/pattern-finding/index.html"
+                                style="color: #667eea; text-decoration: none;">Pattern Finding Lesson</a></h4>
                         <p>Human data insight skills - finding patterns without AI.</p>
-                        <p style="margin-top: 8px; font-size: 0.9em;"><strong>Game:</strong> <a href="games/pattern-finding/index.html" style="color: #48bb78;">Manual Clustering Board</a> - Cluster data manually vs. K-means algorithm</p>
+                        <p style="margin-top: 8px; font-size: 0.9em;"><strong>Game:</strong> <a
+                                href="games/pattern-finding/index.html" style="color: #48bb78;">Manual Clustering
+                                Board</a> - Cluster data manually vs. K-means algorithm</p>
                     </div>
                 </div>
 
                 <h3 style="margin-top: 40px;">🤖 Machine Learning Lessons</h3>
                 <div class="algorithm-grid">
                     <div class="algorithm-box">
-                        <h4><a href="lessons/supervised-learning/index.html" style="color: #667eea; text-decoration: none;">Supervised Learning Lesson</a></h4>
+                        <h4><a href="lessons/supervised-learning/index.html"
+                                style="color: #667eea; text-decoration: none;">Supervised Learning Lesson</a></h4>
                         <p>Learn how AI learns from labeled examples.</p>
-                        <p style="margin-top: 8px; font-size: 0.9em;"><strong>Games:</strong> <a href="games/linear-regression/index.html" style="color: #48bb78;">Stock Market Prophet</a> & <a href="games/logistic-regression/index.html" style="color: #48bb78;">Spam Filter Trainer</a></p>
+                        <p style="margin-top: 8px; font-size: 0.9em;"><strong>Games:</strong> <a
+                                href="games/linear-regression/index.html" style="color: #48bb78;">Stock Market
+                                Prophet</a> & <a href="games/logistic-regression/index.html"
+                                style="color: #48bb78;">Spam Filter Trainer</a></p>
                     </div>
 
                     <div class="algorithm-box">
-                        <h4><a href="lessons/unsupervised-learning/index.html" style="color: #667eea; text-decoration: none;">Unsupervised Learning Lesson</a></h4>
+                        <h4><a href="lessons/unsupervised-learning/index.html"
+                                style="color: #667eea; text-decoration: none;">Unsupervised Learning Lesson</a></h4>
                         <p>Discover how AI finds patterns without labels.</p>
-                        <p style="margin-top: 8px; font-size: 0.9em;"><strong>Game:</strong> <a href="games/kmeans/index.html" style="color: #48bb78;">Color Palette Creator</a> - Use K-means clustering for color palettes</p>
+                        <p style="margin-top: 8px; font-size: 0.9em;"><strong>Game:</strong> <a
+                                href="games/kmeans/index.html" style="color: #48bb78;">Color Palette Creator</a> - Use
+                            K-means clustering for color palettes</p>
                     </div>
 
                     <div class="algorithm-box">
-                        <h4><a href="lessons/deep-learning/index.html" style="color: #667eea; text-decoration: none;">Deep Learning Lesson</a></h4>
+                        <h4><a href="lessons/deep-learning/index.html"
+                                style="color: #667eea; text-decoration: none;">Deep Learning Lesson</a></h4>
                         <p>Neural networks and how they learn.</p>
-                        <p style="margin-top: 8px; font-size: 0.9em;"><strong>Game:</strong> <a href="games/deep-learning/index.html" style="color: #48bb78;">Image Classifier Challenge</a> - Build a neural network to classify images</p>
+                        <p style="margin-top: 8px; font-size: 0.9em;"><strong>Game:</strong> <a
+                                href="games/deep-learning/index.html" style="color: #48bb78;">Image Classifier
+                                Challenge</a> - Build a neural network to classify images</p>
                     </div>
 
                     <div class="algorithm-box">
-                        <h4><a href="lessons/nlp/index.html" style="color: #667eea; text-decoration: none;">NLP Lesson</a></h4>
+                        <h4><a href="lessons/nlp/index.html" style="color: #667eea; text-decoration: none;">NLP
+                                Lesson</a></h4>
                         <p>Natural Language Processing and text AI.</p>
-                        <p style="margin-top: 8px; font-size: 0.9em;"><strong>Game:</strong> <a href="games/nlp/index.html" style="color: #48bb78;">Sentiment Detective</a> - Analyze text sentiment with NLP</p>
+                        <p style="margin-top: 8px; font-size: 0.9em;"><strong>Game:</strong> <a
+                                href="games/nlp/index.html" style="color: #48bb78;">Sentiment Detective</a> - Analyze
+                            text sentiment with NLP</p>
                     </div>
 
                     <div class="algorithm-box">
-                        <h4><a href="lessons/dimension-reduction/index.html" style="color: #667eea; text-decoration: none;">Dimension Reduction Lesson</a></h4>
+                        <h4><a href="lessons/dimension-reduction/index.html"
+                                style="color: #667eea; text-decoration: none;">Dimension Reduction Lesson</a></h4>
                         <p>Simplifying complex data while keeping information.</p>
-                        <p style="margin-top: 8px; font-size: 0.9em;"><strong>Game:</strong> <a href="games/dimension-reduction/index.html" style="color: #48bb78;">Dimension Compressor</a> - Reduce dimensions while preserving variance</p>
+                        <p style="margin-top: 8px; font-size: 0.9em;"><strong>Game:</strong> <a
+                                href="games/dimension-reduction/index.html" style="color: #48bb78;">Dimension
+                                Compressor</a> - Reduce dimensions while preserving variance</p>
                     </div>
 
                     <div class="algorithm-box">
-                        <h4><a href="lessons/reinforcement-learning/index.html" style="color: #667eea; text-decoration: none;">Reinforcement Learning Lesson</a></h4>
+                        <h4><a href="lessons/reinforcement-learning/index.html"
+                                style="color: #667eea; text-decoration: none;">Reinforcement Learning Lesson</a></h4>
                         <p>How AI learns through trial and error.</p>
-                        <p style="margin-top: 8px; font-size: 0.9em;"><strong>Game:</strong> <a href="games/reinforcement-learning/index.html" style="color: #48bb78;">Q-Learning Grid World</a> - Train an AI agent with rewards and penalties</p>
+                        <p style="margin-top: 8px; font-size: 0.9em;"><strong>Game:</strong> <a
+                                href="games/reinforcement-learning/index.html" style="color: #48bb78;">Q-Learning Grid
+                                World</a> - Train an AI agent with rewards and penalties</p>
                     </div>
 
                     <div class="algorithm-box">
-                        <h4><a href="lessons/svm/index.html" style="color: #667eea; text-decoration: none;">SVM Lesson</a></h4>
+                        <h4><a href="lessons/svm/index.html" style="color: #667eea; text-decoration: none;">SVM
+                                Lesson</a></h4>
                         <p>Support Vector Machines: Finding optimal boundaries with maximum margin.</p>
-                        <p style="margin-top: 8px; font-size: 0.9em;"><strong>Game:</strong> <a href="games/svm/index.html" style="color: #48bb78;">Margin Maximizer</a> - Draw decision boundaries to maximize margin</p>
+                        <p style="margin-top: 8px; font-size: 0.9em;"><strong>Game:</strong> <a
+                                href="games/svm/index.html" style="color: #48bb78;">Margin Maximizer</a> - Draw decision
+                            boundaries to maximize margin</p>
                     </div>
                 </div>
 
                 <h3 style="margin-top: 40px;">🧠 Deep Learning Neural Networks</h3>
                 <div class="algorithm-grid">
                     <div class="algorithm-box">
-                        <h4><a href="lessons/feedforward-nn/index.html" style="color: #667eea; text-decoration: none;">Feedforward Neural Networks</a></h4>
+                        <h4><a href="lessons/feedforward-nn/index.html"
+                                style="color: #667eea; text-decoration: none;">Feedforward Neural Networks</a></h4>
                         <p>The simplest neural network where data flows forward without loops.</p>
-                        <p style="margin-top: 8px; font-size: 0.9em;"><strong>Game:</strong> <a href="games/feedforward-nn/index.html" style="color: #48bb78;">Network Architect</a> - Design your own feedforward network architecture</p>
+                        <p style="margin-top: 8px; font-size: 0.9em;"><strong>Game:</strong> <a
+                                href="games/feedforward-nn/index.html" style="color: #48bb78;">Network Architect</a> -
+                            Design your own feedforward network architecture</p>
                     </div>
 
                     <div class="algorithm-box">
-                        <h4><a href="lessons/rnn/index.html" style="color: #667eea; text-decoration: none;">Recurrent Neural Networks (RNN)</a></h4>
+                        <h4><a href="lessons/rnn/index.html" style="color: #667eea; text-decoration: none;">Recurrent
+                                Neural Networks (RNN)</a></h4>
                         <p>Networks with memory - perfect for sequences and time series data.</p>
-                        <p style="margin-top: 8px; font-size: 0.9em;"><strong>Game:</strong> <a href="games/rnn/index.html" style="color: #48bb78;">Text Predictor</a> - Predict the next word using sequence memory</p>
+                        <p style="margin-top: 8px; font-size: 0.9em;"><strong>Game:</strong> <a
+                                href="games/rnn/index.html" style="color: #48bb78;">Text Predictor</a> - Predict the
+                            next word using sequence memory</p>
                     </div>
 
                     <div class="algorithm-box">
-                        <h4><a href="lessons/cnn/index.html" style="color: #667eea; text-decoration: none;">Convolutional Neural Networks (CNN)</a></h4>
+                        <h4><a href="lessons/cnn/index.html"
+                                style="color: #667eea; text-decoration: none;">Convolutional Neural Networks (CNN)</a>
+                        </h4>
                         <p>Specialized for image processing with filters and pooling layers.</p>
-                        <p style="margin-top: 8px; font-size: 0.9em;"><strong>Game:</strong> <a href="games/cnn/index.html" style="color: #48bb78;">Filter Detective</a> - Match filters to detect edges, blurs, and patterns</p>
+                        <p style="margin-top: 8px; font-size: 0.9em;"><strong>Game:</strong> <a
+                                href="games/cnn/index.html" style="color: #48bb78;">Filter Detective</a> - Match filters
+                            to detect edges, blurs, and patterns</p>
                     </div>
 
                     <div class="algorithm-box">
-                        <h4><a href="lessons/lstm/index.html" style="color: #667eea; text-decoration: none;">Long Short-Term Memory (LSTM)</a></h4>
+                        <h4><a href="lessons/lstm/index.html" style="color: #667eea; text-decoration: none;">Long
+                                Short-Term Memory (LSTM)</a></h4>
                         <p>Advanced RNN that solves the vanishing gradient problem.</p>
-                        <p style="margin-top: 8px; font-size: 0.9em;"><strong>Game:</strong> <a href="games/lstm/index.html" style="color: #48bb78;">Sequence Memory Master</a> - Test your long-term sequence memory</p>
+                        <p style="margin-top: 8px; font-size: 0.9em;"><strong>Game:</strong> <a
+                                href="games/lstm/index.html" style="color: #48bb78;">Sequence Memory Master</a> - Test
+                            your long-term sequence memory</p>
                     </div>
 
                     <div class="algorithm-box">
-                        <h4><a href="lessons/gan/index.html" style="color: #667eea; text-decoration: none;">Generative Adversarial Networks (GAN)</a></h4>
+                        <h4><a href="lessons/gan/index.html" style="color: #667eea; text-decoration: none;">Generative
+                                Adversarial Networks (GAN)</a></h4>
                         <p>Two networks compete - generator creates, discriminator judges.</p>
-                        <p style="margin-top: 8px; font-size: 0.9em;"><strong>Game:</strong> <a href="games/gan/index.html" style="color: #48bb78;">Real or Fake Detective</a> - Identify real vs AI-generated patterns</p>
+                        <p style="margin-top: 8px; font-size: 0.9em;"><strong>Game:</strong> <a
+                                href="games/gan/index.html" style="color: #48bb78;">Real or Fake Detective</a> -
+                            Identify real vs AI-generated patterns</p>
                     </div>
 
                     <div class="algorithm-box">
-                        <h4><a href="lessons/autoencoders/index.html" style="color: #667eea; text-decoration: none;">Autoencoders</a></h4>
+                        <h4><a href="lessons/autoencoders/index.html"
+                                style="color: #667eea; text-decoration: none;">Autoencoders</a></h4>
                         <p>Compress and reconstruct data through bottleneck layers.</p>
-                        <p style="margin-top: 8px; font-size: 0.9em;"><strong>Game:</strong> <a href="games/autoencoders/index.html" style="color: #48bb78;">Image Denoiser</a> - Remove noise while preserving image quality</p>
+                        <p style="margin-top: 8px; font-size: 0.9em;"><strong>Game:</strong> <a
+                                href="games/autoencoders/index.html" style="color: #48bb78;">Image Denoiser</a> - Remove
+                            noise while preserving image quality</p>
                     </div>
 
                     <div class="algorithm-box">
-                        <h4><a href="lessons/transformers/index.html" style="color: #667eea; text-decoration: none;">Transformer Networks</a></h4>
+                        <h4><a href="lessons/transformers/index.html"
+                                style="color: #667eea; text-decoration: none;">Transformer Networks</a></h4>
                         <p>Self-attention mechanism powering GPT, BERT, and modern LLMs.</p>
-                        <p style="margin-top: 8px; font-size: 0.9em;"><strong>Game:</strong> <a href="games/transformers/index.html" style="color: #48bb78;">Attention Master</a> - Identify which words should attend to each other</p>
+                        <p style="margin-top: 8px; font-size: 0.9em;"><strong>Game:</strong> <a
+                                href="games/transformers/index.html" style="color: #48bb78;">Attention Master</a> -
+                            Identify which words should attend to each other</p>
                     </div>
                 </div>
 
                 <h3 style="margin-top: 40px;">🎮 Game AI Lessons</h3>
                 <div class="algorithm-grid">
                     <div class="algorithm-box">
-                        <h4><a href="lessons/minimax/index.html" style="color: #667eea; text-decoration: none;">Minimax Algorithm Lesson</a></h4>
+                        <h4><a href="lessons/minimax/index.html" style="color: #667eea; text-decoration: none;">Minimax
+                                Algorithm Lesson</a></h4>
                         <p>How AI makes strategic decisions in two-player games using game tree search.</p>
-                        <p style="margin-top: 8px; font-size: 0.9em;"><strong>Game:</strong> <a href="games/connect-four/index.html" style="color: #48bb78;">Connect Four</a> - Play against AI using Minimax with alpha-beta pruning</p>
+                        <p style="margin-top: 8px; font-size: 0.9em;"><strong>Game:</strong> <a
+                                href="games/connect-four/index.html" style="color: #48bb78;">Connect Four</a> - Play
+                            against AI using Minimax with alpha-beta pruning</p>
                     </div>
                 </div>
 
@@ -750,12 +887,14 @@
                 <div class="algorithm-grid">
                     <div class="algorithm-box">
                         <h4>Breadth-First Search (BFS)</h4>
-                        <p>Explores all neighbors at the current depth before going deeper. Guarantees shortest path in unweighted graphs.</p>
+                        <p>Explores all neighbors at the current depth before going deeper. Guarantees shortest path in
+                            unweighted graphs.</p>
                     </div>
 
                     <div class="algorithm-box">
                         <h4>Depth-First Search (DFS)</h4>
-                        <p>Goes as deep as possible down one path before backtracking. Fast but doesn't guarantee shortest path.</p>
+                        <p>Goes as deep as possible down one path before backtracking. Fast but doesn't guarantee
+                            shortest path.</p>
                     </div>
 
                     <div class="algorithm-box">
@@ -765,7 +904,8 @@
 
                     <div class="algorithm-box">
                         <h4>A* Search</h4>
-                        <p>Uses both actual cost and estimated distance to goal. Most efficient informed search algorithm.</p>
+                        <p>Uses both actual cost and estimated distance to goal. Most efficient informed search
+                            algorithm.</p>
                     </div>
 
                     <div class="algorithm-box">
@@ -785,12 +925,13 @@
             <p><strong>AI 1 - Comprehensive AI Education Platform</strong></p>
             <p>Interactive learning tools, lessons, and games for high school students (Grades 9-12)</p>
             <p>30 Lessons • 24 Games • 9 ML Visualizers • 6 Topics • Built with HTML5, CSS3, and JavaScript</p>
-            <p style="margin-top: 10px; font-size: 0.9em;">Topics: AI Ethics, Human Centered Design, Data Science, Machine Learning, Deep Learning, Search Algorithms, and Game AI</p>
+            <p style="margin-top: 10px; font-size: 0.9em;">Topics: AI Ethics, Human Centered Design, Data Science,
+                Machine Learning, Deep Learning, Search Algorithms, and Game AI</p>
         </footer>
     </div>
 
     <script type="module">
-        import { getCurrentUser, logoutUser } from './auth/auth-utils.js';
+        import { getCurrentUser, logout } from './auth/auth-utils.js';
 
         async function initAuth() {
             try {
@@ -827,11 +968,12 @@
 
         document.getElementById('logoutBtn')?.addEventListener('click', async (e) => {
             e.preventDefault();
-            await logoutUser();
+            await logout();
             window.location.reload();
         });
 
         initAuth();
     </script>
 </body>
+
 </html>

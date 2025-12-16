@@ -1,7 +1,7 @@
 
 import { describe, it, expect } from 'vitest';
 import {
-    INITIAL_STATE, toggleIssueSelection, checkAnswers, nextCase, TEST_CASES
+    INITIAL_STATE, toggleIssueSelection, checkAnswers, nextCase
 } from './engine.js';
 
 describe('Usability Detective Engine', () => {
