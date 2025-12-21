@@ -1,5 +1,14 @@
 # Version History
 
+## v1.1.0 - "Tiered Content & Org Management" (2025-12-21)
+
+### Major Improvements
+- ✨ **Tiered Content System**: Implemented a new system for managing content access based on user tiers.
+- 🏢 **Organization Management**: Added features for enhanced user and organization management.
+- ✅ **Test Coverage**: Added comprehensive unit tests and documentation for the new systems.
+
+---
+
 ## v1.0.6 - "Maintenance Update" (2025-12-16)
 
 ### Updates
