@@ -7,51 +7,94 @@ service cloud.firestore {
     // HELPER FUNCTIONS
     // ============================================
 
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
     function isCurrentUser(userId) {
       return request.auth.uid == userId;
     }
 
-    function hasRole(role) {
-      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == role;
+    function getUserData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+
+    function getUserRole() {
+      return getUserData().role;
+    }
+
+    function getUserTier() {
+      let role = getUserRole();
+      return role == 'super_admin' ? 7 :
+             role == 'system_admin' ? 6 :
+             role == 'superintendent' || role == 'board' ? 5 :
+             role == 'principal' || role == 'admin' ? 4 :
+             role == 'teacher' ? 3 :
+             role == 'student' ? 2 :
+             role == 'guest' ? 1 : 0;
+    }
+
+    function hasMinimumTier(requiredTier) {
+      return getUserTier() >= requiredTier;
     }
 
     function isTeacher() {
-      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'teacher';
+      return hasMinimumTier(3);
+    }
+
+    function isPrincipal() {
+      return hasMinimumTier(4);
+    }
+
+    function isSuperintendent() {
+      return hasMinimumTier(5);
+    }
+
+    function isSystemAdmin() {
+      return hasMinimumTier(6);
+    }
+
+    function isSuperAdmin() {
+      return hasMinimumTier(7);
     }
 
     function isStudent() {
-      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'student';
-    }
-
-    function isGuest() {
-      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'guest';
+      return getUserTier() >= 2;
     }
 
     function isStudentOrHigher() {
-      let userRole = get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
-      return userRole == 'student' || userRole == 'teacher';
+      return hasMinimumTier(2);
     }
 
-    function isApprovedTeacherEmail(email) {
-      return email in [
-        'teacher@school.edu',
-        'instructor@school.edu',
-        'admin@school.edu'
-      ];
+    // Check if user is admin of an organization
+    function isOrgAdmin(orgId) {
+      let org = get(/databases/$(database)/documents/organizations/$(orgId)).data;
+      return request.auth.uid in org.adminIds;
     }
 
-    // REFACTORED: Single expression, no IF statements
-    // Users can register as 'guest' (default) or 'student'
-    // Teachers must use approved email
+    // Check if user has membership in organization
+    function hasOrgMembership(orgId) {
+      return exists(/databases/$(database)/documents/users/$(request.auth.uid)/memberships/$(orgId + '_*'));
+    }
+
+    // Validate role assignment
     function isValidRoleAssignment(newRole, email) {
       return newRole == 'guest'
           || newRole == 'student'
           || (newRole == 'teacher' && isApprovedTeacherEmail(email));
     }
 
+    function isApprovedTeacherEmail(email) {
+      return email.matches('.*@.*\\.edu$')
+          || email in [
+            'teacher@school.edu',
+            'instructor@school.edu',
+            'admin@school.edu'
+          ];
+    }
+
     function roleNotChanged() {
-      let currentUserDoc = get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
-      return request.resource.data.role == currentUserDoc.role;
+      return request.resource.data.role == resource.data.role;
     }
 
     function hasRequiredUserFields() {
@@ -59,62 +102,242 @@ service cloud.firestore {
     }
 
     // ============================================
-    // USER PROFILES COLLECTION RULES
+    // USER PROFILES COLLECTION
     // ============================================
 
     match /users/{userId} {
+      // Read: Own profile or teachers+ can read all
       allow read: if isCurrentUser(userId) || isTeacher();
 
-      // Allow create with required fields + any optional fields
-      // Required: uid, email, displayName, role, createdAt
-      // Optional: bio, profilePictureUrl, school, grade, photoURL, totalQuizzesTaken, averageScore
-      // All users start as guests - teachers/admins grant access to content
+      // Create: User creating own profile with valid data
       allow create: if isCurrentUser(userId)
         && hasRequiredUserFields()
         && isValidRoleAssignment(request.resource.data.role, request.resource.data.email);
 
+      // Update: Own profile, can't change role (unless admin), can't change createdAt
       allow update: if isCurrentUser(userId)
-        && roleNotChanged()
-        && request.resource.data.createdAt == resource.data.createdAt
-        && request.resource.data.keys().hasOnly([
-             'uid', 'email', 'displayName', 'role', 'createdAt',
-             'bio', 'profilePictureUrl', 'school', 'grade', 'photoURL',
-             'totalQuizzesTaken', 'averageScore', 'lastUpdated'
-           ]);
+        && (roleNotChanged() || isSystemAdmin())
+        && request.resource.data.createdAt == resource.data.createdAt;
 
-      allow delete: if false;
+      // Delete: Only super admin
+      allow delete: if isSuperAdmin();
 
       // ============================================
-      // QUIZ SCORES SUBCOLLECTION RULES
-      // GUESTS CANNOT CREATE/UPDATE - STUDENTS AND TEACHERS ONLY
+      // QUIZ SCORES SUBCOLLECTION
       // ============================================
 
       match /quizScores/{quizId} {
         allow read: if isCurrentUser(userId) || isTeacher();
 
-        // Only students and teachers can create quiz scores (guests cannot)
         allow create: if isCurrentUser(userId)
           && isStudentOrHigher()
-          && request.resource.data.keys().hasAll(['quizId', 'score', 'maxScore', 'completedAt'])
-          && request.resource.data.score >= 0
-          && request.resource.data.score <= request.resource.data.maxScore
-          && request.resource.data.keys().hasOnly([
-               'quizId', 'score', 'maxScore', 'completedAt', 'answers',
-               'timeTaken', 'feedback', 'attempts'
-             ]);
+          && request.resource.data.keys().hasAll(['quizId', 'score', 'totalQuestions', 'completedAt'])
+          && request.resource.data.score >= 0;
 
-        // Only students and teachers can update quiz scores (guests cannot)
         allow update: if isCurrentUser(userId)
           && isStudentOrHigher()
-          && request.resource.data.quizId == resource.data.quizId
-          && request.resource.data.completedAt == resource.data.completedAt
-          && request.resource.data.keys().hasOnly([
-               'quizId', 'score', 'maxScore', 'completedAt', 'answers',
-               'timeTaken', 'feedback', 'attempts', 'lastAttemptAt'
-             ]);
+          && request.resource.data.quizId == resource.data.quizId;
 
         allow delete: if false;
       }
+
+      // ============================================
+      // USER MEMBERSHIPS SUBCOLLECTION
+      // ============================================
+
+      match /memberships/{membershipId} {
+        allow read: if isCurrentUser(userId) || isTeacher();
+
+        // Users can create pending memberships for themselves
+        allow create: if isCurrentUser(userId)
+          && request.resource.data.status == 'pending';
+
+        // Only org admins or system admins can update membership status
+        allow update: if isSystemAdmin()
+          || isOrgAdmin(resource.data.organizationId);
+
+        allow delete: if isSystemAdmin();
+      }
+
+      // ============================================
+      // USER ENROLLMENTS SUBCOLLECTION
+      // ============================================
+
+      match /enrollments/{enrollmentId} {
+        allow read: if isCurrentUser(userId) || isTeacher();
+
+        // Students can create pending enrollments
+        allow create: if isCurrentUser(userId);
+
+        // Teachers can update enrollment status
+        allow update: if isTeacher();
+
+        allow delete: if isTeacher();
+      }
+    }
+
+    // ============================================
+    // ORGANIZATIONS COLLECTION
+    // ============================================
+
+    match /organizations/{orgId} {
+      // Read: Authenticated users can read orgs they belong to, admins can read all
+      allow read: if isAuthenticated() && (isPrincipal() || isOrgAdmin(orgId));
+
+      // Create: Based on org type
+      // State: Super admin only
+      // District/County: Superintendent+
+      // School: Principal+
+      allow create: if isAuthenticated()
+        && (
+          (request.resource.data.type == 'state' && isSuperAdmin())
+          || (request.resource.data.type in ['district', 'county'] && isSuperintendent())
+          || (request.resource.data.type in ['school', 'city'] && isPrincipal())
+        )
+        && request.resource.data.keys().hasAll(['id', 'type', 'name', 'createdAt']);
+
+      // Update: Org admins or higher tier admins
+      allow update: if isOrgAdmin(orgId) || isSuperintendent()
+        && request.resource.data.id == resource.data.id
+        && request.resource.data.type == resource.data.type
+        && request.resource.data.createdAt == resource.data.createdAt;
+
+      // Delete: System admin only
+      allow delete: if isSystemAdmin();
+    }
+
+    // ============================================
+    // CLASSROOMS COLLECTION
+    // ============================================
+
+    match /classrooms/{classroomId} {
+      // Read: Teachers of the classroom, school admins, students in classroom
+      allow read: if isAuthenticated()
+        && (
+          isTeacher()
+          || resource.data.studentIds.hasAny([request.auth.uid])
+        );
+
+      // Create: Teachers only
+      allow create: if isTeacher()
+        && request.resource.data.teacherId == request.auth.uid
+        && request.resource.data.keys().hasAll(['id', 'name', 'schoolId', 'teacherId', 'createdAt']);
+
+      // Update: Classroom teacher, co-teachers, or school admin
+      allow update: if isAuthenticated()
+        && (
+          resource.data.teacherId == request.auth.uid
+          || resource.data.coTeacherIds.hasAny([request.auth.uid])
+          || isPrincipal()
+        )
+        && request.resource.data.id == resource.data.id
+        && request.resource.data.schoolId == resource.data.schoolId;
+
+      // Delete: Only the primary teacher or school admin
+      allow delete: if resource.data.teacherId == request.auth.uid || isPrincipal();
+    }
+
+    // ============================================
+    // SUBSCRIPTIONS COLLECTION
+    // ============================================
+
+    match /subscriptions/{subscriptionId} {
+      // Read: Owner or system admins
+      allow read: if isAuthenticated()
+        && (
+          resource.data.userId == request.auth.uid
+          || isSystemAdmin()
+          || (resource.data.organizationId != null && isOrgAdmin(resource.data.organizationId))
+        );
+
+      // Create: Authenticated users can create their own subscription
+      allow create: if isAuthenticated()
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.keys().hasAll(['id', 'userId', 'tier', 'status', 'createdAt']);
+
+      // Update: Owner (limited fields) or system admin (all fields)
+      allow update: if isAuthenticated()
+        && (
+          (resource.data.userId == request.auth.uid
+            && request.resource.data.userId == resource.data.userId
+            && request.resource.data.id == resource.data.id)
+          || isSystemAdmin()
+        );
+
+      // Delete: System admin only
+      allow delete: if isSystemAdmin();
+    }
+
+    // ============================================
+    // PAYMENTS COLLECTION
+    // ============================================
+
+    match /payments/{paymentId} {
+      // Read: Owner or system admins
+      allow read: if isAuthenticated()
+        && (resource.data.userId == request.auth.uid || isSystemAdmin());
+
+      // Create: System only (via Cloud Functions) or system admin
+      allow create: if isSystemAdmin();
+
+      // Update: System admin only
+      allow update: if isSystemAdmin();
+
+      // Delete: Never
+      allow delete: if false;
+    }
+
+    // ============================================
+    // APPROVAL REQUESTS COLLECTION
+    // ============================================
+
+    match /approvalRequests/{requestId} {
+      // Read: Request creator or school/org admins
+      allow read: if isAuthenticated()
+        && (
+          resource.data.userId == request.auth.uid
+          || isPrincipal()
+        );
+
+      // Create: Authenticated users
+      allow create: if isAuthenticated()
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.status == 'pending';
+
+      // Update: Only admins who can approve
+      allow update: if isPrincipal()
+        && request.resource.data.userId == resource.data.userId
+        && request.resource.data.schoolId == resource.data.schoolId;
+
+      // Delete: System admin only
+      allow delete: if isSystemAdmin();
+    }
+
+    // ============================================
+    // COUPONS COLLECTION
+    // ============================================
+
+    match /coupons/{couponCode} {
+      // Read: Anyone can check if coupon exists
+      allow read: if isAuthenticated();
+
+      // Write: System admin only
+      allow create, update, delete: if isSystemAdmin();
+    }
+
+    // ============================================
+    // USAGE TRACKING COLLECTION
+    // ============================================
+
+    match /usage/{userId} {
+      // Read: Own usage or system admin
+      allow read: if isCurrentUser(userId) || isSystemAdmin();
+
+      // Create/Update: Only through Cloud Functions or own usage
+      allow create, update: if isCurrentUser(userId) || isSystemAdmin();
+
+      // Delete: System admin only
+      allow delete: if isSystemAdmin();
     }
 
     // ============================================
@@ -122,8 +345,20 @@ service cloud.firestore {
     // ============================================
 
     match /quizzes/{quizId} {
-      allow read: if request.auth != null;
-      allow write: if false;
+      allow read: if isAuthenticated();
+      allow write: if isSystemAdmin();
+    }
+
+    // ============================================
+    // CONTENT METADATA COLLECTION
+    // ============================================
+
+    match /contentMetadata/{contentId} {
+      // Read: Based on content tier and user subscription
+      allow read: if isAuthenticated();
+
+      // Write: System admin only
+      allow write: if isSystemAdmin();
     }
 
     // ============================================
@@ -131,12 +366,30 @@ service cloud.firestore {
     // ============================================
 
     match /systemLogs/{logId} {
-      allow read: if isTeacher();
-      allow write: if false;
+      allow read: if isSystemAdmin();
+      allow write: if false; // Only via Cloud Functions
     }
 
     // ============================================
-    // CATCH-ALL
+    // ANALYTICS COLLECTION
+    // ============================================
+
+    match /analytics/{docId} {
+      // Read: Based on scope
+      allow read: if isTeacher();
+
+      // Write: System only
+      allow write: if isSystemAdmin();
+
+      // Aggregated analytics subcollections
+      match /{subcollection}/{subDocId} {
+        allow read: if isTeacher();
+        allow write: if isSystemAdmin();
+      }
+    }
+
+    // ============================================
+    // CATCH-ALL - DENY BY DEFAULT
     // ============================================
 
     match /{document=**} {
