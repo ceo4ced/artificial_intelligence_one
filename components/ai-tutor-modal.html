@@ -387,7 +387,8 @@
 </style>
 
 <script type="module">
-    import { validateQuestion, buildSystemPrompt } from '../auth/ai-tutor.js';
+    import { validateQuestion, buildSystemPrompt, createMessage } from '../auth/ai-tutor.js';
+    import { callOpenRouter, setOpenRouterKey, getOpenRouterKeyStatus } from '../auth/ai-tutor-openrouter.js';
 
     // DOM Elements
     const modal = document.getElementById('tutorModal');
@@ -405,6 +406,77 @@
     // State
     let messages = [];
     let isLoading = false;
+    let isConfigured = false;
+    let currentLesson = 'Artificial Intelligence';
+
+    // Initialize on page load
+    async function initialize() {
+        // Try to get API key from multiple sources
+        const apiKey = getApiKey();
+
+        if (!apiKey) {
+            showConfigError();
+            return;
+        }
+
+        try {
+            setOpenRouterKey(apiKey);
+            isConfigured = true;
+            showWelcome();
+        } catch (error) {
+            console.error('Configuration error:', error);
+            showConfigError();
+        }
+    }
+
+    /**
+     * Get API key from environment or localStorage
+     */
+    function getApiKey() {
+        // Try multiple sources (in order of preference):
+        // 1. Window variable (set by parent)
+        if (window.OPENROUTER_API_KEY) {
+            return window.OPENROUTER_API_KEY;
+        }
+
+        // 2. sessionStorage (set by user)
+        const sessionKey = sessionStorage.getItem('openrouter_api_key');
+        if (sessionKey) {
+            return sessionKey;
+        }
+
+        // 3. localStorage (persistent)
+        const localKey = localStorage.getItem('openrouter_api_key');
+        if (localKey) {
+            return localKey;
+        }
+
+        return null;
+    }
+
+    /**
+     * Show configuration error
+     */
+    function showConfigError() {
+        addMessage(
+            '⚠️ OpenRouter API key not configured. ' +
+            'Set window.OPENROUTER_API_KEY or store in localStorage to enable the tutor.',
+            'assistant'
+        );
+        sendBtn.disabled = true;
+    }
+
+    /**
+     * Show welcome message
+     */
+    function showWelcome() {
+        chatHistory.innerHTML = `
+            <div class="tutor-welcome">
+                <p>Hello! I'm your AI tutor. Ask me any questions about ${currentLesson}.</p>
+                <p class="tutor-hint">💡 Tip: Ask for explanations, examples, or hints about concepts.</p>
+            </div>
+        `;
+    }
 
     // Event Listeners
     openBtn.addEventListener('click', () => {
@@ -422,7 +494,7 @@
 
     sendBtn.addEventListener('click', sendQuestion);
     input.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter' && !e.shiftKey) {
+        if (e.key === 'Enter' && !e.shiftKey && !isLoading) {
             e.preventDefault();
             sendQuestion();
         }
@@ -431,7 +503,7 @@
     clearBtn.addEventListener('click', () => {
         if (confirm('Clear all messages? This cannot be undone.')) {
             messages = [];
-            chatHistory.innerHTML = '<div class="tutor-welcome"><p>Hello! I\'m your AI tutor. Ask me any questions about the current lesson.</p></div>';
+            showWelcome();
             input.value = '';
             charCount.textContent = '0';
         }
@@ -442,17 +514,39 @@
             alert('Save at least one exchange (question + answer) before saving.');
             return;
         }
-        alert('✅ Conversation saved! (Feature requires backend integration)');
+        // Export as JSON
+        const dataStr = JSON.stringify({
+            title: 'Tutor Conversation',
+            topic: currentLesson,
+            date: new Date().toISOString(),
+            messages: messages
+        }, null, 2);
+
+        const blob = new Blob([dataStr], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `tutor-${Date.now()}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+        alert('✅ Conversation exported as JSON!');
     });
 
     historyBtn.addEventListener('click', () => {
-        alert('📋 View your saved conversations here. (Feature requires backend integration)');
+        const count = messages.length;
+        const exchanges = Math.floor(count / 2);
+        alert(`📋 Current conversation: ${exchanges} exchanges, ${messages.length} total messages`);
     });
 
     /**
      * Send a question to the tutor
      */
     async function sendQuestion() {
+        if (!isConfigured) {
+            alert('⚠️ AI Tutor not configured. Please set your OpenRouter API key.');
+            return;
+        }
+
         const question = input.value.trim();
 
         // Validate
@@ -473,15 +567,27 @@
         loading.classList.remove('hidden');
 
         try {
-            // Call Claude API (requires backend function)
-            const response = await callTutorAPI(question, messages);
+            // Build system prompt
+            const systemPrompt = buildSystemPrompt(currentLesson, 'student', 2);
+
+            // Prepare messages for API
+            const apiMessages = messages.map(msg => ({
+                role: msg.role,
+                content: msg.content
+            }));
+
+            // Call OpenRouter API
+            const response = await callOpenRouter(apiMessages, systemPrompt, {
+                temperature: 0.7,
+                maxTokens: 1024
+            });
 
             // Add AI response
             addMessage(response, 'assistant');
         } catch (error) {
             console.error('Error calling tutor API:', error);
             addMessage(
-                '❌ Sorry, I encountered an error. Please try again.',
+                `❌ Error: ${error.message}. Please check your API key and try again.`,
                 'assistant'
             );
         } finally {
@@ -496,7 +602,7 @@
      * Add message to chat
      */
     function addMessage(content, role) {
-        const message = { role, content, timestamp: Date.now() };
+        const message = createMessage(content, role);
         messages.push(message);
 
         const div = document.createElement('div');
@@ -513,13 +619,6 @@
         chatHistory.scrollTop = chatHistory.scrollHeight;
     }
 
-    /**
-     * Call AI Tutor API (requires Firebase Cloud Function)
-     * This is a placeholder - backend function needed
-     */
-    async function callTutorAPI(question, conversationHistory) {
-        // This would call a Firebase Cloud Function
-        // For now, return a demo response
-        return 'This is a demo response. To enable the AI Tutor, you need to set up a Firebase Cloud Function that calls the Claude API.';
-    }
+    // Initialize on load
+    initialize();
 </script>

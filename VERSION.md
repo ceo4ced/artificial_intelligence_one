@@ -1,33 +1,56 @@
 # Version History
 
-## v1.2.0 - "AI Tutor Integration" (2025-12-26)
+## v1.2.0 - "AI Tutor Integration with OpenRouter" (2025-12-26)
 
 ### Major Features
-- 🤖 **AI Tutor System**: Integrated Claude-powered AI tutoring for intelligent student support
+- 🤖 **AI Tutor System**: Integrated AI tutoring with OpenRouter API for intelligent student support
   - Pure function architecture for testability (10+ pure functions)
   - 53 comprehensive unit tests (100% pass rate)
+  - OpenRouter API integration (supports Claude 3.5 Sonnet + 50+ other models)
   - Firestore integration for conversation history
   - Interactive modal UI with message history and conversation management
 - ✅ **Full Test Coverage**: All AI Tutor functions fully tested with Vitest
 - 📱 **Mobile Responsive**: AI Tutor works on desktop and mobile devices
-- 💾 **Conversation Persistence**: Save, load, and export tutoring conversations
+- 💾 **Conversation Export**: Download conversations as JSON files
+- 🔑 **Flexible API Configuration**: Multiple ways to set API key (localStorage, sessionStorage, window variable)
 
 ### Implementation Details
 - **New Files**:
   - `auth/ai-tutor.js` - Core tutoring logic (pure functions, 280 LOC)
+  - `auth/ai-tutor-openrouter.js` - OpenRouter API integration (280 LOC)
   - `auth/ai-tutor-firestore.js` - Database integration (400 LOC)
-  - `components/ai-tutor-modal.html` - UI component (400 LOC)
+  - `components/ai-tutor-modal.html` - UI component (625 LOC)
   - `tests/ai-tutor.test.js` - Unit tests (480 LOC)
 - **Architecture**: Separates pure functions from side effects for clean testing
 - **Security**: Input validation, prompt injection prevention, permission checks
 - **Performance**: Message history limited to 10 recent exchanges for context window efficiency
+- **API**: Uses OpenRouter (https://openrouter.ai) instead of direct Claude API for maximum flexibility
 
-### Setup Instructions
-To enable the AI Tutor:
-1. Deploy Firebase Cloud Function (see docs/FIREBASE_SETUP.md)
-2. Configure Claude API key in Cloud Function environment
-3. Import AI Tutor modal into lesson pages: `<iframe src="components/ai-tutor-modal.html"></iframe>`
+### Setup Instructions - QUICK START
+1. Get a free OpenRouter API key: https://openrouter.ai
+2. Set the API key in one of three ways:
+   ```javascript
+   // Option A: Global window variable (easiest for testing)
+   window.OPENROUTER_API_KEY = "sk-or-...";
+
+   // Option B: localStorage (persists across sessions)
+   localStorage.setItem('openrouter_api_key', 'sk-or-...');
+
+   // Option C: sessionStorage (session only)
+   sessionStorage.setItem('openrouter_api_key', 'sk-or-...');
+   ```
+3. Import AI Tutor modal into lesson pages:
+   ```html
+   <script src="components/ai-tutor-modal.html"></script>
+   ```
 4. Users with Student tier or higher can access the tutor
+
+### Why OpenRouter?
+- ✅ **No backend needed** - Runs entirely from GitHub Pages
+- ✅ **Multiple model support** - Claude, GPT-4, Llama, and 50+ more
+- ✅ **Simple integration** - Single API key, unified interface
+- ✅ **Transparent pricing** - Pay only for what you use
+- ✅ **No Firebase functions required** - Direct client-side API calls
 
 ### Breaking Changes
 None - backward compatible with v1.1.0
