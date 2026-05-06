@@ -272,67 +272,40 @@
 
     <!--
     =====================================================
-    HOW TO ADD A STUDENT:
+    STUDENT CARD CONVENTIONS (FERPA-aligned):
 
-    1. Copy one <a class="student-card" ...> block below
-    2. Set data-period to "hs3" or "hs4"
-    3. Set href to the student's HTML file:
-         projects/hs3/Firstname_Lastname.html
-         projects/hs4/Firstname_Lastname.html
-    4. Set the screenshot image src:
-         projects/screenshots/firstname_lastname.png
-    5. Update name, title, description
-    6. Match the period-badge class to the period
+    - Display name: First name + last initial only (e.g., "Aaron R.")
+    - Folder name: Firstname_LastInitial (e.g., Aaron_R)
+    - One folder per student under projects/hs3/ or projects/hs4/
+    - Each folder has its own index.html (project page)
+
+    TO UPDATE A CARD when a student finishes their project:
+    1. Replace the screenshot placeholder with:
+         <img class="card-screenshot" src="projects/<period>/<Folder>/screenshot.png" alt="Project screenshot">
+    2. Update <div class="project-title"> with the real title
+    3. Update <div class="project-desc"> with a one-line description
+    4. Replace the placeholder index.html in the student's folder
+       with the real project page
 
     FOLDER STRUCTURE:
-      index.html                    (this file)
+      index.html                       (this file)
+      ai_lesson_index.html             (AI 1 lessons site)
       projects/
         hs3/
-          Firstname_Lastname.html   (student pages)
+          Firstname_L/
+            index.html                 (student project page)
         hs4/
-          Firstname_Lastname.html
-        screenshots/
-          firstname_lastname.png    (project screenshots)
+          Firstname_L/
+            index.html
     =====================================================
     -->
 
-    <!-- STUDENT 1 — HS3 EXAMPLE -->
-    <a class="student-card" data-period="hs3" href="projects/hs3/Firstname_Lastname.html">
-      <div class="card-screenshot-placeholder">[ Screenshot ]</div>
-      <!-- Replace the placeholder above with this when you have a screenshot:
-      <img class="card-screenshot" src="projects/screenshots/firstname_lastname.png" alt="Project screenshot"> -->
-      <div class="card-info">
-        <div class="card-top">
-          <span class="period-badge hs3">HS3</span>
-          <span class="student-name">Student Name</span>
-        </div>
-        <div class="project-title">Project Title</div>
-        <div class="project-desc">One-line description of what this project does and who it helps.</div>
-        <span class="card-cta">View Project &rarr;</span>
-      </div>
-    </a>
-
-    <!-- STUDENT 2 — HS4 EXAMPLE -->
-    <a class="student-card" data-period="hs4" href="projects/hs4/Firstname_Lastname.html">
-      <div class="card-screenshot-placeholder">[ Screenshot ]</div>
-      <div class="card-info">
-        <div class="card-top">
-          <span class="period-badge hs4">HS4</span>
-          <span class="student-name">Student Name</span>
-        </div>
-        <div class="project-title">Project Title</div>
-        <div class="project-desc">One-line description of what this project does and who it helps.</div>
-        <span class="card-cta">View Project &rarr;</span>
-      </div>
-    </a>
-
-    <!-- STUDENT 3 — HS3 EXAMPLE -->
-    <a class="student-card" data-period="hs3" href="projects/hs3/Firstname_Lastname.html">
+    <a class="student-card" data-period="hs3" href="projects/hs3/Aaron_R/">
       <div class="card-screenshot-placeholder">[ Screenshot ]</div>
       <div class="card-info">
         <div class="card-top">
           <span class="period-badge hs3">HS3</span>
-          <span class="student-name">Student Name</span>
+          <span class="student-name">Aaron R.</span>
         </div>
         <div class="project-title">Project Title</div>
         <div class="project-desc">One-line description of what this project does and who it helps.</div>
@@ -340,27 +313,12 @@
       </div>
     </a>
 
-    <!-- STUDENT 4 — HS4 EXAMPLE -->
-    <a class="student-card" data-period="hs4" href="projects/hs4/Firstname_Lastname.html">
-      <div class="card-screenshot-placeholder">[ Screenshot ]</div>
-      <div class="card-info">
-        <div class="card-top">
-          <span class="period-badge hs4">HS4</span>
-          <span class="student-name">Student Name</span>
-        </div>
-        <div class="project-title">Project Title</div>
-        <div class="project-desc">One-line description of what this project does and who it helps.</div>
-        <span class="card-cta">View Project &rarr;</span>
-      </div>
-    </a>
-
-    <!-- STUDENT 5 — HS3 EXAMPLE -->
-    <a class="student-card" data-period="hs3" href="projects/hs3/Firstname_Lastname.html">
+    <a class="student-card" data-period="hs3" href="projects/hs3/Abdoalrahman_A/">
       <div class="card-screenshot-placeholder">[ Screenshot ]</div>
       <div class="card-info">
         <div class="card-top">
           <span class="period-badge hs3">HS3</span>
-          <span class="student-name">Student Name</span>
+          <span class="student-name">Abdoalrahman A.</span>
         </div>
         <div class="project-title">Project Title</div>
         <div class="project-desc">One-line description of what this project does and who it helps.</div>
@@ -368,13 +326,597 @@
       </div>
     </a>
 
-    <!-- STUDENT 6 — HS4 EXAMPLE -->
-    <a class="student-card" data-period="hs4" href="projects/hs4/Firstname_Lastname.html">
+    <a class="student-card" data-period="hs4" href="projects/hs4/Abdurrahmaan_S/">
       <div class="card-screenshot-placeholder">[ Screenshot ]</div>
       <div class="card-info">
         <div class="card-top">
           <span class="period-badge hs4">HS4</span>
-          <span class="student-name">Student Name</span>
+          <span class="student-name">Abdurrahmaan S.</span>
+        </div>
+        <div class="project-title">Project Title</div>
+        <div class="project-desc">One-line description of what this project does and who it helps.</div>
+        <span class="card-cta">View Project &rarr;</span>
+      </div>
+    </a>
+
+    <a class="student-card" data-period="hs4" href="projects/hs4/Alexander_E/">
+      <div class="card-screenshot-placeholder">[ Screenshot ]</div>
+      <div class="card-info">
+        <div class="card-top">
+          <span class="period-badge hs4">HS4</span>
+          <span class="student-name">Alexander E.</span>
+        </div>
+        <div class="project-title">Project Title</div>
+        <div class="project-desc">One-line description of what this project does and who it helps.</div>
+        <span class="card-cta">View Project &rarr;</span>
+      </div>
+    </a>
+
+    <a class="student-card" data-period="hs3" href="projects/hs3/Angie_E/">
+      <div class="card-screenshot-placeholder">[ Screenshot ]</div>
+      <div class="card-info">
+        <div class="card-top">
+          <span class="period-badge hs3">HS3</span>
+          <span class="student-name">Angie E.</span>
+        </div>
+        <div class="project-title">Project Title</div>
+        <div class="project-desc">One-line description of what this project does and who it helps.</div>
+        <span class="card-cta">View Project &rarr;</span>
+      </div>
+    </a>
+
+    <a class="student-card" data-period="hs4" href="projects/hs4/Assiyah_G/">
+      <div class="card-screenshot-placeholder">[ Screenshot ]</div>
+      <div class="card-info">
+        <div class="card-top">
+          <span class="period-badge hs4">HS4</span>
+          <span class="student-name">Assiyah G.</span>
+        </div>
+        <div class="project-title">Project Title</div>
+        <div class="project-desc">One-line description of what this project does and who it helps.</div>
+        <span class="card-cta">View Project &rarr;</span>
+      </div>
+    </a>
+
+    <a class="student-card" data-period="hs4" href="projects/hs4/Avery_S/">
+      <div class="card-screenshot-placeholder">[ Screenshot ]</div>
+      <div class="card-info">
+        <div class="card-top">
+          <span class="period-badge hs4">HS4</span>
+          <span class="student-name">Avery S.</span>
+        </div>
+        <div class="project-title">Project Title</div>
+        <div class="project-desc">One-line description of what this project does and who it helps.</div>
+        <span class="card-cta">View Project &rarr;</span>
+      </div>
+    </a>
+
+    <a class="student-card" data-period="hs4" href="projects/hs4/Dajaree_H/">
+      <div class="card-screenshot-placeholder">[ Screenshot ]</div>
+      <div class="card-info">
+        <div class="card-top">
+          <span class="period-badge hs4">HS4</span>
+          <span class="student-name">Dajaree H.</span>
+        </div>
+        <div class="project-title">Project Title</div>
+        <div class="project-desc">One-line description of what this project does and who it helps.</div>
+        <span class="card-cta">View Project &rarr;</span>
+      </div>
+    </a>
+
+    <a class="student-card" data-period="hs3" href="projects/hs3/Darius_R/">
+      <div class="card-screenshot-placeholder">[ Screenshot ]</div>
+      <div class="card-info">
+        <div class="card-top">
+          <span class="period-badge hs3">HS3</span>
+          <span class="student-name">Darius R.</span>
+        </div>
+        <div class="project-title">Project Title</div>
+        <div class="project-desc">One-line description of what this project does and who it helps.</div>
+        <span class="card-cta">View Project &rarr;</span>
+      </div>
+    </a>
+
+    <a class="student-card" data-period="hs4" href="projects/hs4/David_C/">
+      <div class="card-screenshot-placeholder">[ Screenshot ]</div>
+      <div class="card-info">
+        <div class="card-top">
+          <span class="period-badge hs4">HS4</span>
+          <span class="student-name">David C.</span>
+        </div>
+        <div class="project-title">Project Title</div>
+        <div class="project-desc">One-line description of what this project does and who it helps.</div>
+        <span class="card-cta">View Project &rarr;</span>
+      </div>
+    </a>
+
+    <a class="student-card" data-period="hs3" href="projects/hs3/Dexter_M/">
+      <div class="card-screenshot-placeholder">[ Screenshot ]</div>
+      <div class="card-info">
+        <div class="card-top">
+          <span class="period-badge hs3">HS3</span>
+          <span class="student-name">Dexter M.</span>
+        </div>
+        <div class="project-title">Project Title</div>
+        <div class="project-desc">One-line description of what this project does and who it helps.</div>
+        <span class="card-cta">View Project &rarr;</span>
+      </div>
+    </a>
+
+    <a class="student-card" data-period="hs4" href="projects/hs4/Dominic_M/">
+      <div class="card-screenshot-placeholder">[ Screenshot ]</div>
+      <div class="card-info">
+        <div class="card-top">
+          <span class="period-badge hs4">HS4</span>
+          <span class="student-name">Dominic M.</span>
+        </div>
+        <div class="project-title">Project Title</div>
+        <div class="project-desc">One-line description of what this project does and who it helps.</div>
+        <span class="card-cta">View Project &rarr;</span>
+      </div>
+    </a>
+
+    <a class="student-card" data-period="hs3" href="projects/hs3/Ella_W/">
+      <div class="card-screenshot-placeholder">[ Screenshot ]</div>
+      <div class="card-info">
+        <div class="card-top">
+          <span class="period-badge hs3">HS3</span>
+          <span class="student-name">Ella W.</span>
+        </div>
+        <div class="project-title">Project Title</div>
+        <div class="project-desc">One-line description of what this project does and who it helps.</div>
+        <span class="card-cta">View Project &rarr;</span>
+      </div>
+    </a>
+
+    <a class="student-card" data-period="hs4" href="projects/hs4/Elv_L/">
+      <div class="card-screenshot-placeholder">[ Screenshot ]</div>
+      <div class="card-info">
+        <div class="card-top">
+          <span class="period-badge hs4">HS4</span>
+          <span class="student-name">Elv L.</span>
+        </div>
+        <div class="project-title">Project Title</div>
+        <div class="project-desc">One-line description of what this project does and who it helps.</div>
+        <span class="card-cta">View Project &rarr;</span>
+      </div>
+    </a>
+
+    <a class="student-card" data-period="hs3" href="projects/hs3/Eustacia_W/">
+      <div class="card-screenshot-placeholder">[ Screenshot ]</div>
+      <div class="card-info">
+        <div class="card-top">
+          <span class="period-badge hs3">HS3</span>
+          <span class="student-name">Eustacia W.</span>
+        </div>
+        <div class="project-title">Project Title</div>
+        <div class="project-desc">One-line description of what this project does and who it helps.</div>
+        <span class="card-cta">View Project &rarr;</span>
+      </div>
+    </a>
+
+    <a class="student-card" data-period="hs4" href="projects/hs4/Finnegan_O/">
+      <div class="card-screenshot-placeholder">[ Screenshot ]</div>
+      <div class="card-info">
+        <div class="card-top">
+          <span class="period-badge hs4">HS4</span>
+          <span class="student-name">Finnegan O.</span>
+        </div>
+        <div class="project-title">Project Title</div>
+        <div class="project-desc">One-line description of what this project does and who it helps.</div>
+        <span class="card-cta">View Project &rarr;</span>
+      </div>
+    </a>
+
+    <a class="student-card" data-period="hs4" href="projects/hs4/Gabrielle_J/">
+      <div class="card-screenshot-placeholder">[ Screenshot ]</div>
+      <div class="card-info">
+        <div class="card-top">
+          <span class="period-badge hs4">HS4</span>
+          <span class="student-name">Gabrielle J.</span>
+        </div>
+        <div class="project-title">Project Title</div>
+        <div class="project-desc">One-line description of what this project does and who it helps.</div>
+        <span class="card-cta">View Project &rarr;</span>
+      </div>
+    </a>
+
+    <a class="student-card" data-period="hs4" href="projects/hs4/Isabella_H/">
+      <div class="card-screenshot-placeholder">[ Screenshot ]</div>
+      <div class="card-info">
+        <div class="card-top">
+          <span class="period-badge hs4">HS4</span>
+          <span class="student-name">Isabella H.</span>
+        </div>
+        <div class="project-title">Project Title</div>
+        <div class="project-desc">One-line description of what this project does and who it helps.</div>
+        <span class="card-cta">View Project &rarr;</span>
+      </div>
+    </a>
+
+    <a class="student-card" data-period="hs3" href="projects/hs3/Izaiah_C/">
+      <div class="card-screenshot-placeholder">[ Screenshot ]</div>
+      <div class="card-info">
+        <div class="card-top">
+          <span class="period-badge hs3">HS3</span>
+          <span class="student-name">Izaiah C.</span>
+        </div>
+        <div class="project-title">Project Title</div>
+        <div class="project-desc">One-line description of what this project does and who it helps.</div>
+        <span class="card-cta">View Project &rarr;</span>
+      </div>
+    </a>
+
+    <a class="student-card" data-period="hs3" href="projects/hs3/Jae-Lin_M/">
+      <div class="card-screenshot-placeholder">[ Screenshot ]</div>
+      <div class="card-info">
+        <div class="card-top">
+          <span class="period-badge hs3">HS3</span>
+          <span class="student-name">Jae-Lin M.</span>
+        </div>
+        <div class="project-title">Project Title</div>
+        <div class="project-desc">One-line description of what this project does and who it helps.</div>
+        <span class="card-cta">View Project &rarr;</span>
+      </div>
+    </a>
+
+    <a class="student-card" data-period="hs4" href="projects/hs4/Joseph_C/">
+      <div class="card-screenshot-placeholder">[ Screenshot ]</div>
+      <div class="card-info">
+        <div class="card-top">
+          <span class="period-badge hs4">HS4</span>
+          <span class="student-name">Joseph C.</span>
+        </div>
+        <div class="project-title">Project Title</div>
+        <div class="project-desc">One-line description of what this project does and who it helps.</div>
+        <span class="card-cta">View Project &rarr;</span>
+      </div>
+    </a>
+
+    <a class="student-card" data-period="hs4" href="projects/hs4/Josiah_N/">
+      <div class="card-screenshot-placeholder">[ Screenshot ]</div>
+      <div class="card-info">
+        <div class="card-top">
+          <span class="period-badge hs4">HS4</span>
+          <span class="student-name">Josiah N.</span>
+        </div>
+        <div class="project-title">Project Title</div>
+        <div class="project-desc">One-line description of what this project does and who it helps.</div>
+        <span class="card-cta">View Project &rarr;</span>
+      </div>
+    </a>
+
+    <a class="student-card" data-period="hs4" href="projects/hs4/Kontar_J/">
+      <div class="card-screenshot-placeholder">[ Screenshot ]</div>
+      <div class="card-info">
+        <div class="card-top">
+          <span class="period-badge hs4">HS4</span>
+          <span class="student-name">Kontar J.</span>
+        </div>
+        <div class="project-title">Project Title</div>
+        <div class="project-desc">One-line description of what this project does and who it helps.</div>
+        <span class="card-cta">View Project &rarr;</span>
+      </div>
+    </a>
+
+    <a class="student-card" data-period="hs4" href="projects/hs4/Lana_A/">
+      <div class="card-screenshot-placeholder">[ Screenshot ]</div>
+      <div class="card-info">
+        <div class="card-top">
+          <span class="period-badge hs4">HS4</span>
+          <span class="student-name">Lana A.</span>
+        </div>
+        <div class="project-title">Project Title</div>
+        <div class="project-desc">One-line description of what this project does and who it helps.</div>
+        <span class="card-cta">View Project &rarr;</span>
+      </div>
+    </a>
+
+    <a class="student-card" data-period="hs4" href="projects/hs4/Logan_M/">
+      <div class="card-screenshot-placeholder">[ Screenshot ]</div>
+      <div class="card-info">
+        <div class="card-top">
+          <span class="period-badge hs4">HS4</span>
+          <span class="student-name">Logan M.</span>
+        </div>
+        <div class="project-title">Project Title</div>
+        <div class="project-desc">One-line description of what this project does and who it helps.</div>
+        <span class="card-cta">View Project &rarr;</span>
+      </div>
+    </a>
+
+    <a class="student-card" data-period="hs3" href="projects/hs3/Mallory_J/">
+      <div class="card-screenshot-placeholder">[ Screenshot ]</div>
+      <div class="card-info">
+        <div class="card-top">
+          <span class="period-badge hs3">HS3</span>
+          <span class="student-name">Mallory J.</span>
+        </div>
+        <div class="project-title">Project Title</div>
+        <div class="project-desc">One-line description of what this project does and who it helps.</div>
+        <span class="card-cta">View Project &rarr;</span>
+      </div>
+    </a>
+
+    <a class="student-card" data-period="hs3" href="projects/hs3/Mason_C/">
+      <div class="card-screenshot-placeholder">[ Screenshot ]</div>
+      <div class="card-info">
+        <div class="card-top">
+          <span class="period-badge hs3">HS3</span>
+          <span class="student-name">Mason C.</span>
+        </div>
+        <div class="project-title">Project Title</div>
+        <div class="project-desc">One-line description of what this project does and who it helps.</div>
+        <span class="card-cta">View Project &rarr;</span>
+      </div>
+    </a>
+
+    <a class="student-card" data-period="hs3" href="projects/hs3/Matthew_F/">
+      <div class="card-screenshot-placeholder">[ Screenshot ]</div>
+      <div class="card-info">
+        <div class="card-top">
+          <span class="period-badge hs3">HS3</span>
+          <span class="student-name">Matthew F.</span>
+        </div>
+        <div class="project-title">Project Title</div>
+        <div class="project-desc">One-line description of what this project does and who it helps.</div>
+        <span class="card-cta">View Project &rarr;</span>
+      </div>
+    </a>
+
+    <a class="student-card" data-period="hs4" href="projects/hs4/Mekhi_F/">
+      <div class="card-screenshot-placeholder">[ Screenshot ]</div>
+      <div class="card-info">
+        <div class="card-top">
+          <span class="period-badge hs4">HS4</span>
+          <span class="student-name">Mekhi F.</span>
+        </div>
+        <div class="project-title">Project Title</div>
+        <div class="project-desc">One-line description of what this project does and who it helps.</div>
+        <span class="card-cta">View Project &rarr;</span>
+      </div>
+    </a>
+
+    <a class="student-card" data-period="hs3" href="projects/hs3/Micah_V/">
+      <div class="card-screenshot-placeholder">[ Screenshot ]</div>
+      <div class="card-info">
+        <div class="card-top">
+          <span class="period-badge hs3">HS3</span>
+          <span class="student-name">Micah V.</span>
+        </div>
+        <div class="project-title">Project Title</div>
+        <div class="project-desc">One-line description of what this project does and who it helps.</div>
+        <span class="card-cta">View Project &rarr;</span>
+      </div>
+    </a>
+
+    <a class="student-card" data-period="hs4" href="projects/hs4/Mustafa_A/">
+      <div class="card-screenshot-placeholder">[ Screenshot ]</div>
+      <div class="card-info">
+        <div class="card-top">
+          <span class="period-badge hs4">HS4</span>
+          <span class="student-name">Mustafa A.</span>
+        </div>
+        <div class="project-title">Project Title</div>
+        <div class="project-desc">One-line description of what this project does and who it helps.</div>
+        <span class="card-cta">View Project &rarr;</span>
+      </div>
+    </a>
+
+    <a class="student-card" data-period="hs3" href="projects/hs3/Nevaeh_C/">
+      <div class="card-screenshot-placeholder">[ Screenshot ]</div>
+      <div class="card-info">
+        <div class="card-top">
+          <span class="period-badge hs3">HS3</span>
+          <span class="student-name">Nevaeh C.</span>
+        </div>
+        <div class="project-title">Project Title</div>
+        <div class="project-desc">One-line description of what this project does and who it helps.</div>
+        <span class="card-cta">View Project &rarr;</span>
+      </div>
+    </a>
+
+    <a class="student-card" data-period="hs3" href="projects/hs3/Nuh_M/">
+      <div class="card-screenshot-placeholder">[ Screenshot ]</div>
+      <div class="card-info">
+        <div class="card-top">
+          <span class="period-badge hs3">HS3</span>
+          <span class="student-name">Nuh M.</span>
+        </div>
+        <div class="project-title">Project Title</div>
+        <div class="project-desc">One-line description of what this project does and who it helps.</div>
+        <span class="card-cta">View Project &rarr;</span>
+      </div>
+    </a>
+
+    <a class="student-card" data-period="hs3" href="projects/hs3/Oniel_O/">
+      <div class="card-screenshot-placeholder">[ Screenshot ]</div>
+      <div class="card-info">
+        <div class="card-top">
+          <span class="period-badge hs3">HS3</span>
+          <span class="student-name">Oniel O.</span>
+        </div>
+        <div class="project-title">Project Title</div>
+        <div class="project-desc">One-line description of what this project does and who it helps.</div>
+        <span class="card-cta">View Project &rarr;</span>
+      </div>
+    </a>
+
+    <a class="student-card" data-period="hs4" href="projects/hs4/Pryceless_F/">
+      <div class="card-screenshot-placeholder">[ Screenshot ]</div>
+      <div class="card-info">
+        <div class="card-top">
+          <span class="period-badge hs4">HS4</span>
+          <span class="student-name">Pryceless F.</span>
+        </div>
+        <div class="project-title">Project Title</div>
+        <div class="project-desc">One-line description of what this project does and who it helps.</div>
+        <span class="card-cta">View Project &rarr;</span>
+      </div>
+    </a>
+
+    <a class="student-card" data-period="hs3" href="projects/hs3/Raelin_W/">
+      <div class="card-screenshot-placeholder">[ Screenshot ]</div>
+      <div class="card-info">
+        <div class="card-top">
+          <span class="period-badge hs3">HS3</span>
+          <span class="student-name">Raelin W.</span>
+        </div>
+        <div class="project-title">Project Title</div>
+        <div class="project-desc">One-line description of what this project does and who it helps.</div>
+        <span class="card-cta">View Project &rarr;</span>
+      </div>
+    </a>
+
+    <a class="student-card" data-period="hs4" href="projects/hs4/Reese_C/">
+      <div class="card-screenshot-placeholder">[ Screenshot ]</div>
+      <div class="card-info">
+        <div class="card-top">
+          <span class="period-badge hs4">HS4</span>
+          <span class="student-name">Reese C.</span>
+        </div>
+        <div class="project-title">Project Title</div>
+        <div class="project-desc">One-line description of what this project does and who it helps.</div>
+        <span class="card-cta">View Project &rarr;</span>
+      </div>
+    </a>
+
+    <a class="student-card" data-period="hs4" href="projects/hs4/Richard_S/">
+      <div class="card-screenshot-placeholder">[ Screenshot ]</div>
+      <div class="card-info">
+        <div class="card-top">
+          <span class="period-badge hs4">HS4</span>
+          <span class="student-name">Richard S.</span>
+        </div>
+        <div class="project-title">Project Title</div>
+        <div class="project-desc">One-line description of what this project does and who it helps.</div>
+        <span class="card-cta">View Project &rarr;</span>
+      </div>
+    </a>
+
+    <a class="student-card" data-period="hs4" href="projects/hs4/Robert_G/">
+      <div class="card-screenshot-placeholder">[ Screenshot ]</div>
+      <div class="card-info">
+        <div class="card-top">
+          <span class="period-badge hs4">HS4</span>
+          <span class="student-name">Robert G.</span>
+        </div>
+        <div class="project-title">Project Title</div>
+        <div class="project-desc">One-line description of what this project does and who it helps.</div>
+        <span class="card-cta">View Project &rarr;</span>
+      </div>
+    </a>
+
+    <a class="student-card" data-period="hs3" href="projects/hs3/Robert_J/">
+      <div class="card-screenshot-placeholder">[ Screenshot ]</div>
+      <div class="card-info">
+        <div class="card-top">
+          <span class="period-badge hs3">HS3</span>
+          <span class="student-name">Robert J.</span>
+        </div>
+        <div class="project-title">Project Title</div>
+        <div class="project-desc">One-line description of what this project does and who it helps.</div>
+        <span class="card-cta">View Project &rarr;</span>
+      </div>
+    </a>
+
+    <a class="student-card" data-period="hs4" href="projects/hs4/Skylar_B/">
+      <div class="card-screenshot-placeholder">[ Screenshot ]</div>
+      <div class="card-info">
+        <div class="card-top">
+          <span class="period-badge hs4">HS4</span>
+          <span class="student-name">Skylar B.</span>
+        </div>
+        <div class="project-title">Project Title</div>
+        <div class="project-desc">One-line description of what this project does and who it helps.</div>
+        <span class="card-cta">View Project &rarr;</span>
+      </div>
+    </a>
+
+    <a class="student-card" data-period="hs3" href="projects/hs3/Tessa_L/">
+      <div class="card-screenshot-placeholder">[ Screenshot ]</div>
+      <div class="card-info">
+        <div class="card-top">
+          <span class="period-badge hs3">HS3</span>
+          <span class="student-name">Tessa L.</span>
+        </div>
+        <div class="project-title">Project Title</div>
+        <div class="project-desc">One-line description of what this project does and who it helps.</div>
+        <span class="card-cta">View Project &rarr;</span>
+      </div>
+    </a>
+
+    <a class="student-card" data-period="hs3" href="projects/hs3/Tyler_K/">
+      <div class="card-screenshot-placeholder">[ Screenshot ]</div>
+      <div class="card-info">
+        <div class="card-top">
+          <span class="period-badge hs3">HS3</span>
+          <span class="student-name">Tyler K.</span>
+        </div>
+        <div class="project-title">Project Title</div>
+        <div class="project-desc">One-line description of what this project does and who it helps.</div>
+        <span class="card-cta">View Project &rarr;</span>
+      </div>
+    </a>
+
+    <a class="student-card" data-period="hs3" href="projects/hs3/William_F/">
+      <div class="card-screenshot-placeholder">[ Screenshot ]</div>
+      <div class="card-info">
+        <div class="card-top">
+          <span class="period-badge hs3">HS3</span>
+          <span class="student-name">William F.</span>
+        </div>
+        <div class="project-title">Project Title</div>
+        <div class="project-desc">One-line description of what this project does and who it helps.</div>
+        <span class="card-cta">View Project &rarr;</span>
+      </div>
+    </a>
+
+    <a class="student-card" data-period="hs3" href="projects/hs3/Xara_W/">
+      <div class="card-screenshot-placeholder">[ Screenshot ]</div>
+      <div class="card-info">
+        <div class="card-top">
+          <span class="period-badge hs3">HS3</span>
+          <span class="student-name">Xara W.</span>
+        </div>
+        <div class="project-title">Project Title</div>
+        <div class="project-desc">One-line description of what this project does and who it helps.</div>
+        <span class="card-cta">View Project &rarr;</span>
+      </div>
+    </a>
+
+    <a class="student-card" data-period="hs4" href="projects/hs4/Xavier_A/">
+      <div class="card-screenshot-placeholder">[ Screenshot ]</div>
+      <div class="card-info">
+        <div class="card-top">
+          <span class="period-badge hs4">HS4</span>
+          <span class="student-name">Xavier A.</span>
+        </div>
+        <div class="project-title">Project Title</div>
+        <div class="project-desc">One-line description of what this project does and who it helps.</div>
+        <span class="card-cta">View Project &rarr;</span>
+      </div>
+    </a>
+
+    <a class="student-card" data-period="hs4" href="projects/hs4/Zinaye_S/">
+      <div class="card-screenshot-placeholder">[ Screenshot ]</div>
+      <div class="card-info">
+        <div class="card-top">
+          <span class="period-badge hs4">HS4</span>
+          <span class="student-name">Zinay'e S.</span>
+        </div>
+        <div class="project-title">Project Title</div>
+        <div class="project-desc">One-line description of what this project does and who it helps.</div>
+        <span class="card-cta">View Project &rarr;</span>
+      </div>
+    </a>
+
+    <a class="student-card" data-period="hs3" href="projects/hs3/Zynniah_W/">
+      <div class="card-screenshot-placeholder">[ Screenshot ]</div>
+      <div class="card-info">
+        <div class="card-top">
+          <span class="period-badge hs3">HS3</span>
+          <span class="student-name">Zynniah W.</span>
         </div>
         <div class="project-title">Project Title</div>
         <div class="project-desc">One-line description of what this project does and who it helps.</div>
