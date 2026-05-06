@@ -1,430 +1,432 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description"
-        content="Mr. Williams' Artificial Intelligence 1 - Interactive learning platform for AI concepts, machine learning, and computational thinking">
-    <title>AI 1 - Mr. Williams, MSCS</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Williams AI Lab — Student Capstone Projects</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; color: #222; line-height: 1.6; background: #f4f4f4; }
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            color: #fff;
-        }
+    /* HEADER */
+    .header {
+      background: #003057;
+      color: #fff;
+      padding: 32px 28px 24px 28px;
+      text-align: center;
+      border-bottom: 4px solid #B3A369;
+      position: relative;
+    }
+    .header-sub {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: #B3A369;
+      margin-bottom: 8px;
+    }
+    .header-title {
+      font-size: 30px;
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+    .header-tagline {
+      font-size: 14px;
+      color: #ccc;
+    }
+    .header-nav {
+      position: absolute;
+      top: 16px;
+      right: 20px;
+    }
+    .header-nav a {
+      display: inline-block;
+      padding: 8px 16px;
+      background: #B3A369;
+      color: #003057;
+      font-size: 12px;
+      font-weight: bold;
+      text-decoration: none;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-radius: 4px;
+      transition: background 0.2s, color 0.2s;
+    }
+    .header-nav a:hover {
+      background: #fff;
+      color: #003057;
+    }
+    @media (max-width: 600px) {
+      .header-nav {
+        position: static;
+        margin-bottom: 16px;
+      }
+    }
 
-        /* Navigation */
-        nav {
-            background: rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(10px);
-            padding: 15px 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.2);
-        }
+    /* WELCOME */
+    .welcome {
+      max-width: 1100px;
+      margin: 24px auto 0 auto;
+      padding: 16px 24px;
+      background: #E3F2FD;
+      border-left: 4px solid #003057;
+      border-radius: 0 6px 6px 0;
+      font-size: 15px;
+      color: #003057;
+    }
 
-        .nav-brand {
-            font-size: 1.3em;
-            font-weight: 700;
-            color: #fff;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-        }
+    /* FILTER BAR */
+    .filter-bar {
+      max-width: 1100px;
+      margin: 16px auto;
+      padding: 10px 16px;
+      background: #fff;
+      border-radius: 6px;
+      border: 1px solid #ddd;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .filter-label {
+      font-size: 13px;
+      font-weight: bold;
+      color: #003057;
+      margin-right: 4px;
+    }
+    .filter-btn {
+      padding: 6px 18px;
+      font-size: 13px;
+      font-weight: bold;
+      border: 2px solid #003057;
+      border-radius: 4px;
+      background: #fff;
+      color: #003057;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+    .filter-btn:hover { background: #E3F2FD; }
+    .filter-btn.active { background: #003057; color: #fff; }
+    .student-count {
+      margin-left: auto;
+      font-size: 13px;
+      color: #666;
+    }
 
-        .version {
-            font-size: 0.5em;
-            font-weight: 400;
-            opacity: 0.7;
-            margin-top: -5px;
-        }
+    /* CARD GRID */
+    .card-grid {
+      max-width: 1100px;
+      margin: 0 auto 32px auto;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+      padding: 0 8px;
+    }
+    @media (max-width: 760px) {
+      .card-grid { grid-template-columns: 1fr; }
+    }
 
-        .nav-links {
-            display: flex;
-            gap: 25px;
-            align-items: center;
-        }
+    /* STUDENT CARD */
+    .student-card {
+      background: #fff;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+      overflow: hidden;
+      transition: box-shadow 0.2s, transform 0.15s;
+      cursor: pointer;
+      text-decoration: none;
+      color: inherit;
+      display: block;
+    }
+    .student-card:hover {
+      box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+      transform: translateY(-2px);
+    }
+    .card-screenshot {
+      width: 100%;
+      height: 240px;
+      object-fit: cover;
+      object-position: top center;
+      display: block;
+      background: #e8e8e8;
+      border-bottom: 1px solid #e0e0e0;
+    }
+    .card-info {
+      padding: 16px 20px 18px 20px;
+    }
+    .card-top {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+    .period-badge {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 3px;
+      font-size: 11px;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .period-badge.hs3 {
+      background: #E8F5E9;
+      color: #2e7d32;
+    }
+    .period-badge.hs4 {
+      background: #FFF8E1;
+      color: #B3A369;
+    }
+    .student-name {
+      font-size: 14px;
+      font-weight: bold;
+      color: #222;
+    }
+    .project-title {
+      font-size: 17px;
+      font-weight: bold;
+      color: #003057;
+      margin-bottom: 4px;
+    }
+    .project-desc {
+      font-size: 13px;
+      color: #555;
+    }
+    .card-cta {
+      display: inline-block;
+      margin-top: 10px;
+      padding: 6px 16px;
+      background: #003057;
+      color: #fff;
+      font-size: 12px;
+      font-weight: bold;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .student-card:hover .card-cta {
+      background: #B3A369;
+      color: #003057;
+    }
 
-        .nav-links a {
-            color: #fff;
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.3s;
-            padding: 8px 15px;
-            border-radius: 8px;
-        }
+    /* PLACEHOLDER IMAGE (no screenshot yet) */
+    .card-screenshot-placeholder {
+      width: 100%;
+      height: 240px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #e8e8e8;
+      border-bottom: 1px solid #e0e0e0;
+      color: #999;
+      font-size: 14px;
+    }
 
-        .nav-links a:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-
-        .btn-login,
-        .btn-register {
-            background: rgba(255, 255, 255, 0.2);
-            padding: 10px 20px;
-            border-radius: 8px;
-            border: 2px solid #fff;
-        }
-
-        .btn-login:hover,
-        .btn-register:hover {
-            background: rgba(255, 255, 255, 0.3);
-        }
-
-        .user-menu {
-            display: none;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .user-menu.active {
-            display: flex;
-        }
-
-        .user-name {
-            font-weight: 600;
-        }
-
-        .dropdown {
-            position: relative;
-        }
-
-        .dropdown-toggle {
-            cursor: pointer;
-            background: rgba(255, 255, 255, 0.2);
-            padding: 8px 15px;
-            border-radius: 8px;
-        }
-
-        .dropdown-menu {
-            display: none;
-            position: absolute;
-            right: 0;
-            top: 45px;
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
-            min-width: 180px;
-            z-index: 1000;
-        }
-
-        .dropdown-menu.show {
-            display: block;
-        }
-
-        .dropdown-menu a {
-            display: block;
-            padding: 12px 20px;
-            color: #2d3748;
-            text-decoration: none;
-            transition: all 0.2s;
-        }
-
-        .dropdown-menu a:hover {
-            background: #f7fafc;
-        }
-
-        .dropdown-menu .teacher-only {
-            border-top: 1px solid #e2e8f0;
-            background: #f0f4f8;
-        }
-
-        /* Hero Section */
-        .hero {
-            text-align: center;
-            padding: 100px 20px;
-            max-width: 900px;
-            margin: 0 auto;
-        }
-
-        .hero h1 {
-            font-size: 4em;
-            margin-bottom: 20px;
-            text-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
-        }
-
-        .hero .subtitle {
-            font-size: 1.8em;
-            opacity: 0.95;
-            margin-bottom: 15px;
-        }
-
-        .hero .instructor {
-            font-size: 1.3em;
-            opacity: 0.9;
-            margin-bottom: 40px;
-        }
-
-        .hero p {
-            font-size: 1.2em;
-            line-height: 1.8;
-            opacity: 0.9;
-            margin-bottom: 40px;
-        }
-
-        .cta-buttons {
-            display: flex;
-            gap: 20px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        .btn {
-            padding: 18px 40px;
-            border-radius: 12px;
-            text-decoration: none;
-            font-weight: 700;
-            font-size: 1.2em;
-            transition: all 0.3s;
-            display: inline-block;
-        }
-
-        .btn-primary {
-            background: #fff;
-            color: #667eea;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
-        }
-
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.2);
-            color: #fff;
-            border: 2px solid #fff;
-        }
-
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.3);
-        }
-
-        /* Features Section */
-        .features {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            padding: 60px 20px;
-            margin: 40px 20px;
-            border-radius: 20px;
-            max-width: 1200px;
-            margin: 40px auto;
-        }
-
-        .features h2 {
-            text-align: center;
-            font-size: 2.5em;
-            margin-bottom: 40px;
-        }
-
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 30px;
-        }
-
-        .feature-card {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 30px;
-            border-radius: 15px;
-            text-align: center;
-            transition: all 0.3s;
-        }
-
-        .feature-card:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: translateY(-5px);
-        }
-
-        .feature-icon {
-            font-size: 3.5em;
-            margin-bottom: 15px;
-        }
-
-        .feature-card h3 {
-            font-size: 1.5em;
-            margin-bottom: 10px;
-        }
-
-        .feature-card p {
-            opacity: 0.9;
-            line-height: 1.6;
-        }
-
-        /* Footer */
-        footer {
-            text-align: center;
-            padding: 30px;
-            opacity: 0.8;
-            font-size: 0.95em;
-        }
-
-        @media (max-width: 768px) {
-            .hero h1 {
-                font-size: 2.5em;
-            }
-
-            .hero .subtitle {
-                font-size: 1.3em;
-            }
-
-            .nav-links {
-                flex-direction: column;
-                gap: 10px;
-            }
-        }
-    </style>
+    /* FOOTER */
+    .footer {
+      background: #003057;
+      color: #fff;
+      text-align: center;
+      padding: 20px 28px;
+      font-size: 12px;
+    }
+    .footer .gold { color: #B3A369; }
+    .footer a {
+      color: #B3A369;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    .footer a:hover {
+      color: #fff;
+      text-decoration: underline;
+    }
+  </style>
 </head>
-
 <body>
-    <nav>
-        <div class="nav-brand">
-            <div>🤖 AI 1</div>
-            <div class="version">v1.1.0</div>
-        </div>
-        <div class="nav-links">
-            <a href="topics.html">Explore Topics</a>
-            <a href="quizzes/index.html">Quizzes</a>
-            <a href="about.html">About</a>
-            <div id="authButtons">
-                <a href="auth/login.html" class="btn-login">Login</a>
-                <a href="auth/register.html" class="btn-register">Register</a>
-            </div>
-            <div class="user-menu" id="userMenu">
-                <span class="user-name" id="userName"></span>
-                <div class="dropdown">
-                    <div class="dropdown-toggle" id="dropdownToggle">
-                        <span>⚙️ Menu</span>
-                    </div>
-                    <div class="dropdown-menu" id="dropdownMenu">
-                        <a href="auth/dashboard.html">📊 Dashboard</a>
-                        <a href="auth/profile.html">👤 Profile</a>
-                        <a href="auth/settings.html">⚙️ Settings</a>
-                        <a href="auth/teacher-admin.html" class="teacher-only" id="teacherLink"
-                            style="display:none;">👨‍🏫 Teacher Admin</a>
-                        <a href="#" id="logoutBtn">🚪 Logout</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </nav>
 
-    <div class="hero">
-        <h1>🤖 Artificial Intelligence 1</h1>
-        <div class="subtitle">Interactive Learning Platform</div>
-        <div class="instructor">Mr. Williams, MSCS</div>
-        <p>
-            Welcome to AI 1! Explore the fascinating world of artificial intelligence through
-            interactive visualizations, hands-on projects, and engaging quizzes. From machine
-            learning to neural networks, discover how AI is shaping our future.
-        </p>
-        <div class="cta-buttons">
-            <a href="topics.html" class="btn btn-primary">🚀 Start Learning</a>
-            <a href="auth/register.html" class="btn btn-secondary">📝 Create Account</a>
-        </div>
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-nav">
+      <a href="ai_lesson_index.html">AI 1 Lessons &amp; Resources &rarr;</a>
     </div>
+    <div class="header-sub">Williams AI Lab &bull; North Carolina Cyber Academy &bull; AI 1</div>
+    <div class="header-title">Student Capstone Projects</div>
+    <div class="header-tagline">Click any project to explore it live.</div>
+  </div>
 
-    <div class="features">
-        <h2>What You'll Learn</h2>
-        <div class="features-grid">
-            <div class="feature-card">
-                <div class="feature-icon">⚖️</div>
-                <h3>AI Ethics</h3>
-                <p>Understand responsible AI development, bias, privacy, and ethical considerations</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">📊</div>
-                <h3>Data Science</h3>
-                <p>Master data visualization, cleaning, and analysis techniques</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">🤖</div>
-                <h3>Machine Learning</h3>
-                <p>Explore supervised, unsupervised, and reinforcement learning algorithms</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">🧠</div>
-                <h3>Deep Learning</h3>
-                <p>Dive into neural networks, CNNs, RNNs, and transformers</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">🔍</div>
-                <h3>Search Algorithms</h3>
-                <p>Understand pathfinding, optimization, and intelligent search</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">🎮</div>
-                <h3>Game AI</h3>
-                <p>Learn minimax, game trees, and strategic decision making</p>
-            </div>
+  <!-- WELCOME -->
+  <div class="welcome">
+    Welcome to the Williams AI Lab Class Project Showcase. Every project below was designed, built, and powered by AI &mdash; created by students in the Artificial Intelligence 1 course. Click any card to open the student's full project page.
+  </div>
+
+  <!-- FILTER BAR -->
+  <div class="filter-bar">
+    <span class="filter-label">Show:</span>
+    <button class="filter-btn active" onclick="filterCards('all')">All</button>
+    <button class="filter-btn" onclick="filterCards('hs3')">HS3</button>
+    <button class="filter-btn" onclick="filterCards('hs4')">HS4</button>
+    <span class="student-count" id="studentCount"></span>
+  </div>
+
+  <!-- STUDENT PROJECT CARDS -->
+  <div class="card-grid" id="cardGrid">
+
+    <!--
+    =====================================================
+    HOW TO ADD A STUDENT:
+
+    1. Copy one <a class="student-card" ...> block below
+    2. Set data-period to "hs3" or "hs4"
+    3. Set href to the student's HTML file:
+         projects/hs3/Firstname_Lastname.html
+         projects/hs4/Firstname_Lastname.html
+    4. Set the screenshot image src:
+         projects/screenshots/firstname_lastname.png
+    5. Update name, title, description
+    6. Match the period-badge class to the period
+
+    FOLDER STRUCTURE:
+      index.html                    (this file)
+      projects/
+        hs3/
+          Firstname_Lastname.html   (student pages)
+        hs4/
+          Firstname_Lastname.html
+        screenshots/
+          firstname_lastname.png    (project screenshots)
+    =====================================================
+    -->
+
+    <!-- STUDENT 1 — HS3 EXAMPLE -->
+    <a class="student-card" data-period="hs3" href="projects/hs3/Firstname_Lastname.html">
+      <div class="card-screenshot-placeholder">[ Screenshot ]</div>
+      <!-- Replace the placeholder above with this when you have a screenshot:
+      <img class="card-screenshot" src="projects/screenshots/firstname_lastname.png" alt="Project screenshot"> -->
+      <div class="card-info">
+        <div class="card-top">
+          <span class="period-badge hs3">HS3</span>
+          <span class="student-name">Student Name</span>
         </div>
-    </div>
+        <div class="project-title">Project Title</div>
+        <div class="project-desc">One-line description of what this project does and who it helps.</div>
+        <span class="card-cta">View Project &rarr;</span>
+      </div>
+    </a>
 
-    <footer>
-        <p>© 2024 Mr. Williams' AI 1 Class | Interactive Learning Platform</p>
-        <p>Coming Soon: Cybersecurity 1</p>
-    </footer>
+    <!-- STUDENT 2 — HS4 EXAMPLE -->
+    <a class="student-card" data-period="hs4" href="projects/hs4/Firstname_Lastname.html">
+      <div class="card-screenshot-placeholder">[ Screenshot ]</div>
+      <div class="card-info">
+        <div class="card-top">
+          <span class="period-badge hs4">HS4</span>
+          <span class="student-name">Student Name</span>
+        </div>
+        <div class="project-title">Project Title</div>
+        <div class="project-desc">One-line description of what this project does and who it helps.</div>
+        <span class="card-cta">View Project &rarr;</span>
+      </div>
+    </a>
 
-    <script type="module">
-        import { getCurrentUser, logout } from './auth/auth-utils.js';
+    <!-- STUDENT 3 — HS3 EXAMPLE -->
+    <a class="student-card" data-period="hs3" href="projects/hs3/Firstname_Lastname.html">
+      <div class="card-screenshot-placeholder">[ Screenshot ]</div>
+      <div class="card-info">
+        <div class="card-top">
+          <span class="period-badge hs3">HS3</span>
+          <span class="student-name">Student Name</span>
+        </div>
+        <div class="project-title">Project Title</div>
+        <div class="project-desc">One-line description of what this project does and who it helps.</div>
+        <span class="card-cta">View Project &rarr;</span>
+      </div>
+    </a>
 
-        async function initAuth() {
-            try {
-                const user = await getCurrentUser();
-                const authButtons = document.getElementById('authButtons');
-                const userMenu = document.getElementById('userMenu');
-                const userName = document.getElementById('userName');
-                const teacherLink = document.getElementById('teacherLink');
+    <!-- STUDENT 4 — HS4 EXAMPLE -->
+    <a class="student-card" data-period="hs4" href="projects/hs4/Firstname_Lastname.html">
+      <div class="card-screenshot-placeholder">[ Screenshot ]</div>
+      <div class="card-info">
+        <div class="card-top">
+          <span class="period-badge hs4">HS4</span>
+          <span class="student-name">Student Name</span>
+        </div>
+        <div class="project-title">Project Title</div>
+        <div class="project-desc">One-line description of what this project does and who it helps.</div>
+        <span class="card-cta">View Project &rarr;</span>
+      </div>
+    </a>
 
-                if (user) {
-                    authButtons.style.display = 'none';
-                    userMenu.classList.add('active');
-                    userName.textContent = user.displayName || user.email.split('@')[0];
+    <!-- STUDENT 5 — HS3 EXAMPLE -->
+    <a class="student-card" data-period="hs3" href="projects/hs3/Firstname_Lastname.html">
+      <div class="card-screenshot-placeholder">[ Screenshot ]</div>
+      <div class="card-info">
+        <div class="card-top">
+          <span class="period-badge hs3">HS3</span>
+          <span class="student-name">Student Name</span>
+        </div>
+        <div class="project-title">Project Title</div>
+        <div class="project-desc">One-line description of what this project does and who it helps.</div>
+        <span class="card-cta">View Project &rarr;</span>
+      </div>
+    </a>
 
-                    // Show teacher link if user is a teacher
-                    if (user.role === 'teacher') {
-                        teacherLink.style.display = 'block';
-                    }
-                } else {
-                    authButtons.style.display = 'flex';
-                    userMenu.classList.remove('active');
-                }
-            } catch (error) {
-                console.error('Auth error:', error);
-            }
+    <!-- STUDENT 6 — HS4 EXAMPLE -->
+    <a class="student-card" data-period="hs4" href="projects/hs4/Firstname_Lastname.html">
+      <div class="card-screenshot-placeholder">[ Screenshot ]</div>
+      <div class="card-info">
+        <div class="card-top">
+          <span class="period-badge hs4">HS4</span>
+          <span class="student-name">Student Name</span>
+        </div>
+        <div class="project-title">Project Title</div>
+        <div class="project-desc">One-line description of what this project does and who it helps.</div>
+        <span class="card-cta">View Project &rarr;</span>
+      </div>
+    </a>
+
+    <!-- ADD MORE STUDENTS: Copy any card block above, paste here, update the info -->
+
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <p>Mr. Williams, MSCS | North Carolina Cyber Academy | AI 1</p>
+    <p style="margin-top:6px;">
+      <a href="ai_lesson_index.html">Visit the AI 1 Lessons &amp; Resources Site &rarr;</a>
+    </p>
+    <p class="gold" style="margin-top:4px;">Williams AI Lab &bull; Spring 2026 &bull; AI was used to help generate this content</p>
+  </div>
+
+  <script>
+    function filterCards(period) {
+      var cards = document.querySelectorAll('.student-card');
+      var buttons = document.querySelectorAll('.filter-btn');
+      var visibleCount = 0;
+
+      // Update active button
+      for (var i = 0; i < buttons.length; i++) {
+        buttons[i].classList.remove('active');
+      }
+      event.target.classList.add('active');
+
+      // Show/hide cards
+      for (var j = 0; j < cards.length; j++) {
+        if (period === 'all' || cards[j].getAttribute('data-period') === period) {
+          cards[j].style.display = '';
+          visibleCount++;
+        } else {
+          cards[j].style.display = 'none';
         }
+      }
 
-        // Dropdown toggle
-        document.getElementById('dropdownToggle').addEventListener('click', () => {
-            document.getElementById('dropdownMenu').classList.toggle('show');
-        });
+      // Update count
+      document.getElementById('studentCount').textContent = visibleCount + ' project' + (visibleCount !== 1 ? 's' : '') + ' showing';
+    }
 
-        // Close dropdown when clicking outside
-        document.addEventListener('click', (e) => {
-            if (!e.target.closest('.dropdown')) {
-                document.getElementById('dropdownMenu').classList.remove('show');
-            }
-        });
+    // Initialize count on load
+    window.addEventListener('DOMContentLoaded', function() {
+      var total = document.querySelectorAll('.student-card').length;
+      document.getElementById('studentCount').textContent = total + ' project' + (total !== 1 ? 's' : '') + ' showing';
+    });
+  </script>
 
-        // Logout
-        document.getElementById('logoutBtn').addEventListener('click', async (e) => {
-            e.preventDefault();
-            await logout();
-            window.location.reload();
-        });
-
-        // Initialize auth on page load
-        initAuth();
-    </script>
 </body>
-
 </html>
